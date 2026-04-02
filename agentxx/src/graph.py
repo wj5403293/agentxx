@@ -12,7 +12,7 @@ os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "../package/playwright-browsers"
 from langchain_core.tools import tool
 from urllib.parse import urlencode
 from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.memory import InMemorySaver  
+from langgraph.checkpoint.memory import InMemorySaver
 from langchain.agents import create_agent
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_community.tools import DuckDuckGoSearchResults
