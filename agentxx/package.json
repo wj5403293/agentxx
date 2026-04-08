@@ -3,9 +3,9 @@
   "private": true,
   "scripts": {
     "dev": "turbo run dev --no-cache",
-    "dev:app": "turbo run dev --filter='app'",
-    "dev:agent": "turbo run dev --filter='agent'",
-    "dev:mcp": "turbo run dev --filter='mcp'",
+    "dev:app": "turbo run dev --filter='app' --no-cache",
+    "dev:agent": "turbo run dev --filter='agent' --no-cache",
+    "dev:mcp": "turbo run dev --filter='mcp' --no-cache",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "clean": "turbo run clean"

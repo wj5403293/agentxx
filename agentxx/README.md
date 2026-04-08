@@ -1,118 +1,30 @@
-# CopilotKit <> LangGraph Starter
+# CopilotKit <> LangGraph
 
-This is a starter template for building AI agents using [LangGraph](https://www.langchain.com/langgraph) and [CopilotKit](https://copilotkit.ai). It provides a modern Next.js application with an integrated LangGraph agent to be built on top of.
+## 模块
+- apps/agent: langgraph，组合工作流、接入mcp等工具服务
+- apps/app: copilotkit，前端ui
 
-https://github.com/user-attachments/assets/47761912-d46a-4fb3-b9bd-cb41ddd02e34
-
-## Prerequisites
-
-- Node.js 18+
-- Python 3.8+
-- Any of the following package managers:
-  - [pnpm](https://pnpm.io/installation) (recommended)
-  - npm
-  - [yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
-  - [bun](https://bun.sh/)
-- OpenAI API Key (for the LangGraph agent)
-
-> **Note:** This repository ignores lock files (package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb) to avoid conflicts between different package managers. Each developer should generate their own lock file using their preferred package manager. After that, make sure to delete it from the .gitignore.
-
-## Getting Started
-
-1. Install dependencies using your preferred package manager:
-
-```bash
-# Using pnpm (recommended)
-pnpm install
-
-# Using npm
-npm install
-
-# Using yarn
-yarn install
-
-# Using bun
-bun install
+## langgraph 更新依赖
+```sh
+cd apps/agent
+.venv/Scripts/activate # 激活 python 环境
+# 向`pyproject.toml`添加依赖，修改版本，执行`uv sync`更新
 ```
 
-2. Set up your environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Then edit the `.env` file and add your OpenAI API key:
-
-```bash
-OPENAI_API_KEY=your-openai-api-key-here
-```
-
-3. Start the development server:
-
-```bash
-# Using pnpm
-pnpm dev
-
-# Using npm
-npm run dev
-
-# Using yarn
-yarn dev
-
-# Using bun
-bun run dev
-```
-
-This will start both the UI and agent servers concurrently.
-
-## Available Scripts
-
-The following scripts can also be run using your preferred package manager:
-
-- `dev` - Starts both UI and agent servers in development mode
-- `dev:debug` - Starts development servers with debug logging enabled
-- `dev:ui` - Starts only the Next.js UI server
-- `dev:agent` - Starts only the LangGraph agent server
-- `build` - Builds the Next.js application for production
-- `start` - Starts the production server
-- `lint` - Runs ESLint for code linting
-- `install:agent` - Installs Python dependencies for the agent
-
-## Documentation
-
-The main UI component is in `src/app/page.tsx`. You can:
-
-- Modify the theme colors and styling
-- Add new frontend actions
-- Customize the CopilotKit sidebar appearance
-
-## 📚 Documentation
-
-- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/) - Learn more about LangGraph and its features
-- [CopilotKit Documentation](https://docs.copilotkit.ai) - Explore CopilotKit's capabilities
-
-## Contributing
-
-Feel free to submit issues and enhancement requests! This starter is designed to be easily extensible.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Troubleshooting
-
-### Agent Connection Issues
-
-If you see "I'm having trouble connecting to my tools", make sure:
-
-1. The LangGraph agent is running on port 8000
-2. Your OpenAI API key is set correctly
-3. Both servers started successfully
-
-### Python Dependencies
-
-If you encounter Python import errors:
-
-```bash
-npm install:agent
+## 问题
+- 如果聊天请求失败，可能是`langgraph`代码执行异常，默认服务端口是8123，可以直接连接 langgraph server 调试`https://smith.langchain.com/studio/?baseUrl=http://localhost:8123`，如果是缺依赖库，[按流程安装](#langgraph-更新依赖)
+- 日志崩溃，修改`apps/app/next.config.ts`，添加`logging: false`关闭日志打印
+- 如果启动后卡住提示等待缓存写入，可以修改`package.json`:
+```sh
+{
+  "scripts": {
+    "dev": "turbo run dev --no-cache",
+    "dev:app": "turbo run dev --filter='app' --no-cache",
+    "dev:agent": "turbo run dev --filter='agent' --no-cache",
+    "dev:mcp": "turbo run dev --filter='mcp' --no-cache",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean"
+  },
+}
 ```
