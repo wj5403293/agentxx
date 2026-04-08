@@ -1,8 +1,0 @@
-{
-    "dependencies": ["./"],
-    "workers": 1,
-    "graphs": {
-        "lumenxs": "./src/graph.py:make_graph"
-    },
-    "env": ".env"
-}

@@ -1,0 +1,26 @@
+[project]
+name = "sample-agent"
+version = "0.1.0"
+description = "A LangGraph agent"
+requires-python = ">=3.12"
+dependencies = [
+  "python-dotenv>=1.0.0,<2.0.0",
+  "uvicorn>=0.29.0,<1.0.0",
+  "pip>=26.0.1",
+  "uv>=0.11.3",
+  "fastapi>=0.115.5,<1.0.0",
+  "psutil>=7.2.2",
+  "copilotkit==0.1.85",
+  "langsmith>=0.7.26",
+  "langgraph==1.1.6",
+  "langgraph-api>=0.7.98",
+  "langgraph-cli[inmem]>=0.4.19",
+  "langchain==1.2.15",
+  "langchain-openai>=1.1.12",
+  "langchain-anthropic>=1.4.0",
+  "langchain-experimental>=0.4.1",
+  "langchain-community>=0.4.1",
+  "langchain-mcp-adapters>=0.2.2",
+  "openai>=2.26.0,<3.0.0",
+  "duckduckgo-search>=8.1.1",
+]

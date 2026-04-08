@@ -9,28 +9,22 @@ os.environ["LANGSMITH_TRACING"] = "0"
 os.environ["LANGCHAIN_DISABLE_TELEMETRY"] = "1"
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "../package/playwright-browsers"
 
-from langchain_core.tools import tool
 from urllib.parse import urlencode
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain.agents import create_agent
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_community.tools import DuckDuckGoSearchResults
-from langchain_experimental.tools import PythonREPLTool
+from langchain_core.tools import tool
 from langchain_core.messages import AnyMessage, SystemMessage
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_experimental.tools import PythonREPLTool
+from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.tools.file_management.copy import CopyFileTool
 from langchain_community.tools.file_management.delete import DeleteFileTool
 from langchain_community.tools.file_management.list_dir import ListDirectoryTool
 from langchain_community.tools.file_management.move import MoveFileTool
 from langchain_community.tools.file_management.read import ReadFileTool
 from langchain_community.tools.file_management.write import WriteFileTool
-from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
-from langchain_community.tools.playwright.utils import (
-    create_async_playwright_browser,
-)
 from copilotkit import CopilotKitMiddleware
-from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
 
 from src.query import query_data
 from src.todos import AgentState, todo_tools
@@ -39,7 +33,7 @@ from src.form import generate_form
 class LumenxxAbility_c:
     lumenxxBaseUrl = "" # f"http://127.0.0.1:{os.environ['LUMENXX_PORT']}"
     musicxxBaseUrl = "" # f"http://127.0.0.1:53023"
-    enableSearch: bool = True
+    enableSearch: bool = False
     enableBrowser: bool = True
     enableEvalCode: bool = True
 
@@ -268,12 +262,6 @@ async def make_graph():
     if (lumenxxAbility.enableEvalCode):
         tools.append(PythonREPLTool())
 
-    # async_browser = create_async_playwright_browser()
-    # async_browser_toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=async_browser)
-    # async_browser_tools = async_browser_toolkit.get_tools()
-    # if (len(async_browser_tools) > 0):
-    #     tools.extend(async_browser_tools)
-
     if (len(lumenxxAbility.lumenxxBaseUrl) > 0):
         tools.append(run_funasr)
 
@@ -295,15 +283,12 @@ async def make_graph():
         tools.extend(mcpTools)
 
     # agent ---
-    memory=InMemorySaver()
     graph = create_agent(
-        name=useSystemPromtName,
         model=model,
         tools=tools,
         middleware=[CopilotKitMiddleware()],
         state_schema=AgentState,
         system_prompt=SystemMessage(content=defSystemPromtList[useSystemPromtName]),
-        checkpointer=memory,
     )
 
     return graph
