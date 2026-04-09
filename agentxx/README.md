@@ -12,7 +12,15 @@ cd apps/agent
 ```
 
 ## 问题
-- 如果聊天请求失败，可能是`langgraph`代码执行异常，默认服务端口是8123，可以直接连接 langgraph server 调试`https://smith.langchain.com/studio/?baseUrl=http://localhost:8123`，如果是缺依赖库，[按流程安装](#langgraph-更新依赖)
+- 聊天请求失败:
+  - 可能是`langgraph`代码执行异常，默认服务端口是7123，可以直接连接 langgraph server 调试`https://smith.langchain.com/studio/?baseUrl=http://localhost:7123`，如果是缺依赖库，[按流程安装](#langgraph-更新依赖)
+  - 可能`langgraph`没启动完成，卡在下载依赖包等情况，可以打开vpn，重新启动，知道看见日志输出：
+```sh
+@repo/agent:dev: INFO:langgraph_api.cli:
+@repo/agent:dev: 
+@repo/agent:dev:         Welcome to
+@repo/agent:dev: 
+```
 - 日志崩溃，修改`apps/app/next.config.ts`，添加`logging: false`关闭日志打印
 - 如果启动后卡住提示等待缓存写入，可以修改`package.json`:
 ```sh

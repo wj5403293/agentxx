@@ -1,1 +1,1 @@
-langgraph dev --no-browser --host localhost
+langgraph dev --no-browser --host localhost --port 7123

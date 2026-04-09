@@ -241,7 +241,7 @@ pnpm dev
 
 # Start individually
 pnpm dev:app    # Next.js frontend on port 3000
-pnpm dev:agent  # LangGraph agent on port 8123
+pnpm dev:agent  # LangGraph agent on port 7123
 pnpm dev:mcp    # MCP server
 
 # Build all apps

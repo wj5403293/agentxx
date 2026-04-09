@@ -9,8 +9,8 @@ import { NextRequest } from "next/server";
 // 1. Define the agent connection to LangGraph
 const defaultAgent = new LangGraphAgent({
   deploymentUrl:
-    process.env.LANGGRAPH_DEPLOYMENT_URL || "http://localhost:8123",
-  graphId: "sample_agent",
+    process.env.LANGGRAPH_DEPLOYMENT_URL || "http://localhost:7123",
+  graphId: "agentxx",
   langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
 });
 
@@ -22,15 +22,15 @@ export const POST = async (req: NextRequest) => {
     runtime: new CopilotRuntime({
       agents: { default: defaultAgent },
       a2ui: { injectA2UITool: true },
-      mcpApps: {
-        servers: [
-          {
-            type: "http",
-            url: process.env.MCP_SERVER_URL || "https://mcp.excalidraw.com",
-            serverId: "example_mcp_app",
-          },
-        ],
-      },
+      // mcpApps: {
+      //   servers: [
+      //     {
+      //       type: "http",
+      //       url: process.env.MCP_SERVER_URL || "https://mcp.excalidraw.com",
+      //       serverId: "example_mcp_app",
+      //     },
+      //   ],
+      // },
     }),
   });
 

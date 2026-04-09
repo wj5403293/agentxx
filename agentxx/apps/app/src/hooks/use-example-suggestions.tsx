@@ -1,6 +1,6 @@
 import { useConfigureSuggestions } from "@copilotkit/react-core/v2";
 
-export const useExampleSuggestions = () => {
+export const useSuggestionExamples = () => {
   useConfigureSuggestions({
     suggestions: [
       // 1. Controlled Generative UI — charts rendered by frontend components
@@ -34,8 +34,8 @@ export const useExampleSuggestions = () => {
       },
       // 5. Frontend Tools — direct frontend state manipulation
       {
-        title: "Toggle Dark Mode (Frontend Tools)",
-        message: "Switch the app to dark mode using the toggleTheme tool.",
+        title: "切换主题",
+        message: "使用工具`toggleTheme`切换页面主题",
       },
       // 6. Shared State — agent manipulates application state
       {

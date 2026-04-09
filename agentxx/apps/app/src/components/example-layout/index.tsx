@@ -1,7 +1,9 @@
 "use client";
 
+import { useAgent } from "@copilotkit/react-core/v2";
 import { ReactNode, useState } from "react";
 import { ModeToggle } from "./mode-toggle";
+import { Button } from "@/components/ui/button";
 import { useFrontendTool } from "@copilotkit/react-core";
 
 interface ExampleLayoutProps {
@@ -10,7 +12,22 @@ interface ExampleLayoutProps {
 }
 
 export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
+  const { agent } = useAgent();
   const [mode, setMode] = useState<"chat" | "app">("chat");
+
+  function newChatThread() {
+    agent.abortRun();
+    agent.setMessages([]);
+  }
+
+  useFrontendTool({
+    name: "newChatThread",
+    description:
+      "Enable app mode, make sure its open when interacting with todos.",
+    handler: async () => {
+      newChatThread();
+    },
+  });
 
   useFrontendTool({
     name: "enableAppMode",
@@ -31,7 +48,14 @@ export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
 
   return (
     <div className="h-full flex flex-row">
-      <ModeToggle mode={mode} onModeChange={setMode} />
+      <div className="flex-row">
+        <Button 
+          onClick={newChatThread}
+          className={`fixed top-4 left-4 z-50 flex rounded-full`}>
+            新对话
+        </Button>
+        <ModeToggle mode={mode} onModeChange={setMode} />
+      </div>
 
       {/* Chat Content */}
       <div

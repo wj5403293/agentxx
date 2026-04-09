@@ -1,5 +1,5 @@
 [project]
-name = "sample-agent"
+name = "agentxx"
 version = "0.1.0"
 description = "A LangGraph agent"
 requires-python = ">=3.12"
@@ -23,4 +23,5 @@ dependencies = [
   "langchain-mcp-adapters>=0.2.2",
   "openai>=2.26.0,<3.0.0",
   "duckduckgo-search>=8.1.1",
+  "ddgs>=9.13.0",
 ]

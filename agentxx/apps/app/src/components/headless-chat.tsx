@@ -20,7 +20,7 @@ export const HeadlessChat = () => {
 
   return (
     <div>
-      <h1>Chat</h1>
+      <h1>聊天</h1>
       {agent.messages.map((message) => (
         <div key={message.id}>
           <p>{JSON.stringify(message.content)}</p>
@@ -31,7 +31,7 @@ export const HeadlessChat = () => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
       />
-      <button onClick={() => sendMessage(message)}>Send</button>
+      <button onClick={() => sendMessage(message)}>发送</button>
     </div>
   );
 };

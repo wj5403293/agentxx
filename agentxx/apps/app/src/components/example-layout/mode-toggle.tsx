@@ -14,7 +14,7 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
             : "text-neutral-500 dark:text-neutral-400"
         }`}
       >
-        Chat
+        聊天
       </button>
       <button
         onClick={() => onModeChange("app")}
@@ -24,7 +24,7 @@ export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
             : "text-neutral-500 dark:text-neutral-400"
         }`}
       >
-        App
+        程序
       </button>
     </div>
   );
