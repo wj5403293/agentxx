@@ -1,7 +1,7 @@
 [project]
 name = "agentxx"
 version = "0.1.0"
-description = "A LangGraph agent"
+description = "A LangGraph agent for lumenxx"
 requires-python = ">=3.12"
 dependencies = [
   "python-dotenv>=1.0.0,<2.0.0",

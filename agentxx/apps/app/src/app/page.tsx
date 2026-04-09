@@ -2,18 +2,19 @@
 
 import { ExampleLayout } from "@/components/example-layout";
 import { ExampleCanvas } from "@/components/example-canvas";
-import { useGenerativeUIExamples, useSuggestionExamples as useSuggestionExamples } from "@/hooks";
+import { useGenerativeUIExamples, useSuggestionExamples } from "@/hooks";
 
 import dynamic from 'next/dynamic'
+import { useAgent } from "@copilotkit/react-core/v2";
 
 // 不直接导入，用动态导入禁用SSR
 const CopilotChat = dynamic(
   () => import('@copilotkit/react-core/v2').then(mod => mod.CopilotChat),
-  { 
-    ssr: false, 
+  {
+    ssr: false,
     loading: () => (
       <>
-        <div className="xx_column" style={{ flex:1, paddingTop: '30px' }}>
+        <div className="xx_column" style={{ flex: 1, paddingTop: '30px' }}>
           <ul className="xx_ul" id="list">
             <li className="xx_li_notransform" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginBottom: '10px' }}>
@@ -51,19 +52,22 @@ const CopilotChat = dynamic(
   }
 )
 export default function HomePage() {
+  const { agent } = useAgent({
+    agentId: "agentxx",
+  });
   useGenerativeUIExamples();
   useSuggestionExamples();
 
   return (
     <ExampleLayout
       chatContent={
-        <CopilotChat 
+        <CopilotChat
           labels={{
             chatInputPlaceholder: "聊点什么...",
             chatInputToolbarStartTranscribeButtonLabel: "开始语音转文字",
             chatInputToolbarCancelTranscribeButtonLabel: "取消语音转文字",
             chatInputToolbarFinishTranscribeButtonLabel: "完成语音转文字",
-            chatInputToolbarAddButtonLabel: "添加附件",
+            chatInputToolbarAddButtonLabel: "添加文件",
             chatInputToolbarToolsButtonLabel: "工具",
             assistantMessageToolbarCopyCodeLabel: "复制代码",
             assistantMessageToolbarCopyCodeCopiedLabel: "代码已复制",
@@ -80,9 +84,10 @@ export default function HomePage() {
             modalHeaderTitle: "助理",
             welcomeMessageText: "有什么我能帮你的吗",
           }}
-          input={{ 
-            autoFocus: true, 
-            disclaimer: () => null, className: "pb-6" 
+          input={{
+            autoFocus: true,
+            onAddFile: () => { },
+            disclaimer: () => null, className: "pb-6",
           }} />
       }
       appContent={<ExampleCanvas />}

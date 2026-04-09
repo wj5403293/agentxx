@@ -12,7 +12,9 @@ interface ExampleLayoutProps {
 }
 
 export function ExampleLayout({ chatContent, appContent }: ExampleLayoutProps) {
-  const { agent } = useAgent();
+  const { agent } = useAgent({
+    agentId: "agentxx",
+  });
   const [mode, setMode] = useState<"chat" | "app">("chat");
 
   function newChatThread() {

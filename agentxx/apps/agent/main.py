@@ -215,9 +215,9 @@ model = ChatOpenAI(
     api_key="EMPTY",
     streaming=True,
     stream_usage=True,
-    top_p=0.95,
-    temperature=0.6,
-    verbose=True,
+    # top_p=0.95,
+    # temperature=0.6,
+    # verbose=True,
     # output_version="responses/v1",
     # reasoning={
     #     "effort": "medium",  # 'low', 'medium', or 'high'
@@ -243,7 +243,7 @@ async def make_graph():
         get_system_datetime,
     ]
 
-    fileLimitDir = "../workspace/"
+    fileLimitDir = "../../../workspace"
     tools.extend([
         WriteFileTool(root_dir=fileLimitDir),
         MoveFileTool(root_dir=fileLimitDir),
@@ -255,7 +255,7 @@ async def make_graph():
     ])
 
     if (lumenxxAbility.enableSearch):
-        search = DuckDuckGoSearchResults(output_format='json', max_results=8)
+        search = DuckDuckGoSearchResults(output_format='json', max_results=5)
         tools.append(search)
 
     if (lumenxxAbility.enableEvalCode):

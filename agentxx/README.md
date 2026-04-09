@@ -1,4 +1,5 @@
-# CopilotKit <> LangGraph
+# Agentxx
+- lumenxx衍生开发的智能体，用于整合lumenxx的各种功能，实现自动处理
 
 ## 模块
 - apps/agent: langgraph，组合工作流、接入mcp等工具服务

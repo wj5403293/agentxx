@@ -4,7 +4,9 @@ import { useAgent } from "@copilotkit/react-core/v2";
 import { TodoList } from "./todo-list";
 
 export function ExampleCanvas() {
-  const { agent } = useAgent();
+  const { agent } = useAgent({
+    agentId: "agentxx",
+  });
 
   return (
     <div className="h-full overflow-y-auto bg-[--background]">

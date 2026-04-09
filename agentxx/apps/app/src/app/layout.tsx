@@ -10,12 +10,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="zh">
       <body className={`antialiased`}>
         <ThemeProvider>
           <CopilotKit
+            enableInspector={false}
             runtimeUrl="/api/copilotkit"
-            // a2ui={ theme } // Custom theme for A2UI, check @/lib/a2ui-theme.css
+            agent="agentxx"
+          // a2ui={ theme } // Custom theme for A2UI, check @/lib/a2ui-theme.css
           >
             {children}
           </CopilotKit>
