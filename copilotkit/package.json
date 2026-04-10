@@ -6,7 +6,8 @@
     "dev:app": "turbo run dev --filter='app' --no-cache",
     "dev:agent": "turbo run dev --filter='agent' --no-cache",
     "dev:mcp": "turbo run dev --filter='mcp' --no-cache",
-    "build": "turbo run build",
+    "build": "turbo run build  --no-cache",
+    "start": "cd ./apps/app/out/ && npx serve@latest -l 3000",
     "lint": "turbo run lint",
     "clean": "turbo run clean"
   },

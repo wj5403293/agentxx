@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 import os
+from pathlib import Path
 import re
-import subprocess
 import aiohttp
-import psutil
 import requests
 
 os.environ["LANGSMITH_TRACING"] = "0"
@@ -11,19 +10,12 @@ os.environ["LANGCHAIN_DISABLE_TELEMETRY"] = "1"
 os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "../package/playwright-browsers"
 
 from urllib.parse import urlencode
+from deepagents import create_deep_agent
+from deepagents.backends import LocalShellBackend
 from langchain_openai import ChatOpenAI
-from langchain.agents import AgentState, create_agent
 from langchain_core.tools import tool
-from langchain_core.messages import AnyMessage, SystemMessage
+from langchain_core.messages import SystemMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_experimental.tools import PythonREPLTool
-from langchain_community.tools import DuckDuckGoSearchResults
-from langchain_community.tools.file_management.copy import CopyFileTool
-from langchain_community.tools.file_management.delete import DeleteFileTool
-from langchain_community.tools.file_management.list_dir import ListDirectoryTool
-from langchain_community.tools.file_management.move import MoveFileTool
-from langchain_community.tools.file_management.read import ReadFileTool
-from langchain_community.tools.file_management.write import WriteFileTool
 from copilotkit import CopilotKitMiddleware
 
 from src.query import query_data
@@ -81,69 +73,11 @@ agentxxAbility = AgentxxAbility_c()
 #     return
 
 @tool
-def get_system_memory_usage() -> str:
-    '''Retrieve the system's current total memory, available memory, and memory usage rate, excluding video memory'''
-    mem = psutil.virtual_memory()
-    total = mem.total / 1024 / 1024 / 1024
-    available = mem.available / 1024 / 1024 / 1024
-    used = mem.used / 1024 / 1024 / 1024
-    percent = mem.percent
-
-    return  f"""
-总内存: {total:.2f} GB
-可用内存: {available:.2f} GB
-已用内存: {used:.2f} GB
-已用内存占比: ({percent}%)
-"""
-
-@tool
 def get_system_datetime() -> str:
     '''Read the current time zone, date, and time from the offline local operating system'''
     now = datetime.now()
 
     return  f"{now.strftime("%Y-%m-%d %H:%M:%S %Z%z")}"
-
-async def fetchGet(url, params):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, params=params) as response:
-            return {
-                "code": response.status,
-                "data": await response.json()
-            }
-
-@tool
-async def run_funasr(audio: str) -> dict:
-    '''
-    Function:
-        - Speech Recognition Tool: Supports inputting an audio clip, outputs the spoken content of the audio, along with timestamps corresponding to the text.
-        - If the main language model does not support audio data, this tool can be used to assist in recognizing audio content.
-        - Supports inputting a song, recognizes and outputs the lyric content, along with timestamps by character or word.
-        - The timestamps in the recognition results are accurate, but the text content is likely to contain typos, missing characters, or extra characters. However, the number and position of the text and timestamps correspond to each other. If you adjust the text content, you need to synchronously add, delete, or modify the timestamps.
-
-    Arg:
-        audio (str):
-            Local path to the audio file; it must be an absolute path.
-    '''
-    assert(len(agentxxAbility.lumenxxBaseUrl) > 0)
-    if (len(audio) == 0):
-        return {
-            "state": "faild",
-            "tip": "参数 `audio` 不能为空",
-        }
-    url = f"{agentxxAbility.lumenxxBaseUrl}/funasr"
-    params = {
-        "audio": audio,
-        "model": "sensevoice",
-    }
-    response = None
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params) as response:
-                response.raise_for_status()
-                data = await response.json()
-                return data
-    except requests.exceptions.RequestException as e:
-        return f"请求失败: {e}, {response.json()}"
 
 def lrc_remove_timestamp(lrc_text):
     # 正则匹配 [时间戳] 格式，去掉
@@ -218,6 +152,15 @@ defSystemPromtList = {
     ''',
 }
 
+# make graph ---
+tools=None
+root_dir = Path.cwd().parent.parent.parent
+isolation_root_dir = f"{root_dir}/isolation"
+backend = LocalShellBackend(
+    root_dir=isolation_root_dir,
+    virtual_mode=True,
+    max_output_bytes=1024 * 1024 * 1024,
+)
 model = ChatOpenAI(
     name=defAgentName,
     base_url="http://localhost:7070/",
@@ -239,35 +182,19 @@ model = ChatOpenAI(
     }
 )
 
-async def make_graph():
+async def init_tools():
+    global tools
+    if tools is not None:
+        return
+
     # tool ---
     tools=[
-        query_data, 
+        query_data,
         generate_form,
 
         searchLyric,
-        get_system_memory_usage,
         get_system_datetime,
     ]
-
-    fileLimitDir = "../../../workspace"
-    tools.extend([
-        WriteFileTool(root_dir=fileLimitDir),
-        MoveFileTool(root_dir=fileLimitDir),
-        DeleteFileTool(root_dir=fileLimitDir),
-        CopyFileTool(),
-        ReadFileTool(),
-        ListDirectoryTool(),
-        # FileSearchTool(),
-    ])
-
-    if (agentxxAbility.enableSearch):
-        search = DuckDuckGoSearchResults(output_format='json', max_results=5)
-        tools.append(search)
-
-    if (agentxxAbility.enableEvalCode):
-        tools.append(PythonREPLTool())
-
     if (len(agentxxAbility.lumenxxBaseUrl) > 0):
         tools.append(run_funasr)
 
@@ -290,13 +217,18 @@ async def make_graph():
     if (len(mcpTools) > 0):
         tools.extend(mcpTools)
 
+async def make_graph():
+    await init_tools()
+
     # agent ---
-    graph = create_agent(
+    graph = create_deep_agent(
         model=model,
         tools=tools,
+        skills=[f"{isolation_root_dir}/skills"],
         middleware=[CopilotKitMiddleware()],
-        state_schema=AgentState,
         system_prompt=SystemMessage(content=defSystemPromtList[useSystemPromtName]),
+        backend=backend,
+        # checkpointer=MemorySaver()
     )
 
     return graph
