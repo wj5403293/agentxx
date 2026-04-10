@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import re
+import subprocess
 import aiohttp
 import psutil
 import requests
@@ -11,7 +12,7 @@ os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "../package/playwright-browsers"
 
 from urllib.parse import urlencode
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_agent
+from langchain.agents import AgentState, create_agent
 from langchain_core.tools import tool
 from langchain_core.messages import AnyMessage, SystemMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -26,50 +27,58 @@ from langchain_community.tools.file_management.write import WriteFileTool
 from copilotkit import CopilotKitMiddleware
 
 from src.query import query_data
-from src.todos import AgentState, todo_tools
 from src.form import generate_form
 
-class LumenxxAbility_c:
+class AgentxxAbility_c:
     lumenxxBaseUrl = "" # f"http://127.0.0.1:{os.environ['LUMENXX_PORT']}"
-    musicxxBaseUrl = "" # f"http://127.0.0.1:53023"
+    musicxxBaseUrl = f"http://127.0.0.1:{os.environ['MUSICXX_PORT']}"
     enableSearch: bool = True
     enableBrowser: bool = True
     enableEvalCode: bool = True
 
-lumenxxAbility = LumenxxAbility_c()
+agentxxAbility = AgentxxAbility_c()
 
-@tool
-def run_musicxx(filename: str = "", url: str = "", search:str = "") -> str:
-    '''
-    Function:
-        - Launch the `musicxx` program or control playback of music in `musicxx`.
-        - `musicxx` is a music player developed by coolight, and its Chinese name is `拟声`.
+# @tool
+# def run_musicxx(filename: str = "", url: str = "", search:str = ""):
+#     '''
+#     Function:
+#         - Launch the `musicxx` program or control playback of music in `musicxx`.
+#         - `musicxx` is a music player developed by coolight, and its Chinese name is `拟声`.
 
-    Args:
-        Only one of the following parameters needs to be passed to play music; if no parameter is passed, only `musicxx` will be launched and displayed in the foreground.
-        search (str):
-            Recommended for fuzzy search playback. Pass a vague song name or keyword, and musicxx will perform a fuzzy search for songs based on the input string to play.
-        filename (str):
-            Filename of the audio resource to be played (no URL encoding required, e.g., test.mp3). musicxx will automatically attempt to find and play the audio file with this filename from scanned local songs or cache. This is suitable for automatic handling when stored file locations differ across devices.
-        url (str):
-            URL of the audio resource to be played (no URL encoding required, e.g., https://xxx, file:///xxx, etc.) or a direct file path.
-    '''
+#     Args:
+#         Only one of the following parameters needs to be passed to play music; if no parameter is passed, only `musicxx` will be launched and displayed in the foreground.
+#         search (str):
+#             Recommended for fuzzy search playback. Pass a vague song name or keyword, and musicxx will perform a fuzzy search for songs based on the input string to play.
+#         filename (str):
+#             Filename of the audio resource to be played (no URL encoding required, e.g., test.mp3). musicxx will automatically attempt to find and play the audio file with this filename from scanned local songs or cache. This is suitable for automatic handling when stored file locations differ across devices.
+#         url (str):
+#             URL of the audio resource to be played (no URL encoding required, e.g., https://xxx, file:///xxx, etc.) or a direct file path.
+#     '''
 
-    useArg = {}
-    if len(filename) > 0:
-        useArg["filename"] = filename
-    if len(url) > 0:
-        useArg["url"] = url
-    if len(search) > 0:
-        useArg["search"] = search
+#     useArg = {}
+#     if len(filename) > 0:
+#         useArg["filename"] = filename
+#     if len(url) > 0:
+#         useArg["url"] = url
+#     if len(search) > 0:
+#         useArg["search"] = search
+      # subprocess.Popen/os.system 都会导致执行一次后线程卡死
+#     if len(useArg) > 0:
+#         subprocess.Popen(
+#             ["start", "", f"musicxx://play/?{urlencode(useArg)}"], 
+#             shell=True,
+#             close_fds=True,
+#             creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+#         )
+#     else:
+#         subprocess.Popen(
+#             ["start", "", "musicxx://"], 
+#             shell=True, 
+#             close_fds=True,
+#             creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+#         )
 
-    ret = 0
-    if len(useArg) > 0:
-        ret = os.system(f'start "" "musicxx://play/?{urlencode(useArg)}"')
-    else:
-        ret = os.system('start "" "musicxx://"')
-
-    return f"os.system() 启动`拟声`的返回值：{ret}"
+#     return
 
 @tool
 def get_system_memory_usage() -> str:
@@ -115,13 +124,13 @@ async def run_funasr(audio: str) -> dict:
         audio (str):
             Local path to the audio file; it must be an absolute path.
     '''
-    assert(len(lumenxxAbility.lumenxxBaseUrl) > 0)
+    assert(len(agentxxAbility.lumenxxBaseUrl) > 0)
     if (len(audio) == 0):
         return {
             "state": "faild",
             "tip": "参数 `audio` 不能为空",
         }
-    url = f"{lumenxxAbility.lumenxxBaseUrl}/funasr"
+    url = f"{agentxxAbility.lumenxxBaseUrl}/funasr"
     params = {
         "audio": audio,
         "model": "sensevoice",
@@ -234,10 +243,8 @@ async def make_graph():
     # tool ---
     tools=[
         query_data, 
-        *todo_tools, 
         generate_form,
 
-        # run_musicxx,
         searchLyric,
         get_system_memory_usage,
         get_system_datetime,
@@ -254,27 +261,29 @@ async def make_graph():
         # FileSearchTool(),
     ])
 
-    if (lumenxxAbility.enableSearch):
+    if (agentxxAbility.enableSearch):
         search = DuckDuckGoSearchResults(output_format='json', max_results=5)
         tools.append(search)
 
-    if (lumenxxAbility.enableEvalCode):
+    if (agentxxAbility.enableEvalCode):
         tools.append(PythonREPLTool())
 
-    if (len(lumenxxAbility.lumenxxBaseUrl) > 0):
+    if (len(agentxxAbility.lumenxxBaseUrl) > 0):
         tools.append(run_funasr)
 
     # MCP ---
     mcpClientConfig:dict[str, dict] = {}
-    if (len(lumenxxAbility.lumenxxBaseUrl) > 0):
+    if (len(agentxxAbility.lumenxxBaseUrl) > 0):
         mcpClientConfig["lumenxx"] = {
             "transport": "streamable_http",
-            "url": f"{lumenxxAbility.lumenxxBaseUrl}/mcp",
+            "url": f"{agentxxAbility.lumenxxBaseUrl}/mcp",
+            "timeout": timedelta(seconds=5),
         }
-    if (len(lumenxxAbility.musicxxBaseUrl) > 0):
+    if (len(agentxxAbility.musicxxBaseUrl) > 0):
         mcpClientConfig["musicxx"] = {
             "transport": "streamable_http",
-            "url": f"{lumenxxAbility.musicxxBaseUrl}/mcp",
+            "url": f"{agentxxAbility.musicxxBaseUrl}/mcp",
+            "timeout": timedelta(seconds=5),
         }
     mcpClient = MultiServerMCPClient(mcpClientConfig)
     mcpTools = await mcpClient.get_tools()

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAgent } from "@copilotkit/react-core/v2";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useFrontendTool } from "@copilotkit/react-core";
 
@@ -36,9 +36,7 @@ export function ExampleLayout({ chatContent }: ExampleLayoutProps) {
       </div>
 
       {/* Chat Content */}
-      <div
-        className={`max-h-full overflow-y-auto flex-1 max-lg:px-4`}
-      >
+      <div className={`max-h-full overflow-y-auto flex-1 max-lg:px-4`}>
         {chatContent}
       </div>
     </div>

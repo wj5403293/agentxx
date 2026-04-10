@@ -11,6 +11,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh">
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="referrer" content="never" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>冬瓜 • agentxx</title>
+      </head>
+
       <body className={`antialiased`}>
         <ThemeProvider>
           <CopilotKit
