@@ -39,7 +39,7 @@ export function BarChart({ title, description, data }: BarChartProps) {
         </CardHeader>
         <CardContent>
           <p className="text-[var(--muted-foreground)] text-center py-8">
-            No data available
+            无可展示的数据
           </p>
         </CardContent>
       </Card>

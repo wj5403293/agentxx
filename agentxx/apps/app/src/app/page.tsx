@@ -1,7 +1,6 @@
 "use client";
 
 import { ExampleLayout } from "@/components/example-layout";
-import { ExampleCanvas } from "@/components/example-canvas";
 import { useGenerativeUIExamples, useSuggestionExamples } from "@/hooks";
 
 import dynamic from 'next/dynamic'
@@ -51,6 +50,7 @@ const CopilotChat = dynamic(
     )
   }
 )
+
 export default function HomePage() {
   const { agent } = useAgent({
     agentId: "agentxx",
@@ -82,15 +82,16 @@ export default function HomePage() {
             chatToggleOpenLabel: "打开聊天窗口",
             chatToggleCloseLabel: "关闭聊天窗口",
             modalHeaderTitle: "助理",
-            welcomeMessageText: "有什么我能帮你的吗",
+            welcomeMessageText: "有什么我能帮你的吗💡",
           }}
           input={{
             autoFocus: true,
             onAddFile: () => { },
-            disclaimer: () => null, className: "pb-6",
-          }} />
+            disclaimer: () => null,
+            className: "pb-6",
+          }}
+        />
       }
-      appContent={<ExampleCanvas />}
     />
   );
 }

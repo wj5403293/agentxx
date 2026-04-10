@@ -23,7 +23,7 @@ export function MeetingTimePicker({
   respond,
   reasonForScheduling,
   meetingDuration,
-  title = "Schedule a Meeting",
+  title = "预约会议",
   timeSlots = [
     { date: "Tomorrow", time: "2:00 PM", duration: "30 min" },
     { date: "Friday", time: "10:00 AM", duration: "30 min" },
@@ -58,14 +58,14 @@ export function MeetingTimePicker({
           <div className="text-center">
             <div className="text-7xl mb-4">📅</div>
             <h2 className="text-2xl font-bold mb-2 text-[var(--foreground)]">
-              Meeting Scheduled
+              预约会议
             </h2>
             <p className="text-[var(--muted-foreground)] mb-2">
               {selectedSlot.date} at {selectedSlot.time}
             </p>
             {selectedSlot.duration && (
               <p className="text-sm text-[var(--muted-foreground)]">
-                Duration: {selectedSlot.duration}
+                时长: {selectedSlot.duration}
               </p>
             )}
           </div>
@@ -73,10 +73,10 @@ export function MeetingTimePicker({
           <div className="text-center">
             <div className="text-7xl mb-4">🔄</div>
             <h2 className="text-2xl font-bold mb-2 text-[var(--foreground)]">
-              No Time Selected
+              未选择时间
             </h2>
             <p className="text-[var(--muted-foreground)]">
-              Let me find a better time that works for you
+              让我为您找到一个更合适的时间
             </p>
           </div>
         ) : (
@@ -133,7 +133,7 @@ export function MeetingTimePicker({
                   className="w-full"
                   onClick={handleDecline}
                 >
-                  None of these work
+                  选择的时间冲突，请修改
                 </Button>
               </div>
             )}
