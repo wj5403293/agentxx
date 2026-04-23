@@ -1,5 +1,6 @@
 /isolation/workspace/*
-/isolation/skills/append/*
+/isolation/skills/public/*
 /package/*
+/resource/temp/*
 .langgraph_api
 __pycache__
