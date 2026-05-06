@@ -1,0 +1,10 @@
+{
+    "dependencies": [
+        "./"
+    ],
+    "workers": 1,
+    "graphs": {
+        "agentxx": "./src/graph.py:make_graph"
+    },
+    "env": ".env"
+}
