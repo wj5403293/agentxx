@@ -148,7 +148,7 @@ backend = LocalShellBackend(
     max_output_bytes=1024 * 1024 * 1024,
 )
 model = ChatOpenAI(
-    name=defAgentName,
+    name="openai/agentxx",
     base_url="http://localhost:7070/",
     api_key="EMPTY",
     streaming=True,
@@ -209,6 +209,7 @@ async def make_graph():
 
     # agent ---
     graph = create_deep_agent(
+        name=defAgentName,
         model=model,
         tools=tools,
         skills=[f"{isolation_root_dir}/skills"],

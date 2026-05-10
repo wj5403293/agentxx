@@ -1,0 +1,3 @@
+[submodule "agentxx/deep-agents-ui"]
+	path = agentxx/deep-agents-ui
+	url = https://github.com/coolight7/deep-agents-ui
