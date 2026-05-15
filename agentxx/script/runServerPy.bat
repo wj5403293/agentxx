@@ -3,7 +3,7 @@ rem set utf8
 chcp 65001 > NUL
 
 set SCRIPT_DIR=%~dp0
-cd %SCRIPT_DIR%\\..
+cd %SCRIPT_DIR%\\..\\server-py-langgraph
 
 call .venv\\Scripts\\activate
 
