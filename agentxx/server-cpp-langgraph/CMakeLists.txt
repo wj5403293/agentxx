@@ -49,8 +49,8 @@ if (MSVC)
 
     # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(_AGNETXX_C_FLAGS   "-fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17")
-    set(_AGNETXX_CXX_FLAGS "-fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
+    set(_AGENTXX_C_FLAGS   "-fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17")
+    set(_AGENTXX_CXX_FLAGS "-fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
     set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
 
     if (DEFINED CMAKE_CONFIGURATION_TYPES)
