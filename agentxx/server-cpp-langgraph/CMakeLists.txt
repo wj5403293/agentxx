@@ -188,13 +188,13 @@ set(fmt_INSTALL_DIR "${BINARY_DIR}/")
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
 include_directories(${third_party_DIR})
 
-aux_source_directory("./src/util" DIR_UTIL)
-aux_source_directory("./src/agent" DIR_AGENT)
+aux_source_directory("./lib/util" DIR_UTIL)
+aux_source_directory("./lib/agent" DIR_AGENT)
 
 add_library(agentxx SHARED
   ${DIR_UTIL}
@@ -236,6 +236,9 @@ target_compile_definitions(agentxx PUBLIC DART_SHARED_LIB)
 if (DEFINED LUMENXX_BUILD_TYPE)
   ADD_SUBDIRECTORY(test)
   add_dependencies(test agentxx)
+
+  ADD_SUBDIRECTORY(client)
+  add_dependencies(client agentxx)
 endif()
 
 if (DEFINED LUMENXX_BUILD_TYPE)

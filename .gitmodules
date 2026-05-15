@@ -1,3 +1,11 @@
 [submodule "agentxx/deep-agents-ui"]
 	path = agentxx/deep-agents-ui
 	url = https://github.com/coolight7/deep-agents-ui
+[submodule "agentxx/server-cpp-langgraph/third_party/simdjson"]
+	path = agentxx/server-cpp-langgraph/third_party/simdjson
+	url = https://github.com/simdjson/simdjson.git
+	branch = v4.6.4
+[submodule "agentxx/server-cpp-langgraph/third_party/fmt"]
+	path = agentxx/server-cpp-langgraph/third_party/fmt
+	url = https://github.com/fmtlib/fmt
+	branch = 12.1.0
