@@ -55,18 +55,18 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
 
     if (DEFINED CMAKE_CONFIGURATION_TYPES)
       set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_C_FLAGS}   ")
-      set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_CXX_FLAGS} -fno-exceptions -fno-rtti")
+      set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_CXX_FLAGS} ")
       set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}   ${_AGENTXX_C_FLAGS}   ")
-      set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_CXX_FLAGS} -fno-exceptions -fno-rtti")
+      set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_CXX_FLAGS} ")
       set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-      set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+      set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     else ()
       if (CMAKE_BUILD_TYPE MATCHES "Debug")
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}   ${_AGENTXX_CXX_FLAGS} -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
       else ()
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}   ${_AGENTXX_C_FLAGS}     ")
-        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS}   -fno-exceptions -fno-rtti")
+        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS}   ")
       endif ()
     endif ()
 
@@ -91,6 +91,7 @@ if (DEFINED LUMENXX_BUILD_TYPE)
 endif()
 
 include(ExternalProject)
+include(FetchContent)
 
 # simdjson
 ExternalProject_Add(
@@ -185,6 +186,23 @@ set(fmt_SOURCE_DIR "${SOURCE_DIR}")
 ExternalProject_Get_Property(fmt_repo BINARY_DIR)
 set(fmt_INSTALL_DIR "${BINARY_DIR}/")
 
+# neograph
+FetchContent_Declare(
+  NeoGraph
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/neo_graph/"
+)
+set(NEOGRAPH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_PYBIND   OFF CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_A2A      OFF CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_POSTGRES OFF CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_SQLITE   OFF CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_ASYNC    ON  CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_LLM      ON  CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_MCP      ON  CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_UTIL     ON  CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(NeoGraph)
+
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
@@ -207,10 +225,15 @@ add_dependencies(agentxx fmt_repo)
 target_link_directories(agentxx PUBLIC 
   ${simdjson_INSTALL_DIR}
   ${fmt_INSTALL_DIR}
+  ${neo_graph_INSTALL_DIR}
 )
 
 target_link_libraries(agentxx PUBLIC
   simdjson
+  neograph::core
+  neograph::async
+  neograph::llm
+  neograph::mcp
 )
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   # 仅单配置构建、debug 时使用
@@ -231,7 +254,7 @@ set_target_properties(agentxx PROPERTIES
   OUTPUT_NAME "agentxx"
 )
 
-target_compile_definitions(agentxx PUBLIC DART_SHARED_LIB)
+target_compile_definitions(agentxx PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
 
 if (DEFINED LUMENXX_BUILD_TYPE)
   ADD_SUBDIRECTORY(test)

@@ -27,5 +27,5 @@ if (IS_WIN_D)
 endif ()
 
 if (DEFINED LUMENXX_BUILD_TYPE)
-	install(TARGETS ${NAME_test} DESTINATION "${EXE_INSTALL_PREFIX}")
+	install(TARGETS ${NAME_client} DESTINATION "${EXE_INSTALL_PREFIX}")
 endif()
