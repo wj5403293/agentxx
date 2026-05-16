@@ -209,6 +209,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
+include_directories(${NeoGraph}/deps/asio/include/)
 include_directories(${third_party_DIR})
 
 aux_source_directory("./lib/util" DIR_UTIL)
