@@ -1,7 +1,8 @@
 #!/bin/bash
 
-build_dir=$PWD/build/debug
-src_dir=$PWD/
+script_dir=$(dirname "$0")
+build_dir=$script_dir/build/debug
+src_dir=$script_dir/
 
 cmake -B "$build_dir" -S "$src_dir" -DLUMENXX_BUILD_TYPE=LUMENXX_BUILD_DEBUG -DCMAKE_BUILD_TYPE=Debug
 
