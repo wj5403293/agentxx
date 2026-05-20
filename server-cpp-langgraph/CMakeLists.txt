@@ -200,7 +200,9 @@ set(NEOGRAPH_BUILD_SQLITE   OFF CACHE BOOL "" FORCE)
 set(NEOGRAPH_BUILD_ASYNC    ON  CACHE BOOL "" FORCE)
 set(NEOGRAPH_BUILD_LLM      ON  CACHE BOOL "" FORCE)
 set(NEOGRAPH_BUILD_MCP      ON  CACHE BOOL "" FORCE)
+set(NEOGRAPH_BUILD_ACP      ON  CACHE BOOL "" FORCE)
 set(NEOGRAPH_BUILD_UTIL     ON  CACHE BOOL "" FORCE)
+set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(NeoGraph)
 
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
@@ -213,10 +215,12 @@ include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
 include_directories(${third_party_DIR})
 aux_source_directory("./lib/util" DIR_UTIL)
+aux_source_directory("./lib/tools" DIR_TOOLS)
 aux_source_directory("./lib/agent" DIR_AGENT)
 
 add_library(agentxx SHARED
   ${DIR_UTIL}
+  ${DIR_TOOLS}
   ${DIR_AGENT}
 )
 
@@ -232,9 +236,11 @@ target_link_directories(agentxx PUBLIC
 target_link_libraries(agentxx PUBLIC
   simdjson
   neograph::core
+  neograph::util
   neograph::async
   neograph::llm
   neograph::mcp
+  neograph::acp
 )
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   # 仅单配置构建、debug 时使用
