@@ -205,6 +205,13 @@ set(NEOGRAPH_BUILD_UTIL     ON  CACHE BOOL "" FORCE)
 set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(NeoGraph)
 
+# html2md
+FetchContent_Declare(
+  html2md
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/html2md/"
+)
+FetchContent_MakeAvailable(html2md)
+
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
@@ -213,6 +220,7 @@ include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
 include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
+include_directories(${html2md_SOURCE_DIR}/include/)
 include_directories(${third_party_DIR})
 aux_source_directory("./lib/util" DIR_UTIL)
 aux_source_directory("./lib/tools" DIR_TOOLS)
@@ -235,6 +243,7 @@ target_link_directories(agentxx PUBLIC
 
 target_link_libraries(agentxx PUBLIC
   simdjson
+  html2md
   neograph::core
   neograph::util
   neograph::async

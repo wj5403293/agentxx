@@ -8,6 +8,7 @@
 #include "neograph/mcp/client.h"
 #include "neograph/neograph.h"
 #include "tools/get_current_system_datetime.h"
+#include "tools/websearch.h"
 #include "util/log.h"
 #include <format>
 #include <iostream>
@@ -38,6 +39,9 @@ public:
     std::vector<std::unique_ptr<neograph::Tool>> tools{};
     tools.push_back(
         std::make_unique<agentxx::tools::GetCurrentSystemDateTimeTool>());
+    tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
+    tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
+    tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
 
     for (auto &url : config->mcpServerUrls) {
       auto mcp_client = neograph::mcp::MCPClient{url};
@@ -86,7 +90,7 @@ public:
               }
             });
       }
-      std::cout << "\n>>> ";
+      std::cout << "\n\n>>> ";
     }
   }
 
