@@ -45,6 +45,7 @@ public:
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
     tools.push_back(std::make_unique<agentxx::tools::FileSystemListFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemReadFile>());
+    tools.push_back(std::make_unique<agentxx::tools::FilesystemWriteFile>());
 
     for (auto &url : config->mcpServerUrls) {
       auto mcp_client = neograph::mcp::MCPClient{url};
@@ -67,31 +68,37 @@ public:
 
     for (std::string line; std::getline(std::cin, line);) {
       if (false == line.empty()) {
-        neograph::graph::RunConfig cfg{
-            .thread_id = "session",
-            .input = {{
-                "messages",
-                neograph::json::array({{{"role", "user"}, {"content", line}}}),
-            }},
-            .resume_if_exists = true,
-        };
+        try {
 
-        std::cout << config->agentNameView << ": " << std::flush;
-        auto result = co_await engine->run_stream_async(
-            cfg, [](const neograph::graph::GraphEvent &event) {
-              switch (event.type) {
-              case neograph::graph::GraphEvent::Type::NODE_START:
-              case neograph::graph::GraphEvent::Type::NODE_END:
-                break;
-              case neograph::graph::GraphEvent::Type::LLM_TOKEN: {
-                std::cout << event.data.get<std::string>() << std::flush;
-              } break;
-              case neograph::graph::GraphEvent::Type::CHANNEL_WRITE:
-              case neograph::graph::GraphEvent::Type::INTERRUPT:
-              case neograph::graph::GraphEvent::Type::ERROR:
-                break;
-              }
-            });
+          neograph::graph::RunConfig cfg{
+              .thread_id = "session",
+              .input = {{
+                  "messages",
+                  neograph::json::array(
+                      {{{"role", "user"}, {"content", line}}}),
+              }},
+              .resume_if_exists = true,
+          };
+
+          std::cout << config->agentNameView << ": " << std::flush;
+          auto result = co_await engine->run_stream_async(
+              cfg, [](const neograph::graph::GraphEvent &event) {
+                switch (event.type) {
+                case neograph::graph::GraphEvent::Type::NODE_START:
+                case neograph::graph::GraphEvent::Type::NODE_END:
+                  break;
+                case neograph::graph::GraphEvent::Type::LLM_TOKEN: {
+                  std::cout << event.data.get<std::string>() << std::flush;
+                } break;
+                case neograph::graph::GraphEvent::Type::CHANNEL_WRITE:
+                case neograph::graph::GraphEvent::Type::INTERRUPT:
+                case neograph::graph::GraphEvent::Type::ERROR:
+                  break;
+                }
+              });
+        } catch (const std::exception &e) {
+          XX_LOGE(R"({{"error": "Agent Response failed: {}"}})", e.what());
+        }
       }
       std::cout << "\n\n>>> ";
     }

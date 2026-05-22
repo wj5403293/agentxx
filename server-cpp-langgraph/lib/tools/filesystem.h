@@ -150,8 +150,8 @@ public:
                                ? size_t(text_line_limit)
                                : std::numeric_limits<size_t>::max();
         std::stringstream result{};
-        int line_num = 0;
-        int count = 0;
+        size_t line_num = 0;
+        size_t count = 0;
 
         for (std::string line; std::getline(stream, line) && count < limit;) {
           // 跳过偏移行
@@ -160,7 +160,7 @@ public:
             continue;
           }
           // 达到限制则停止
-          if (limit != -1 && count >= limit) {
+          if (count >= limit) {
             break;
           }
           result << line << "\n";
@@ -175,6 +175,185 @@ public:
                             std::istreambuf_iterator<char>());
     } catch (const std::exception &e) {
       co_return std::format(R"({{"error": "filesystem_readfile failed: {}"}})",
+                            e.what());
+    }
+  }
+};
+
+/// write
+class FilesystemWriteFile : public neograph::AsyncTool {
+public:
+  explicit FilesystemWriteFile() {}
+
+  std::string get_name() const override { return "filesystem_writefile"; }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "filesystem_writefile",
+        "创建新文件，如果文件已经存在则返回失败.",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "path",
+                        {
+                            {"type", "string"},
+                            {"description", "Absolute file path."},
+                        },
+                    },
+                    {
+                        "content",
+                        {
+                            {"type", "string"},
+                            {"description", "写入文件的内容"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({"path"})},
+        },
+    };
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto filepath = arguments.value("path", std::string{});
+    if (filepath.empty()) {
+      co_return R"({"error":"Arg `path` is empty"})";
+    }
+    auto content = arguments.value<std::string>("content", std::string{});
+
+    std::ofstream stream;
+    try {
+      auto path = std::filesystem::path{filepath};
+      if (std::filesystem::exists(path)) {
+        co_return std::format(R"({{"error":"File already exist."}})",
+                              path.parent_path().string());
+      }
+      if (false == std::filesystem::exists(path.parent_path()) &&
+          false == std::filesystem::create_directories(path.parent_path())) {
+        // 创建父目录
+        co_return std::format(
+            R"({{"error":"Can not create `path`({})'s parent dirs."}})",
+            path.parent_path().string());
+      }
+
+      stream.open(filepath, std::ios_base::out);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        stream.close();
+        co_return std::format(
+            R"({{"error":"Can not create or open file. Error: {}"}})",
+            ec.message());
+      }
+
+      if (false == content.empty()) {
+        // 写入文件内容
+        stream << content;
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          stream.close();
+          co_return std::format(
+              R"({{"error":"File created success, but write failed. Error: {}"}})",
+              ec.message());
+        }
+      }
+      stream.close();
+
+      co_return "success";
+    } catch (const std::exception &e) {
+      co_return std::format(R"({{"error": "filesystem_writefile failed: {}"}})",
+                            e.what());
+    }
+  }
+};
+
+/// edit file
+class FilesystemEditFile : public neograph::AsyncTool {
+public:
+  explicit FilesystemEditFile() {}
+
+  std::string get_name() const override { return "filesystem_editfile"; }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "filesystem_editfile",
+        "Perform exact string replacements in files (with global replace "
+        "mode).",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "path",
+                        {
+                            {"type", "string"},
+                            {"description", "Absolute file path."},
+                        },
+                    },
+                    {
+                        "content",
+                        {
+                            {"type", "string"},
+                            {"description", "写入文件的内容"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({"path"})},
+        },
+    };
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto filepath = arguments.value("path", std::string{});
+    if (filepath.empty()) {
+      co_return R"({"error":"Arg `path` is empty"})";
+    }
+    auto content = arguments.value<std::string>("content", std::string{});
+
+    std::ofstream stream;
+    try {
+      auto path = std::filesystem::path{filepath};
+      if (std::filesystem::exists(path)) {
+        co_return std::format(R"({{"error":"File already exist."}})",
+                              path.parent_path().string());
+      }
+      if (false == std::filesystem::create_directories(path.parent_path())) {
+        co_return std::format(
+            R"({{"error":"Can not create `path`({})'s parent dirs."}})",
+            path.parent_path().string());
+      }
+
+      stream.open(filepath, std::ios_base::out);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        stream.close();
+        co_return std::format(
+            R"({{"error":"Can not create or open file. Error: {}"}})",
+            ec.message());
+      }
+
+      if (false == content.empty()) {
+        // 写入文件内容
+        stream << content;
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          stream.close();
+          co_return std::format(
+              R"({{"error":"File created success, but write failed. Error: {}"}})",
+              ec.message());
+        }
+      }
+      stream.close();
+
+      co_return "success";
+    } catch (const std::exception &e) {
+      co_return std::format(R"({{"error": "filesystem_writefile failed: {}"}})",
                             e.what());
     }
   }
