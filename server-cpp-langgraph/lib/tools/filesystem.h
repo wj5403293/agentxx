@@ -55,28 +55,22 @@ public:
     if (targetPath.empty()) {
       co_return R"({"error":"Arg `path` is empty"})";
     }
-    std::cout << (targetPath) << std::endl;
-    try {
-      auto result = neograph::json::array();
-      for (const auto &entity :
-           std::filesystem::directory_iterator(targetPath)) {
-        auto item = neograph::json{
-            {"path", entity.path().generic_string()},
-            {"type", (entity.is_directory()      ? "dir"
-                      : entity.is_regular_file() ? "file"
-                      : entity.is_symlink()      ? "symlink"
-                                                 : "other")},
-            {"size", size_t(entity.file_size())},
-            {"last_write_time",
-             entity.last_write_time().time_since_epoch().count()},
-        };
-        result.push_back(item);
-      }
-      co_return result.dump();
-    } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "filesystem_listfile failed: {}"}})",
-                            e.what());
+
+    auto result = neograph::json::array();
+    for (const auto &entity : std::filesystem::directory_iterator(targetPath)) {
+      auto item = neograph::json{
+          {"path", entity.path().generic_string()},
+          {"type", (entity.is_directory()      ? "dir"
+                    : entity.is_regular_file() ? "file"
+                    : entity.is_symlink()      ? "symlink"
+                                               : "other")},
+          {"size", size_t(entity.file_size())},
+          {"last_write_time",
+           entity.last_write_time().time_since_epoch().count()},
+      };
+      result.push_back(item);
     }
+    co_return result.dump();
   }
 };
 
@@ -185,8 +179,8 @@ public:
       stream.close();
       co_return result;
     } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "filesystem_readfile failed: {}"}})",
-                            e.what());
+      stream.close();
+      throw e;
     }
   }
 };
@@ -285,8 +279,8 @@ public:
       stream.close();
       co_return "success";
     } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "filesystem_writefile failed: {}"}})",
-                            e.what());
+      stream.close();
+      throw e;
     }
   }
 };
@@ -414,8 +408,8 @@ public:
         co_return "success";
       }
     } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "filesystem_editfile failed: {}"}})",
-                            e.what());
+      stream.close();
+      throw e;
     }
   }
 };
@@ -430,14 +424,17 @@ public:
     return {
         "filesystem_glob",
         R"(Find files matching patterns.
-e.g., `**/*.txt`,`docx/*[0-9].txt`,`include/nc*.h`,`output/file[0-9].*`,`read/??.txt`.
+
 | Wildcard | Matches | Example
 |--- |--- |--- |
 | `*` | any characters | `*.txt` matches all files with the txt extension |
+| `**` | any name dir recursively | `include/**/*.txt` matches all files with the txt extension in dir `include` and children dirs |
 | `?` | any one character | `???` matches files with 3 characters long |
 | `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
 | `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
 | `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+
+e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.
 )",
         neograph::json{
             {"type", "object"},
@@ -445,67 +442,38 @@ e.g., `**/*.txt`,`docx/*[0-9].txt`,`include/nc*.h`,`output/file[0-9].*`,`read/??
                 "properties",
                 {
                     {
-                        "path",
-                        {
-                            {"type", "string"},
-                            {"description", "Absolute dir path"},
-                        },
-                    },
-                    {
                         "pattern",
                         {
                             {"type", "string"},
-                            {"description", "glob pattern"},
-                        },
-                    },
-                    {
-                        "recursively",
-                        {
-                            {"type", "boolean"},
-                            {"description", "默认`false`,是否递归搜索子目录"},
+                            {"description",
+                             "Absolute dir path and glob pattern"},
                         },
                     },
                 },
             },
-            {"required", neograph::json::array({"path", "pattern"})},
+            {"required", neograph::json::array({"pattern"})},
         },
     };
   }
 
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
-    auto dirpath = arguments.value("path", std::string{});
-    if (dirpath.empty()) {
-      co_return R"({"error":"Arg `path` is empty"})";
-    }
     auto searchPattern = arguments.value("pattern", std::string{});
     if (searchPattern.empty()) {
       co_return R"({"error":"Arg `pattern` is empty"})";
     }
-    auto recursively = arguments.value<bool>("recursively", false);
 
-    try {
-      auto path = std::filesystem::path{dirpath};
-      if (false == std::filesystem::is_directory(path)) {
-        co_return R"({"error":"Path not a directory or not exist."})";
-      }
-
-      auto relist =
-          recursively ? glob::rglob(searchPattern) : glob::glob(searchPattern);
-      if (relist.empty()) {
-        co_return R"({"error":"No match `pattern` found"})";
-      }
-
-      auto result = std::ostringstream{};
-      for (auto &item : relist) {
-        result << item << std::endl;
-      }
-
-      co_return result.str();
-    } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "filesystem_glob failed: {}"}})",
-                            e.what());
+    auto relist = glob::rglob(searchPattern);
+    if (relist.empty()) {
+      co_return R"({"error":"No match `pattern` found"})";
     }
+
+    auto result = std::ostringstream{};
+    for (auto &item : relist) {
+      result << item.string() << std::endl;
+    }
+
+    co_return result.str();
   }
 };
 

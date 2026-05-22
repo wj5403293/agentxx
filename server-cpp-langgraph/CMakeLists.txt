@@ -231,11 +231,13 @@ message("glob_SOURCE_DIR: ${glob_SOURCE_DIR}")
 
 aux_source_directory("./lib/util" DIR_UTIL)
 aux_source_directory("./lib/tools" DIR_TOOLS)
+aux_source_directory("./lib/nodes" DIR_NODES)
 aux_source_directory("./lib/agent" DIR_AGENT)
 
 add_library(agentxx SHARED
   ${DIR_UTIL}
   ${DIR_TOOLS}
+  ${DIR_NODES}
   ${DIR_AGENT}
 )
 

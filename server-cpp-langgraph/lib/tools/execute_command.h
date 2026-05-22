@@ -50,30 +50,26 @@ Current System is Linux, please use shell/bash.
       co_return R"({"error":"Arg `command` is empty"})";
     }
 
-    try {
+    // TODO: async
 #if IS_WIN_D
-      auto pipe = std::unique_ptr<FILE, decltype(&_pclose)>{
-          _popen(command.c_str(), "r"), _pclose};
+    auto pipe = std::unique_ptr<FILE, decltype(&_pclose)>{
+        _popen(command.c_str(), "r"), _pclose};
 #else
-      auto pipe = std::unique_ptr<FILE, decltype(&pclose)>{
-          popen(command.c_str(), "r"), pclose};
+    auto pipe = std::unique_ptr<FILE, decltype(&pclose)>{
+        popen(command.c_str(), "r"), pclose};
 #endif
-      if (!pipe) {
-        auto ec = std::error_code{errno, std::system_category()};
-        co_return std::format(R"({{"error":"Exec command faild. Error: {}"}})",
-                              ec.message());
-      }
-
-      std::array<char, 1024> buffer{};
-      std::ostringstream result;
-      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-        result << buffer.data();
-      }
-      co_return result.str();
-    } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "execute_command failed: {}"}})",
-                            e.what());
+    if (!pipe) {
+      auto ec = std::error_code{errno, std::system_category()};
+      co_return std::format(R"({{"error":"Exec command faild. Error: {}"}})",
+                            ec.message());
     }
+
+    std::array<char, 1024> buffer{};
+    std::ostringstream result;
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+      result << buffer.data();
+    }
+    co_return result.str();
   }
 };
 } // namespace tools

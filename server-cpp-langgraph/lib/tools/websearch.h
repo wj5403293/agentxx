@@ -58,28 +58,23 @@ public:
     // TODO: 更换api
     auto search_url = std::format("https://www.baidu.com/s?wd={}",
                                   agentxx::HttpClient_c::urlEncode(query));
-    try {
-      auto [resp, resp_err] =
-          co_await agentxx::HttpClient_c::fetchMarkdown(search_url);
-      if (resp.has_value()) {
-        auto &data = resp.value();
-        if (data.empty()) {
-          co_return R"({"error": "Empty search result."})";
-        } else {
-          const auto maxLength = 8000;
-          if (data.size() > maxLength) {
-            data.resize(maxLength);
-          }
-          co_return data;
-        }
+
+    auto [resp, resp_err] =
+        co_await agentxx::HttpClient_c::fetchMarkdown(search_url);
+    if (resp.has_value()) {
+      auto &data = resp.value();
+      if (data.empty()) {
+        co_return R"({"error": "Empty search result."})";
       }
-      co_return std::format(
-          R"({{"error":"web_search failed: {}"}})",
-          resp_err.value_or(std::runtime_error("[unknown]")).what());
-    } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "web_search failed: {}"}})",
-                            e.what());
+      const auto maxLength = 8000;
+      if (data.size() > maxLength) {
+        data.resize(maxLength);
+      }
+      co_return data;
     }
+    co_return std::format(
+        R"({{"error":"web_search failed: {}"}})",
+        resp_err.value_or(std::runtime_error("[unknown]")).what());
   }
 };
 
@@ -126,30 +121,25 @@ public:
     }
     int timeout = int(arguments.value<double>("timeout", 60.0));
 
-    try {
-      auto [resp, resp_err] = co_await agentxx::HttpClient_c::getAsync(
-          url, std::chrono::seconds(timeout));
-      if (resp.has_value()) {
-        if (false == agentxx::HttpClient_c::respIsSucc(resp.value())) {
-          co_return std::format(
-              R"({{"error":"fetch_url failed, status {}, error: {}"}})",
-              resp.value().status,
-              resp_err.value_or(std::runtime_error("[none]")).what());
-        }
-
-        auto &data = resp.value().body;
-        if (data.empty()) {
-          co_return R"({"error": "Http GET request Success, but got empty body."})";
-        } else {
-          co_return data;
-        }
+    auto [resp, resp_err] = co_await agentxx::HttpClient_c::getAsync(
+        url, std::chrono::seconds(timeout));
+    if (resp.has_value()) {
+      if (false == agentxx::HttpClient_c::respIsSucc(resp.value())) {
+        co_return std::format(
+            R"({{"error":"fetch_url failed, status {}, error: {}"}})",
+            resp.value().status,
+            resp_err.value_or(std::runtime_error("[none]")).what());
       }
-      co_return std::format(
-          R"({{"error":"fetch_url failed: {}"}})",
-          resp_err.value_or(std::runtime_error("[unknown]")).what());
-    } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "fetch_url failed: {}"}})", e.what());
+
+      auto &data = resp.value().body;
+      if (data.empty()) {
+        co_return R"({"error": "Http GET request Success, but got empty body."})";
+      }
+      co_return data;
     }
+    co_return std::format(
+        R"({{"error":"fetch_url failed: {}"}})",
+        resp_err.value_or(std::runtime_error("[unknown]")).what());
   }
 };
 
@@ -197,28 +187,21 @@ public:
       co_return R"({"error":"Arg `url` is empty"})";
     }
 
-    try {
-      auto [resp, resp_err] =
-          co_await agentxx::HttpClient_c::fetchMarkdown(url);
-      if (resp.has_value()) {
-        auto &data = resp.value();
-        if (data.empty()) {
-          co_return R"({"error": "Request Success, but got empty result."})";
-        } else {
-          const auto maxLength = 5000;
-          if (data.size() > maxLength) {
-            data.resize(maxLength);
-          }
-          co_return data;
-        }
+    auto [resp, resp_err] = co_await agentxx::HttpClient_c::fetchMarkdown(url);
+    if (resp.has_value()) {
+      auto &data = resp.value();
+      if (data.empty()) {
+        co_return R"({"error": "Request Success, but got empty result."})";
       }
-      co_return std::format(
-          R"({{"error":"fetch_url_markdown failed: {}"}})",
-          resp_err.value_or(std::runtime_error("[unknown]")).what());
-    } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "fetch_url_markdown failed: {}"}})",
-                            e.what());
+      const auto maxLength = 5000;
+      if (data.size() > maxLength) {
+        data.resize(maxLength);
+      }
+      co_return data;
     }
+    co_return std::format(
+        R"({{"error":"fetch_url_markdown failed: {}"}})",
+        resp_err.value_or(std::runtime_error("[unknown]")).what());
   }
 };
 } // namespace tools
