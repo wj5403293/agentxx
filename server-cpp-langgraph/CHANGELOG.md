@@ -1,3 +1,5 @@
-## 0.0.1
 
-* TODO: Describe initial release.
+## LOG
+- 2026/05/22
+    - toolcall 支持`filesystem`、`websearch`
+    

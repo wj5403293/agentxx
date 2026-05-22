@@ -12,3 +12,6 @@
 [submodule "server-cpp-langgraph/third_party/neo_graph"]
 	path = server-cpp-langgraph/third_party/neo_graph
 	url = https://github.com/fox1245/NeoGraph
+[submodule "server-cpp-langgraph/third_party/html2md"]
+	path = server-cpp-langgraph/third_party/html2md
+	url = https://github.com/tim-gromeyer/html2md

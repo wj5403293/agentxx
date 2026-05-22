@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glob/glob.hpp"
 #include "util/log.h"
 #include <cstdlib>
 #include <filesystem>
@@ -80,9 +81,9 @@ public:
 };
 
 /// read
-class FilesystemReadFile : public neograph::AsyncTool {
+class FilesystemReadFileTool : public neograph::AsyncTool {
 public:
-  explicit FilesystemReadFile() {}
+  explicit FilesystemReadFileTool() {}
 
   std::string get_name() const override { return "filesystem_readfile"; }
 
@@ -109,7 +110,7 @@ public:
                         "text_line_offset",
                         {
                             {"type", "number"},
-                            {"description", "文本偏移行数，默认 0 "
+                            {"description", "文本偏移行数,默认`0`"
                                             "表示不偏移.如果偏移超出文件最大行"
                                             "数,将返回错误提示"},
                         },
@@ -119,7 +120,7 @@ public:
                         {
                             {"type", "number"},
                             {"description",
-                             "读取文本行数限制,取值范围 [1, ~]，默认 null "
+                             "读取文本行数限制,取值范围 [1, ~],默认`null`"
                              "表示不限制.允许指定的限制值超出文件最大行数不报"
                              "错"},
                         },
@@ -191,9 +192,9 @@ public:
 };
 
 /// write
-class FilesystemWriteFile : public neograph::AsyncTool {
+class FilesystemWriteFileTool : public neograph::AsyncTool {
 public:
-  explicit FilesystemWriteFile() {}
+  explicit FilesystemWriteFileTool() {}
 
   std::string get_name() const override { return "filesystem_writefile"; }
 
@@ -225,8 +226,8 @@ public:
                         {
                             {"type", "boolean"},
                             {"description",
-                             R"(是否覆盖文件，默认`false`.
-                             如果为`true`，仅创建新文件并写入,若文件已存在则返回失败.
+                             R"(默认`false`,是否覆盖文件.
+                             如果为`true`,仅创建新文件并写入,若文件已存在则返回失败.
                              如果为`false`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.)"},
                         },
                     },
@@ -291,9 +292,9 @@ public:
 };
 
 /// edit file
-class FilesystemEditFile : public neograph::AsyncTool {
+class FilesystemEditFileTool : public neograph::AsyncTool {
 public:
-  explicit FilesystemEditFile() {}
+  explicit FilesystemEditFileTool() {}
 
   std::string get_name() const override { return "filesystem_editfile"; }
 
@@ -335,7 +336,7 @@ public:
                             {"type", "boolean"},
                             {"description",
                              "是否替换所有匹配`old_str`"
-                             "的字符串,默认false只替换第一个匹配"},
+                             "的字符串.默认`false`只替换第一个匹配"},
                         },
                     },
 
@@ -407,9 +408,93 @@ public:
       }
 
       stream.close();
-      co_return "success";
+      if (multi_replace) {
+        co_return std::format(R"(Success, Replace {} times)", replaceHit);
+      } else {
+        co_return "success";
+      }
     } catch (const std::exception &e) {
       co_return std::format(R"({{"error": "filesystem_editfile failed: {}"}})",
+                            e.what());
+    }
+  }
+};
+
+class FilesystemGlobTool : public neograph::AsyncTool {
+public:
+  explicit FilesystemGlobTool() {}
+
+  std::string get_name() const override { return "filesystem_glob"; }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "filesystem_glob",
+        "Find files matching patterns (e.g., **/*.py).",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "path",
+                        {
+                            {"type", "string"},
+                            {"description", "Absolute dir path"},
+                        },
+                    },
+                    {
+                        "pattern",
+                        {
+                            {"type", "string"},
+                            {"description", "glob pattern"},
+                        },
+                    },
+                    {
+                        "recursively",
+                        {
+                            {"type", "boolean"},
+                            {"description", "默认`false`,是否递归搜索子目录"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({"path", "pattern"})},
+        },
+    };
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto dirpath = arguments.value("path", std::string{});
+    if (dirpath.empty()) {
+      co_return R"({"error":"Arg `path` is empty"})";
+    }
+    auto searchPattern = arguments.value("pattern", std::string{});
+    if (searchPattern.empty()) {
+      co_return R"({"error":"Arg `pattern` is empty"})";
+    }
+    auto recursively = arguments.value<bool>("recursively", false);
+
+    try {
+      auto path = std::filesystem::path{dirpath};
+      if (false == std::filesystem::is_directory(path)) {
+        co_return R"({"error":"Path not a directory or not exist."})";
+      }
+
+      auto relist =
+          recursively ? glob::rglob(searchPattern) : glob::glob(searchPattern);
+      if (relist.empty()) {
+        co_return R"({"error":"No match `pattern` found"})";
+      }
+
+      auto result = std::ostringstream{};
+      for (auto &item : relist) {
+        result << item << std::endl;
+      }
+
+      co_return result.str();
+    } catch (const std::exception &e) {
+      co_return std::format(R"({{"error": "filesystem_glob failed: {}"}})",
                             e.what());
     }
   }

@@ -90,6 +90,8 @@ if (DEFINED LUMENXX_BUILD_TYPE)
   add_definitions(-DLUMENXX_BUILD_TYPE=${LUMENXX_BUILD_TYPE})
 endif()
 
+set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
+
 include(ExternalProject)
 include(FetchContent)
 
@@ -212,8 +214,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(html2md)
 
-set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
+# glob
+set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
+include_directories(${third_party_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 include_directories(${simdjson_SOURCE_DIR}/include/)
@@ -221,7 +225,10 @@ include_directories(${fmt_SOURCE_DIR}/include/)
 include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
 include_directories(${html2md_SOURCE_DIR}/include/)
-include_directories(${third_party_DIR})
+include_directories(${glob_SOURCE_DIR}/single_include/)
+
+message("glob_SOURCE_DIR: ${glob_SOURCE_DIR}")
+
 aux_source_directory("./lib/util" DIR_UTIL)
 aux_source_directory("./lib/tools" DIR_TOOLS)
 aux_source_directory("./lib/agent" DIR_AGENT)
