@@ -7,6 +7,7 @@
 #include "neograph/llm/openai_provider.h"
 #include "neograph/mcp/client.h"
 #include "neograph/neograph.h"
+#include "nodes/Toolcall.h"
 #include "tools/execute_command.h"
 #include "tools/filesystem.h"
 #include "tools/get_current_system_datetime.h"
@@ -30,13 +31,6 @@ public:
 
   void init() {
     assert(config->modelOpenAIBaseUrl.empty() == false);
-
-    neograph::llm::OpenAIProvider::Config provideConfig{
-        .api_key = config->modelOpenAIApiKey,
-        .base_url = config->modelOpenAIBaseUrl,
-        .default_model = config->modelOpenAIModelName,
-    };
-    auto provider = neograph::llm::OpenAIProvider::create_shared(provideConfig);
 
     std::vector<std::unique_ptr<neograph::Tool>> tools{};
     tools.push_back(
@@ -62,10 +56,75 @@ public:
       }
     }
 
-    engine = neograph::graph::create_react_graph(provider, std::move(tools),
-                                                 config->systemPrompt);
+    neograph::graph::NodeFactory::instance().register_type(
+        std::string{agentxx::nodes::ToolcallNode::defNodeType},
+        [](const std::string &name, const neograph::json &,
+           const neograph::graph::NodeContext &ctx) {
+          return std::make_unique<agentxx::nodes::ToolcallNode>(
+              name, ctx,
+              [name](neograph::graph::NodeInput &in) {
+                return agentxx::nodes::ToolcallNode::
+                    defStdoutLogOnToolcallStart(in, name);
+              },
+              [name](const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) {
+                return agentxx::nodes::ToolcallNode::defStdoutLogOnToolcallEnd(
+                    in, result, name);
+              });
+        });
+
+    // JSON definition equivalent to the Agent::run() ReAct loop:
+    //   __start__ -> llm -> (has_tool_calls ? tools : __end__)
+    //                         tools -> llm  (loop back)
+    auto definition = neograph::json{
+        {"name", "react_agent"},
+        {"channels", {{"messages", {{"type", "list"}, {"reducer", "append"}}}}},
+        {
+            "nodes",
+            {
+                {"llm", {{"type", "llm_call"}}},
+                {
+                    "tools",
+                    {{"type", agentxx::nodes::ToolcallNode::defNodeType}},
+                },
+            },
+        },
+        {
+            "edges",
+            neograph::json::array({
+                {{"from", "__start__"}, {"to", "llm"}},
+                {
+                    {"from", "llm"},
+                    {"type", "conditional"},
+                    {"condition", "has_tool_calls"},
+                    {"routes", {{"true", "tools"}, {"false", "__end__"}}},
+                },
+                {{"from", "tools"}, {"to", "llm"}},
+            }),
+        },
+    };
+
+    // Build NodeContext
+    neograph::graph::NodeContext ctx;
+    ctx.instructions = config->systemPrompt;
+
+    std::vector<neograph::Tool *> tool_ptrs;
+    tool_ptrs.reserve(tools.size());
+    for (auto &t : tools) {
+      tool_ptrs.push_back(t.get());
+    }
+    ctx.tools = std::move(tool_ptrs);
+
+    neograph::llm::OpenAIProvider::Config provideConfig{
+        .api_key = config->modelOpenAIApiKey,
+        .base_url = config->modelOpenAIBaseUrl,
+        .default_model = config->modelOpenAIModelName,
+    };
+    ctx.provider = neograph::llm::OpenAIProvider::create_shared(provideConfig);
+
     auto store = std::make_shared<neograph::graph::InMemoryCheckpointStore>();
-    engine->set_checkpoint_store(store);
+    engine = neograph::graph::GraphEngine::compile(definition, ctx, store);
+    engine->own_tools(std::move(tools));
   }
 
   asio::awaitable<void> runCliAsync() {
