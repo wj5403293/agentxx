@@ -46,6 +46,7 @@ public:
     tools.push_back(std::make_unique<agentxx::tools::FileSystemListFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemReadFile>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemWriteFile>());
+    tools.push_back(std::make_unique<agentxx::tools::FilesystemEditFile>());
 
     for (auto &url : config->mcpServerUrls) {
       auto mcp_client = neograph::mcp::MCPClient{url};

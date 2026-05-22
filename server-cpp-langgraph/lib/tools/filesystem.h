@@ -39,7 +39,7 @@ public:
                     "path",
                     {
                         {"type", "string"},
-                        {"description", "文件或文件夹的绝对路径."},
+                        {"description", "文件或文件夹的绝对路径"},
                     },
                 }},
             },
@@ -102,7 +102,7 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "Absolute file path."},
+                            {"description", "文件绝对路径"},
                         },
                     },
                     {
@@ -110,8 +110,8 @@ public:
                         {
                             {"type", "number"},
                             {"description", "文本偏移行数，默认 0 "
-                                            "表示不偏移。如果偏移超出文件最大行"
-                                            "数，将返回错误提示"},
+                                            "表示不偏移.如果偏移超出文件最大行"
+                                            "数,将返回错误提示"},
                         },
                     },
                     {
@@ -119,8 +119,8 @@ public:
                         {
                             {"type", "number"},
                             {"description",
-                             "读取文本行数限制，取值范围 [1, ~]，默认 null "
-                             "表示不限制。允许指定的限制值超出文件最大行数不报"
+                             "读取文本行数限制,取值范围 [1, ~]，默认 null "
+                             "表示不限制.允许指定的限制值超出文件最大行数不报"
                              "错"},
                         },
                     },
@@ -140,8 +140,16 @@ public:
     auto text_line_offset = arguments.value<double>("text_line_offset", -1);
     auto text_line_limit = arguments.value<double>("text_line_limit", -1);
 
+    std::ifstream stream;
     try {
-      auto stream = std::ifstream{filepath};
+      stream.open(filepath);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        stream.close();
+        co_return std::format(R"({{"error":"Can not open file. Error: {}"}})",
+                              ec.message());
+      }
+
       if (text_line_offset >= 0 || text_line_limit >= 0) {
         // 读取部分文件
         const auto offset =
@@ -171,8 +179,10 @@ public:
         co_return result.str();
       }
       // 读取完整文件
-      co_return std::string((std::istreambuf_iterator<char>(stream)),
-                            std::istreambuf_iterator<char>());
+      auto result = std::string((std::istreambuf_iterator<char>(stream)),
+                                std::istreambuf_iterator<char>());
+      stream.close();
+      co_return result;
     } catch (const std::exception &e) {
       co_return std::format(R"({{"error": "filesystem_readfile failed: {}"}})",
                             e.what());
@@ -190,7 +200,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_writefile",
-        "创建新文件，如果文件已经存在则返回失败.",
+        "创建新文件，或覆盖文件.",
         neograph::json{
             {"type", "object"},
             {
@@ -200,7 +210,7 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "Absolute file path."},
+                            {"description", "文件绝对路径"},
                         },
                     },
                     {
@@ -208,6 +218,16 @@ public:
                         {
                             {"type", "string"},
                             {"description", "写入文件的内容"},
+                        },
+                    },
+                    {
+                        "overwrite",
+                        {
+                            {"type", "boolean"},
+                            {"description",
+                             R"(是否覆盖文件，默认`false`.
+                             如果为`true`，仅创建新文件并写入,若文件已存在则返回失败.
+                             如果为`false`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.)"},
                         },
                     },
                 },
@@ -224,13 +244,13 @@ public:
       co_return R"({"error":"Arg `path` is empty"})";
     }
     auto content = arguments.value<std::string>("content", std::string{});
+    auto overwrite = arguments.value<bool>("overwrite", false);
 
     std::ofstream stream;
     try {
       auto path = std::filesystem::path{filepath};
-      if (std::filesystem::exists(path)) {
-        co_return std::format(R"({{"error":"File already exist."}})",
-                              path.parent_path().string());
+      if (false == overwrite && std::filesystem::exists(path)) {
+        co_return R"({"error":"File already exist."})";
       }
       if (false == std::filesystem::exists(path.parent_path()) &&
           false == std::filesystem::create_directories(path.parent_path())) {
@@ -260,8 +280,8 @@ public:
               ec.message());
         }
       }
-      stream.close();
 
+      stream.close();
       co_return "success";
     } catch (const std::exception &e) {
       co_return std::format(R"({{"error": "filesystem_writefile failed: {}"}})",
@@ -291,19 +311,37 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "Absolute file path."},
+                            {"description", "文件绝对路径"},
                         },
                     },
                     {
-                        "content",
+                        "old_str",
                         {
                             {"type", "string"},
-                            {"description", "写入文件的内容"},
+                            {"description",
+                             "待替换的旧字符串,精准匹配,不能为空"},
                         },
                     },
+                    {
+                        "new_str",
+                        {
+                            {"type", "string"},
+                            {"description", "新字符串"},
+                        },
+                    },
+                    {
+                        "multi_replace",
+                        {
+                            {"type", "boolean"},
+                            {"description",
+                             "是否替换所有匹配`old_str`"
+                             "的字符串,默认false只替换第一个匹配"},
+                        },
+                    },
+
                 },
             },
-            {"required", neograph::json::array({"path"})},
+            {"required", neograph::json::array({"path", "old_str", "new_str"})},
         },
     };
   }
@@ -314,46 +352,64 @@ public:
     if (filepath.empty()) {
       co_return R"({"error":"Arg `path` is empty"})";
     }
-    auto content = arguments.value<std::string>("content", std::string{});
+    auto old_str = arguments.value<std::string>("old_str", std::string{});
+    if (old_str.empty()) {
+      co_return R"({"error":"Arg `old_str` is empty"})";
+    }
+    auto new_str = arguments.value<std::string>("new_str", std::string{});
+    auto multi_replace = arguments.value<bool>("multi_replace", false);
 
-    std::ofstream stream;
+    std::fstream stream;
     try {
       auto path = std::filesystem::path{filepath};
-      if (std::filesystem::exists(path)) {
-        co_return std::format(R"({{"error":"File already exist."}})",
-                              path.parent_path().string());
-      }
-      if (false == std::filesystem::create_directories(path.parent_path())) {
-        co_return std::format(
-            R"({{"error":"Can not create `path`({})'s parent dirs."}})",
-            path.parent_path().string());
+      if (false == std::filesystem::exists(path)) {
+        co_return R"({"error":"File not exist."})";
       }
 
-      stream.open(filepath, std::ios_base::out);
+      stream.open(filepath, std::ios_base::in | std::ios_base::out |
+                                std::ios_base::binary);
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
         stream.close();
-        co_return std::format(
-            R"({{"error":"Can not create or open file. Error: {}"}})",
-            ec.message());
+        co_return std::format(R"({{"error":"Can not open file. Error: {}"}})",
+                              ec.message());
       }
 
-      if (false == content.empty()) {
-        // 写入文件内容
-        stream << content;
-        if (!stream) {
-          auto ec = std::error_code{errno, std::system_category()};
-          stream.close();
-          co_return std::format(
-              R"({{"error":"File created success, but write failed. Error: {}"}})",
-              ec.message());
+      std::ostringstream output;
+      output << stream.rdbuf();
+      std::string content = output.str();
+
+      int replaceHit = 0;
+      size_t pos = 0;
+      while ((pos = content.find(old_str, pos)) != std::string::npos) {
+        replaceHit++;
+        content.replace(pos, old_str.length(), new_str);
+        // 跳过新字符串，避免死循环
+        pos += new_str.length();
+        if (false == multi_replace) {
+          break;
         }
       }
-      stream.close();
 
+      if (0 == replaceHit) {
+        stream.close();
+        co_return R"({"error":"No match `old_str` found"})";
+      }
+
+      // 写入文件内容
+      stream.seekp(0);
+      stream << content;
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        stream.close();
+        co_return std::format(R"({{"error":"Edit file failed. Error: {}"}})",
+                              ec.message());
+      }
+
+      stream.close();
       co_return "success";
     } catch (const std::exception &e) {
-      co_return std::format(R"({{"error": "filesystem_writefile failed: {}"}})",
+      co_return std::format(R"({{"error": "filesystem_editfile failed: {}"}})",
                             e.what());
     }
   }
