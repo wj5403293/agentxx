@@ -15,3 +15,6 @@
 [submodule "server-cpp-langgraph/third_party/html2md"]
 	path = server-cpp-langgraph/third_party/html2md
 	url = https://github.com/tim-gromeyer/html2md
+[submodule "server-cpp-langgraph/third_party/glob"]
+	path = server-cpp-langgraph/third_party/glob
+	url = https://github.com/p-ranav/glob

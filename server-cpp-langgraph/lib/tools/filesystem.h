@@ -429,7 +429,16 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_glob",
-        "Find files matching patterns (e.g., **/*.py).",
+        R"(Find files matching patterns.
+e.g., `**/*.txt`,`docx/*[0-9].txt`,`include/nc*.h`,`output/file[0-9].*`,`read/??.txt`.
+| Wildcard | Matches | Example
+|--- |--- |--- |
+| `*` | any characters | `*.txt` matches all files with the txt extension |
+| `?` | any one character | `???` matches files with 3 characters long |
+| `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
+| `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
+| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+)",
         neograph::json{
             {"type", "object"},
             {

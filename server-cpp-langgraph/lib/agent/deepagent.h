@@ -7,6 +7,7 @@
 #include "neograph/llm/openai_provider.h"
 #include "neograph/mcp/client.h"
 #include "neograph/neograph.h"
+#include "tools/execute_command.h"
 #include "tools/filesystem.h"
 #include "tools/get_current_system_datetime.h"
 #include "tools/websearch.h"
@@ -49,6 +50,7 @@ public:
         std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemEditFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
+    tools.push_back(std::make_unique<agentxx::tools::ExecuteCommandTool>());
 
     for (auto &url : config->mcpServerUrls) {
       auto mcp_client = neograph::mcp::MCPClient{url};
