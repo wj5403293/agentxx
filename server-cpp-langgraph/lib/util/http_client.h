@@ -10,6 +10,7 @@
 #include <optional>
 
 namespace agentxx {
+namespace util {
 
 class HttpClient_c {
 public:
@@ -116,4 +117,5 @@ public:
                         std::optional<std::exception>>{std::nullopt, resp_err};
   }
 };
+} // namespace util
 } // namespace agentxx

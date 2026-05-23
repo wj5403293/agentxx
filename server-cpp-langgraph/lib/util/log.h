@@ -32,9 +32,9 @@
 #endif
 
 namespace agentxx {
-namespace logxx {
+namespace util {
 void printStack();
 
 void signalError(std::string_view exepath);
-}; // namespace logxx
+}; // namespace util
 }; // namespace agentxx

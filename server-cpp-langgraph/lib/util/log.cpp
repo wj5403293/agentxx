@@ -10,7 +10,7 @@ using namespace agentxx;
 
 static std::string _exe_path{};
 
-void agentxx::logxx::printStack() {
+void agentxx::util::printStack() {
 
 #define innerPrintToConsoleAndFile_d(str, ...) printf(str, ##__VA_ARGS__);
 
@@ -112,7 +112,7 @@ void signal_handler(int signo) {
 #undef innerPrintToConsoleAndFile_d
 }
 
-void agentxx::logxx::signalError(std::string_view exepath) {
+void agentxx::util::signalError(std::string_view exepath) {
   _exe_path = exepath;
   printf("# Signal error handler: %s\n", exepath.data());
   signal(SIGSEGV, signal_handler);
@@ -120,8 +120,8 @@ void agentxx::logxx::signalError(std::string_view exepath) {
 
 #else
 
-void agentxx::logxx::printStack() {}
+void agentxx::util::printStack() {}
 
-void agentxx::logxx::signalError(std::string_view exepath) {}
+void agentxx::util::signalError(std::string_view exepath) {}
 
 #endif

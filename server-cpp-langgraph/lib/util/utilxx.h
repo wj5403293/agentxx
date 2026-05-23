@@ -4,5 +4,5 @@
 
 namespace agentxx {
 
-namespace utilxx {}; // namespace utilxx
+namespace util {}; // namespace util
 }; // namespace agentxx

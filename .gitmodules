@@ -9,8 +9,8 @@
 	path = server-cpp-langgraph/third_party/fmt
 	url = https://github.com/fmtlib/fmt
 	branch = 12.1.0
-[submodule "server-cpp-langgraph/third_party/neo_graph"]
-	path = server-cpp-langgraph/third_party/neo_graph
+[submodule "server-cpp-langgraph/third_party/neograph"]
+	path = server-cpp-langgraph/third_party/neograph
 	url = https://github.com/fox1245/NeoGraph
 [submodule "server-cpp-langgraph/third_party/html2md"]
 	path = server-cpp-langgraph/third_party/html2md

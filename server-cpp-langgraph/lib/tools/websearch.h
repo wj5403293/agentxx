@@ -56,11 +56,12 @@ public:
       co_return R"({"error":"Arg `query` is empty"})";
     }
     // TODO: 更换api
-    auto search_url = std::format("https://www.baidu.com/s?wd={}",
-                                  agentxx::HttpClient_c::urlEncode(query));
+    auto search_url =
+        std::format("https://www.baidu.com/s?wd={}",
+                    agentxx::util::HttpClient_c::urlEncode(query));
 
     auto [resp, resp_err] =
-        co_await agentxx::HttpClient_c::fetchMarkdown(search_url);
+        co_await agentxx::util::HttpClient_c::fetchMarkdown(search_url);
     if (resp.has_value()) {
       auto &data = resp.value();
       if (data.empty()) {
@@ -121,10 +122,10 @@ public:
     }
     int timeout = int(arguments.value<double>("timeout", 60.0));
 
-    auto [resp, resp_err] = co_await agentxx::HttpClient_c::getAsync(
+    auto [resp, resp_err] = co_await agentxx::util::HttpClient_c::getAsync(
         url, std::chrono::seconds(timeout));
     if (resp.has_value()) {
-      if (false == agentxx::HttpClient_c::respIsSucc(resp.value())) {
+      if (false == agentxx::util::HttpClient_c::respIsSucc(resp.value())) {
         co_return std::format(
             R"({{"error":"fetch_url failed, status {}, error: {}"}})",
             resp.value().status,
@@ -187,7 +188,8 @@ public:
       co_return R"({"error":"Arg `url` is empty"})";
     }
 
-    auto [resp, resp_err] = co_await agentxx::HttpClient_c::fetchMarkdown(url);
+    auto [resp, resp_err] =
+        co_await agentxx::util::HttpClient_c::fetchMarkdown(url);
     if (resp.has_value()) {
       auto &data = resp.value();
       if (data.empty()) {

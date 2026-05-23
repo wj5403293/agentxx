@@ -9,7 +9,7 @@ void test() {}
 
 int main(int argn, char **argv) {
 #if IS_LINUX_D
-  agentxx::logxx::signalError(argv[0]);
+  agentxx::util::signalError(argv[0]);
 #endif
   std::cout << "======= Test Start =======" << std::endl;
   test();

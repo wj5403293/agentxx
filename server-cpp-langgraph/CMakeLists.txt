@@ -1,7 +1,7 @@
 # The Flutter tooling requires that developers have CMake 3.10 or later
 # installed. You should not increase this version, as doing so will cause
 # the plugin to fail to compile for some customers of the plugin.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.28)
 cmake_policy(SET CMP0097 NEW)
 
 project(agentxx VERSION 0.0.1 LANGUAGES C CXX)
@@ -37,7 +37,6 @@ add_definitions(-DIS_IOS_D=${IS_IOS_D})
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
 
-
 message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 if (MSVC)
 		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}    /utf-8 /MD /wd4200 /std:c17")
@@ -69,12 +68,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
         set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS}   ")
       endif ()
     endif ()
-
-    if (IS_ANDROID_D OR IS_LINUX_D) 
-      # static link to ffmpeg.a
-      # windows 不需要
-      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-Bsymbolic")
-    endif()
 else ()
   message("[agentxx] 不支持的编译器")
   return()
@@ -90,54 +83,31 @@ if (DEFINED LUMENXX_BUILD_TYPE)
   add_definitions(-DLUMENXX_BUILD_TYPE=${LUMENXX_BUILD_TYPE})
 endif()
 
+# deps
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
 include(ExternalProject)
 include(FetchContent)
 
+# boost
+# https://github.com/boostorg/boost
+# - 下载 release/boost-xxx.7z 解压到 third_party/boost/
+#   cd boost/ && ./bootstrap.sh
+#   ./b2 --prefix=${root}/third_party/boost-build
+#   ./b2 install --prefix=${root}/third_party/boost-build
+set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost-build/")
+
 # simdjson
-ExternalProject_Add(
-  simdjson_repo
+FetchContent_Declare(
+  simdjson
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/simdjson/"
-  UPDATE_COMMAND ""
-  CMAKE_ARGS 
-      -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
-      -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
-      "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-      "-DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
-      "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}"
-      "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}" 
-      "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}"
-
-      "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
-      "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
-      "-DANDROID_ABI=${ANDROID_ABI}"
-      "-DANDROID_NDK=${ANDROID_NDK}"
-      "-DANDROID_STL=${ANDROID_STL}"
-      "-DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}"
-      "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}"
-
-      "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
-      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-      "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-
-      "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
-      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-      "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
-      "-DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}"
-      "-DCMAKE_C_FLAGS_PROFILE=${CMAKE_C_FLAGS_PROFILE}"
-      "-DCMAKE_CXX_FLAGS_PROFILE=${CMAKE_CXX_FLAGS_PROFILE}"
-      "-DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}"
-      "-DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}"
-      -DBUILD_SHARED_LIBS=OFF
-      -DSIMDJSON_BUILD_STATIC_LIB=ON
-  INSTALL_COMMAND ""
+  EXCLUDE_FROM_ALL
 )
-ExternalProject_Get_Property(simdjson_repo SOURCE_DIR)
-set(simdjson_SOURCE_DIR "${SOURCE_DIR}")
-ExternalProject_Get_Property(simdjson_repo BINARY_DIR)
-set(simdjson_INSTALL_DIR "${BINARY_DIR}/")
+block()
+  set(BUILD_SHARED_LIBS             OFF)
+  set(BUILD_STATIC_LIBS             ON)
+  FetchContent_MakeAvailable(simdjson)
+endblock()
 
 # fmt
 ExternalProject_Add(
@@ -188,46 +158,78 @@ set(fmt_SOURCE_DIR "${SOURCE_DIR}")
 ExternalProject_Get_Property(fmt_repo BINARY_DIR)
 set(fmt_INSTALL_DIR "${BINARY_DIR}/")
 
+# vectorscan
+FetchContent_Declare(
+  vectorscan
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vectorscan/"
+  EXCLUDE_FROM_ALL
+)
+block()
+  set(BUILD_UNIT            OFF)
+  set(BUILD_TOOLS           OFF)
+  set(BUILD_EXAMPLES        OFF)
+  set(BUILD_BENCHMARKS      OFF)
+  set(BUILD_DOC             OFF)
+  set(BUILD_SHARED_LIBS     OFF)
+  set(BUILD_STATIC_LIBS     ON )
+  set(FAT_RUNTIME           OFF)
+  set(USE_CPU_NATIVE        ON )
+  set(BUILD_AVX2            ON )
+  set(BUILD_AVX512          ON )
+  set(BUILD_AVX512VBMI      ON )
+  set(BUILD_SIMDE_BACKEND   OFF)
+  set(BUILD_SIMDE_NATIVE    OFF)
+  # set(BUILD_SVE            ON)
+  # set(BUILD_SVE2           ON)
+  # set(BUILD_SVE2_BITPERM   ON)
+  FetchContent_MakeAvailable(vectorscan)
+endblock()
+
 # neograph
 FetchContent_Declare(
   NeoGraph
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/neo_graph/"
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/neograph/"
+  EXCLUDE_FROM_ALL
 )
-set(NEOGRAPH_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_PYBIND   OFF CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_A2A      OFF CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_POSTGRES OFF CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_SQLITE   OFF CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_ASYNC    ON  CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_LLM      ON  CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_MCP      ON  CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_ACP      ON  CACHE BOOL "" FORCE)
-set(NEOGRAPH_BUILD_UTIL     ON  CACHE BOOL "" FORCE)
-set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(NeoGraph)
+block()
+  set(NEOGRAPH_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_PYBIND    OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_A2A       OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_POSTGRES  OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_SQLITE    OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_ASYNC     ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_LLM       ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_MCP       ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_ACP       ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_UTIL      ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_INSTALL_HEADERS OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(NeoGraph)
+endblock()
 
 # html2md
 FetchContent_Declare(
   html2md
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/html2md/"
+  EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(html2md)
 
 # glob
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
-include_directories(${third_party_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
+include_directories(${vectorscan_SOURCE_DIR}/src/)
 include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
 include_directories(${html2md_SOURCE_DIR}/include/)
 include_directories(${glob_SOURCE_DIR}/single_include/)
-
-message("glob_SOURCE_DIR: ${glob_SOURCE_DIR}")
+include_directories(${Boost_ROOT}/include/)
+include_directories(${third_party_DIR})
 
 aux_source_directory("./lib/util" DIR_UTIL)
 aux_source_directory("./lib/tools" DIR_TOOLS)
@@ -241,13 +243,14 @@ add_library(agentxx SHARED
   ${DIR_AGENT}
 )
 
-add_dependencies(agentxx simdjson_repo)
 add_dependencies(agentxx fmt_repo)
 
 target_link_directories(agentxx PUBLIC 
   ${simdjson_INSTALL_DIR}
   ${fmt_INSTALL_DIR}
-  ${neo_graph_INSTALL_DIR}
+  ${neograph_INSTALL_DIR}
+  ${vectorscan_INSTALL_DIR}/lib/
+  ${Boost_ROOT}/lib/
 )
 
 target_link_libraries(agentxx PUBLIC
@@ -259,6 +262,8 @@ target_link_libraries(agentxx PUBLIC
   neograph::llm
   neograph::mcp
   neograph::acp
+	hs_runtime
+	hs
 )
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
   # 仅单配置构建、debug 时使用
