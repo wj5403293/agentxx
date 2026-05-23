@@ -3,6 +3,7 @@
 #include "log.h"
 #include <agentxx.h>
 #include <algorithm>
+#include <boost/beast/core/detail/base64.hpp>
 #include <cstring>
 #include <iostream>
 #include <queue>
@@ -420,5 +421,17 @@ inline std::string_view stringCopyMalloc(const std::string_view data1,
   return std::string_view{result, len};
 }
 
+inline static std::string base64_encode(const void *data, size_t len) {
+  // 预分配
+  std::string result;
+  result.resize(boost::beast::detail::base64::encoded_size(len));
+
+  size_t bytes_written =
+      boost::beast::detail::base64::encode(result.data(), data, len);
+
+  // 调整大小为实际写入的字节数
+  result.resize(bytes_written);
+  return result;
+}
 }; // namespace util
 }; // namespace agentxx

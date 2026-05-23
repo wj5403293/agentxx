@@ -135,7 +135,6 @@ int run_test(neograph::acp::ACPServer &server) {
       return 1;
     }
   }
-
   if (notif_count == 0) {
     std::cerr << "[!] expected at least one session/update notification\n";
     return 1;

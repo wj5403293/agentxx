@@ -11,6 +11,7 @@
 #include "tools/execute_command.h"
 #include "tools/filesystem.h"
 #include "tools/get_current_system_datetime.h"
+#include "tools/string.h"
 #include "tools/websearch.h"
 #include "util/log.h"
 #include <format>
@@ -39,7 +40,10 @@ public:
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
     tools.push_back(std::make_unique<agentxx::tools::FileSystemListFileTool>());
-    tools.push_back(std::make_unique<agentxx::tools::FilesystemReadFileTool>());
+    tools.push_back(
+        std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
+    tools.push_back(
+        std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
     tools.push_back(
         std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemEditFileTool>());
@@ -47,6 +51,7 @@ public:
     tools.push_back(std::make_unique<agentxx::tools::ExecuteCommandTool>());
     tools.push_back(
         std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
+    tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
 
     for (auto &url : config->mcpServerUrls) {
       auto mcp_client = neograph::mcp::MCPClient{url};
@@ -140,8 +145,10 @@ public:
               .thread_id = "session",
               .input = {{
                   "messages",
-                  neograph::json::array(
-                      {{{"role", "user"}, {"content", line}}}),
+                  neograph::json::array({{
+                      {"role", "user"},
+                      {"content", line},
+                  }}),
               }},
               .resume_if_exists = true,
           };

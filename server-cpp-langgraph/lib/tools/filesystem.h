@@ -2,6 +2,7 @@
 
 #include "glob/glob.hpp"
 #include "util/log.h"
+#include "util/string_util.h"
 #include <cstdlib>
 #include <filesystem>
 #include <format>
@@ -75,19 +76,18 @@ public:
 };
 
 /// read
-class FilesystemReadFileTool : public neograph::AsyncTool {
+class FilesystemReadTextFileTool : public neograph::AsyncTool {
 public:
-  explicit FilesystemReadFileTool() {}
+  explicit FilesystemReadTextFileTool() {}
 
-  std::string get_name() const override { return "filesystem_readfile"; }
+  std::string get_name() const override { return "filesystem_read_text_file"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "filesystem_readfile",
-        "Read file contents with line numbers, supports offset/limit for large "
-        "files."
-        "Also supports returning multimodal content blocks for non-text files "
-        "(images, video, audio, and documents).",
+        "filesystem_read_text_file",
+        "Read text file (e.g.: .txt,.md,.json,.log) contents with line "
+        "numbers, supports offset/limit for large "
+        "files.",
         neograph::json{
             {"type", "object"},
             {
@@ -101,7 +101,7 @@ public:
                         },
                     },
                     {
-                        "text_line_offset",
+                        "line_offset",
                         {
                             {"type", "number"},
                             {"description", "文本偏移行数,默认`0`"
@@ -110,7 +110,7 @@ public:
                         },
                     },
                     {
-                        "text_line_limit",
+                        "line_limit",
                         {
                             {"type", "number"},
                             {"description",
@@ -132,8 +132,8 @@ public:
     if (filepath.empty()) {
       co_return R"({"error":"Arg `path` is empty"})";
     }
-    auto text_line_offset = arguments.value<double>("text_line_offset", -1);
-    auto text_line_limit = arguments.value<double>("text_line_limit", -1);
+    auto text_line_offset = arguments.value<double>("line_offset", -1);
+    auto text_line_limit = arguments.value<double>("line_limit", -1);
 
     std::ifstream stream;
     try {
@@ -171,6 +171,14 @@ public:
           line_num++;
           count++;
         }
+
+        stream.close();
+        if (0 == count) {
+          // offset 超出文件行数
+          co_return std::format(
+              R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
+              offset, line_num);
+        }
         co_return result.str();
       }
       // 读取完整文件
@@ -178,6 +186,140 @@ public:
                                 std::istreambuf_iterator<char>());
       stream.close();
       co_return result;
+    } catch (const std::exception &e) {
+      stream.close();
+      throw e;
+    }
+  }
+};
+
+/// read
+class FilesystemReadBinaryFileTool : public neograph::AsyncTool {
+public:
+  explicit FilesystemReadBinaryFileTool() {}
+
+  std::string get_name() const override {
+    return "filesystem_read_binary_file";
+  }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "filesystem_read_binary_file",
+        "Read binary file (e.g.: .txt,.md,.json,.log) contents with byte "
+        "offset. Supports offset/limit for large files. Returns binary content "
+        "as base64 string.",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "path",
+                        {
+                            {"type", "string"},
+                            {"description", "文件绝对路径"},
+                        },
+                    },
+                    {
+                        "byte_offset",
+                        {
+                            {"type", "number"},
+                            {"description",
+                             "起始读取字节偏移量,默认`0`表示不偏移."
+                             "如果偏移超出文件大小,将返回错误提示"},
+                        },
+                    },
+                    {
+                        "byte_limit",
+                        {
+                            {"type", "number"},
+                            {"description",
+                             "读取字节数限制,取值范围 [1, ~],默认`null`"
+                             "表示不限制.允许指定的限制值超出文件大小不报错"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({"path"})},
+        },
+    };
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto filepath = arguments.value("path", std::string{});
+    if (filepath.empty()) {
+      co_return R"({"error":"Arg `path` is empty"})";
+    }
+    auto byte_offset = arguments.value<double>("byte_offset", -1);
+    auto byte_limit = arguments.value<double>("byte_limit", -1);
+
+    std::ifstream stream;
+    try {
+      stream.open(filepath, std::ios::binary);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        stream.close();
+        co_return std::format(R"({{"error":"Can not open file. Error: {}"}})",
+                              ec.message());
+      }
+
+      if (byte_offset >= 0 || byte_limit >= 0) {
+        // 读取部分文件
+        const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
+        const size_t limit = (byte_limit >= 0)
+                                 ? size_t(byte_limit)
+                                 : std::numeric_limits<size_t>::max();
+
+        // 计算实际需要读取的字节数
+        auto fileSize = stream.tellg();
+        auto bytesAvailable =
+            std::max((long long)fileSize - (long long)offset, (long long)0);
+        auto bytesRead = std::min(static_cast<std::streamsize>(limit),
+                                  static_cast<std::streamsize>(bytesAvailable));
+
+        // 没有数据可读
+        if (bytesRead <= 0) {
+          stream.close();
+          co_return std::format(
+              R"({{"error":"Arg `byte_offset`({}) is out of range of file size({})."}})",
+              offset, (size_t)fileSize);
+        }
+
+        stream.seekg(offset, std::ios::beg);
+        if (!stream.good()) {
+          auto ec = std::error_code{errno, std::system_category()};
+          stream.close();
+          co_return std::format(
+              R"({{"error":"Read offset {} bytes failed. Error: {}"}})", offset,
+              ec.message());
+        }
+
+        std::vector<char> result{};
+        result.resize(bytesRead + 1);
+        stream.read(result.data(), limit);
+        std::streamsize realBytesRead = stream.gcount();
+
+        stream.close();
+        co_return neograph::json{
+            {"bytes_read_len", realBytesRead},
+            {"base64_data",
+             agentxx::util::base64_encode(result.data(), result.size())},
+        }
+            .dump();
+      }
+
+      // 读取完整文件
+      auto result = std::string((std::istreambuf_iterator<char>(stream)),
+                                std::istreambuf_iterator<char>());
+      std::streamsize bytes_read = stream.gcount();
+      stream.close();
+      co_return neograph::json{
+          {"bytes_read_len", bytes_read},
+          {"base64_data",
+           agentxx::util::base64_encode(result.data(), result.size())},
+      }
+          .dump();
     } catch (const std::exception &e) {
       stream.close();
       throw e;

@@ -12,6 +12,17 @@
 namespace agentxx {
 namespace tools {
 
+//   """
+//   识别图中的文本，并输出文本块在图片中的坐标和宽高数组，单项格式为:
+//   {
+//     "text": "hello",
+//     "x": 0,
+//     "y": 200,
+//     "width": 100,
+//     "height": 20,
+//   }
+//   其中需要将图片的 x、y、width、height 量化为千分比，即取值范围在 [0, 1000]
+//   """
 class ExecuteCommandTool : public neograph::AsyncTool {
 public:
   explicit ExecuteCommandTool() {}
