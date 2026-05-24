@@ -96,6 +96,9 @@ include(FetchContent)
 #   ./b2 --prefix=${root}/third_party/boost-build
 #   ./b2 install --prefix=${root}/third_party/boost-build
 set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost-build/")
+add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
+add_definitions(-DBOOST_ASIO_STANDALONE=1)
+add_definitions(-DASIO_STANDALONE=1)
 
 # simdjson
 FetchContent_Declare(
@@ -186,6 +189,7 @@ block()
 endblock()
 
 # neograph
+# ln -s /home/coolight/program/agentxx/server-cpp-langgraph/third_party/boost-build/include/boost/asio/ /home/coolight/program/agentxx/server-cpp-langgraph/third_party/neograph/deps/asio/include/asio
 FetchContent_Declare(
   NeoGraph
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/neograph/"

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "boost/beast/core/detail/base64.hpp"
 #include "log.h"
 #include <agentxx.h>
 #include <algorithm>
-#include <boost/beast/core/detail/base64.hpp>
 #include <cstring>
 #include <iostream>
 #include <queue>
@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
 
 namespace agentxx {
 namespace util {
@@ -433,5 +434,17 @@ inline static std::string base64_encode(const void *data, size_t len) {
   result.resize(bytes_written);
   return result;
 }
+
+inline static std::string base64_decode(const std::string_view str) {
+  std::string result;
+  result.resize(boost::beast::detail::base64::decoded_size(str.size()));
+
+  auto [bytes_written, _] = boost::beast::detail::base64::decode(
+      result.data(), str.data(), str.size());
+
+  result.resize(bytes_written);
+  return result;
+}
+
 }; // namespace util
 }; // namespace agentxx

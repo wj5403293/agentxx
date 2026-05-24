@@ -59,7 +59,7 @@ public:
 
     auto result = neograph::json::array();
     for (const auto &entity : std::filesystem::directory_iterator(targetPath)) {
-      auto item = neograph::json{
+      result.push_back(neograph::json{
           {"path", entity.path().generic_string()},
           {"type", (entity.is_directory()      ? "dir"
                     : entity.is_regular_file() ? "file"
@@ -68,8 +68,7 @@ public:
           {"size", size_t(entity.file_size())},
           {"last_write_time",
            entity.last_write_time().time_since_epoch().count()},
-      };
-      result.push_back(item);
+      });
     }
     co_return result.dump();
   }
@@ -140,9 +139,8 @@ public:
       stream.open(filepath);
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
-        stream.close();
-        co_return std::format(R"({{"error":"Can not open file. Error: {}"}})",
-                              ec.message());
+        throw std::runtime_error{
+            std::format(R"(Can not open file. Error: {})", ec.message())};
       }
 
       if (text_line_offset >= 0 || text_line_limit >= 0) {
@@ -179,6 +177,7 @@ public:
               R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
               offset, line_num);
         }
+
         co_return result.str();
       }
       // 读取完整文件
@@ -259,9 +258,8 @@ public:
       stream.open(filepath, std::ios::binary);
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
-        stream.close();
-        co_return std::format(R"({{"error":"Can not open file. Error: {}"}})",
-                              ec.message());
+        throw std::runtime_error{
+            std::format(R"(Can not open file. Error: {})", ec.message())};
       }
 
       if (byte_offset >= 0 || byte_limit >= 0) {
@@ -280,19 +278,17 @@ public:
 
         // 没有数据可读
         if (bytesRead <= 0) {
-          stream.close();
-          co_return std::format(
-              R"({{"error":"Arg `byte_offset`({}) is out of range of file size({})."}})",
-              offset, (size_t)fileSize);
+          throw std::runtime_error{std::format(
+              R"(Arg `byte_offset`({}) is out of range of file size({}).)",
+              offset, (size_t)fileSize)};
         }
 
         stream.seekg(offset, std::ios::beg);
         if (!stream.good()) {
           auto ec = std::error_code{errno, std::system_category()};
-          stream.close();
-          co_return std::format(
-              R"({{"error":"Read offset {} bytes failed. Error: {}"}})", offset,
-              ec.message());
+          throw std::runtime_error{
+              std::format(R"(Read offset {} bytes failed. Error: {})", offset,
+                          ec.message())};
         }
 
         std::vector<char> result{};
@@ -367,6 +363,16 @@ public:
                              如果为`false`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.)"},
                         },
                     },
+                    {
+                        "is_binary",
+                        {
+                            {"type", "boolean"},
+                            {"description",
+                             R"(默认`false`,是否按二进制模式写入文件.
+                             如果为`true`,参数`content`应当为base64编码的二进制数据.
+                             如果为`false`,参数`content`视为普通文本,按字符串直接写入文件.)"},
+                        },
+                    },
                 },
             },
             {"required", neograph::json::array({"path"})},
@@ -382,39 +388,47 @@ public:
     }
     auto content = arguments.value<std::string>("content", std::string{});
     auto overwrite = arguments.value<bool>("overwrite", false);
+    auto is_binary = arguments.value<bool>("is_binary", false);
 
     std::ofstream stream;
     try {
       auto path = std::filesystem::path{filepath};
       if (false == overwrite && std::filesystem::exists(path)) {
-        co_return R"({"error":"File already exist."})";
+        throw std::runtime_error{"File already exist"};
       }
       if (false == std::filesystem::exists(path.parent_path()) &&
           false == std::filesystem::create_directories(path.parent_path())) {
         // 创建父目录
-        co_return std::format(
-            R"({{"error":"Can not create `path`({})'s parent dirs."}})",
-            path.parent_path().string());
+        throw std::runtime_error{
+            std::format(R"(Can not create `path`({})'s parent dirs.)",
+                        path.parent_path().string())};
       }
 
-      stream.open(filepath, std::ios_base::out);
+      stream.open(filepath, is_binary
+                                ? std::ios_base::out | std::ios_base::binary
+                                : std::ios_base::out);
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
-        stream.close();
-        co_return std::format(
-            R"({{"error":"Can not create or open file. Error: {}"}})",
-            ec.message());
+        throw std::runtime_error{std::format(
+            R"(Can not create or open file. Error: {})", ec.message())};
       }
 
       if (false == content.empty()) {
         // 写入文件内容
-        stream << content;
+        if (is_binary) {
+          auto result = agentxx::util::base64_decode(content);
+          if (result.empty()) {
+            throw std::runtime_error{"base64 decode failed"};
+          }
+          stream << result;
+        } else {
+          stream << content;
+        }
         if (!stream) {
           auto ec = std::error_code{errno, std::system_category()};
-          stream.close();
-          co_return std::format(
-              R"({{"error":"File created success, but write failed. Error: {}"}})",
-              ec.message());
+          throw std::runtime_error{std::format(
+              R"(File created success, but write failed. Error: {})",
+              ec.message())};
         }
       }
 
@@ -500,16 +514,15 @@ public:
     try {
       auto path = std::filesystem::path{filepath};
       if (false == std::filesystem::exists(path)) {
-        co_return R"({"error":"File not exist."})";
+        throw std::runtime_error{"File not exist"};
       }
 
       stream.open(filepath, std::ios_base::in | std::ios_base::out |
                                 std::ios_base::binary);
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
-        stream.close();
-        co_return std::format(R"({{"error":"Can not open file. Error: {}"}})",
-                              ec.message());
+        throw std::runtime_error{
+            std::format(R"(Can not open file. Error: {})", ec.message())};
       }
 
       std::ostringstream output;
@@ -529,8 +542,7 @@ public:
       }
 
       if (0 == replaceHit) {
-        stream.close();
-        co_return R"({"error":"No match `old_str` found"})";
+        throw std::runtime_error{R"(No match `old_str` found)"};
       }
 
       // 写入文件内容
@@ -538,9 +550,8 @@ public:
       stream << content;
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
-        stream.close();
-        co_return std::format(R"({{"error":"Edit file failed. Error: {}"}})",
-                              ec.message());
+        throw std::runtime_error{
+            std::format(R"(Edit file failed. Error: {})", ec.message())};
       }
 
       stream.close();

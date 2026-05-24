@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asio/io_context.hpp"
 #include <cstdlib>
 #include <neograph/graph/deep_research_graph.h>
 #include <neograph/llm/rate_limited_provider.h>
