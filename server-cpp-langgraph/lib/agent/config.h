@@ -14,6 +14,7 @@ public:
   std::string modelOpenAIModelName = "Agentxx";
 
   std::string currentSystemName;
+  bool isSystemWSL = false;
   std::string systemPrompt = "You are a helpful assistant.";
   std::vector<std::string> mcpServerUrls{};
 };

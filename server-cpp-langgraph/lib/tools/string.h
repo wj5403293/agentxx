@@ -10,7 +10,6 @@
 #include <iostream>
 #include <limits>
 #include <memory>
-#include <neograph/graph/deep_research_graph.h>
 #include <neograph/llm/rate_limited_provider.h>
 #include <neograph/llm/schema_provider.h>
 #include <neograph/neograph.h>

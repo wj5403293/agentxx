@@ -100,18 +100,6 @@ add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_ASIO_STANDALONE=1)
 add_definitions(-DASIO_STANDALONE=1)
 
-# simdjson
-FetchContent_Declare(
-  simdjson
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/simdjson/"
-  EXCLUDE_FROM_ALL
-)
-block()
-  set(BUILD_SHARED_LIBS             OFF)
-  set(BUILD_STATIC_LIBS             ON)
-  FetchContent_MakeAvailable(simdjson)
-endblock()
-
 # fmt
 ExternalProject_Add(
   fmt_repo
@@ -161,6 +149,68 @@ set(fmt_SOURCE_DIR "${SOURCE_DIR}")
 ExternalProject_Get_Property(fmt_repo BINARY_DIR)
 set(fmt_INSTALL_DIR "${BINARY_DIR}/")
 
+# iconv
+set(LIBICONV_VERSION 1.18)
+set(LIBICONV_URL "https://ftp.gnu.org/gnu/libiconv/libiconv-${LIBICONV_VERSION}.tar.gz")
+set(LIBICONV_PREFIX ${CMAKE_BINARY_DIR}/libiconv-src)
+set(LIBICONV_SOURCE_DIR ${LIBICONV_PREFIX}/src/iconv_repo)
+set(LIBICONV_BINARY_DIR ${CMAKE_BINARY_DIR}/libiconv-build)
+set(LIBICONV_INSTALL_DIR ${CMAKE_BINARY_DIR}/libiconv-install)
+ExternalProject_Add(
+  iconv_repo
+  URL ${LIBICONV_URL}
+  PREFIX ${LIBICONV_PREFIX} 
+  SOURCE_DIR ${LIBICONV_SOURCE_DIR}
+  BINARY_DIR ${LIBICONV_BINARY_DIR} 
+  INSTALL_DIR ${LIBICONV_INSTALL_DIR} 
+  CONFIGURE_COMMAND 
+      cd ${LIBICONV_SOURCE_DIR} && ./configure
+      --prefix=${LIBICONV_INSTALL_DIR} 
+      --host=${CMAKE_C_COMPILER_TARGET}
+      --enable-static=yes
+      --enable-shared=no
+      --enable-pic
+      --disable-rpath
+      --disable-nls
+      --disable-libiconv-close
+      CC=${CMAKE_C_COMPILER}
+      CXX=${CMAKE_CXX_COMPILER}
+      AR=${CMAKE_AR}
+      RANLIB=${CMAKE_RANLIB}
+      "CFLAGS=${CMAKE_C_FLAGS} -DANDROID_PLATFORM=${ANDROID_PLATFORM} -DANDROID_ABI=${ANDROID_ABI} -DANDROID_NDK=${ANDROID_NDK} -DANDROID_STL=${ANDROID_STL}"
+  BUILD_COMMAND 
+    cd ${LIBICONV_SOURCE_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
+  INSTALL_COMMAND 
+    cd ${LIBICONV_SOURCE_DIR} && make install
+  UPDATE_COMMAND ""
+  TEST_COMMAND ""
+)
+
+# uchardet
+FetchContent_Declare(
+  uchardet
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/uchardet/"
+  EXCLUDE_FROM_ALL
+)
+block()
+  set(CHECK_SSE2            ON)
+  set(BUILD_BINARY          OFF)
+  set(BUILD_SHARED_LIBS     OFF)
+  FetchContent_MakeAvailable(uchardet)
+endblock()
+
+# simdjson
+FetchContent_Declare(
+  simdjson
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/simdjson/"
+  EXCLUDE_FROM_ALL
+)
+block()
+  set(BUILD_SHARED_LIBS             OFF)
+  set(BUILD_STATIC_LIBS             ON)
+  FetchContent_MakeAvailable(simdjson)
+endblock()
+
 # vectorscan
 FetchContent_Declare(
   vectorscan
@@ -209,6 +259,8 @@ block()
   set(NEOGRAPH_BUILD_UTIL      ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_INSTALL_HEADERS OFF CACHE BOOL "" FORCE)
+  set(BUILD_SHARED_LIBS             OFF)
+  set(BUILD_STATIC_LIBS             ON)
   FetchContent_MakeAvailable(NeoGraph)
 endblock()
 
@@ -218,7 +270,15 @@ FetchContent_Declare(
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/html2md/"
   EXCLUDE_FROM_ALL
 )
-FetchContent_MakeAvailable(html2md)
+block()
+  set(BUILD_EXE                 OFF)
+  set(BUILD_DOC                 OFF)
+  set(BUILD_TEST                OFF)
+  set(PYTHON_BINDINGS           OFF)
+  set(BUILD_SHARED_LIBS         OFF)
+  set(BUILD_STATIC_LIBS         ON)
+  FetchContent_MakeAvailable(html2md)
+endblock()
 
 # glob
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
@@ -227,6 +287,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
+include_directories(${UCHARDET_INSTALL_DIR}/include/)
+include_directories(${LIBICONV_INSTALL_DIR}/include/)
 include_directories(${vectorscan_SOURCE_DIR}/src/)
 include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
@@ -248,18 +310,23 @@ add_library(agentxx SHARED
 )
 
 add_dependencies(agentxx fmt_repo)
+add_dependencies(agentxx iconv_repo)
 
 target_link_directories(agentxx PUBLIC 
   ${simdjson_INSTALL_DIR}
   ${fmt_INSTALL_DIR}
   ${neograph_INSTALL_DIR}
   ${vectorscan_INSTALL_DIR}/lib/
+  ${UCHARDET_INSTALL_DIR}/lib/
+  ${LIBICONV_INSTALL_DIR}/lib/
   ${Boost_ROOT}/lib/
 )
 
 target_link_libraries(agentxx PUBLIC
   simdjson
   html2md
+  uchardet
+  iconv
   neograph::core
   neograph::util
   neograph::async

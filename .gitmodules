@@ -18,3 +18,9 @@
 [submodule "server-cpp-langgraph/third_party/glob"]
 	path = server-cpp-langgraph/third_party/glob
 	url = https://github.com/p-ranav/glob
+[submodule "server-cpp-langgraph/third_party/vectorscan"]
+	path = server-cpp-langgraph/third_party/vectorscan
+	url = https://github.com/VectorCamp/vectorscan
+[submodule "server-cpp-langgraph/third_party/uchardet"]
+	path = server-cpp-langgraph/third_party/uchardet
+	url = https://gitlab.freedesktop.org/uchardet/uchardet

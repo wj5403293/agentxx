@@ -10,7 +10,7 @@
 #include "nodes/toolcall.h"
 #include "tools/execute_command.h"
 #include "tools/filesystem.h"
-#include "tools/get_current_system_datetime.h"
+#include "tools/get_current_datetime.h"
 #include "tools/string.h"
 #include "tools/websearch.h"
 #include "util/log.h"
@@ -34,8 +34,7 @@ public:
     assert(config->modelOpenAIBaseUrl.empty() == false);
 
     std::vector<std::unique_ptr<neograph::Tool>> tools{};
-    tools.push_back(
-        std::make_unique<agentxx::tools::GetCurrentSystemDateTimeTool>());
+    tools.push_back(std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
     tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
@@ -48,10 +47,21 @@ public:
         std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemEditFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
-    tools.push_back(std::make_unique<agentxx::tools::ExecuteCommandTool>());
     tools.push_back(
         std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
     tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
+
+#if IS_WIN_D
+    tools.push_back(
+        std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+#elif IS_LINUX_D
+    tools.push_back(
+        std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
+    if (agentxx::util::isRunningInWSL()) {
+      tools.push_back(
+          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+    }
+#endif
 
     for (auto &url : config->mcpServerUrls) {
       auto mcp_client = neograph::mcp::MCPClient{url};

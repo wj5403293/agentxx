@@ -16,18 +16,16 @@ namespace agentxx {
 namespace tools {
 
 /// 获取系统日期和时间
-class GetCurrentSystemDateTimeTool : public neograph::Tool {
+class GetCurrentDateTimeTool : public neograph::Tool {
 public:
-  explicit GetCurrentSystemDateTimeTool() {}
+  explicit GetCurrentDateTimeTool() {}
 
-  std::string get_name() const override {
-    return "get_current_system_datetime";
-  }
+  std::string get_name() const override { return "get_current_datetime"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "get_current_system_datetime",
-        "Get current system date and time.",
+        "get_current_datetime",
+        "Get current date and time.",
         neograph::json{},
     };
   }

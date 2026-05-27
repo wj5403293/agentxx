@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <functional>
 #include <iostream>
-#include <neograph/graph/deep_research_graph.h>
 #include <neograph/llm/rate_limited_provider.h>
 #include <neograph/llm/schema_provider.h>
 #include <neograph/neograph.h>

@@ -16,7 +16,6 @@
 #include <unordered_set>
 #include <vector>
 
-
 namespace agentxx {
 namespace util {
 
@@ -446,5 +445,8 @@ inline static std::string base64_decode(const std::string_view str) {
   return result;
 }
 
+std::string convertToUtf8(const std::string_view src, const char *src_encoding);
+bool chardetConvertEncoding(const std::string_view str, std::string &encoding,
+                            std::string &result);
 }; // namespace util
 }; // namespace agentxx

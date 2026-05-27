@@ -15,20 +15,18 @@
 namespace agentxx {
 namespace tools {
 
-/// 寄存信息，节省模型上下文
-/// TODO: 重启恢复
-class MemoryDepositSetTool : public neograph::Tool {
+class TodoListTool : public neograph::Tool {
 protected:
   std::map<int, std::string> memory{};
 
 public:
-  explicit MemoryDepositSetTool() {}
+  explicit TodoListTool() {}
 
-  std::string get_name() const override { return "memory_deposit_set"; }
+  std::string get_name() const override { return "todolist"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "memory_deposit_set",
+        "todolist",
         R"(Store text in memory. Return a unique id, used to get text by toolcall `memory_deposit_get`.
 New store text or Set/Delete text by unique id.
 )",

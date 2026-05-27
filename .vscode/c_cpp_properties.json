@@ -1,0 +1,70 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/server-cpp-langgraph/third_party/neograph/include/",
+                "${workspaceFolder}/server-cpp-langgraph/third_party/neograph/deps/",
+                "${workspaceFolder}/server-cpp-langgraph/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/server-cpp-langgraph/third_party/boost-build/include/",
+                "${workspaceFolder}/server-cpp-langgraph/lib/",
+                "${workspaceFolder}/server-cpp-langgraph/"
+            ],
+            "defines": [
+                "IS_LINUX_D",
+                "LUMENXX_BUILD_TYPE",
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "/usr/local/bin/g++",
+            "cStandard": "c23",
+            "cppStandard": "c++23"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/src/third_party/ffmpeg/include-win/",
+                "${workspaceFolder}/src/third_party/",
+                "${workspaceFolder}/src/lib/",
+                "${workspaceFolder}/src/",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "IS_WIN_D",
+                "LUMENXX_BUILD_TYPE",
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "WIN32"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c23",
+            "cppStandard": "c++23"
+        },
+        {
+            "name": "Android",
+            "includePath": [
+                "${workspaceFolder}/src/third_party/ffmpeg/include-android/",
+                "${workspaceFolder}/src/third_party/",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/",
+                "${workspaceFolder}/src/lib/",
+                "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
+                "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android/"
+            ],
+            "defines": [
+                "IS_ANDROID_D",
+                "ANDROID",
+                "LUMENXX_BUILD_TYPE",
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "cStandard": "c23",
+            "cppStandard": "c++23"
+        }
+    ],
+    "version": 4
+}
