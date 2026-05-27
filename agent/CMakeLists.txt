@@ -196,6 +196,7 @@ block()
   set(CHECK_SSE2            ON)
   set(BUILD_BINARY          OFF)
   set(BUILD_SHARED_LIBS     OFF)
+  set(BUILD_STATIC_LIBS     ON )
   FetchContent_MakeAvailable(uchardet)
 endblock()
 
