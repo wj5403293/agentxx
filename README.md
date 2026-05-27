@@ -6,10 +6,8 @@
     - ``
 
 ## 目录结构
-- `server-cpp-langgraph`
+- `agent`
     - c++实现agent
-- `server-py-langgraph`
-    - 使用python/`langgraph`实现的agent
 
 ## 编译 server-cpp
 - 

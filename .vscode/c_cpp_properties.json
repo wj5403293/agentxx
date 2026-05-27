@@ -3,12 +3,12 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/server-cpp-langgraph/third_party/neograph/include/",
-                "${workspaceFolder}/server-cpp-langgraph/third_party/neograph/deps/",
-                "${workspaceFolder}/server-cpp-langgraph/third_party/neograph/deps/asio/include/",
-                "${workspaceFolder}/server-cpp-langgraph/third_party/boost-build/include/",
-                "${workspaceFolder}/server-cpp-langgraph/lib/",
-                "${workspaceFolder}/server-cpp-langgraph/"
+                "${workspaceFolder}/agent/third_party/neograph/include/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/",
+                "${workspaceFolder}/agent/lib/",
+                "${workspaceFolder}/agent/"
             ],
             "defines": [
                 "IS_LINUX_D",

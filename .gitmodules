@@ -1,26 +1,23 @@
-[submodule "deep-agents-ui"]
-	path = deep-agents-ui
-	url = https://github.com/coolight7/deep-agents-ui
-[submodule "server-cpp-langgraph/third_party/simdjson"]
-	path = server-cpp-langgraph/third_party/simdjson
+[submodule "agent/third_party/simdjson"]
+	path = agent/third_party/simdjson
 	url = https://github.com/simdjson/simdjson.git
 	branch = v4.6.4
-[submodule "server-cpp-langgraph/third_party/fmt"]
-	path = server-cpp-langgraph/third_party/fmt
+[submodule "agent/third_party/fmt"]
+	path = agent/third_party/fmt
 	url = https://github.com/fmtlib/fmt
 	branch = 12.1.0
-[submodule "server-cpp-langgraph/third_party/neograph"]
-	path = server-cpp-langgraph/third_party/neograph
+[submodule "agent/third_party/neograph"]
+	path = agent/third_party/neograph
 	url = https://github.com/fox1245/NeoGraph
-[submodule "server-cpp-langgraph/third_party/html2md"]
-	path = server-cpp-langgraph/third_party/html2md
+[submodule "agent/third_party/html2md"]
+	path = agent/third_party/html2md
 	url = https://github.com/tim-gromeyer/html2md
-[submodule "server-cpp-langgraph/third_party/glob"]
-	path = server-cpp-langgraph/third_party/glob
+[submodule "agent/third_party/glob"]
+	path = agent/third_party/glob
 	url = https://github.com/p-ranav/glob
-[submodule "server-cpp-langgraph/third_party/vectorscan"]
-	path = server-cpp-langgraph/third_party/vectorscan
+[submodule "agent/third_party/vectorscan"]
+	path = agent/third_party/vectorscan
 	url = https://github.com/VectorCamp/vectorscan
-[submodule "server-cpp-langgraph/third_party/uchardet"]
-	path = server-cpp-langgraph/third_party/uchardet
+[submodule "agent/third_party/uchardet"]
+	path = agent/third_party/uchardet
 	url = https://gitlab.freedesktop.org/uchardet/uchardet

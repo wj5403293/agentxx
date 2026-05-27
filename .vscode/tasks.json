@@ -4,7 +4,7 @@
         {
             "label": "compileDebugCxx",
             "type": "shell",
-            "command": "${workspaceFolder}/server-cpp-langgraph/script/debug_build.sh",
+            "command": "${workspaceFolder}/agent/script/debug_build.sh",
             "args": [],
             "group": {
                 "kind": "build",
