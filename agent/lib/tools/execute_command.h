@@ -78,7 +78,7 @@ Current System is {}{}, please use linux shell/bash commands.
 };
 
 /// windows cmd
-/// TODO: 返回值编码转 utf8
+/// 支持 WSL
 class ExecuteWindowsCommandTool : public neograph::AsyncTool {
 public:
   explicit ExecuteWindowsCommandTool() {}
@@ -163,6 +163,7 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
     std::string result = out.str();
     std::string encoding, utf8result;
     if (agentxx::util::chardetConvertEncoding(result, encoding, utf8result)) {
+      // 转 utf8
       co_return utf8result;
     }
     co_return result;

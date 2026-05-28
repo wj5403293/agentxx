@@ -4,9 +4,6 @@
 #include <neograph/llm/schema_provider.h>
 #include <neograph/neograph.h>
 
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include <httplib.h>
-
 #include "util/http_client.h"
 #include "util/log.h"
 #include <cstdlib>
@@ -16,6 +13,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include <httplib.h>
 
 namespace agentxx {
 namespace tools {

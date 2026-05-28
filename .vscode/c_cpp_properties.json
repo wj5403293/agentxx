@@ -3,8 +3,14 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/agent/third_party/fmt/include/",
+                "${workspaceFolder}/agent/third_party/html2md/include/",
+                "${workspaceFolder}/agent/third_party/vectorscan/src/",
+                "${workspaceFolder}/agent/third_party/glob/single_include/",
                 "${workspaceFolder}/agent/third_party/neograph/include/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
                 "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",

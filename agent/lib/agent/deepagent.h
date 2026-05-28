@@ -7,6 +7,7 @@
 #include "neograph/llm/openai_provider.h"
 #include "neograph/mcp/client.h"
 #include "neograph/neograph.h"
+#include "nodes/modelcall.h"
 #include "nodes/toolcall.h"
 #include "tools/execute_command.h"
 #include "tools/filesystem.h"
@@ -23,6 +24,8 @@ class DeepAgent {
 protected:
   std::unique_ptr<neograph::graph::GraphEngine> engine = nullptr;
   std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
+  std::shared_ptr<agentxx::nodes::MiddlewareWarpHandleContext> handleContext =
+      nullptr;
 
 public:
   DeepAgent(std::shared_ptr<agentxx::AgentxxConfig_c> in_config)
@@ -33,11 +36,54 @@ public:
   void init() {
     assert(config->modelOpenAIBaseUrl.empty() == false);
 
+    {
+      handleContext =
+          std::make_shared<agentxx::nodes::MiddlewareWarpHandleContext>();
+
+      /// 应当作为最后一层
+      handleContext->handles.push_back(agentxx::nodes::MiddlewareWarpHandle{
+          .onToolcallStart =
+              [](neograph::graph::NodeInput &in) -> asio::awaitable<void> {
+            return agentxx::nodes::MiddlewareWrapToolcallNode::
+                defStdoutLogOnToolcallStart(in);
+          },
+          .onToolcallEnd =
+              [](const neograph::graph::NodeInput &in,
+                 neograph::graph::NodeOutput &result) {
+                return agentxx::nodes::MiddlewareWrapToolcallNode::
+                    defStdoutLogOnToolcallEnd(in, result);
+              },
+      });
+    }
+
+    {
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
+          [funcCtx = handleContext](const std::string &name,
+                                    const neograph::json &,
+                                    const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<agentxx::nodes::MiddlewareWrapToolcallNode>(
+                name, ctx, funcCtx);
+          });
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{agentxx::nodes::MiddlewareWrapModelCallNode::defNodeType},
+          [funcCtx = handleContext](const std::string &name,
+                                    const neograph::json &,
+                                    const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapModelCallNode>(name, ctx,
+                                                             funcCtx);
+          });
+    }
+
     std::vector<std::unique_ptr<neograph::Tool>> tools{};
+
     tools.push_back(std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
+
     tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
     tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
+
     tools.push_back(std::make_unique<agentxx::tools::FileSystemListFileTool>());
     tools.push_back(
         std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
@@ -47,6 +93,7 @@ public:
         std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemEditFileTool>());
     tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
+
     tools.push_back(
         std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
     tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
@@ -73,23 +120,6 @@ public:
       }
     }
 
-    neograph::graph::NodeFactory::instance().register_type(
-        std::string{agentxx::nodes::ToolcallNode::defNodeType},
-        [](const std::string &name, const neograph::json &,
-           const neograph::graph::NodeContext &ctx) {
-          return std::make_unique<agentxx::nodes::ToolcallNode>(
-              name, ctx,
-              [name](neograph::graph::NodeInput &in) {
-                return agentxx::nodes::ToolcallNode::
-                    defStdoutLogOnToolcallStart(in, name);
-              },
-              [name](const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) {
-                return agentxx::nodes::ToolcallNode::defStdoutLogOnToolcallEnd(
-                    in, result, name);
-              });
-        });
-
     // JSON definition equivalent to the Agent::run() ReAct loop:
     //   __start__ -> llm -> (has_tool_calls ? tools : __end__)
     //                         tools -> llm  (loop back)
@@ -99,10 +129,20 @@ public:
         {
             "nodes",
             {
-                {"llm", {{"type", "llm_call"}}},
+                {
+                    "llm",
+                    {{
+                        "type",
+                        agentxx::nodes::MiddlewareWrapModelCallNode::
+                            defNodeType,
+                    }},
+                },
                 {
                     "tools",
-                    {{"type", agentxx::nodes::ToolcallNode::defNodeType}},
+                    {{
+                        "type",
+                        agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType,
+                    }},
                 },
             },
         },

@@ -16,6 +16,7 @@ public:
   std::string currentSystemName;
   bool isSystemWSL = false;
   std::string systemPrompt = "You are a helpful assistant.";
+  std::vector<std::string> skillDirPaths{};
   std::vector<std::string> mcpServerUrls{};
 };
 } // namespace agentxx

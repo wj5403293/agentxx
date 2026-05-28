@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "middleware.h"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -15,55 +16,39 @@
 namespace agentxx {
 namespace nodes {
 
-class NEOGRAPH_API ToolcallNode : public neograph::graph::ToolDispatchNode {
+class NEOGRAPH_API MiddlewareWrapToolcallNode
+    : public MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode> {
 protected:
-  std::string name;
-  std::function<void(neograph::graph::NodeInput &in)> onToolcallStart;
-  std::function<void(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result)>
-      onToolcallEnd;
-
 public:
-  inline static const auto defNodeType = std::string_view{"xx_tool_call"};
+  inline static const auto defNodeType = std::string_view{"xx_Toolcall"};
 
-  ToolcallNode(const std::string &in_name,
-               const neograph::graph::NodeContext &ctx,
-               const std::function<void(neograph::graph::NodeInput &in)>
-                   &in_onToolcallStart = nullptr,
-               const std::function<void(const neograph::graph::NodeInput &in,
-                                        neograph::graph::NodeOutput &result)>
-                   &in_onToolcallEnd = nullptr)
-      : neograph::graph::ToolDispatchNode(in_name, ctx), name(in_name),
-        onToolcallStart(in_onToolcallStart), onToolcallEnd(in_onToolcallEnd) {}
+  MiddlewareWrapToolcallNode(
+      const std::string &in_name, const neograph::graph::NodeContext &in_ctx,
+      std::shared_ptr<MiddlewareWarpHandleContext> in_handleContext)
+      : MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
+            in_name, in_ctx, in_handleContext) {}
 
-  asio::awaitable<neograph::graph::NodeOutput>
-  run(neograph::graph::NodeInput in) override {
-    try {
-      if (nullptr != onToolcallStart) {
-        onToolcallStart(in);
-      }
-      auto result = co_await neograph::graph::ToolDispatchNode::run(in);
-      if (nullptr != onToolcallEnd) {
-        onToolcallEnd(in, result);
-      }
-      co_return result;
-    } catch (const std::exception &e) {
-      neograph::graph::NodeOutput out;
-      out.writes.push_back(neograph::graph::ChannelWrite{
-          "messages",
-          std::format(R"({{"error": "Tool `{}` exception: {}"}})", name,
-                      e.what()),
-      });
-      if (nullptr != onToolcallEnd) {
-        onToolcallEnd(in, out);
-      }
-      co_return out;
+  asio::awaitable<void> onHandleStart(const MiddlewareWarpHandle &item,
+                                      neograph::graph::NodeInput &in) override {
+    if (nullptr != item.onToolcallStart) {
+      co_await item.onToolcallStart(in);
     }
+    co_return;
   }
 
-  inline static void defStdoutLogOnToolcallStart(neograph::graph::NodeInput &in,
-                                                 const std::string_view name,
-                                                 size_t limitOutput = 0) {
+  asio::awaitable<void>
+  onHandleEnd(const MiddlewareWarpHandle &item,
+              const neograph::graph::NodeInput &in,
+              neograph::graph::NodeOutput &result) override {
+    if (nullptr != item.onToolcallEnd) {
+      co_await item.onToolcallEnd(in, result);
+    }
+    co_return;
+  }
+
+  inline static asio::awaitable<void>
+  defStdoutLogOnToolcallStart(neograph::graph::NodeInput &in,
+                              size_t limitOutput = 0) {
     const neograph::ChatMessage *assistant_msg = nullptr;
     auto messages = in.state.get_messages();
     if (false == messages.empty()) {
@@ -94,19 +79,21 @@ public:
     }
 
     std::cout << std::format(R"(
-┏━━━━━━ Toolcall/{} ━━━━━━┓
+┏━━━━━━ Toolcall  Run ━━━━━━┓
 {}
+╿
 )",
-                             name, out.str())
+                             out.str())
               << std::flush;
+    co_return;
   }
 
-  inline static void defStdoutLogOnToolcallEnd(
-      const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result,
-      const std::string_view name, size_t limitOutput = 0) {
+  inline static asio::awaitable<void>
+  defStdoutLogOnToolcallEnd(const neograph::graph::NodeInput &in,
+                            neograph::graph::NodeOutput &result,
+                            size_t limitOutput = 0) {
     std::ostringstream out{};
     if (false == result.writes.empty()) {
-
       size_t index = 0;
       for (auto &item : result.writes) {
         ++index;
@@ -122,11 +109,13 @@ public:
     }
 
     std::cout << std::format(R"(
+╽
 {}
-┗━━━━━━  Done / {}  ━━━━━━┛
+┗━━━━━━ Toolcall Done ━━━━━━┛
 )",
-                             out.str(), name)
+                             out.str())
               << std::endl;
+    co_return;
   }
 };
 } // namespace nodes
