@@ -24,106 +24,126 @@ class DeepAgent {
 protected:
   std::unique_ptr<neograph::graph::GraphEngine> engine = nullptr;
   std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
-  std::shared_ptr<agentxx::nodes::MiddlewareWarpHandleContext> handleContext =
-      nullptr;
+  std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+      middlewareHandleContext = nullptr;
 
 public:
   DeepAgent(std::shared_ptr<agentxx::AgentxxConfig_c> in_config)
       : config(in_config) {
     assert(nullptr != config);
+    assert(config->modelOpenAIBaseUrl.empty() == false);
   }
 
   void init() {
-    assert(config->modelOpenAIBaseUrl.empty() == false);
+
+    /// Toolcall
+    std::vector<std::unique_ptr<neograph::Tool>> tools{};
+    {
+      tools.push_back(
+          std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
+
+      tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
+
+      tools.push_back(
+          std::make_unique<agentxx::tools::FileSystemListFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemEditFileTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
+
+      tools.push_back(
+          std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
+      tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
+
+#if IS_WIN_D
+      tools.push_back(
+          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+#elif IS_LINUX_D
+      tools.push_back(
+          std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
+      if (agentxx::util::isRunningInWSL()) {
+        tools.push_back(
+            std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+      }
+#endif
+    }
 
     {
-      handleContext =
-          std::make_shared<agentxx::nodes::MiddlewareWarpHandleContext>();
+      /// MCP
+      for (auto &url : config->mcpServerUrls) {
+        auto mcpClient = neograph::mcp::MCPClient{url};
+        if (mcpClient.initialize(config->agentName)) {
+          auto mcpTools = mcpClient.get_tools();
+          XX_LOGD("append mcp tool size: {}", mcpTools.size());
+          tools.insert(tools.end(), std::make_move_iterator(mcpTools.begin()),
+                       std::make_move_iterator(mcpTools.end()));
+        }
+      }
+    }
+
+    {
+      /// middleware
+      middlewareHandleContext =
+          std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
 
       /// 应当作为最后一层
-      handleContext->handles.push_back(agentxx::nodes::MiddlewareWarpHandle{
-          .onToolcallStart =
+      middlewareHandleContext->handles.push_back(
+          std::make_unique<agentxx::middleware::MiddlewareWarpHandle>(
+              "toolcall_log",
+              (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
+              (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               [](neograph::graph::NodeInput &in) -> asio::awaitable<void> {
-            return agentxx::nodes::MiddlewareWrapToolcallNode::
-                defStdoutLogOnToolcallStart(in);
-          },
-          .onToolcallEnd =
+                return agentxx::nodes::MiddlewareWrapToolcallNode::
+                    defStdoutLogOnToolcallStart(in);
+              },
               [](const neograph::graph::NodeInput &in,
                  neograph::graph::NodeOutput &result) {
                 return agentxx::nodes::MiddlewareWrapToolcallNode::
                     defStdoutLogOnToolcallEnd(in, result);
-              },
-      });
-    }
+              }));
 
-    {
-      neograph::graph::NodeFactory::instance().register_type(
-          std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
-          [funcCtx = handleContext](const std::string &name,
-                                    const neograph::json &,
-                                    const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<agentxx::nodes::MiddlewareWrapToolcallNode>(
-                name, ctx, funcCtx);
-          });
-      neograph::graph::NodeFactory::instance().register_type(
-          std::string{agentxx::nodes::MiddlewareWrapModelCallNode::defNodeType},
-          [funcCtx = handleContext](const std::string &name,
-                                    const neograph::json &,
-                                    const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<
-                agentxx::nodes::MiddlewareWrapModelCallNode>(name, ctx,
-                                                             funcCtx);
-          });
-    }
-
-    std::vector<std::unique_ptr<neograph::Tool>> tools{};
-
-    tools.push_back(std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
-
-    tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
-    tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
-    tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
-
-    tools.push_back(std::make_unique<agentxx::tools::FileSystemListFileTool>());
-    tools.push_back(
-        std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
-    tools.push_back(
-        std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
-    tools.push_back(
-        std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
-    tools.push_back(std::make_unique<agentxx::tools::FilesystemEditFileTool>());
-    tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
-
-    tools.push_back(
-        std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
-    tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
-
-#if IS_WIN_D
-    tools.push_back(
-        std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
-#elif IS_LINUX_D
-    tools.push_back(
-        std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
-    if (agentxx::util::isRunningInWSL()) {
-      tools.push_back(
-          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
-    }
-#endif
-
-    for (auto &url : config->mcpServerUrls) {
-      auto mcp_client = neograph::mcp::MCPClient{url};
-      if (mcp_client.initialize(config->agentName)) {
-        auto mcp_tools = mcp_client.get_tools();
-        XX_LOGD("append mcp tool size: {}", mcp_tools.size());
-        tools.insert(tools.end(), std::make_move_iterator(mcp_tools.begin()),
-                     std::make_move_iterator(mcp_tools.end()));
+      /// 添加 tools
+      for (auto &item : middlewareHandleContext->handles) {
+        if (false == item->toolcalls.empty()) {
+          tools.insert(tools.end(),
+                       std::make_move_iterator(item->toolcalls.begin()),
+                       std::make_move_iterator(item->toolcalls.end()));
+        }
       }
     }
+
+    // Build NodeContext
+    neograph::graph::NodeContext nodeContext;
+    nodeContext.instructions = config->systemPrompt;
+
+    std::vector<neograph::Tool *> toolPtrs;
+    toolPtrs.reserve(tools.size());
+    for (auto &t : tools) {
+      toolPtrs.push_back(t.get());
+    }
+    nodeContext.tools = std::move(toolPtrs);
+
+    neograph::llm::OpenAIProvider::Config provideConfig{
+        .api_key = config->modelOpenAIApiKey,
+        .base_url = config->modelOpenAIBaseUrl,
+        .default_model = config->modelOpenAIModelName,
+    };
+    nodeContext.provider =
+        neograph::llm::OpenAIProvider::create_shared(provideConfig);
+
+    auto store = std::make_shared<neograph::graph::InMemoryCheckpointStore>();
 
     // JSON definition equivalent to the Agent::run() ReAct loop:
     //   __start__ -> llm -> (has_tool_calls ? tools : __end__)
     //                         tools -> llm  (loop back)
-    auto definition = neograph::json{
+    auto graphDefinition = neograph::json{
         {"name", config->agentName},
         {"channels", {{"messages", {{"type", "list"}, {"reducer", "append"}}}}},
         {
@@ -161,26 +181,29 @@ public:
         },
     };
 
-    // Build NodeContext
-    neograph::graph::NodeContext ctx;
-    ctx.instructions = config->systemPrompt;
-
-    std::vector<neograph::Tool *> tool_ptrs;
-    tool_ptrs.reserve(tools.size());
-    for (auto &t : tools) {
-      tool_ptrs.push_back(t.get());
+    {
+      /// register Node
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
+          [handleCtx = middlewareHandleContext](
+              const std::string &name, const neograph::json &,
+              const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<agentxx::nodes::MiddlewareWrapToolcallNode>(
+                name, ctx, handleCtx);
+          });
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{agentxx::nodes::MiddlewareWrapModelCallNode::defNodeType},
+          [handleCtx = middlewareHandleContext](
+              const std::string &name, const neograph::json &,
+              const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapModelCallNode>(name, ctx,
+                                                             handleCtx);
+          });
     }
-    ctx.tools = std::move(tool_ptrs);
 
-    neograph::llm::OpenAIProvider::Config provideConfig{
-        .api_key = config->modelOpenAIApiKey,
-        .base_url = config->modelOpenAIBaseUrl,
-        .default_model = config->modelOpenAIModelName,
-    };
-    ctx.provider = neograph::llm::OpenAIProvider::create_shared(provideConfig);
-
-    auto store = std::make_shared<neograph::graph::InMemoryCheckpointStore>();
-    engine = neograph::graph::GraphEngine::compile(definition, ctx, store);
+    engine = neograph::graph::GraphEngine::compile(graphDefinition, nodeContext,
+                                                   store);
     engine->own_tools(std::move(tools));
   }
 
@@ -190,7 +213,6 @@ public:
     for (std::string line; std::getline(std::cin, line);) {
       if (false == line.empty()) {
         try {
-
           neograph::graph::RunConfig cfg{
               .thread_id = "session",
               .input = {{

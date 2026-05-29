@@ -1,10 +1,6 @@
 #pragma once
 
 #include "neograph/neograph.h"
-
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#include "httplib.h"
-
 #include <format>
 #include <iostream>
 #include <map>

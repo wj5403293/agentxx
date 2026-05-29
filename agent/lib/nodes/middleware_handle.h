@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "middlewares/middleware.h"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -15,12 +16,6 @@
 namespace agentxx {
 namespace nodes {
 
-typedef std::function<asio::awaitable<void>(neograph::graph::NodeInput &in)>
-    onGraphNodeBeforeCallFunc;
-typedef std::function<asio::awaitable<void>(
-    const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>
-    onGraphNodeAfterCallFunc;
-
 template <typename T>
 concept BaseGraphNodeType = std::same_as<T, neograph::graph::GraphNode> ||
                             std::derived_from<T, neograph::graph::GraphNode>;
@@ -30,14 +25,16 @@ class NEOGRAPH_API MiddlewareWrapBaseNode : public T {
 
 protected:
   std::string name;
-  onGraphNodeBeforeCallFunc onBeforeCall;
-  onGraphNodeAfterCallFunc onAfterCall;
+  agentxx::middleware::onGraphNodeBeforeCallFunc onBeforeCall;
+  agentxx::middleware::onGraphNodeAfterCallFunc onAfterCall;
 
 public:
   MiddlewareWrapBaseNode(
       const std::string &in_name, const neograph::graph::NodeContext &ctx,
-      const onGraphNodeBeforeCallFunc &in_onBeforeCall = nullptr,
-      const onGraphNodeAfterCallFunc &in_onAfterCall = nullptr)
+      const agentxx::middleware::onGraphNodeBeforeCallFunc &in_onBeforeCall =
+          nullptr,
+      const agentxx::middleware::onGraphNodeAfterCallFunc &in_onAfterCall =
+          nullptr)
       : name(in_name), onBeforeCall(in_onBeforeCall),
         onAfterCall(in_onAfterCall) {}
 
@@ -80,32 +77,18 @@ public:
   }
 };
 
-class MiddlewareWarpHandle {
-public:
-  std::string name;
-  onGraphNodeBeforeCallFunc onModelcallStart;
-  onGraphNodeAfterCallFunc onModelcallEnd;
-  onGraphNodeBeforeCallFunc onToolcallStart;
-  onGraphNodeAfterCallFunc onToolcallEnd;
-};
-
-class MiddlewareWarpHandleContext {
-public:
-  std::vector<MiddlewareWarpHandle> handles{};
-
-  MiddlewareWarpHandleContext() {}
-};
-
 template <BaseGraphNodeType T>
 class NEOGRAPH_API MiddlewareWrapHandleBaseNode : public T {
 protected:
   std::string nodeName;
-  std::shared_ptr<MiddlewareWarpHandleContext> handleContext;
+  std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+      handleContext;
 
 public:
   MiddlewareWrapHandleBaseNode(
       const std::string &name, const neograph::graph::NodeContext &ctx,
-      std::shared_ptr<MiddlewareWarpHandleContext> in_handleContext)
+      std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+          in_handleContext)
       : T(name, ctx), nodeName(name), handleContext(in_handleContext) {}
 
   virtual asio::awaitable<neograph::graph::NodeOutput>
@@ -124,11 +107,11 @@ public:
   }
 
   virtual asio::awaitable<void>
-  onHandleStart(const MiddlewareWarpHandle &item,
+  onHandleStart(agentxx::middleware::MiddlewareWarpHandleBase &item,
                 neograph::graph::NodeInput &in) = 0;
 
   virtual asio::awaitable<void>
-  onHandleEnd(const MiddlewareWarpHandle &item,
+  onHandleEnd(agentxx::middleware::MiddlewareWarpHandleBase &item,
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) = 0;
 
@@ -139,14 +122,14 @@ public:
     size_t i = 0;
     const auto len = handleContext->handles.size();
     for (; i < len; ++i) {
-      const auto &item = handleContext->handles[i];
+      auto &item = handleContext->handles[i];
       try {
-        co_await onHandleStart(item, in);
+        co_await onHandleStart(*item, in);
       } catch (const std::exception &e) {
         out.writes.push_back(neograph::graph::ChannelWrite{
             "messages",
             std::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
-                        nodeName, item.name, e.what()),
+                        nodeName, item->name, e.what()),
         });
         break;
       }
@@ -158,14 +141,14 @@ public:
     }
 
     for (; i-- > 0;) {
-      const auto &item = handleContext->handles[i];
+      auto &item = handleContext->handles[i];
       try {
-        co_await onHandleEnd(item, in, out);
+        co_await onHandleEnd(*item, in, out);
       } catch (const std::exception &e) {
         out.writes.push_back(neograph::graph::ChannelWrite{
             "messages",
             std::format(R"({{"error": "{}/End call `{}` exception: {}"}})",
-                        nodeName, item.name, e.what()),
+                        nodeName, item->name, e.what()),
         });
       }
     }

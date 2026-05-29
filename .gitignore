@@ -5,3 +5,4 @@
 .langgraph_api
 __pycache__
 help-dummy.o
+.VSCodeCounter

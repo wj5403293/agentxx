@@ -1,7 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
-#include "middleware.h"
+#include "nodes/middleware_handle.h"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -25,26 +25,22 @@ public:
 
   MiddlewareWrapModelCallNode(
       const std::string &name, const neograph::graph::NodeContext &ctx,
-      std::shared_ptr<MiddlewareWarpHandleContext> in_handleContext)
+      std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+          in_handleContext)
       : MiddlewareWrapHandleBaseNode<neograph::graph::LLMCallNode>(
             name, ctx, in_handleContext) {}
 
-  asio::awaitable<void> onHandleStart(const MiddlewareWarpHandle &item,
-                                      neograph::graph::NodeInput &in) override {
-    if (nullptr != item.onModelcallStart) {
-      co_await item.onModelcallStart(in);
-    }
-    co_return;
+  asio::awaitable<void>
+  onHandleStart(agentxx::middleware::MiddlewareWarpHandleBase &item,
+                neograph::graph::NodeInput &in) override {
+    co_await item.onModelcallStartFunc(in);
   }
 
   asio::awaitable<void>
-  onHandleEnd(const MiddlewareWarpHandle &item,
+  onHandleEnd(agentxx::middleware::MiddlewareWarpHandleBase &item,
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) override {
-    if (nullptr != item.onModelcallEnd) {
-      co_await item.onModelcallEnd(in, result);
-    }
-    co_return;
+    co_await item.onModelcallEndFunc(in, result);
   }
 };
 } // namespace nodes

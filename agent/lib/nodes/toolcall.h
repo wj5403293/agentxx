@@ -1,7 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
-#include "middleware.h"
+#include "nodes/middleware_handle.h"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -24,26 +24,22 @@ public:
 
   MiddlewareWrapToolcallNode(
       const std::string &in_name, const neograph::graph::NodeContext &in_ctx,
-      std::shared_ptr<MiddlewareWarpHandleContext> in_handleContext)
+      std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+          in_handleContext)
       : MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
             in_name, in_ctx, in_handleContext) {}
 
-  asio::awaitable<void> onHandleStart(const MiddlewareWarpHandle &item,
-                                      neograph::graph::NodeInput &in) override {
-    if (nullptr != item.onToolcallStart) {
-      co_await item.onToolcallStart(in);
-    }
-    co_return;
+  asio::awaitable<void>
+  onHandleStart(agentxx::middleware::MiddlewareWarpHandleBase &item,
+                neograph::graph::NodeInput &in) override {
+    co_await item.onToolcallStartFunc(in);
   }
 
   asio::awaitable<void>
-  onHandleEnd(const MiddlewareWarpHandle &item,
+  onHandleEnd(agentxx::middleware::MiddlewareWarpHandleBase &item,
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) override {
-    if (nullptr != item.onToolcallEnd) {
-      co_await item.onToolcallEnd(in, result);
-    }
-    co_return;
+    co_await item.onToolcallEndFunc(in, result);
   }
 
   inline static asio::awaitable<void>
@@ -81,7 +77,6 @@ public:
     std::cout << std::format(R"(
 ┏━━━━━━ Toolcall  Run ━━━━━━┓
 {}
-╿
 )",
                              out.str())
               << std::flush;
@@ -109,7 +104,6 @@ public:
     }
 
     std::cout << std::format(R"(
-╽
 {}
 ┗━━━━━━ Toolcall Done ━━━━━━┛
 )",
