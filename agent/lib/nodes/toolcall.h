@@ -1,6 +1,8 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "fmt/base.h"
+#include "fmt/format.h"
 #include "nodes/middleware_handle.h"
 #include <cstdlib>
 #include <functional>
@@ -74,12 +76,11 @@ public:
       out << "┣━ Empty Argument List\n";
     }
 
-    std::cout << std::format(R"(
+    fmt::print(R"(
 ┏━━━━━━ Toolcall  Run ━━━━━━┓
 {}
 )",
-                             out.str())
-              << std::flush;
+               out.str());
     co_return;
   }
 
@@ -103,12 +104,12 @@ public:
       out << "┣━ Empty Result List\n";
     }
 
-    std::cout << std::format(R"(
+    fmt::print(R"(
 {}
 ┗━━━━━━ Toolcall Done ━━━━━━┛
+
 )",
-                             out.str())
-              << std::endl;
+               out.str());
     co_return;
   }
 };

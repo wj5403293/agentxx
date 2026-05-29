@@ -4,6 +4,7 @@
 #include <neograph/llm/schema_provider.h>
 #include <neograph/neograph.h>
 
+#include "fmt/format.h"
 #include "util/http_client.h"
 #include "util/log.h"
 #include <cstdlib>
@@ -53,7 +54,7 @@ public:
     }
     // TODO: 更换api
     auto search_url =
-        std::format("https://www.baidu.com/s?wd={}",
+        fmt::format("https://www.baidu.com/s?wd={}",
                     agentxx::util::HttpClient_c::urlEncode(query));
 
     auto [resp, resp_err] =
@@ -69,7 +70,7 @@ public:
       }
       co_return data;
     }
-    co_return std::format(
+    co_return fmt::format(
         R"({{"error":"web_search failed: {}"}})",
         resp_err.value_or(std::runtime_error("[unknown]")).what());
   }
@@ -122,7 +123,7 @@ public:
         url, std::chrono::seconds(timeout));
     if (resp.has_value()) {
       if (false == agentxx::util::HttpClient_c::respIsSucc(resp.value())) {
-        co_return std::format(
+        co_return fmt::format(
             R"({{"error":"fetch_url failed, status {}, error: {}"}})",
             resp.value().status,
             resp_err.value_or(std::runtime_error("[none]")).what());
@@ -134,7 +135,7 @@ public:
       }
       co_return data;
     }
-    co_return std::format(
+    co_return fmt::format(
         R"({{"error":"fetch_url failed: {}"}})",
         resp_err.value_or(std::runtime_error("[unknown]")).what());
   }
@@ -197,7 +198,7 @@ public:
       }
       co_return data;
     }
-    co_return std::format(
+    co_return fmt::format(
         R"({{"error":"fetch_url_markdown failed: {}"}})",
         resp_err.value_or(std::runtime_error("[unknown]")).what());
   }

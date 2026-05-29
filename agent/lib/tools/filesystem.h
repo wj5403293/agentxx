@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fmt/format.h"
 #include "glob/glob.hpp"
 #include "util/log.h"
 #include "util/string_util.h"
@@ -136,7 +137,7 @@ public:
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
         throw std::runtime_error{
-            std::format(R"(Can not open file. Error: {})", ec.message())};
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
       }
 
       if (text_line_offset >= 0 || text_line_limit >= 0) {
@@ -169,7 +170,7 @@ public:
         stream.close();
         if (0 == count) {
           // offset 超出文件行数
-          co_return std::format(
+          co_return fmt::format(
               R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
               offset, line_num);
         }
@@ -253,7 +254,7 @@ public:
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
         throw std::runtime_error{
-            std::format(R"(Can not open file. Error: {})", ec.message())};
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
       }
 
       if (byte_offset >= 0 || byte_limit >= 0) {
@@ -272,7 +273,7 @@ public:
 
         // 没有数据可读
         if (bytesRead <= 0) {
-          throw std::runtime_error{std::format(
+          throw std::runtime_error{fmt::format(
               R"(Arg `byte_offset`({}) is out of range of file size({}).)",
               offset, (size_t)fileSize)};
         }
@@ -281,7 +282,7 @@ public:
         if (!stream.good()) {
           auto ec = std::error_code{errno, std::system_category()};
           throw std::runtime_error{
-              std::format(R"(Read offset {} bytes failed. Error: {})", offset,
+              fmt::format(R"(Read offset {} bytes failed. Error: {})", offset,
                           ec.message())};
         }
 
@@ -394,7 +395,7 @@ public:
           false == std::filesystem::create_directories(path.parent_path())) {
         // 创建父目录
         throw std::runtime_error{
-            std::format(R"(Can not create `path`({})'s parent dirs.)",
+            fmt::format(R"(Can not create `path`({})'s parent dirs.)",
                         path.parent_path().string())};
       }
 
@@ -403,7 +404,7 @@ public:
                                 : std::ios_base::out);
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
-        throw std::runtime_error{std::format(
+        throw std::runtime_error{fmt::format(
             R"(Can not create or open file. Error: {})", ec.message())};
       }
 
@@ -420,7 +421,7 @@ public:
         }
         if (!stream) {
           auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{std::format(
+          throw std::runtime_error{fmt::format(
               R"(File created success, but write failed. Error: {})",
               ec.message())};
         }
@@ -515,7 +516,7 @@ public:
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
         throw std::runtime_error{
-            std::format(R"(Can not open file. Error: {})", ec.message())};
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
       }
 
       std::ostringstream output;
@@ -544,12 +545,12 @@ public:
       if (!stream) {
         auto ec = std::error_code{errno, std::system_category()};
         throw std::runtime_error{
-            std::format(R"(Edit file failed. Error: {})", ec.message())};
+            fmt::format(R"(Edit file failed. Error: {})", ec.message())};
       }
 
       stream.close();
       if (multi_replace) {
-        co_return std::format(R"(Success, Replace {} times)", replaceHit);
+        co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
       } else {
         co_return "success";
       }

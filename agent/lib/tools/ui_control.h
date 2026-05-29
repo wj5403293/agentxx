@@ -51,27 +51,7 @@ public:
     if (query.empty()) {
       co_return R"({"error":"Arg `query` is empty"})";
     }
-    // TODO: 更换api
-    auto search_url =
-        std::format("https://www.baidu.com/s?wd={}",
-                    agentxx::util::HttpClient_c::urlEncode(query));
-
-    auto [resp, resp_err] =
-        co_await agentxx::util::HttpClient_c::fetchMarkdown(search_url);
-    if (resp.has_value()) {
-      auto &data = resp.value();
-      if (data.empty()) {
-        co_return R"({"error": "Empty search result."})";
-      }
-      const auto maxLength = 8000;
-      if (data.size() > maxLength) {
-        data.resize(maxLength);
-      }
-      co_return data;
-    }
-    co_return std::format(
-        R"({{"error":"web_search failed: {}"}})",
-        resp_err.value_or(std::runtime_error("[unknown]")).what());
+    co_return "";
   }
 };
 

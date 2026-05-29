@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fmt/format.h"
 #include "util/hyperscan.h"
 #include "util/log.h"
 #include "util/string_util.h"
@@ -148,7 +149,7 @@ public:
           relist.push_back(content.substr(item.start, item.end - item.start));
         }
         return neograph::json{
-            {"tip", std::format("Match found {} items.", results.size())},
+            {"tip", fmt::format("Match found {} items.", results.size())},
             {"result", relist},
         }
             .dump();

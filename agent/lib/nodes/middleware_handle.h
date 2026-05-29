@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "fmt/format.h"
 #include "middlewares/middleware.h"
 #include <cstdlib>
 #include <functional>
@@ -61,7 +62,7 @@ public:
       neograph::graph::NodeOutput out;
       out.writes.push_back(neograph::graph::ChannelWrite{
           "messages",
-          std::format(R"({{"error": "Middleware Wrap `{}` exception: {}"}})",
+          fmt::format(R"({{"error": "Middleware Wrap `{}` exception: {}"}})",
                       name, e.what()),
       });
       co_return out;
@@ -99,7 +100,7 @@ public:
       neograph::graph::NodeOutput out;
       out.writes.push_back(neograph::graph::ChannelWrite{
           "messages",
-          std::format(R"({{"error": "{}/LLMCall exception: {}"}})", nodeName,
+          fmt::format(R"({{"error": "{}/LLMCall exception: {}"}})", nodeName,
                       e.what()),
       });
       co_return out;
@@ -128,7 +129,7 @@ public:
       } catch (const std::exception &e) {
         out.writes.push_back(neograph::graph::ChannelWrite{
             "messages",
-            std::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
+            fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
                         nodeName, item->name, e.what()),
         });
         break;
@@ -147,7 +148,7 @@ public:
       } catch (const std::exception &e) {
         out.writes.push_back(neograph::graph::ChannelWrite{
             "messages",
-            std::format(R"({{"error": "{}/End call `{}` exception: {}"}})",
+            fmt::format(R"({{"error": "{}/End call `{}` exception: {}"}})",
                         nodeName, item->name, e.what()),
         });
       }

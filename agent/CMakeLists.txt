@@ -100,55 +100,6 @@ add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_ASIO_STANDALONE=1)
 add_definitions(-DASIO_STANDALONE=1)
 
-# fmt
-ExternalProject_Add(
-  fmt_repo
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/fmt/"
-  UPDATE_COMMAND ""
-  CMAKE_ARGS 
-      -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
-      -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
-      "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-      "-DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
-      "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}"
-      "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}" 
-      "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}"
-
-      "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
-      "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
-      "-DANDROID_ABI=${ANDROID_ABI}"
-      "-DANDROID_NDK=${ANDROID_NDK}"
-      "-DANDROID_STL=${ANDROID_STL}"
-      "-DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}"
-      "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}"
-
-      "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
-      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-      "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-
-      "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
-      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-      "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
-      "-DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}"
-      "-DCMAKE_C_FLAGS_PROFILE=${CMAKE_C_FLAGS_PROFILE}"
-      "-DCMAKE_CXX_FLAGS_PROFILE=${CMAKE_CXX_FLAGS_PROFILE}"
-      "-DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}"
-      "-DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}"
-      -DFMT_PEDANTIC=OFF
-      -DFMT_INSTALL=OFF
-      -DFMT_WERROR=OFF
-      -DBUILD_SHARED_LIBS=OFF
-      -DFMT_DOC=OFF
-      -DFMT_TEST=OFF
-      -DFMT_CUDA_TEST=OFF
-  INSTALL_COMMAND ""
-)
-ExternalProject_Get_Property(fmt_repo SOURCE_DIR)
-set(fmt_SOURCE_DIR "${SOURCE_DIR}")
-ExternalProject_Get_Property(fmt_repo BINARY_DIR)
-set(fmt_INSTALL_DIR "${BINARY_DIR}/")
-
 # iconv
 set(LIBICONV_VERSION 1.18)
 set(LIBICONV_URL "https://ftp.gnu.org/gnu/libiconv/libiconv-${LIBICONV_VERSION}.tar.gz")
@@ -185,6 +136,22 @@ ExternalProject_Add(
   UPDATE_COMMAND ""
   TEST_COMMAND ""
 )
+
+# fmt
+FetchContent_Declare(
+  fmt
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/fmt/"
+)
+block()
+  set(FMT_PEDANTIC          OFF)
+  set(FMT_INSTALL           OFF)
+  set(FMT_WERROR            OFF)
+  set(BUILD_SHARED_LIBS     OFF)
+  set(BUILD_STATIC_LIBS     ON )
+  set(FMT_DOC               OFF)
+  set(FMT_TEST              OFF)
+  FetchContent_MakeAvailable(fmt)
+endblock()
 
 # uchardet
 FetchContent_Declare(
@@ -280,6 +247,24 @@ block()
   FetchContent_MakeAvailable(html2md)
 endblock()
 
+# yaml-cpp
+FetchContent_Declare(
+  yaml-cpp
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/"
+  EXCLUDE_FROM_ALL
+)
+block()
+  set(YAML_CPP_BUILD_CONTRIB          OFF)
+  set(YAML_CPP_BUILD_TOOLS            ON)
+  set(YAML_BUILD_SHARED_LIBS          OFF)
+  set(YAML_CPP_INSTALL                OFF)
+  set(YAML_ENABLE_PIC                 ON)
+  set(YAML_CPP_BUILD_TESTS            ON)
+  set(BUILD_SHARED_LIBS               OFF)
+  set(BUILD_STATIC_LIBS               ON )
+  FetchContent_MakeAvailable(yaml-cpp)
+endblock()
+
 # glob
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
@@ -311,7 +296,6 @@ add_library(agentxx SHARED
   ${DIR_AGENT}
 )
 
-add_dependencies(agentxx fmt_repo)
 add_dependencies(agentxx iconv_repo)
 
 target_link_directories(agentxx PUBLIC 
@@ -325,6 +309,7 @@ target_link_directories(agentxx PUBLIC
 )
 
 target_link_libraries(agentxx PUBLIC
+  fmt::fmt
   simdjson
   html2md
   uchardet
@@ -337,17 +322,8 @@ target_link_libraries(agentxx PUBLIC
   neograph::acp
 	hs_runtime
 	hs
+  yaml-cpp::yaml-cpp
 )
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  # 仅单配置构建、debug 时使用
-  target_link_libraries(agentxx PUBLIC
-    fmtd
-  )
-else ()
-  target_link_libraries(agentxx PUBLIC
-    fmt
-  )
-endif()
 
 # 统一输出名称 libagentxx
 # - 不指定时，部分系统，如win可能编译输出缺少前缀 lib

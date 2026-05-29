@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fmt/format.h"
 #include "neograph/neograph.h"
 #include <format>
 #include <iostream>
@@ -30,12 +31,13 @@ public:
     auto now = std::chrono::system_clock::now();
     std::chrono::zoned_time local_time{std::chrono::current_zone(), now};
 
-    return std::format(R"(
+    return fmt::format(
+        R"(
 本地时间: {}
 UTC 时间: {}
 )",
-                       std::format("{:%Y-%m-%d %H:%M:%S}", local_time),
-                       std::format("{:%Y-%m-%d %H:%M:%S}", now));
+        std::format("{:%Y-%m-%d} {:%H:%M:%S}", local_time, local_time),
+        std::format("{:%Y-%m-%d} {:%H:%M:%S}", now, now));
   }
 };
 

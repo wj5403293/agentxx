@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "fmt/format.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include <cstdlib>
@@ -23,7 +24,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "execute_linux_command",
-        std::format(R"(Run linux shell commands in the terminal.
+        fmt::format(R"(Run linux shell commands in the terminal.
 Current System is {}{}, please use linux shell/bash commands.
 )",
                     agentxx::util::getSystemName(),
@@ -64,7 +65,7 @@ Current System is {}{}, please use linux shell/bash commands.
 #endif
     if (!pipe) {
       auto ec = std::error_code{errno, std::system_category()};
-      co_return std::format(R"({{"error":"Exec command faild. Error: {}"}})",
+      co_return fmt::format(R"({{"error":"Exec command faild. Error: {}"}})",
                             ec.message());
     }
 
@@ -88,7 +89,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "execute_windows_command",
-        std::format(
+        fmt::format(
             R"(Run windows commands in the terminal.
 Example:
 {}
@@ -151,7 +152,7 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
 #endif
     if (!pipe) {
       auto ec = std::error_code{errno, std::system_category()};
-      co_return std::format(R"({{"error":"Exec command faild. Error: {}"}})",
+      co_return fmt::format(R"({{"error":"Exec command faild. Error: {}"}})",
                             ec.message());
     }
 
