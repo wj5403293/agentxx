@@ -22,7 +22,7 @@ class NEOGRAPH_API MiddlewareWrapToolcallNode
     : public MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode> {
 protected:
 public:
-  inline static const auto defNodeType = std::string_view{"xx_Toolcall"};
+  inline static constexpr auto defNodeType = std::string_view{"xx_Toolcall"};
 
   MiddlewareWrapToolcallNode(
       const std::string &in_name, const neograph::graph::NodeContext &in_ctx,
@@ -32,13 +32,13 @@ public:
             in_name, in_ctx, in_handleContext) {}
 
   asio::awaitable<void>
-  onHandleStart(agentxx::middleware::MiddlewareWarpHandleBase &item,
+  onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) override {
     co_await item.onToolcallStartFunc(in);
   }
 
   asio::awaitable<void>
-  onHandleEnd(agentxx::middleware::MiddlewareWarpHandleBase &item,
+  onHandleEnd(agentxx::middleware::BaseMiddlewareHandleInterface &item,
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) override {
     co_await item.onToolcallEndFunc(in, result);

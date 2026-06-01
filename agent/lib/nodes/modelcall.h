@@ -20,7 +20,7 @@ class NEOGRAPH_API MiddlewareWrapModelCallNode
     : public MiddlewareWrapHandleBaseNode<neograph::graph::LLMCallNode> {
 protected:
 public:
-  inline static const auto defNodeType =
+  inline static constexpr auto defNodeType =
       std::string_view{"xx_MiddlewareWrapModelCall"};
 
   MiddlewareWrapModelCallNode(
@@ -31,13 +31,13 @@ public:
             name, ctx, in_handleContext) {}
 
   asio::awaitable<void>
-  onHandleStart(agentxx::middleware::MiddlewareWarpHandleBase &item,
+  onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) override {
     co_await item.onModelcallStartFunc(in);
   }
 
   asio::awaitable<void>
-  onHandleEnd(agentxx::middleware::MiddlewareWarpHandleBase &item,
+  onHandleEnd(agentxx::middleware::BaseMiddlewareHandleInterface &item,
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) override {
     co_await item.onModelcallEndFunc(in, result);

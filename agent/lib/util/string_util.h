@@ -353,6 +353,20 @@ inline bool utf8IsAvail(std::string_view str) {
   return true;
 }
 
+template <typename T>
+inline std::string stringVectorJoin(const std::vector<T> &list,
+                                    const std::string_view sep = ", ") {
+  std::ostringstream oss;
+  auto len = list.size();
+  for (size_t i = 0; i < len; ++i) {
+    oss << list[i];
+    if (i < len - 1) {
+      oss << sep;
+    }
+  }
+  return oss.str();
+}
+
 inline std::vector<std::string> strSplit(const std::string &in_str,
                                          char in_char) {
   std::vector<std::string> re_strlist{};

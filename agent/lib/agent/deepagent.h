@@ -4,14 +4,17 @@
 #include "asio/co_spawn.hpp"
 #include "asio/detached.hpp"
 #include "asio/io_context.hpp"
+#include "middlewares/skill.h"
 #include "neograph/llm/openai_provider.h"
 #include "neograph/mcp/client.h"
 #include "neograph/neograph.h"
+#include "nodes/agentcall.h"
 #include "nodes/modelcall.h"
 #include "nodes/toolcall.h"
 #include "tools/execute_command.h"
 #include "tools/filesystem.h"
 #include "tools/get_current_datetime.h"
+#include "tools/skill.h"
 #include "tools/string.h"
 #include "tools/websearch.h"
 #include "util/log.h"
@@ -22,6 +25,7 @@
 namespace agentxx {
 class DeepAgent {
 protected:
+  asio::io_context ioCtx;
   std::unique_ptr<neograph::graph::GraphEngine> engine = nullptr;
   std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
   std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
@@ -93,10 +97,23 @@ public:
       middlewareHandleContext =
           std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
 
-      /// 应当作为最后一层
+      {
+        auto skillMiddleware =
+            std::make_unique<agentxx::middleware::SkillMiddlewareHandle>(
+                std::set<std::string>{
+                    "/home/coolight/program/agentxx/isolation/skills/"});
+        skillMiddleware->toolcalls.push_back(
+            std::make_unique<agentxx::tools::SkillTool>());
+        middlewareHandleContext->handles.push_back(std::move(skillMiddleware));
+      }
+
+      /// Toolcall  应当作为最后一层
       middlewareHandleContext->handles.push_back(
-          std::make_unique<agentxx::middleware::MiddlewareWarpHandle>(
+          std::make_unique<agentxx::middleware::MiddlewareWarpHandle<
+              agentxx::middleware::BaseMiddlewareState_c>>(
               "toolcall_log",
+              (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
+              (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               [](neograph::graph::NodeInput &in) -> asio::awaitable<void> {
@@ -150,6 +167,22 @@ public:
             "nodes",
             {
                 {
+                    "agent_start",
+                    {{
+                        "type",
+                        agentxx::nodes::MiddlewareWrapAgentStartCallNode::
+                            defNodeType,
+                    }},
+                },
+                {
+                    "agent_end",
+                    {{
+                        "type",
+                        agentxx::nodes::MiddlewareWrapAgentEndCallNode::
+                            defNodeType,
+                    }},
+                },
+                {
                     "llm",
                     {{
                         "type",
@@ -169,20 +202,42 @@ public:
         {
             "edges",
             neograph::json::array({
-                {{"from", "__start__"}, {"to", "llm"}},
+                {{"from", "__start__"}, {"to", "agent_start"}},
+                {{"from", "agent_start"}, {"to", "llm"}},
                 {
                     {"from", "llm"},
                     {"type", "conditional"},
                     {"condition", "has_tool_calls"},
-                    {"routes", {{"true", "tools"}, {"false", "__end__"}}},
+                    {"routes", {{"true", "tools"}, {"false", "agent_end"}}},
                 },
                 {{"from", "tools"}, {"to", "llm"}},
+                {{"from", "agent_end"}, {"to", "__end__"}},
             }),
         },
     };
 
     {
       /// register Node
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{
+              agentxx::nodes::MiddlewareWrapAgentStartCallNode::defNodeType},
+          [handleCtx = middlewareHandleContext](
+              const std::string &name, const neograph::json &,
+              const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapAgentStartCallNode>(name, ctx,
+                                                                  handleCtx);
+          });
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{
+              agentxx::nodes::MiddlewareWrapAgentEndCallNode::defNodeType},
+          [handleCtx = middlewareHandleContext](
+              const std::string &name, const neograph::json &,
+              const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapAgentEndCallNode>(name, ctx,
+                                                                handleCtx);
+          });
       neograph::graph::NodeFactory::instance().register_type(
           std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
           [handleCtx = middlewareHandleContext](
@@ -250,12 +305,11 @@ public:
   }
 
   void runCli() {
-    asio::io_context io;
     asio::co_spawn(
-        io,
+        ioCtx,
         [this]() -> asio::awaitable<void> { co_return co_await runCliAsync(); },
         asio::detached);
-    io.run();
+    ioCtx.run();
   }
 
   ~DeepAgent() { engine = nullptr; }

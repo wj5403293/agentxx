@@ -22,7 +22,25 @@ typedef std::function<asio::awaitable<void>(
     const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>
     onGraphNodeAfterCallFunc;
 
-class MiddlewareWarpHandleBase {
+class BaseMiddlewareState_c {
+public:
+  BaseMiddlewareState_c() {}
+
+  virtual ~BaseMiddlewareState_c() {}
+};
+
+template <typename T>
+concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
+                                  std::derived_from<T, BaseMiddlewareState_c>;
+
+/// 接口类型
+/// - 主要用于接收多种泛型参数, 见
+/// [MiddlewareWarpHandleContext::handles]，handles
+///   需要接收多种不同继承后的模版类型
+///   BaseMiddlewareHandle<BaseMiddlewareStateType>，当 state
+///   被继承时编译会失败，因此拉出 [BaseMiddlewareHandleInterface] 无 state
+///   模版参数作为基本类型
+class BaseMiddlewareHandleInterface {
 public:
   std::string name;
   /// 会被添加移动到 agent 中，完成后此处留空数组
@@ -30,7 +48,15 @@ public:
   /// 谨慎存储/修改 middleware 中的变量，
   /// 这是一个agent中所有会话共享的，单会话变量应该放 state 内
 
-  MiddlewareWarpHandleBase(const std::string &in_name) : name(in_name) {}
+  BaseMiddlewareHandleInterface(const std::string &in_name) : name(in_name) {}
+
+  /// ================ warp call ================
+  virtual asio::awaitable<void>
+  onAgentcallStartFunc(neograph::graph::NodeInput &in) = 0;
+
+  virtual asio::awaitable<void>
+  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) = 0;
 
   virtual asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) = 0;
@@ -45,10 +71,91 @@ public:
   virtual asio::awaitable<void>
   onToolcallEndFunc(const neograph::graph::NodeInput &in,
                     neograph::graph::NodeOutput &result) = 0;
+
+  virtual ~BaseMiddlewareHandleInterface() = default;
 };
 
-class MiddlewareWarpHandle : public MiddlewareWarpHandleBase {
+template <BaseMiddlewareStateType T>
+class BaseMiddlewareHandle : public BaseMiddlewareHandleInterface {
+protected:
+  std::map<std::string, std::shared_ptr<BaseMiddlewareState_c>> states{};
+
 public:
+  BaseMiddlewareHandle(const std::string &in_name)
+      : BaseMiddlewareHandleInterface(in_name) {}
+
+  /// ================ state ================
+  virtual asio::awaitable<void>
+  stateReadBlock(const std::function<asio::awaitable<void>()> &func) {
+    if (nullptr != func) {
+      co_await func();
+    }
+  }
+
+  virtual asio::awaitable<void>
+  stateWriteBlock(const std::function<asio::awaitable<void>()> &func) {
+    if (nullptr != func) {
+      co_await func();
+    }
+  }
+
+  /// 延迟加载 state
+  /// - 如果 thread 很多，可以等需要时从硬盘加载进内存
+  virtual asio::awaitable<std::shared_ptr<T>>
+  loadStateItem(const std::string &thread_id) {
+    // TODO: 从磁盘读取
+    auto ptr = std::make_shared<T>();
+    states[thread_id] = ptr;
+    co_return ptr;
+  }
+
+  virtual asio::awaitable<std::shared_ptr<T>>
+  getStateItem(const std::string &thread_id) {
+    {
+      auto it = states.find(thread_id);
+      if (it != states.end()) {
+        co_return *(std::shared_ptr<T> *)(&it->second);
+      }
+    }
+    co_return co_await loadStateItem(thread_id);
+  }
+
+  virtual asio::awaitable<void> saveStateItem(const std::string &thread_id,
+                                              bool offload = true) {
+    std::shared_ptr<agentxx::middleware::BaseMiddlewareState_c> oldEntity =
+        nullptr;
+    bool doSave = false;
+    if (offload) {
+      {
+        auto it = states.find(thread_id);
+        if (it != states.end()) {
+          doSave = true;
+          oldEntity = states.erase(it)->second;
+        }
+      }
+    } else {
+      auto it = states.find(thread_id);
+      if (it != states.end()) {
+        doSave = true;
+        oldEntity = it->second;
+      }
+    }
+    if (doSave && nullptr != oldEntity) {
+      // TODO: old 写入磁盘
+    }
+    co_return;
+  }
+
+  virtual bool containsItem(const std::string &thread_id) {
+    return states.contains(thread_id);
+  }
+};
+
+template <BaseMiddlewareStateType T>
+class MiddlewareWarpHandle : public BaseMiddlewareHandle<T> {
+public:
+  onGraphNodeBeforeCallFunc onAgentcallStart;
+  onGraphNodeAfterCallFunc onAgentcallEnd;
   onGraphNodeBeforeCallFunc onModelcallStart;
   onGraphNodeAfterCallFunc onModelcallEnd;
   onGraphNodeBeforeCallFunc onToolcallStart;
@@ -56,40 +163,58 @@ public:
 
   MiddlewareWarpHandle(
       const std::string &in_name,
+      const onGraphNodeBeforeCallFunc &in_onAgentcallStart = nullptr,
+      const onGraphNodeAfterCallFunc &in_onAgentcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onModelcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onModelcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onToolcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onToolcallEnd = nullptr)
-      : MiddlewareWarpHandleBase(in_name),
+      : BaseMiddlewareHandle<T>(in_name), onAgentcallStart(in_onAgentcallStart),
+        onAgentcallEnd(in_onAgentcallEnd),
         onModelcallStart(in_onModelcallStart),
         onModelcallEnd(in_onModelcallEnd), onToolcallStart(in_onToolcallStart),
         onToolcallEnd(in_onToolcallEnd) {}
 
-  virtual asio::awaitable<void>
-  onModelcallStartFunc(neograph::graph::NodeInput &in) {
+  asio::awaitable<void>
+  onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
+    if (nullptr != onAgentcallStart) {
+      co_await onAgentcallStart(in);
+    }
+  }
+
+  asio::awaitable<void>
+  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    if (nullptr != onAgentcallEnd) {
+      co_await onAgentcallEnd(in, result);
+    }
+  }
+
+  asio::awaitable<void>
+  onModelcallStartFunc(neograph::graph::NodeInput &in) override {
     if (nullptr != onModelcallStart) {
       co_await onModelcallStart(in);
     }
   }
 
-  virtual asio::awaitable<void>
+  asio::awaitable<void>
   onModelcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) {
+                     neograph::graph::NodeOutput &result) override {
     if (nullptr != onModelcallEnd) {
       co_await onModelcallEnd(in, result);
     }
   }
 
-  virtual asio::awaitable<void>
-  onToolcallStartFunc(neograph::graph::NodeInput &in) {
+  asio::awaitable<void>
+  onToolcallStartFunc(neograph::graph::NodeInput &in) override {
     if (nullptr != onToolcallStart) {
       co_await onToolcallStart(in);
     }
   }
 
-  virtual asio::awaitable<void>
+  asio::awaitable<void>
   onToolcallEndFunc(const neograph::graph::NodeInput &in,
-                    neograph::graph::NodeOutput &result) {
+                    neograph::graph::NodeOutput &result) override {
     if (nullptr != onToolcallEnd) {
       co_await onToolcallEnd(in, result);
     }
@@ -98,7 +223,7 @@ public:
 
 class MiddlewareWarpHandleContext {
 public:
-  std::vector<std::unique_ptr<MiddlewareWarpHandleBase>> handles{};
+  std::vector<std::unique_ptr<BaseMiddlewareHandleInterface>> handles{};
 
   MiddlewareWarpHandleContext() {}
 };

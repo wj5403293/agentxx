@@ -178,8 +178,8 @@ public:
         co_return result.str();
       }
       // 读取完整文件
-      auto result = std::string((std::istreambuf_iterator<char>(stream)),
-                                std::istreambuf_iterator<char>());
+      auto result = std::string{std::istreambuf_iterator<char>(stream),
+                                std::istreambuf_iterator<char>()};
       stream.close();
       co_return result;
     } catch (const std::exception &e) {

@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/agent/third_party/fmt/include/",
+                "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
                 "${workspaceFolder}/agent/third_party/html2md/include/",
                 "${workspaceFolder}/agent/third_party/vectorscan/src/",
                 "${workspaceFolder}/agent/third_party/glob/single_include/",

@@ -21,6 +21,23 @@ template <typename T>
 concept BaseGraphNodeType = std::same_as<T, neograph::graph::GraphNode> ||
                             std::derived_from<T, neograph::graph::GraphNode>;
 
+class MiddlewareWarpBaseNodeInterface : public neograph::graph::GraphNode {
+protected:
+  std::string name_;
+
+public:
+  MiddlewareWarpBaseNodeInterface(const std::string &name,
+                                  const neograph::graph::NodeContext &ctx)
+      : name_(name) {}
+
+  asio::awaitable<neograph::graph::NodeOutput>
+  run(neograph::graph::NodeInput in) override {
+    co_return neograph::graph::NodeOutput{};
+  }
+
+  std::string get_name() const override { return name_; }
+};
+
 template <BaseGraphNodeType T>
 class NEOGRAPH_API MiddlewareWrapBaseNode : public T {
 
@@ -108,11 +125,11 @@ public:
   }
 
   virtual asio::awaitable<void>
-  onHandleStart(agentxx::middleware::MiddlewareWarpHandleBase &item,
+  onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) = 0;
 
   virtual asio::awaitable<void>
-  onHandleEnd(agentxx::middleware::MiddlewareWarpHandleBase &item,
+  onHandleEnd(agentxx::middleware::BaseMiddlewareHandleInterface &item,
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) = 0;
 
