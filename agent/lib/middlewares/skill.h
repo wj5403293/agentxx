@@ -1,8 +1,12 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "fmt/format.h"
 #include "middlewares/middleware.h"
+#include "util/string_util.h"
+#include "yaml-cpp/yaml.h"
 #include <cstdlib>
+#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <neograph/llm/rate_limited_provider.h>
@@ -16,25 +20,295 @@
 namespace agentxx {
 namespace middleware {
 
-class _SkillData_c {
+class _SkillMetadata_c {
 public:
+  std::string dirpath;
+
+  /// Skill identifier.
+  ///   Constraints per Agent Skills specification:
+  ///   - 1-64 characters
+  ///   - Unicode lowercase alphanumeric and hyphens only (`a-z` and `-`).
+  ///   - Must not start or end with `-`
+  ///   - Must not contain consecutive `--`
+  ///   - Must match the parent directory name containing the `SKILL.md` file
+  std::string name;
+
+  /// What the skill does.
+  ///     Constraints per Agent Skills specification:
+  ///     - 1-1024 characters
+  ///     - Should describe both what the skill does and when to use it
+  ///     - Should include specific keywords that help agents identify
+  ///     relevant tasks
+  std::string description;
+
+  /// License name or reference to bundled license file.
+  std::string license;
+
+  /// Environment requirements.
+  ///   Constraints per Agent Skills specification:
+  ///   - 1-500 characters if provided
+  ///   - Should only be included if there are specific compatibility
+  ///   requirements
+  ///   - Can indicate intended product, required packages, etc.
+  std::string compatibility;
+
+  /// Arbitrary key-value mapping for additional metadata.
+  /// Clients can use this to store additional properties not defined by the
+  /// spec. It is recommended to keep key names unique to avoid conflicts.
+  std::map<std::string, std::string> metadata;
+
+  /// Tool names the skill recommends using.
+  /// Warning: this is experimental.
+  /// Constraints per Agent Skills specification:
+  /// - Space-delimited list of tool names
+  std::vector<std::string> allowed_tools;
 };
 
-class MiddlewareWarpSkillHandle : public MiddlewareWarpHandleBase {
-protected:
-  std::set<std::string> skillPaths{};
-
+class _SkillContext_c {
+public:
   /// <path, data>
-  std::map<std::string, _SkillData_c> skillData{};
+  std::map<std::string, _SkillMetadata_c> skillData{};
 
   /// <path, error>
   std::map<std::string, std::string> loadErrors{};
+};
+
+class SkillMiddlewareState_c : public BaseMiddlewareState_c {
+public:
+  _SkillContext_c skillContext{};
+
+  SkillMiddlewareState_c() {}
+};
+
+class SkillMiddlewareHandle
+    : public BaseMiddlewareHandle<SkillMiddlewareState_c> {
+protected:
+  inline static constexpr std::string_view defSkillPromptTemplate =
+      std::string_view{R"_(
+
+## Skills System
+
+You have access to a skills library that provides specialized capabilities and domain knowledge.
+
+{}
+
+**Available Skills:**
+
+{}
+
+**How to Use Skills (Progressive Disclosure):**
+
+Skills follow a **progressive disclosure** pattern - you see their name and description above, but only read full instructions when needed:
+
+1. **Recognize when a skill applies**: Check if the user's task matches a skill's description
+2. **Read the skill's full instructions**: Use `read_file` on the path shown in the skill list above.
+   Pass `limit=1000` since the default of 100 lines is too small for most skill files.
+3. **Follow the skill's instructions**: SKILL.md contains step-by-step workflows, best practices, and examples
+4. **Access supporting files**: Skills may include helper scripts, configs, or reference docs - use absolute paths
+
+**When to Use Skills:**
+- User's request matches a skill's domain (e.g., "research X" -> web-research skill)
+- You need specialized knowledge or structured workflows
+- A skill provides proven patterns for complex tasks
+
+**Executing Skill Scripts:**
+Skills may contain Python scripts or other executable files. Always use absolute paths from the skill list.
+
+**Example Workflow:**
+
+User: "Can you research the latest developments in quantum computing?"
+
+1. Check available skills -> See "web-research" skill with its path
+2. Read the full skill file: `read_file(path, limit=1000)`
+3. Follow the skill's research workflow (search -> organize -> synthesize)
+4. Use any helper scripts with absolute paths
+
+Remember: Skills make you more capable and consistent. When in doubt, check if a skill exists for the task!
+)_"};
+
+  std::set<std::string> skillPaths;
+  _SkillContext_c skillCache{};
+  bool haveLoadSkillMetadata = false;
 
 public:
-  MiddlewareWarpSkillHandle() : MiddlewareWarpHandleBase("SkillManager") {}
+  SkillMiddlewareHandle(const std::set<std::string> &in_skillPaths)
+      : BaseMiddlewareHandle<SkillMiddlewareState_c>("SkillManager"),
+        skillPaths(in_skillPaths) {}
+
+  std::string formatSkillsLocation() {
+    std::ostringstream oss;
+    for (const auto &path : skillPaths) {
+      oss << fmt::format("- **{} Skill**: `{}`\n",
+                         std::filesystem::path{path}.filename().string(), path);
+    }
+    return oss.str();
+  }
+
+  std::string formatSkillsMetadataList() {
+    std::ostringstream oss;
+    for (const auto &item : skillCache.skillData) {
+      oss << fmt::format(
+          R"(
+- **{}**: {}
+  - compatibility: {}
+  - allowed-tools: {}
+  - Read file `{}` for full instructions
+)",
+          item.second.name, item.second.description, item.second.compatibility,
+          agentxx::util::stringVectorJoin(item.second.allowed_tools),
+          item.first);
+    }
+    return oss.str();
+  }
+
+  /// <error, metadata>
+  asio::awaitable<std::pair<std::string, agentxx::middleware::_SkillMetadata_c>>
+  readSkillFile(std::string_view dirpath) {
+    auto data =
+        agentxx::middleware::_SkillMetadata_c{.dirpath = std::string{dirpath}};
+    std::ifstream stream;
+    try {
+      stream.open(std::string{dirpath} + "/SKILL.md");
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
+      }
+      auto filecontent = std::string{std::istreambuf_iterator<char>(stream),
+                                     std::istreambuf_iterator<char>()};
+      stream.close();
+      const auto yamlDelimiter = std::string_view{"---"};
+      auto yamlStart =
+          filecontent.find_first_of(yamlDelimiter) + yamlDelimiter.size();
+      auto yamlEnd = filecontent.find_first_of(yamlDelimiter, yamlStart);
+      if (yamlStart >= 0 && yamlStart < yamlEnd &&
+          yamlEnd < filecontent.size()) {
+        auto yamlContent = filecontent.substr(yamlStart, yamlEnd - yamlStart);
+        auto metadata = YAML::Load(yamlContent);
+        if (metadata["name"]) {
+          data.name = metadata["name"].as<std::string>();
+        }
+        if (metadata["description"]) {
+          data.description = metadata["description"].as<std::string>();
+        }
+        if (metadata["license"]) {
+          data.license = metadata["license"].as<std::string>();
+        }
+        if (metadata["compatibility"]) {
+          data.compatibility = metadata["compatibility"].as<std::string>();
+        }
+        if (metadata["allowed-tools"].IsScalar()) {
+          data.allowed_tools = agentxx::util::strSplit(
+              metadata["allowed-tools"].as<std::string>(), ' ');
+        }
+        if (metadata["metadata"].IsMap()) {
+          for (const auto &item : metadata["metadata"]) {
+            data.metadata[item.first.as<std::string>()] =
+                item.second.as<std::string>();
+          }
+        }
+      }
+      co_return std::make_pair("load skill metadata faild", data);
+    } catch (const std::exception &e) {
+      stream.close();
+      co_return std::make_pair(e.what(), data);
+    }
+  }
+
+  asio::awaitable<void>
+  onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
+    if (skillPaths.empty()) {
+      co_return;
+    }
+    // list skills / load skill metadata
+    if (false == haveLoadSkillMetadata) {
+      haveLoadSkillMetadata = true;
+
+      skillCache.skillData.clear();
+      skillCache.loadErrors.clear();
+      auto skillQueue =
+          std::vector<std::string>{skillPaths.begin(), skillPaths.end()};
+      for (size_t i = 0; i < skillQueue.size(); ++i) {
+        try {
+          auto dir = std::filesystem::directory_entry{skillQueue[i]};
+          if (dir.is_directory()) {
+            if (std::filesystem::is_regular_file(skillQueue[i] + "/SKILL.md")) {
+              // load skill metadata
+              const auto [err, metadata] =
+                  co_await readSkillFile(skillQueue[i]);
+              if (err.empty()) {
+                fmt::print("load skill success: {} | {} | {}", skillQueue[i],
+                           metadata.name, metadata.description);
+                skillCache.skillData[skillQueue[i]] = metadata;
+              } else {
+                fmt::print("load skill faild: {}, {}", skillQueue[i], err);
+                skillCache.loadErrors[skillQueue[i]] = err;
+              }
+            } else {
+              // 添加子目录等待加载
+              for (const auto &entity :
+                   std::filesystem::directory_iterator(dir)) {
+                if (entity.is_directory()) {
+                  skillQueue.push_back(entity.path().string());
+                }
+              }
+            }
+          }
+        } catch (const std::exception &e) {
+          skillCache.loadErrors[skillQueue[i]] = e.what();
+        }
+      }
+    }
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    co_return;
+  }
 
   asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
+    if (skillPaths.empty()) {
+      co_return;
+    }
+    co_return;
+
+    auto skillState = co_await getStateItem(in.ctx.thread_id);
+
+    // 插入 skill
+    auto msglist = in.state.get("messages");
+    bool haveSystemMsg = false;
+    auto skillMsg = neograph::ChatMessage{.role = "system"};
+    if (msglist.is_array() && false == msglist.empty()) {
+      auto systemMsg = neograph::ChatMessage{};
+      from_json(msglist.front(), systemMsg);
+      if (systemMsg.role == "system") {
+        haveSystemMsg = true;
+        skillMsg = std::move(systemMsg);
+      }
+    }
+    skillMsg.content +=
+        fmt::format(defSkillPromptTemplate, formatSkillsLocation(),
+                    formatSkillsMetadataList());
+
+    neograph::json skillJson;
+    to_json(skillJson, skillMsg);
+    if (haveSystemMsg) {
+      // 替换 system msg
+      msglist[0] = std::move(skillJson);
+    } else {
+      // 缺少 system msg，在开头插入
+      auto newlist = neograph::json::array();
+      newlist.push_back(std::move(skillJson));
+      for (auto item : msglist.items()) {
+        newlist.push_back(item.second);
+      }
+      msglist = std::move(newlist);
+    }
+    in.state.write("messages", msglist);
+
     co_return;
   }
 

@@ -15,7 +15,7 @@
 namespace agentxx {
 namespace tools {
 
-class SkillTool : public neograph::Tool {
+class SkillTool : public neograph::AsyncTool {
 protected:
 public:
   explicit SkillTool() {}
@@ -34,18 +34,10 @@ New store text or Set/Delete text by unique id.
                 "properties",
                 {
                     {
-                        "text",
+                        "path",
                         {
                             {"type", "string"},
                             {"description", "text content to store in memory"},
-                        },
-                    },
-                    {
-                        "id",
-                        {
-                            {"type", "string"},
-                            {"description", "unique id to store text when opt "
-                                            "is `set` or `delete`"},
                         },
                     },
                     {
@@ -53,14 +45,12 @@ New store text or Set/Delete text by unique id.
                         {
                             {"type", "string"},
                             {"enum", neograph::json::array({
-                                         "insert",
-                                         "set",
-                                         "delete",
+                                         "load",
+                                         "offload",
                                      })},
                             {"description", R"(operation.
-`insert` New store text, return unique id
-`set` Modify text by unique id
-`delete` Delete text by unique id
+`load` New store text, return unique id
+`offload` Modify text by unique id
 )"},
                         },
                     },
@@ -71,10 +61,11 @@ New store text or Set/Delete text by unique id.
     };
   }
 
-  std::string execute(const neograph::json &arguments) override {
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
     auto text = arguments.value("text", std::string{});
     if (text.empty()) {
-      return R"({"error":"Arg `text` is empty"})";
+      co_return R"({"error":"Arg `text` is empty"})";
     }
     auto text_id = arguments.value("id", std::string{});
     auto text_opt = arguments.value("opt", std::string{});
@@ -83,7 +74,7 @@ New store text or Set/Delete text by unique id.
     } else if (text_opt == std::string_view{"set"}) {
     } else if (text_opt == std::string_view{"delete"}) {
     } else {
-      return R"({"error":"Arg `opt` is invalid"})";
+      co_return R"({"error":"Arg `opt` is invalid"})";
     }
   }
 };
