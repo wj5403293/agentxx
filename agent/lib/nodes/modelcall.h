@@ -98,7 +98,6 @@ public:
       msglist = std::move(newlist);
     }
     in.state.overwrite("messages", msglist);
-    std::cout << msglist.size() << std::endl;
 
     co_return co_await neograph::graph::LLMCallNode::run(in);
   }
