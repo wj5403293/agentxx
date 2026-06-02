@@ -23,6 +23,7 @@
 #include <memory>
 
 namespace agentxx {
+
 class DeepAgent {
 protected:
   asio::io_context ioCtx;
@@ -101,7 +102,8 @@ public:
         auto skillMiddleware =
             std::make_unique<agentxx::middleware::SkillMiddlewareHandle>(
                 std::set<std::string>{
-                    "/home/coolight/program/agentxx/isolation/skills/"});
+                    "/home/coolight/program/agentxx/isolation/skills/"},
+                middlewareHandleContext);
         skillMiddleware->toolcalls.push_back(
             std::make_unique<agentxx::tools::SkillTool>());
         middlewareHandleContext->handles.push_back(std::move(skillMiddleware));
@@ -111,7 +113,7 @@ public:
       middlewareHandleContext->handles.push_back(
           std::make_unique<agentxx::middleware::MiddlewareWarpHandle<
               agentxx::middleware::BaseMiddlewareState_c>>(
-              "toolcall_log",
+              "toolcall_log", middlewareHandleContext,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
@@ -137,7 +139,7 @@ public:
     }
 
     // Build NodeContext
-    neograph::graph::NodeContext nodeContext;
+    neograph::graph::NodeContext nodeContext{};
     nodeContext.instructions = config->systemPrompt;
 
     std::vector<neograph::Tool *> toolPtrs;

@@ -170,5 +170,86 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
     co_return result;
   }
 };
+
+class ExecutePythonTool : public neograph::AsyncTool {
+public:
+  explicit ExecutePythonTool() {}
+
+  std::string get_name() const override { return "execute_python"; }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "execute_python",
+        "Run python commands in the terminal.",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "command",
+                        {
+                            {"type", "string"},
+                            {"description", "Command to execute"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({"command"})},
+        },
+    };
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto command = arguments.value("command", std::string{});
+    if (command.empty()) {
+      co_return R"({"error":"Arg `command` is empty"})";
+    }
+
+    co_return "";
+  }
+};
+
+class ExecuteJavaScriptTool : public neograph::AsyncTool {
+public:
+  explicit ExecuteJavaScriptTool() {}
+
+  std::string get_name() const override { return "execute_javascript"; }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "execute_javascript",
+        "Run javascript commands in the terminal.",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "command",
+                        {
+                            {"type", "string"},
+                            {"description", "Command to execute"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({"command"})},
+        },
+    };
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto command = arguments.value("command", std::string{});
+    if (command.empty()) {
+      co_return R"({"error":"Arg `command` is empty"})";
+    }
+
+    co_return "";
+  }
+};
+
 } // namespace tools
 } // namespace agentxx

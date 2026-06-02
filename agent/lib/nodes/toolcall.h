@@ -26,7 +26,7 @@ public:
 
   MiddlewareWrapToolcallNode(
       const std::string &in_name, const neograph::graph::NodeContext &in_ctx,
-      std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
             in_name, in_ctx, in_handleContext) {}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include <any>
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -33,6 +34,8 @@ template <typename T>
 concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
                                   std::derived_from<T, BaseMiddlewareState_c>;
 
+class MiddlewareWarpHandleContext;
+
 /// 接口类型
 /// - 主要用于接收多种泛型参数, 见
 /// [MiddlewareWarpHandleContext::handles]，handles
@@ -41,14 +44,23 @@ concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
 ///   被继承时编译会失败，因此拉出 [BaseMiddlewareHandleInterface] 无 state
 ///   模版参数作为基本类型
 class BaseMiddlewareHandleInterface {
+protected:
 public:
-  std::string name;
-  /// 会被添加移动到 agent 中，完成后此处留空数组
-  std::vector<std::unique_ptr<neograph::Tool>> toolcalls{};
   /// 谨慎存储/修改 middleware 中的变量，
   /// 这是一个agent中所有会话共享的，单会话变量应该放 state 内
 
-  BaseMiddlewareHandleInterface(const std::string &in_name) : name(in_name) {}
+  /// 名称
+  std::string name;
+  /// 会被添加移动到 agent 中，完成后此处留空数组
+  std::vector<std::unique_ptr<neograph::Tool>> toolcalls{};
+  /// 每个 [Middleware] 全局共享，按会话ID 取值 <thread_id, state>
+  std::map<std::string, std::shared_ptr<BaseMiddlewareState_c>> states{};
+  std::weak_ptr<MiddlewareWarpHandleContext> handleContext;
+
+  BaseMiddlewareHandleInterface(
+      const std::string &in_name,
+      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
+      : name(in_name), handleContext(in_handleContext) {}
 
   /// ================ warp call ================
   virtual asio::awaitable<void>
@@ -78,11 +90,11 @@ public:
 template <BaseMiddlewareStateType T>
 class BaseMiddlewareHandle : public BaseMiddlewareHandleInterface {
 protected:
-  std::map<std::string, std::shared_ptr<BaseMiddlewareState_c>> states{};
-
 public:
-  BaseMiddlewareHandle(const std::string &in_name)
-      : BaseMiddlewareHandleInterface(in_name) {}
+  BaseMiddlewareHandle(
+      const std::string &in_name,
+      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
+      : BaseMiddlewareHandleInterface(in_name, in_handleContext) {}
 
   /// ================ state ================
   virtual asio::awaitable<void>
@@ -163,13 +175,15 @@ public:
 
   MiddlewareWarpHandle(
       const std::string &in_name,
+      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext,
       const onGraphNodeBeforeCallFunc &in_onAgentcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onAgentcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onModelcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onModelcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onToolcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onToolcallEnd = nullptr)
-      : BaseMiddlewareHandle<T>(in_name), onAgentcallStart(in_onAgentcallStart),
+      : BaseMiddlewareHandle<T>(in_name, in_handleContext),
+        onAgentcallStart(in_onAgentcallStart),
         onAgentcallEnd(in_onAgentcallEnd),
         onModelcallStart(in_onModelcallStart),
         onModelcallEnd(in_onModelcallEnd), onToolcallStart(in_onToolcallStart),
@@ -223,9 +237,26 @@ public:
 
 class MiddlewareWarpHandleContext {
 public:
+  inline static constexpr std::string graphDataKey_systemMessage{
+      "systemMessage"};
+
+  /// <thread_id, itemData>
+  /// 每次执行的临时数据，在 [AgentStartCall] 时刷新，在 [AgentEndCall] 时清理
+  std::map<std::string, std::map<std::string, std::any>> graphData{};
   std::vector<std::unique_ptr<BaseMiddlewareHandleInterface>> handles{};
 
   MiddlewareWarpHandleContext() {}
+
+  template <typename T>
+  T &getGraphDataItemValue(const std::string &thread_id,
+                           const std::string &key) {
+    auto &itemGraphData = graphData[thread_id];
+    auto sysMsgIt = itemGraphData.find(key);
+    if (sysMsgIt == itemGraphData.end()) {
+      itemGraphData.insert(std::pair<std::string, std::any>{key, T{}});
+    }
+    return std::any_cast<T &>(itemGraphData[key]);
+  }
 };
 
 } // namespace middleware

@@ -99,13 +99,12 @@ template <BaseGraphNodeType T>
 class NEOGRAPH_API MiddlewareWrapHandleBaseNode : public T {
 protected:
   std::string nodeName;
-  std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-      handleContext;
+  std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
 
 public:
   MiddlewareWrapHandleBaseNode(
       const std::string &name, const neograph::graph::NodeContext &ctx,
-      std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : T(name, ctx), nodeName(name), handleContext(in_handleContext) {}
 
@@ -114,10 +113,11 @@ public:
     try {
       co_return co_await T::run(in);
     } catch (const std::exception &e) {
+      XX_LOGE("{}/run exception: {})", nodeName, e.what());
       neograph::graph::NodeOutput out;
       out.writes.push_back(neograph::graph::ChannelWrite{
           "messages",
-          fmt::format(R"({{"error": "{}/LLMCall exception: {}"}})", nodeName,
+          fmt::format(R"({{"error": "{}/run exception: {}"}})", nodeName,
                       e.what()),
       });
       co_return out;
@@ -137,13 +137,16 @@ public:
   run(neograph::graph::NodeInput in) override {
     neograph::graph::NodeOutput out;
 
+    auto handleContextPtr = handleContext.lock();
+    const auto len = handleContextPtr->handles.size();
     size_t i = 0;
-    const auto len = handleContext->handles.size();
     for (; i < len; ++i) {
-      auto &item = handleContext->handles[i];
+      auto &item = handleContextPtr->handles[i];
       try {
         co_await onHandleStart(*item, in);
       } catch (const std::exception &e) {
+        XX_LOGE("{}/Start call `{}` exception: {}", nodeName, item->name,
+                e.what());
         out.writes.push_back(neograph::graph::ChannelWrite{
             "messages",
             fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
@@ -159,10 +162,12 @@ public:
     }
 
     for (; i-- > 0;) {
-      auto &item = handleContext->handles[i];
+      auto &item = handleContextPtr->handles[i];
       try {
         co_await onHandleEnd(*item, in, out);
       } catch (const std::exception &e) {
+        XX_LOGE("{}/End call `{}` exception: {}", nodeName, item->name,
+                e.what());
         out.writes.push_back(neograph::graph::ChannelWrite{
             "messages",
             fmt::format(R"({{"error": "{}/End call `{}` exception: {}"}})",
