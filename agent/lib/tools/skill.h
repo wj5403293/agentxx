@@ -63,16 +63,14 @@ New store text or Set/Delete text by unique id.
 
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
-    auto text = arguments.value("text", std::string{});
-    if (text.empty()) {
-      co_return R"({"error":"Arg `text` is empty"})";
+    auto path = arguments.value("path", std::string{});
+    if (path.empty()) {
+      co_return R"({"error":"Arg `path` is empty"})";
     }
-    auto text_id = arguments.value("id", std::string{});
-    auto text_opt = arguments.value("opt", std::string{});
+    auto path_opt = arguments.value("opt", std::string{"load"});
 
-    if (text_opt == std::string_view{"insert"}) {
-    } else if (text_opt == std::string_view{"set"}) {
-    } else if (text_opt == std::string_view{"delete"}) {
+    if (path_opt == std::string_view{"load"}) {
+    } else if (path_opt == std::string_view{"offload"}) {
     } else {
       co_return R"({"error":"Arg `opt` is invalid"})";
     }

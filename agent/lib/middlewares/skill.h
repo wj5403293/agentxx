@@ -220,7 +220,9 @@ public:
         }
         co_return std::make_pair("", data);
       }
-      co_return std::make_pair("load skill metadata faild", data);
+      co_return std::make_pair(
+          "load skill metadata faild, can not found metadata in SKILL.md file",
+          data);
     } catch (const std::exception &e) {
       stream.close();
       co_return std::make_pair(e.what(), data);

@@ -24,3 +24,6 @@
 [submodule "agent/third_party/yaml-cpp"]
 	path = agent/third_party/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+[submodule "agent/third_party/liburing"]
+	path = agent/third_party/liburing
+	url = https://github.com/axboe/liburing

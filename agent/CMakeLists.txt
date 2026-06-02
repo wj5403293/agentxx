@@ -18,6 +18,8 @@ set(IS_IOS_D      0)
 
 if (WIN32)
   set(IS_WIN_D 1)
+
+  set(WINDOWS_IOCP_SUPPORTED ON)
 elseif (ANDROID)
   set(IS_ANDROID_D 1)
 elseif (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -26,6 +28,15 @@ elseif (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "iOS")
   set(IS_IOS_D 1)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   set(IS_LINUX_D 1)
+
+  # 检查是否支持 [LINUX_IO_URING_SUPPORTED]
+  file(READ "/usr/include/linux/version.h" _linux_version_h)
+  string(REGEX MATCH "#define LINUX_VERSION_CODE ([0-9]+)" _match "${_linux_version_h}")
+  if(_match AND (CMAKE_MATCH_1 GREATER_EQUAL 330240))  # >= 5.10.0
+      set(LINUX_IO_URING_SUPPORTED ON)
+  else()
+      set(LINUX_IO_URING_SUPPORTED OFF)
+  endif()
 endif ()
 
 add_definitions(-DIS_LINUX_D=${IS_LINUX_D})
@@ -33,6 +44,20 @@ add_definitions(-DIS_WIN_D=${IS_WIN_D})
 add_definitions(-DIS_MACOS_D=${IS_MACOS_D})
 add_definitions(-DIS_ANDROID_D=${IS_ANDROID_D})
 add_definitions(-DIS_IOS_D=${IS_IOS_D})
+
+# asio
+if (WINDOWS_IOCP_SUPPORTED)
+  add_definitions(-DASIO_HAS_IOCP=ON)
+  add_definitions(-DBOOST_ASIO_HAS_IOCP=ON)
+  add_definitions(-DASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
+  add_definitions(-DBOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
+  message("[agentxx] Enable asio/iocp")
+endif()
+if (LINUX_IO_URING_SUPPORTED)
+  add_definitions(-DASIO_HAS_IO_URING=ON)
+  add_definitions(-DBOOST_ASIO_HAS_IO_URING=ON)
+  message("[agentxx] Enable asio/io_uring")
+endif()
 
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
@@ -137,6 +162,62 @@ ExternalProject_Add(
   TEST_COMMAND ""
 )
 
+# liburing
+set(LIBURING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/liburing/)
+set(LIBURING_INSTALL_DIR ${CMAKE_BINARY_DIR}/liburing-install)
+if (LINUX_IO_URING_SUPPORTED)
+  set(LIBURING_PREFIX ${CMAKE_BINARY_DIR}/liburing-src)
+  set(LIBURING_BINARY_DIR ${CMAKE_BINARY_DIR}/liburing-build)
+  ExternalProject_Add(
+    liburing_repo
+    PREFIX ${LIBURING_PREFIX}
+    SOURCE_DIR ${LIBURING_SOURCE_DIR}
+    BINARY_DIR ${LIBURING_BINARY_DIR}
+    INSTALL_DIR ${LIBURING_INSTALL_DIR}
+    CMAKE_ARGS 
+      -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+      -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
+      "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+      "-DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
+      "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}"
+      "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}" 
+      "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}"
+
+      "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
+      "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
+      "-DANDROID_ABI=${ANDROID_ABI}"
+      "-DANDROID_NDK=${ANDROID_NDK}"
+      "-DANDROID_STL=${ANDROID_STL}"
+      "-DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}"
+      "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}"
+
+      "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
+      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+      "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+
+      "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
+      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
+      "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
+      "-DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}"
+      "-DCMAKE_C_FLAGS_PROFILE=${CMAKE_C_FLAGS_PROFILE}"
+      "-DCMAKE_CXX_FLAGS_PROFILE=${CMAKE_CXX_FLAGS_PROFILE}"
+      "-DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}"
+      "-DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}"
+    CONFIGURE_COMMAND 
+        cd ${LIBURING_SOURCE_DIR} && ./configure
+        --prefix=${LIBURING_INSTALL_DIR}
+        --cc=${CMAKE_C_COMPILER}
+        --cxx=${CMAKE_CXX_COMPILER}
+    BUILD_COMMAND 
+      cd ${LIBURING_SOURCE_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
+    INSTALL_COMMAND 
+      cd ${LIBURING_SOURCE_DIR} && make install
+    UPDATE_COMMAND ""
+    TEST_COMMAND ""
+  )
+endif()
+
 # fmt
 FetchContent_Declare(
   fmt
@@ -213,6 +294,9 @@ FetchContent_Declare(
   EXCLUDE_FROM_ALL
 )
 block()
+  if (LINUX_IO_URING_SUPPORTED)
+    include_directories(${LIBURING_INSTALL_DIR}/include/)
+  endif()
   set(NEOGRAPH_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_PYBIND    OFF CACHE BOOL "" FORCE)
@@ -274,6 +358,7 @@ include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
 include_directories(${UCHARDET_INSTALL_DIR}/include/)
 include_directories(${LIBICONV_INSTALL_DIR}/include/)
+include_directories(${LIBURING_INSTALL_DIR}/include/)
 include_directories(${vectorscan_SOURCE_DIR}/src/)
 include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
@@ -297,6 +382,9 @@ add_library(agentxx SHARED
 )
 
 add_dependencies(agentxx iconv_repo)
+if (LINUX_IO_URING_SUPPORTED)
+  add_dependencies(agentxx liburing_repo)
+endif()
 
 target_link_directories(agentxx PUBLIC 
   ${simdjson_INSTALL_DIR}
@@ -307,6 +395,11 @@ target_link_directories(agentxx PUBLIC
   ${LIBICONV_INSTALL_DIR}/lib/
   ${Boost_ROOT}/lib/
 )
+if (LINUX_IO_URING_SUPPORTED)
+  target_link_directories(agentxx PUBLIC 
+    ${LIBURING_INSTALL_DIR}/lib/
+  )
+endif()
 
 target_link_libraries(agentxx PUBLIC
   fmt::fmt
@@ -324,6 +417,12 @@ target_link_libraries(agentxx PUBLIC
 	hs
   yaml-cpp::yaml-cpp
 )
+if (LINUX_IO_URING_SUPPORTED)
+  target_link_libraries(agentxx PUBLIC
+    liburing.a 
+    liburing-ffi.a
+  )
+endif()
 
 # 统一输出名称 libagentxx
 # - 不指定时，部分系统，如win可能编译输出缺少前缀 lib

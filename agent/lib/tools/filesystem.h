@@ -1,9 +1,16 @@
 #pragma once
 
+#include "asio/random_access_file.hpp"
+#include "asio/read.hpp"
+#include "asio/read_at.hpp"
+#include "asio/read_until.hpp"
+#include "asio/registered_buffer.hpp"
+#include "asio/stream_file.hpp"
 #include "fmt/format.h"
 #include "glob/glob.hpp"
 #include "util/log.h"
 #include "util/string_util.h"
+#include <asio/redirect_error.hpp>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
@@ -76,8 +83,12 @@ public:
 
 /// read
 class FilesystemReadTextFileTool : public neograph::AsyncTool {
+protected:
+  asio::any_io_executor executor;
+
 public:
-  explicit FilesystemReadTextFileTool() {}
+  explicit FilesystemReadTextFileTool(asio::any_io_executor in_executor)
+      : executor(in_executor) {}
 
   std::string get_name() const override { return "filesystem_read_text_file"; }
 
@@ -131,68 +142,138 @@ public:
     auto text_line_offset = arguments.value<double>("line_offset", -1);
     auto text_line_limit = arguments.value<double>("line_limit", -1);
 
-    std::ifstream stream;
-    try {
-      stream.open(filepath);
-      if (!stream) {
-        auto ec = std::error_code{errno, std::system_category()};
-        throw std::runtime_error{
-            fmt::format(R"(Can not open file. Error: {})", ec.message())};
-      }
-
-      if (text_line_offset >= 0 || text_line_limit >= 0) {
-        // 读取部分文件
-        const auto offset =
-            (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
-        const auto limit = (text_line_limit >= 0)
-                               ? size_t(text_line_limit)
-                               : std::numeric_limits<size_t>::max();
-        std::stringstream result{};
-        size_t line_num = 0;
-        size_t count = 0;
-
-        for (std::string line; std::getline(stream, line) && count < limit;) {
-          // 跳过偏移行
-          if (line_num < offset) {
-            line_num++;
-            continue;
-          }
-          // 达到限制则停止
-          if (count >= limit) {
-            break;
-          }
-          result << line << "\n";
-
-          line_num++;
-          count++;
+#if defined(ASIO_HAS_FILE)
+    {
+      /// 异步读取文件
+      asio::stream_file stream{executor};
+      try {
+        stream.open(filepath, asio::stream_file::read_only);
+        if (false == stream.is_open()) {
+          stream.close();
+          co_return "Can not open file.";
         }
 
+        if (text_line_offset >= 0 || text_line_limit >= 0) {
+          const auto offset =
+              (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
+          const auto limit = (text_line_limit >= 0)
+                                 ? size_t(text_line_limit)
+                                 : std::numeric_limits<size_t>::max();
+          std::stringstream result{};
+          size_t lineNum = 0;
+
+          for (std::string buf; lineNum < offset + limit; lineNum++) {
+            asio::error_code errCode;
+            auto readlen = co_await asio::async_read_until(
+                stream, asio::dynamic_buffer(buf), '\n',
+                asio::redirect_error(asio::use_awaitable, errCode));
+
+            if (errCode == asio::error::eof) {
+              if (lineNum >= offset) {
+                result << buf;
+              }
+              break;
+            } else if (errCode) {
+              throw asio::system_error{errCode};
+            }
+
+            if (lineNum < offset) {
+              continue;
+            }
+
+            auto line = std::string_view{buf}.substr(0, readlen);
+            result << line << "\n";
+            buf.erase(0, readlen);
+          }
+
+          stream.close();
+          if (lineNum <= offset) {
+            // offset 超出文件行数
+            co_return fmt::format(
+                R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
+                offset, lineNum);
+          }
+
+          co_return result.str();
+        }
+
+        // 读取完整文件
+        std::string data;
+        co_await asio::async_read(stream, asio::dynamic_buffer(data),
+                                  asio::use_awaitable);
         stream.close();
-        if (0 == count) {
-          // offset 超出文件行数
-          co_return fmt::format(
-              R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
-              offset, line_num);
+        co_return data;
+      } catch (const std::exception &e) {
+        stream.close();
+        throw e;
+      }
+    }
+#endif
+
+    {
+      /// 同步阻塞读取文件
+      std::ifstream stream;
+      try {
+        stream.open(filepath);
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file. Error: {})", ec.message())};
         }
 
-        co_return result.str();
+        if (text_line_offset >= 0 || text_line_limit >= 0) {
+          // 读取部分文件
+          const auto offset =
+              (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
+          const auto limit = (text_line_limit > 0)
+                                 ? size_t(text_line_limit)
+                                 : std::numeric_limits<size_t>::max();
+          std::stringstream result{};
+          size_t lineNum = 0;
+
+          for (std::string line;
+               std::getline(stream, line) && lineNum < offset + limit;
+               lineNum++) {
+            // 跳过偏移行
+            if (lineNum < offset) {
+              continue;
+            }
+
+            result << line << "\n";
+          }
+
+          stream.close();
+          if (lineNum <= offset) {
+            // offset 超出文件行数
+            co_return fmt::format(
+                R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
+                offset, lineNum);
+          }
+
+          co_return result.str();
+        }
+
+        // 读取完整文件
+        auto result = std::string{std::istreambuf_iterator<char>(stream),
+                                  std::istreambuf_iterator<char>()};
+        stream.close();
+        co_return result;
+      } catch (const std::exception &e) {
+        stream.close();
+        throw e;
       }
-      // 读取完整文件
-      auto result = std::string{std::istreambuf_iterator<char>(stream),
-                                std::istreambuf_iterator<char>()};
-      stream.close();
-      co_return result;
-    } catch (const std::exception &e) {
-      stream.close();
-      throw e;
     }
   }
 };
 
 /// read
 class FilesystemReadBinaryFileTool : public neograph::AsyncTool {
+protected:
+  asio::any_io_executor executor;
+
 public:
-  explicit FilesystemReadBinaryFileTool() {}
+  explicit FilesystemReadBinaryFileTool(asio::any_io_executor in_executor)
+      : executor(in_executor) {}
 
   std::string get_name() const override {
     return "filesystem_read_binary_file";
@@ -248,72 +329,151 @@ public:
     auto byte_offset = arguments.value<double>("byte_offset", -1);
     auto byte_limit = arguments.value<double>("byte_limit", -1);
 
-    std::ifstream stream;
-    try {
-      stream.open(filepath, std::ios::binary);
-      if (!stream) {
-        auto ec = std::error_code{errno, std::system_category()};
-        throw std::runtime_error{
-            fmt::format(R"(Can not open file. Error: {})", ec.message())};
+#if defined(ASIO_HAS_FILE)
+    {
+      /// 异步读取文件
+      if (byte_offset >= 0 || byte_limit >= 0) {
+        asio::random_access_file stream{executor};
+        try {
+          stream.open(filepath, asio::random_access_file::read_only);
+          if (false == stream.is_open()) {
+            stream.close();
+            co_return "Can not open file.";
+          }
+
+          // 读取部分文件
+          const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
+          const size_t limit = (byte_limit >= 0)
+                                   ? size_t(byte_limit)
+                                   : std::numeric_limits<size_t>::max();
+
+          auto fileSize = stream.size();
+          auto bytesAvailable =
+              std::max((long long)fileSize - (long long)offset, (long long)0);
+          auto bytesRead =
+              std::min(static_cast<std::streamsize>(limit),
+                       static_cast<std::streamsize>(bytesAvailable));
+
+          // 没有数据可读
+          if (bytesRead <= 0) {
+            throw std::runtime_error{fmt::format(
+                R"(Arg `byte_offset`({}) is out of range of file size({}).)",
+                offset, (size_t)fileSize)};
+          }
+
+          std::string result;
+          auto bytesReadLen = co_await asio::async_read_at(
+              stream, byte_offset, asio::buffer(result, bytesRead),
+              asio::use_awaitable);
+          stream.close();
+          co_return neograph::json{
+              {"bytes_read_len", bytesReadLen},
+              {"base64_data",
+               agentxx::util::base64_encode(result.data(), result.size())},
+          }
+              .dump();
+        } catch (const std::exception &e) {
+          stream.close();
+          throw e;
+        }
       }
 
-      if (byte_offset >= 0 || byte_limit >= 0) {
-        // 读取部分文件
-        const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
-        const size_t limit = (byte_limit >= 0)
-                                 ? size_t(byte_limit)
-                                 : std::numeric_limits<size_t>::max();
-
-        // 计算实际需要读取的字节数
-        auto fileSize = stream.tellg();
-        auto bytesAvailable =
-            std::max((long long)fileSize - (long long)offset, (long long)0);
-        auto bytesRead = std::min(static_cast<std::streamsize>(limit),
-                                  static_cast<std::streamsize>(bytesAvailable));
-
-        // 没有数据可读
-        if (bytesRead <= 0) {
-          throw std::runtime_error{fmt::format(
-              R"(Arg `byte_offset`({}) is out of range of file size({}).)",
-              offset, (size_t)fileSize)};
+      // 读取完整文件
+      asio::stream_file stream{executor};
+      try {
+        stream.open(filepath, asio::stream_file::read_only);
+        if (false == stream.is_open()) {
+          stream.close();
+          co_return "Can not open file.";
         }
 
-        stream.seekg(offset, std::ios::beg);
-        if (!stream.good()) {
-          auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{
-              fmt::format(R"(Read offset {} bytes failed. Error: {})", offset,
-                          ec.message())};
-        }
-
-        std::vector<char> result{};
-        result.resize(bytesRead + 1);
-        stream.read(result.data(), limit);
-        std::streamsize realBytesRead = stream.gcount();
-
+        std::string result;
+        auto bytesReadLen = co_await asio::async_read(
+            stream, asio::dynamic_buffer(result), asio::use_awaitable);
         stream.close();
         co_return neograph::json{
-            {"bytes_read_len", realBytesRead},
+            {"bytes_read_len", bytesReadLen},
             {"base64_data",
              agentxx::util::base64_encode(result.data(), result.size())},
         }
             .dump();
+      } catch (const std::exception &e) {
+        stream.close();
+        throw e;
       }
+    }
+#endif
 
-      // 读取完整文件
-      auto result = std::string((std::istreambuf_iterator<char>(stream)),
-                                std::istreambuf_iterator<char>());
-      std::streamsize bytes_read = stream.gcount();
-      stream.close();
-      co_return neograph::json{
-          {"bytes_read_len", bytes_read},
-          {"base64_data",
-           agentxx::util::base64_encode(result.data(), result.size())},
+    {
+      /// 同步读取
+      std::ifstream stream;
+      try {
+        stream.open(filepath, std::ios::binary);
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file. Error: {})", ec.message())};
+        }
+
+        if (byte_offset >= 0 || byte_limit >= 0) {
+          // 读取部分文件
+          const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
+          const size_t limit = (byte_limit >= 0)
+                                   ? size_t(byte_limit)
+                                   : std::numeric_limits<size_t>::max();
+
+          // 计算实际需要读取的字节数
+          auto fileSize = stream.tellg();
+          auto bytesAvailable =
+              std::max((long long)fileSize - (long long)offset, (long long)0);
+          auto bytesRead =
+              std::min(static_cast<std::streamsize>(limit),
+                       static_cast<std::streamsize>(bytesAvailable));
+
+          // 没有数据可读
+          if (bytesRead <= 0) {
+            throw std::runtime_error{fmt::format(
+                R"(Arg `byte_offset`({}) is out of range of file size({}).)",
+                offset, (size_t)fileSize)};
+          }
+
+          stream.seekg(offset, std::ios::beg);
+          if (!stream.good()) {
+            auto ec = std::error_code{errno, std::system_category()};
+            throw std::runtime_error{
+                fmt::format(R"(Read offset {} bytes failed. Error: {})", offset,
+                            ec.message())};
+          }
+
+          std::vector<char> result{};
+          result.resize(bytesRead + 1);
+          stream.read(result.data(), limit);
+          std::streamsize realBytesRead = stream.gcount();
+
+          stream.close();
+          co_return neograph::json{
+              {"bytes_read_len", realBytesRead},
+              {"base64_data",
+               agentxx::util::base64_encode(result.data(), result.size())},
+          }
+              .dump();
+        }
+
+        // 读取完整文件
+        auto result = std::string((std::istreambuf_iterator<char>(stream)),
+                                  std::istreambuf_iterator<char>());
+        std::streamsize bytesReadLen = stream.gcount();
+        stream.close();
+        co_return neograph::json{
+            {"bytes_read_len", bytesReadLen},
+            {"base64_data",
+             agentxx::util::base64_encode(result.data(), result.size())},
+        }
+            .dump();
+      } catch (const std::exception &e) {
+        stream.close();
+        throw e;
       }
-          .dump();
-    } catch (const std::exception &e) {
-      stream.close();
-      throw e;
     }
   }
 };

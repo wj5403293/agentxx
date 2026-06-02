@@ -6,6 +6,7 @@
                 "${workspaceFolder}/agent/third_party/fmt/include/",
                 "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
                 "${workspaceFolder}/agent/third_party/html2md/include/",
+                "${workspaceFolder}/agent/third_party/liburing/src/include/",
                 "${workspaceFolder}/agent/third_party/vectorscan/src/",
                 "${workspaceFolder}/agent/third_party/glob/single_include/",
                 "${workspaceFolder}/agent/third_party/neograph/include/",
@@ -22,7 +23,9 @@
                 "LUMENXX_BUILD_TYPE",
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "ASIO_HAS_IO_URING",
+                "ASIO_HAS_FILE"
             ],
             "compilerPath": "/usr/local/bin/g++",
             "cStandard": "c23",
@@ -31,19 +34,30 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/src/third_party/ffmpeg/include-win/",
-                "${workspaceFolder}/src/third_party/",
-                "${workspaceFolder}/src/lib/",
-                "${workspaceFolder}/src/",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/agent/third_party/fmt/include/",
+                "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
+                "${workspaceFolder}/agent/third_party/html2md/include/",
+                "${workspaceFolder}/agent/third_party/vectorscan/src/",
+                "${workspaceFolder}/agent/third_party/glob/single_include/",
+                "${workspaceFolder}/agent/third_party/neograph/include/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/",
+                "${workspaceFolder}/agent/lib/",
+                "${workspaceFolder}/agent/"
             ],
             "defines": [
+                "WIN32",
                 "IS_WIN_D",
                 "LUMENXX_BUILD_TYPE",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "WIN32"
+                "ASIO_HAS_IOCP",
+                "ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE",
+                "ASIO_HAS_FILE"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "cl.exe",
@@ -53,11 +67,19 @@
         {
             "name": "Android",
             "includePath": [
-                "${workspaceFolder}/src/third_party/ffmpeg/include-android/",
-                "${workspaceFolder}/src/third_party/",
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/src/",
-                "${workspaceFolder}/src/lib/",
+                "${workspaceFolder}/agent/third_party/fmt/include/",
+                "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
+                "${workspaceFolder}/agent/third_party/html2md/include/",
+                "${workspaceFolder}/agent/third_party/vectorscan/src/",
+                "${workspaceFolder}/agent/third_party/glob/single_include/",
+                "${workspaceFolder}/agent/third_party/neograph/include/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
+                "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/",
+                "${workspaceFolder}/agent/lib/",
+                "${workspaceFolder}/agent/",
                 "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
                 "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android/"
             ],

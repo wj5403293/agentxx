@@ -54,9 +54,11 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
+          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>(
+              ioCtx.get_executor()));
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
+          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>(
+              ioCtx.get_executor()));
       tools.push_back(
           std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
       tools.push_back(
