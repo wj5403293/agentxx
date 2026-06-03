@@ -1,4 +1,6 @@
 #include "util.h"
+#include "util/log.h"
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -33,10 +35,12 @@ std::string agentxx::util::getSystemName() {
 }
 
 bool agentxx::util::isRunningInWSL() {
-  std::ifstream wslInterop{"/proc/sys/fs/binfmt_misc/WSLInterop"};
-  auto rebool = wslInterop.good();
-  wslInterop.close();
-  return rebool;
+  try {
+    return std::filesystem::exists("/proc/sys/fs/binfmt_misc/WSLInterop");
+  } catch (const std::exception &e) {
+    XX_LOGD("isRunningInWSL exception: {}", e.what());
+  }
+  return false;
 }
 
 #elif IS_WIN_D
