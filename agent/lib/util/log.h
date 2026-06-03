@@ -41,7 +41,7 @@ namespace util {
 
 inline static std::string _exe_path{};
 
-void printStack() {
+inline void printStack() {
 
 #define innerPrintToConsoleAndFile_d(str, ...) printf(str, ##__VA_ARGS__);
 
@@ -86,7 +86,7 @@ void printStack() {
 #undef innerPrintToConsoleAndFile_d
 }
 
-void signal_handler(int signo) {
+inline void signal_handler(int signo) {
   const std::string filename = fmt::format("crash-{}.log", std::time(nullptr));
 
 #define innerPrintToConsoleAndFile_d(fp, str, ...)                             \
@@ -143,7 +143,7 @@ void signal_handler(int signo) {
 #undef innerPrintToConsoleAndFile_d
 }
 
-void signalError(std::string_view exepath) {
+inline void signalError(std::string_view exepath) {
   _exe_path = exepath;
   printf("# Signal error handler: %s\n", exepath.data());
   signal(SIGSEGV, signal_handler);
@@ -151,9 +151,9 @@ void signalError(std::string_view exepath) {
 
 #else
 
-void printStack() {}
+inline void printStack() {}
 
-void signalError(std::string_view exepath) {}
+inline void signalError(std::string_view exepath) {}
 
 #endif
 }; // namespace util

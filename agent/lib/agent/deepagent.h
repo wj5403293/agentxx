@@ -111,8 +111,8 @@ public:
                 std::set<std::string>{
                     "/home/coolight/program/agentxx/isolation/skills/"},
                 middlewareHandleContext);
-        skillMiddleware->toolcalls.push_back(
-            std::make_unique<agentxx::tools::SkillTool>());
+        // skillMiddleware->toolcalls.push_back(
+        //     std::make_unique<agentxx::tools::SkillTool>());
         middlewareHandleContext->handles.push_back(std::move(skillMiddleware));
       }
 

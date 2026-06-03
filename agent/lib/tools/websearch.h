@@ -27,7 +27,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "web_search",
-        "query 进行网络搜索. 返回一个 markdown 列表结果. "
+        "进行网络搜索. 返回一个 markdown 列表结果. "
         "然后可以使用 fetch_url_markdown 工具拉取网页具体内容.",
         neograph::json{
             {"type", "object"},
