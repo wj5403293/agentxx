@@ -13,6 +13,7 @@
 #include <asio/as_tuple.hpp>
 #include <asio/redirect_error.hpp>
 #include <asio/strand.hpp>
+#include <asio/write.hpp>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
@@ -148,10 +149,12 @@ public:
       /// 异步读取文件
       asio::stream_file stream{currentIoCtx};
       try {
-        stream.open(filepath, asio::stream_file::read_only);
+        asio::error_code errCode;
+        stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return "Can not open file.";
+          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
+                                errCode.message());
         }
 
         if (text_line_offset >= 0 || text_line_limit >= 0) {
@@ -164,7 +167,6 @@ public:
           size_t lineNum = 0;
 
           for (std::string buf; lineNum < offset + limit; lineNum++) {
-            asio::error_code errCode;
             auto readlen = co_await asio::async_read_until(
                 stream, asio::dynamic_buffer(buf), '\n',
                 asio::redirect_error(asio::use_awaitable, errCode));
@@ -178,12 +180,11 @@ public:
               throw asio::system_error{errCode};
             }
 
-            if (lineNum < offset) {
-              continue;
+            if (lineNum >= offset) {
+              auto line = std::string_view{buf}.substr(0, readlen);
+              result << line;
             }
 
-            auto line = std::string_view{buf}.substr(0, readlen);
-            result << line;
             buf.erase(0, readlen);
           }
 
@@ -200,11 +201,10 @@ public:
 
         // 读取完整文件
         std::string data;
-        asio::error_code errCode;
         co_await asio::async_read(
             stream, asio::dynamic_buffer(data), asio::transfer_all(),
             asio::redirect_error(asio::use_awaitable, errCode));
-        if (errCode != asio::error::eof) {
+        if (errCode && errCode != asio::error::eof) {
           throw asio::system_error{errCode};
         }
         stream.close();
@@ -341,10 +341,12 @@ public:
       if (byte_offset >= 0 || byte_limit >= 0) {
         asio::random_access_file stream{currentIoCtx};
         try {
-          stream.open(filepath, asio::random_access_file::read_only);
+          asio::error_code errCode;
+          stream.open(filepath, asio::random_access_file::read_only, errCode);
           if (false == stream.is_open()) {
             stream.close();
-            co_return "Can not open file.";
+            co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
+                                  errCode.message());
           }
 
           // 读取部分文件
@@ -368,11 +370,10 @@ public:
           }
 
           std::string result;
-          asio::error_code errCode;
           auto bytesReadLen = co_await asio::async_read_at(
               stream, byte_offset, asio::buffer(result, bytesRead),
               asio::redirect_error(asio::use_awaitable, errCode));
-          if (errCode != asio::error::eof) {
+          if (errCode && errCode != asio::error::eof) {
             throw asio::system_error{errCode};
           }
           stream.close();
@@ -396,18 +397,19 @@ public:
       // 读取完整文件
       asio::stream_file stream{currentIoCtx};
       try {
-        stream.open(filepath, asio::stream_file::read_only);
+        asio::error_code errCode;
+        stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return "Can not open file.";
+          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
+                                errCode.message());
         }
 
         std::string result;
-        asio::error_code errCode;
         auto bytesReadLen = co_await asio::async_read(
             stream, asio::dynamic_buffer(result), asio::transfer_all(),
             asio::redirect_error(asio::use_awaitable, errCode));
-        if (errCode != asio::error::eof) {
+        if (errCode && errCode != asio::error::eof) {
           throw asio::system_error{errCode};
         }
         stream.close();
@@ -571,70 +573,131 @@ public:
     auto overwrite = arguments.value<bool>("overwrite", false);
     auto is_binary = arguments.value<bool>("is_binary", false);
 
-    std::ofstream stream;
-    try {
-      auto path = std::filesystem::path{filepath};
-      if (false == overwrite && std::filesystem::exists(path)) {
-        throw std::runtime_error{"File already exist"};
-      }
-      if (false == std::filesystem::exists(path.parent_path()) &&
-          false == std::filesystem::create_directories(path.parent_path())) {
-        // 创建父目录
-        throw std::runtime_error{
-            fmt::format(R"(Can not create `path`({})'s parent dirs.)",
-                        path.parent_path().string())};
-      }
+#if defined(ASIO_HAS_FILE)
+    {
+      auto currentIoCtx = co_await asio::this_coro::executor;
 
-      stream.open(filepath, is_binary
-                                ? std::ios_base::out | std::ios_base::binary
-                                : std::ios_base::out);
-      if (!stream) {
-        auto ec = std::error_code{errno, std::system_category()};
-        throw std::runtime_error{fmt::format(
-            R"(Can not create or open file. Error: {})", ec.message())};
-      }
-
-      if (false == content.empty()) {
-        // 写入文件内容
-        if (is_binary) {
-          auto result = agentxx::util::base64_decode(content);
-          if (result.empty()) {
-            throw std::runtime_error{"base64 decode failed"};
-          }
-          stream << result;
-        } else {
-          stream << content;
+      // 读取完整文件
+      asio::stream_file stream{currentIoCtx};
+      try {
+        auto path = std::filesystem::path{filepath};
+        if (false == overwrite && std::filesystem::exists(path)) {
+          throw std::runtime_error{"File already exist"};
         }
+        if (false == std::filesystem::exists(path.parent_path()) &&
+            false == std::filesystem::create_directories(path.parent_path())) {
+          // 创建父目录
+          throw std::runtime_error{
+              fmt::format(R"(Can not create `path`({})'s parent dirs.)",
+                          path.parent_path().string())};
+        }
+
+        asio::error_code errCode;
+        stream.open(filepath,
+                    asio::stream_file::write_only | asio::stream_file::create,
+                    errCode);
+        if (false == stream.is_open()) {
+          stream.close();
+          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
+                                errCode.message());
+        }
+
+        if (false == content.empty()) {
+          // 写入文件内容
+          if (is_binary) {
+            auto result = agentxx::util::base64_decode(content);
+            if (result.empty()) {
+              throw std::runtime_error{"base64 decode failed"};
+            }
+            co_await asio::async_write(
+                stream, asio::buffer(result),
+                asio::redirect_error(asio::use_awaitable, errCode));
+          } else {
+            co_await asio::async_write(
+                stream, asio::buffer(content),
+                asio::redirect_error(asio::use_awaitable, errCode));
+          }
+          if (errCode) {
+            throw asio::system_error{errCode};
+          }
+        }
+
+        stream.close();
+        co_return "success";
+      } catch (const std::exception &e) {
+        stream.close();
+        XX_LOGD("FilesystemWriteFileTool exception: {}", e.what());
+        throw e;
+      }
+    }
+#endif
+
+    {
+      std::ofstream stream;
+      try {
+        auto path = std::filesystem::path{filepath};
+        if (false == overwrite && std::filesystem::exists(path)) {
+          throw std::runtime_error{"File already exist"};
+        }
+        if (false == std::filesystem::exists(path.parent_path()) &&
+            false == std::filesystem::create_directories(path.parent_path())) {
+          // 创建父目录
+          throw std::runtime_error{
+              fmt::format(R"(Can not create `path`({})'s parent dirs.)",
+                          path.parent_path().string())};
+        }
+
+        stream.open(filepath, is_binary
+                                  ? std::ios_base::out | std::ios_base::binary
+                                  : std::ios_base::out);
         if (!stream) {
           auto ec = std::error_code{errno, std::system_category()};
           throw std::runtime_error{fmt::format(
-              R"(File created success, but write failed. Error: {})",
-              ec.message())};
+              R"(Can not create or open file. Error: {})", ec.message())};
         }
-      }
 
-      stream.close();
-      co_return "success";
-    } catch (const std::exception &e) {
-      stream.close();
-      XX_LOGD("FilesystemWriteFileTool exception: {}", e.what());
-      throw e;
+        if (false == content.empty()) {
+          // 写入文件内容
+          if (is_binary) {
+            auto result = agentxx::util::base64_decode(content);
+            if (result.empty()) {
+              throw std::runtime_error{"base64 decode failed"};
+            }
+            stream << result;
+          } else {
+            stream << content;
+          }
+          if (!stream) {
+            auto ec = std::error_code{errno, std::system_category()};
+            throw std::runtime_error{fmt::format(
+                R"(File created success, but write failed. Error: {})",
+                ec.message())};
+          }
+        }
+
+        stream.close();
+        co_return "success";
+      } catch (const std::exception &e) {
+        stream.close();
+        XX_LOGD("FilesystemWriteFileTool exception: {}", e.what());
+        throw e;
+      }
     }
   }
 };
 
 /// edit file
-class FilesystemEditFileTool : public neograph::AsyncTool {
+class FilesystemEditTextFileTool : public neograph::AsyncTool {
 public:
-  explicit FilesystemEditFileTool() {}
+  explicit FilesystemEditTextFileTool() {}
 
-  std::string get_name() const override { return "filesystem_editfile"; }
+  std::string get_name() const override { return "filesystem_edit_text_file"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "filesystem_editfile",
-        "Perform exact string replacements in files (with global replace "
-        "mode).",
+        "filesystem_edit_text_file",
+        "Perform exact string replacements in text files(e.g. "
+        "*.txt,*.md,*.cpp).",
         neograph::json{
             {"type", "object"},
             {
@@ -691,59 +754,140 @@ public:
     auto new_str = arguments.value<std::string>("new_str", std::string{});
     auto multi_replace = arguments.value<bool>("multi_replace", false);
 
-    std::fstream stream;
-    try {
-      auto path = std::filesystem::path{filepath};
-      if (false == std::filesystem::exists(path)) {
-        throw std::runtime_error{"File not exist"};
-      }
+#if defined(ASIO_HAS_FILE)
+    {
+      auto currentIoCtx = co_await asio::this_coro::executor;
 
-      stream.open(filepath, std::ios_base::in | std::ios_base::out |
-                                std::ios_base::binary);
-      if (!stream) {
-        auto ec = std::error_code{errno, std::system_category()};
-        throw std::runtime_error{
-            fmt::format(R"(Can not open file. Error: {})", ec.message())};
-      }
-
-      std::ostringstream output;
-      output << stream.rdbuf();
-      std::string content = output.str();
-
-      int replaceHit = 0;
-      size_t pos = 0;
-      while ((pos = content.find(old_str, pos)) != std::string::npos) {
-        replaceHit++;
-        content.replace(pos, old_str.length(), new_str);
-        // 跳过新字符串，避免死循环
-        pos += new_str.length();
-        if (false == multi_replace) {
-          break;
+      // 读取完整文件
+      asio::stream_file stream{currentIoCtx};
+      try {
+        auto path = std::filesystem::path{filepath};
+        if (false == std::filesystem::exists(path)) {
+          throw std::runtime_error{"File not exist"};
         }
-      }
 
-      if (0 == replaceHit) {
-        throw std::runtime_error{R"(No match `old_str` found)"};
-      }
+        asio::error_code errCode;
+        stream.open(filepath, asio::stream_file::read_only, errCode);
+        if (false == stream.is_open()) {
+          stream.close();
+          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
+                                errCode.message());
+        }
 
-      // 写入文件内容
-      stream.seekp(0);
-      stream << content;
-      if (!stream) {
-        auto ec = std::error_code{errno, std::system_category()};
-        throw std::runtime_error{
-            fmt::format(R"(Edit file failed. Error: {})", ec.message())};
-      }
+        std::string content;
+        // 读出文件
+        co_await asio::async_read(
+            stream, asio::dynamic_buffer(content), asio::transfer_all(),
+            asio::redirect_error(asio::use_awaitable, errCode));
+        if (errCode && errCode != asio::error::eof) {
+          throw asio::system_error{errCode};
+        }
+        stream.close();
 
-      stream.close();
-      if (multi_replace) {
-        co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
-      } else {
-        co_return "success";
+        int replaceHit = 0;
+        size_t pos = 0;
+        while ((pos = content.find(old_str, pos)) != std::string::npos) {
+          replaceHit++;
+          content.replace(pos, old_str.length(), new_str);
+          // 跳过新字符串，避免死循环
+          pos += new_str.length();
+          if (false == multi_replace) {
+            break;
+          }
+        }
+
+        if (0 == replaceHit) {
+          throw std::runtime_error{R"(No match `old_str` found)"};
+        }
+
+        // 覆盖写入文件内容
+        stream.open(filepath, asio::stream_file::write_only, errCode);
+        if (false == stream.is_open()) {
+          stream.close();
+          co_return fmt::format(
+              R"({{"error": "Can not open file to write: {}"}})",
+              errCode.message());
+        }
+        co_await asio::async_write(
+            stream, asio::buffer(content),
+            asio::redirect_error(asio::use_awaitable, errCode));
+        if (errCode) {
+          throw asio::system_error{errCode};
+        }
+
+        stream.close();
+        if (multi_replace) {
+          co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
+        } else {
+          co_return "success";
+        }
+      } catch (const std::exception &e) {
+        stream.close();
+        throw e;
       }
-    } catch (const std::exception &e) {
-      stream.close();
-      throw e;
+    }
+#endif
+
+    {
+      std::fstream stream;
+      try {
+        auto path = std::filesystem::path{filepath};
+        if (false == std::filesystem::exists(path)) {
+          throw std::runtime_error{"File not exist"};
+        }
+
+        stream.open(filepath, std::ios_base::in);
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file. Error: {})", ec.message())};
+        }
+
+        std::ostringstream output;
+        output << stream.rdbuf();
+        std::string content = output.str();
+
+        int replaceHit = 0;
+        size_t pos = 0;
+        while ((pos = content.find(old_str, pos)) != std::string::npos) {
+          replaceHit++;
+          content.replace(pos, old_str.length(), new_str);
+          // 跳过新字符串，避免死循环
+          pos += new_str.length();
+          if (false == multi_replace) {
+            break;
+          }
+        }
+
+        if (0 == replaceHit) {
+          throw std::runtime_error{R"(No match `old_str` found)"};
+        }
+
+        // 写入文件内容
+        stream.close();
+        stream.open(filepath, std::ios_base::out);
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          throw std::runtime_error{fmt::format(
+              R"(Can not open file to write. Error: {})", ec.message())};
+        }
+        stream << content;
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          throw std::runtime_error{
+              fmt::format(R"(Edit file failed. Error: {})", ec.message())};
+        }
+
+        stream.close();
+        if (multi_replace) {
+          co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
+        } else {
+          co_return "success";
+        }
+      } catch (const std::exception &e) {
+        stream.close();
+        throw e;
+      }
     }
   }
 };

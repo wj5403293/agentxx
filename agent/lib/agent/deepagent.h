@@ -67,7 +67,7 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemEditFileTool>());
+          std::make_unique<agentxx::tools::FilesystemEditTextFileTool>());
       tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
 
       tools.push_back(
