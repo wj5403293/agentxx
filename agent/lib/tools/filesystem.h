@@ -10,7 +10,9 @@
 #include "glob/glob.hpp"
 #include "util/log.h"
 #include "util/string_util.h"
+#include <asio/as_tuple.hpp>
 #include <asio/redirect_error.hpp>
+#include <asio/strand.hpp>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
@@ -84,11 +86,12 @@ public:
 /// read
 class FilesystemReadTextFileTool : public neograph::AsyncTool {
 protected:
-  asio::any_io_executor executor;
+  std::shared_ptr<asio::io_context> ioCtx;
 
 public:
-  explicit FilesystemReadTextFileTool(asio::any_io_executor in_executor)
-      : executor(in_executor) {}
+  explicit FilesystemReadTextFileTool(
+      std::shared_ptr<asio::io_context> in_ioCtx)
+      : ioCtx(in_ioCtx) {}
 
   std::string get_name() const override { return "filesystem_read_text_file"; }
 
@@ -145,7 +148,7 @@ public:
 #if defined(ASIO_HAS_FILE)
     {
       /// 异步读取文件
-      asio::stream_file stream{executor};
+      asio::stream_file stream{ioCtx->get_executor()};
       try {
         stream.open(filepath, asio::stream_file::read_only);
         if (false == stream.is_open()) {
@@ -164,9 +167,11 @@ public:
 
           for (std::string buf; lineNum < offset + limit; lineNum++) {
             asio::error_code errCode;
-            auto readlen = co_await asio::async_read_until(
-                stream, asio::dynamic_buffer(buf), '\n',
-                asio::redirect_error(asio::use_awaitable, errCode));
+            auto readlen = asio::read_until(stream, asio::dynamic_buffer(buf),
+                                            '\n', errCode);
+            // auto readlen = co_await asio::async_read_until(
+            //     stream, asio::dynamic_buffer(buf), '\n',
+            //     asio::redirect_error(asio::use_awaitable, errCode));
 
             if (errCode == asio::error::eof) {
               if (lineNum >= offset) {
@@ -182,7 +187,7 @@ public:
             }
 
             auto line = std::string_view{buf}.substr(0, readlen);
-            result << line << "\n";
+            result << line;
             buf.erase(0, readlen);
           }
 
@@ -199,12 +204,20 @@ public:
 
         // 读取完整文件
         std::string data;
-        co_await asio::async_read(stream, asio::dynamic_buffer(data),
-                                  asio::use_awaitable);
+        asio::error_code errCode;
+        asio::read(stream, asio::dynamic_buffer(data), asio::transfer_all(),
+                   errCode);
+        // co_await asio::async_read(
+        //     stream, asio::dynamic_buffer(data), asio::transfer_all(),
+        //     asio::redirect_error(asio::use_awaitable, errCode));
+        if (errCode != asio::error::eof) {
+          throw asio::system_error{errCode};
+        }
         stream.close();
         co_return data;
       } catch (const std::exception &e) {
         stream.close();
+        XX_LOGD("FilesystemReadTextFileTool exception: {}", e.what());
         throw e;
       }
     }
@@ -260,6 +273,7 @@ public:
         co_return result;
       } catch (const std::exception &e) {
         stream.close();
+        XX_LOGD("FilesystemReadTextFileTool exception: {}", e.what());
         throw e;
       }
     }
@@ -269,11 +283,12 @@ public:
 /// read
 class FilesystemReadBinaryFileTool : public neograph::AsyncTool {
 protected:
-  asio::any_io_executor executor;
+  std::shared_ptr<asio::io_context> ioCtx;
 
 public:
-  explicit FilesystemReadBinaryFileTool(asio::any_io_executor in_executor)
-      : executor(in_executor) {}
+  explicit FilesystemReadBinaryFileTool(
+      std::shared_ptr<asio::io_context> in_ioCtx)
+      : ioCtx(in_ioCtx) {}
 
   std::string get_name() const override {
     return "filesystem_read_binary_file";
@@ -333,7 +348,7 @@ public:
     {
       /// 异步读取文件
       if (byte_offset >= 0 || byte_limit >= 0) {
-        asio::random_access_file stream{executor};
+        asio::random_access_file stream{ioCtx->get_executor()};
         try {
           stream.open(filepath, asio::random_access_file::read_only);
           if (false == stream.is_open()) {
@@ -362,24 +377,35 @@ public:
           }
 
           std::string result;
-          auto bytesReadLen = co_await asio::async_read_at(
-              stream, byte_offset, asio::buffer(result, bytesRead),
-              asio::use_awaitable);
+          asio::error_code errCode;
+          auto bytesReadLen = asio::read_at(
+              stream, byte_offset, asio::buffer(result, bytesRead), errCode);
+          // auto bytesReadLen = co_await asio::async_read_at(
+          //     stream, byte_offset, asio::buffer(result, bytesRead),
+          //     asio::redirect_error(asio::use_awaitable, errCode));
+          if (errCode != asio::error::eof) {
+            throw asio::system_error{errCode};
+          }
           stream.close();
+          auto readRange = std::string_view{result}.substr(0, bytesReadLen);
           co_return neograph::json{
               {"bytes_read_len", bytesReadLen},
-              {"base64_data",
-               agentxx::util::base64_encode(result.data(), result.size())},
+              {
+                  "base64_data",
+                  agentxx::util::base64_encode(readRange.data(),
+                                               readRange.size()),
+              },
           }
               .dump();
         } catch (const std::exception &e) {
           stream.close();
+          XX_LOGD("FilesystemReadBinaryFileTool exception: {}", e.what());
           throw e;
         }
       }
 
       // 读取完整文件
-      asio::stream_file stream{executor};
+      asio::stream_file stream{ioCtx->get_executor()};
       try {
         stream.open(filepath, asio::stream_file::read_only);
         if (false == stream.is_open()) {
@@ -388,17 +414,29 @@ public:
         }
 
         std::string result;
-        auto bytesReadLen = co_await asio::async_read(
-            stream, asio::dynamic_buffer(result), asio::use_awaitable);
+        asio::error_code errCode;
+        auto bytesReadLen =
+            asio::read(stream, asio::dynamic_buffer(result), errCode);
+        // auto bytesReadLen = co_await asio::async_read(
+        //     stream, asio::dynamic_buffer(result),
+        //     asio::redirect_error(asio::use_awaitable, errCode));
+        if (errCode != asio::error::eof) {
+          throw asio::system_error{errCode};
+        }
         stream.close();
+        auto readRange = std::string_view{result}.substr(0, bytesReadLen);
         co_return neograph::json{
             {"bytes_read_len", bytesReadLen},
-            {"base64_data",
-             agentxx::util::base64_encode(result.data(), result.size())},
+            {
+                "base64_data",
+                agentxx::util::base64_encode(readRange.data(),
+                                             readRange.size()),
+            },
         }
             .dump();
       } catch (const std::exception &e) {
         stream.close();
+        XX_LOGD("FilesystemReadBinaryFileTool exception: {}", e.what());
         throw e;
       }
     }
@@ -472,6 +510,7 @@ public:
             .dump();
       } catch (const std::exception &e) {
         stream.close();
+        XX_LOGD("FilesystemReadBinaryFileTool exception: {}", e.what());
         throw e;
       }
     }
@@ -591,6 +630,7 @@ public:
       co_return "success";
     } catch (const std::exception &e) {
       stream.close();
+      XX_LOGD("FilesystemWriteFileTool exception: {}", e.what());
       throw e;
     }
   }

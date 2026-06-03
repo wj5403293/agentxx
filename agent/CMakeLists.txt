@@ -56,6 +56,8 @@ endif()
 if (LINUX_IO_URING_SUPPORTED)
   add_definitions(-DASIO_HAS_IO_URING=ON)
   add_definitions(-DBOOST_ASIO_HAS_IO_URING=ON)
+  add_definitions(-DASIO_HAS_IO_URING_AS_DEFAULT=ON)
+  add_definitions(-DBOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
   message("[agentxx] Enable asio/io_uring")
 endif()
 

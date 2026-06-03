@@ -26,7 +26,7 @@ namespace agentxx {
 
 class DeepAgent {
 protected:
-  asio::io_context ioCtx;
+  std::shared_ptr<asio::io_context> ioCtx = nullptr;
   std::unique_ptr<neograph::graph::GraphEngine> engine = nullptr;
   std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
   std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
@@ -37,6 +37,7 @@ public:
       : config(in_config) {
     assert(nullptr != config);
     assert(config->modelOpenAIBaseUrl.empty() == false);
+    ioCtx = std::make_shared<asio::io_context>();
   }
 
   void init() {
@@ -54,11 +55,10 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>(
-              ioCtx.get_executor()));
+          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>(ioCtx));
       tools.push_back(
           std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>(
-              ioCtx.get_executor()));
+              ioCtx));
       tools.push_back(
           std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
       tools.push_back(
@@ -310,10 +310,10 @@ public:
 
   void runCli() {
     asio::co_spawn(
-        ioCtx,
+        *ioCtx,
         [this]() -> asio::awaitable<void> { co_return co_await runCliAsync(); },
         asio::detached);
-    ioCtx.run();
+    ioCtx->run();
   }
 
   ~DeepAgent() { engine = nullptr; }
