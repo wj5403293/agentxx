@@ -3,16 +3,35 @@
 - 依赖`NeoGraph`，仿照Python著名的 agent 框架`langgraph`，实现常用功能
 - 计划实现:
     - 基础模块:
-        - ⬜Toolcall添加各种常见功能
+        - ⬜Toolcall:
             - ✅返回值自动转换字符编码到 utf8
-            - ✅filesystem
-            - ✅websearch
+            - ✅filesystem（已支持 同步 + asio协程异步 文件读写）
+                - ls
+                - read_text (full / offset+limit)
+                - read_binary
+                - write (text/binary)
+                - edit_text
+                - glob
             - ✅exec_shell
+                - execute_linux_command
+                - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
+            - ✅websearch
+            - ⬜memory
+            - ⬜todolist
+            - ⬜ui_control
         - ✅Middleware支持
+            - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
+        - ✅Skill支持
+            - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
+            - 待实现 load/offload 动态加载
         - ❌MCP支持（Neograph已实现，但暂时使用有问题）
-        - ⬜Skill支持
-        - ⬜server openai api
-        - ⬜tree-context
+        - 扩展
+            - file Graph
+        - ⬜Server:
+            - Openai api server
+            - ACP server
+        - ⬜Tree-context-messages
+            - message 分叉、缩减、总结
     - 功能:
         - 翻译/划词翻译
         - 根据文本/音视频，生成评论/弹幕

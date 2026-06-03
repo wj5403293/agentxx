@@ -8,7 +8,7 @@
 	branch = 12.1.0
 [submodule "agent/third_party/neograph"]
 	path = agent/third_party/neograph
-	url = https://github.com/fox1245/NeoGraph
+	url = https://github.com/coolight7/NeoGraph
 [submodule "agent/third_party/html2md"]
 	path = agent/third_party/html2md
 	url = https://github.com/tim-gromeyer/html2md
