@@ -26,6 +26,12 @@ namespace agentxx {
 
 class DeepAgent {
 protected:
+  /// 主协程调度器
+  /// - 不要在同线程中传递到 [runCliAsync]
+  /// 内使用，因为[engine->run_stream_async]会启动其他 io_context， 交替 ioCtx
+  /// 的话会导致互相等待，进而卡住
+  /// - 某个异步函数需要 io_context 时，可以通过 `co_await
+  /// asio::this_coro::executor` 获取当前异步函数运行时绑定的 io_context
   std::shared_ptr<asio::io_context> ioCtx = nullptr;
   std::unique_ptr<neograph::graph::GraphEngine> engine = nullptr;
   std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
@@ -55,10 +61,9 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>(ioCtx));
+          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>(
-              ioCtx));
+          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
       tools.push_back(
           std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
       tools.push_back(

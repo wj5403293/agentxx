@@ -86,12 +86,8 @@ public:
 /// read
 class FilesystemReadTextFileTool : public neograph::AsyncTool {
 protected:
-  std::shared_ptr<asio::io_context> ioCtx;
-
 public:
-  explicit FilesystemReadTextFileTool(
-      std::shared_ptr<asio::io_context> in_ioCtx)
-      : ioCtx(in_ioCtx) {}
+  explicit FilesystemReadTextFileTool() {}
 
   std::string get_name() const override { return "filesystem_read_text_file"; }
 
@@ -147,8 +143,10 @@ public:
 
 #if defined(ASIO_HAS_FILE)
     {
+      auto currentIoCtx = co_await asio::this_coro::executor;
+
       /// 异步读取文件
-      asio::stream_file stream{ioCtx->get_executor()};
+      asio::stream_file stream{currentIoCtx};
       try {
         stream.open(filepath, asio::stream_file::read_only);
         if (false == stream.is_open()) {
@@ -167,11 +165,9 @@ public:
 
           for (std::string buf; lineNum < offset + limit; lineNum++) {
             asio::error_code errCode;
-            auto readlen = asio::read_until(stream, asio::dynamic_buffer(buf),
-                                            '\n', errCode);
-            // auto readlen = co_await asio::async_read_until(
-            //     stream, asio::dynamic_buffer(buf), '\n',
-            //     asio::redirect_error(asio::use_awaitable, errCode));
+            auto readlen = co_await asio::async_read_until(
+                stream, asio::dynamic_buffer(buf), '\n',
+                asio::redirect_error(asio::use_awaitable, errCode));
 
             if (errCode == asio::error::eof) {
               if (lineNum >= offset) {
@@ -205,11 +201,9 @@ public:
         // 读取完整文件
         std::string data;
         asio::error_code errCode;
-        asio::read(stream, asio::dynamic_buffer(data), asio::transfer_all(),
-                   errCode);
-        // co_await asio::async_read(
-        //     stream, asio::dynamic_buffer(data), asio::transfer_all(),
-        //     asio::redirect_error(asio::use_awaitable, errCode));
+        co_await asio::async_read(
+            stream, asio::dynamic_buffer(data), asio::transfer_all(),
+            asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode != asio::error::eof) {
           throw asio::system_error{errCode};
         }
@@ -282,13 +276,8 @@ public:
 
 /// read
 class FilesystemReadBinaryFileTool : public neograph::AsyncTool {
-protected:
-  std::shared_ptr<asio::io_context> ioCtx;
-
 public:
-  explicit FilesystemReadBinaryFileTool(
-      std::shared_ptr<asio::io_context> in_ioCtx)
-      : ioCtx(in_ioCtx) {}
+  explicit FilesystemReadBinaryFileTool() {}
 
   std::string get_name() const override {
     return "filesystem_read_binary_file";
@@ -346,9 +335,11 @@ public:
 
 #if defined(ASIO_HAS_FILE)
     {
+      auto currentIoCtx = co_await asio::this_coro::executor;
+
       /// 异步读取文件
       if (byte_offset >= 0 || byte_limit >= 0) {
-        asio::random_access_file stream{ioCtx->get_executor()};
+        asio::random_access_file stream{currentIoCtx};
         try {
           stream.open(filepath, asio::random_access_file::read_only);
           if (false == stream.is_open()) {
@@ -378,11 +369,9 @@ public:
 
           std::string result;
           asio::error_code errCode;
-          auto bytesReadLen = asio::read_at(
-              stream, byte_offset, asio::buffer(result, bytesRead), errCode);
-          // auto bytesReadLen = co_await asio::async_read_at(
-          //     stream, byte_offset, asio::buffer(result, bytesRead),
-          //     asio::redirect_error(asio::use_awaitable, errCode));
+          auto bytesReadLen = co_await asio::async_read_at(
+              stream, byte_offset, asio::buffer(result, bytesRead),
+              asio::redirect_error(asio::use_awaitable, errCode));
           if (errCode != asio::error::eof) {
             throw asio::system_error{errCode};
           }
@@ -405,7 +394,7 @@ public:
       }
 
       // 读取完整文件
-      asio::stream_file stream{ioCtx->get_executor()};
+      asio::stream_file stream{currentIoCtx};
       try {
         stream.open(filepath, asio::stream_file::read_only);
         if (false == stream.is_open()) {
@@ -415,11 +404,9 @@ public:
 
         std::string result;
         asio::error_code errCode;
-        auto bytesReadLen =
-            asio::read(stream, asio::dynamic_buffer(result), errCode);
-        // auto bytesReadLen = co_await asio::async_read(
-        //     stream, asio::dynamic_buffer(result),
-        //     asio::redirect_error(asio::use_awaitable, errCode));
+        auto bytesReadLen = co_await asio::async_read(
+            stream, asio::dynamic_buffer(result), asio::transfer_all(),
+            asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode != asio::error::eof) {
           throw asio::system_error{errCode};
         }
