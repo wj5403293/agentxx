@@ -407,8 +407,8 @@ target_link_libraries(agentxx PUBLIC
   fmt::fmt
   simdjson
   html2md
-  uchardet
   iconv
+  libuchardet
   neograph::core
   neograph::util
   neograph::async
