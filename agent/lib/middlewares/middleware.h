@@ -126,7 +126,7 @@ public:
     {
       auto it = states.find(thread_id);
       if (it != states.end()) {
-        co_return *(std::shared_ptr<T> *)(&it->second);
+        co_return (std::static_pointer_cast<T>(it->second));
       }
     }
     co_return co_await loadStateItem(thread_id);
