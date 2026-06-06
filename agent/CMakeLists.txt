@@ -10,6 +10,22 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
+option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
+option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
+
+# 仅用于指示是否编译用于调试用途，不代表真实编译类型
+# - [IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
+# 性能的编译将视为 release
+set(IS_DEBUG_D    0)
+set(IS_RELEASE_D  1)
+
+if (XX_BUILD_TYPE STREQUAL "DEBUG")
+  set(IS_DEBUG_D    1)
+  set(IS_RELEASE_D  0)
+endif()
+add_definitions(-DXX_BUILD_TYPE=${XX_BUILD_TYPE})
+
 set(IS_LINUX_D    0)
 set(IS_WIN_D      0)
 set(IS_MACOS_D    0)
@@ -87,7 +103,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
       set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
       set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     else ()
-      if (CMAKE_BUILD_TYPE MATCHES "Debug")
+      if (IS_DEBUG_D)
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
         set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
       else ()
@@ -106,9 +122,6 @@ message("[agentxx] EXE_INSTALL_PREFIX: ${EXE_INSTALL_PREFIX}")
 message("[agentxx] CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_definitions(-D__STDC_CONSTANT_MACROS)
-if (DEFINED LUMENXX_BUILD_TYPE)
-  add_definitions(-DLUMENXX_BUILD_TYPE=${LUMENXX_BUILD_TYPE})
-endif()
 
 # deps
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
@@ -358,7 +371,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
-include_directories(${UCHARDET_INSTALL_DIR}/include/)
+include_directories(${uchardet_INSTALL_DIR}/include/)
 include_directories(${LIBICONV_INSTALL_DIR}/include/)
 include_directories(${LIBURING_INSTALL_DIR}/include/)
 include_directories(${vectorscan_SOURCE_DIR}/src/)
@@ -393,7 +406,7 @@ target_link_directories(agentxx PUBLIC
   ${fmt_INSTALL_DIR}
   ${neograph_INSTALL_DIR}
   ${vectorscan_INSTALL_DIR}/lib/
-  ${UCHARDET_INSTALL_DIR}/lib/
+  ${uchardet_INSTALL_DIR}/lib/
   ${LIBICONV_INSTALL_DIR}/lib/
   ${Boost_ROOT}/lib/
 )
@@ -436,16 +449,15 @@ set_target_properties(agentxx PROPERTIES
 
 target_compile_definitions(agentxx PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
 
-if (DEFINED LUMENXX_BUILD_TYPE)
-  ADD_SUBDIRECTORY(test)
-  add_dependencies(test agentxx)
-
+if (AGENTXX_BUILD_CLIENT)
   ADD_SUBDIRECTORY(client)
   add_dependencies(client agentxx)
 endif()
+if (AGENTXX_BUILD_TEST) 
+  ADD_SUBDIRECTORY(test)
+  add_dependencies(test agentxx)
+endif()
 
-if (DEFINED LUMENXX_BUILD_TYPE)
+if (DEFINED XX_BUILD_TYPE)
   install(TARGETS agentxx DESTINATION "${EXE_INSTALL_PREFIX}")
-elseif (STATIC_LINK_FFMPEG)
-  install(TARGETS agentxx RUNTIME)
 endif()

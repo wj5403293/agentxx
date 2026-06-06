@@ -4,7 +4,7 @@ script_dir=$(dirname "$0")
 src_dir=$script_dir/../
 build_dir=$src_dir/build/debug
 
-cmake -B "$build_dir" -S "$src_dir" -DLUMENXX_BUILD_TYPE=LUMENXX_BUILD_DEBUG -DCMAKE_BUILD_TYPE=Debug
+cmake -B "$build_dir" -S "$src_dir" -DAGENTXX_BUILD_CLIENT=ON -DAGENTXX_BUILD_TEST=ON -DXX_BUILD_TYPE=DEBUG -DCMAKE_BUILD_TYPE=Debug
 
 if [[ $? -ne 0 ]]; then
     echo "cmake config failed!"
