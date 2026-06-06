@@ -26,6 +26,8 @@ int main(int argn, char **argv) {
 3. 你需要总是用简体中文回复
 )";
   config->currentSystemName = "Ubuntu 22.04/Linux";
+  config->skillDirPaths = std::vector<std::string>{
+      "/home/coolight/program/agentxx/isolation/skills/"};
 
   auto agent = agentxx::DeepAgent{config};
   agent.init();

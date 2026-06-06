@@ -29,7 +29,7 @@ public:
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
-            in_name, in_ctx, in_handleContext) {}
+            in_name, in_ctx, in_handleContext, in_ctx) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,

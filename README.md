@@ -23,14 +23,15 @@
         - search
         - fetch_url_md (html to markdown)
         - fetch_url (raw resp body)
-    - ⬜tool_search (延迟加载 mcp tool)
-    - ⬜temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
     - ⬜ui_control
         - 接收音视频/图片/文本输入，输出键鼠控制
     - ⬜todo_list
+    - ⬜sub-agent
+        - sub_task
+        - skill_search+tool_search (延迟加载 mcp tool)
     - ⬜tree-messages
         - 压缩上下文
-        - sub-agent
+        - ⬜temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
         - 修改历史消息
         - 模型重新生成消息
 - ✅Middleware支持
@@ -39,11 +40,13 @@
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
     - ⬜实现 load/offload 动态加载
 - ❌MCP支持（Neograph已实现，但暂时使用有问题）
+- ✅RAG
 - 扩展
     - file Graph
 - ⬜Server:
     - Openai api server
     - ACP server
+    - A2A server
 - ⬜Tree-context-messages
     - message 分叉、缩减、总结
 

@@ -129,14 +129,14 @@ Remember: Skills make you more capable and consistent. When in doubt, check if a
 )_"};
 
   /// 初始化后固定，按指定的文件夹扫描 SKILL.md
-  const std::set<std::string> initSkillDirPaths;
+  const std::vector<std::string> initSkillDirPaths;
 
   _SkillContext_c skillCache{};
   bool haveLoadSkillMetadata = false;
 
 public:
   SkillMiddlewareHandle(
-      const std::set<std::string> &in_initSkillDirPaths,
+      const std::vector<std::string> &in_initSkillDirPaths,
       std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
       : BaseMiddlewareHandle<SkillMiddlewareState_c>("SkillManager",
                                                      in_handleContext),

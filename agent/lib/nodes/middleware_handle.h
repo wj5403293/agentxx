@@ -102,11 +102,14 @@ protected:
   std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
 
 public:
+  template <typename... Args>
   MiddlewareWrapHandleBaseNode(
       const std::string &name, const neograph::graph::NodeContext &ctx,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
-      : T(name, ctx), nodeName(name), handleContext(in_handleContext) {}
+          in_handleContext,
+      Args &&...args)
+      : T(name, std::forward<Args>(args)...), nodeName(name),
+        handleContext(in_handleContext) {}
 
   virtual asio::awaitable<neograph::graph::NodeOutput>
   baseRun(neograph::graph::NodeInput &in) {

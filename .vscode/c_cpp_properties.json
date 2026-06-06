@@ -25,7 +25,8 @@
                 "UNICODE",
                 "_UNICODE",
                 "ASIO_HAS_IO_URING",
-                "ASIO_HAS_FILE"
+                "ASIO_HAS_FILE",
+                "BOOST_PROCESS_V2_STANDALONE"
             ],
             "compilerPath": "/usr/local/bin/g++",
             "cStandard": "c23",
@@ -57,7 +58,8 @@
                 "_UNICODE",
                 "ASIO_HAS_IOCP",
                 "ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE",
-                "ASIO_HAS_FILE"
+                "ASIO_HAS_FILE",
+                "BOOST_PROCESS_V2_STANDALONE"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "cl.exe",

@@ -29,9 +29,8 @@ public:
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<
-            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(name, ctx,
-                                                             in_handleContext) {
-  }
+            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(
+            name, ctx, in_handleContext, ctx) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -66,9 +65,8 @@ public:
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<
-            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(name, ctx,
-                                                             in_handleContext) {
-  }
+            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(
+            name, ctx, in_handleContext, ctx) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
