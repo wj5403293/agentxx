@@ -27,13 +27,15 @@
         - 接收音视频/图片/文本输入，输出键鼠控制
     - ⬜todo_list
     - ⬜sub-agent
-        - subagent_task (隔离上下文)
+        - ✅subagent_task (隔离上下文)
         - skill_search + tool_search (延迟加载 mcp tool)
     - ⬜tree-messages
         - 压缩上下文
         - temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
         - 修改历史消息
         - 模型重新生成消息
+    - ⬜self-upgrade
+        - 自动循环调整系统提示词、工具提示词等，评估效果
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅Skill支持

@@ -17,6 +17,7 @@
 #include "tools/skill.h"
 #include "tools/string.h"
 #include "tools/sub_agent.h"
+#include "tools/tool_skill_search.h"
 #include "tools/websearch.h"
 #include "util/log.h"
 #include <format>
@@ -48,16 +49,11 @@ public:
   }
 
   void init() {
-    const auto subagentManagerNodeName = std::string{"subagent_manager"};
-    const auto subagentTaskNodeName = std::string{"subagent_task"};
     neograph::llm::OpenAIProvider::Config provideConfig{
         .api_key = config->modelOpenAIApiKey,
         .base_url = config->modelOpenAIBaseUrl,
         .default_model = config->modelOpenAIModelName,
     };
-    /// middleware
-    middlewareHandleContext =
-        std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
 
     {
       /// register Node
@@ -96,78 +92,9 @@ public:
           });
     }
 
-    /// Toolcall
-    std::vector<std::unique_ptr<neograph::Tool>> tools{};
-    {
-      tools.push_back(
-          std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
-
-      tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
-
-      tools.push_back(
-          std::make_unique<agentxx::tools::FileSystemListFileTool>());
-      tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
-      tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
-      tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
-      tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemEditTextFileTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
-
-      tools.push_back(
-          std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
-      tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
-
-      {
-        // subagent
-        neograph::graph::NodeContext nodeContext{};
-        nodeContext.instructions = "";
-        nodeContext.provider =
-            neograph::llm::OpenAIProvider::create_shared(provideConfig);
-
-        auto subagentManagerTool =
-            std::make_unique<agentxx::tools::SubAgentManagerTool>(
-                subagentManagerNodeName);
-        subagentManagerTool->subAgentList.insert(std::make_pair(
-            subagentTaskNodeName,
-            std::make_shared<agentxx::tools::SubAgentNormalTask>(
-                subagentTaskNodeName,
-                "Create a isolation messages context sub agent to "
-                "exec.",
-                nodeContext)));
-        tools.push_back(std::move(subagentManagerTool));
-      }
-
-#if IS_WIN_D
-      tools.push_back(
-          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
-#elif IS_LINUX_D
-      tools.push_back(
-          std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
-      if (agentxx::util::isRunningInWSL()) {
-        tools.push_back(
-            std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
-      }
-#endif
-    }
-
-    {
-      /// MCP
-      for (auto &url : config->mcpServerUrls) {
-        auto mcpClient = neograph::mcp::MCPClient{url};
-        if (mcpClient.initialize(config->agentName)) {
-          auto mcpTools = mcpClient.get_tools();
-          XX_LOGD("append mcp tool size: {}", mcpTools.size());
-          tools.insert(tools.end(), std::make_move_iterator(mcpTools.begin()),
-                       std::make_move_iterator(mcpTools.end()));
-        }
-      }
-    }
-
+    /// middleware
+    middlewareHandleContext =
+        std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
     {
       {
         auto skillMiddleware =
@@ -196,8 +123,12 @@ public:
                 return agentxx::nodes::MiddlewareWrapToolcallNode::
                     defStdoutLogOnToolcallEnd(in, result);
               }));
+    }
 
-      /// 添加 tools
+    /// Toolcall
+    std::vector<std::unique_ptr<neograph::Tool>> tools{};
+    {
+      /// middleware tools
       for (auto &item : middlewareHandleContext->handles) {
         if (false == item->toolcalls.empty()) {
           tools.insert(tools.end(),
@@ -206,8 +137,104 @@ public:
         }
       }
     }
+    {
+      /// MCP tool
+      for (auto &url : config->mcpServerUrls) {
+        auto mcpClient = neograph::mcp::MCPClient{url};
+        if (mcpClient.initialize(config->agentName)) {
+          auto mcpTools = mcpClient.get_tools();
+          XX_LOGD("append mcp tool size: {}", mcpTools.size());
+          tools.insert(tools.end(), std::make_move_iterator(mcpTools.begin()),
+                       std::make_move_iterator(mcpTools.end()));
+        }
+      }
+    }
+    {
+      tools.push_back(
+          std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
 
-    // Build NodeContext
+      tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
+
+      tools.push_back(
+          std::make_unique<agentxx::tools::FileSystemListFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::FilesystemEditTextFileTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
+
+      tools.push_back(
+          std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
+      tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
+
+#if IS_WIN_D
+      tools.push_back(
+          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+#elif IS_LINUX_D
+      tools.push_back(
+          std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
+      if (agentxx::util::isRunningInWSL()) {
+        tools.push_back(
+            std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+      }
+#endif
+
+      {
+        // subagent
+        auto subagentManagerTool =
+            std::make_unique<agentxx::tools::SubAgentManagerTool>(
+                "subagent_manager");
+
+        {
+          // tool_skill_search
+          // - 复制 除了 subagent 的所有 tool/mcp tool/skill 组合上下文到
+          // subagent 中 根据需求分析加载/使用的 tool/skill
+          neograph::graph::NodeContext nodeContext{};
+          nodeContext.instructions = "";
+          nodeContext.provider =
+              neograph::llm::OpenAIProvider::create_shared(provideConfig);
+
+          subagentManagerTool->subAgentList.insert(std::make_pair(
+              "tool_skill_search",
+              std::make_shared<agentxx::tools::ToolSkillSearchTool>(
+                  nodeContext, std::vector<agentxx::tools::XXToolBase>{})));
+        }
+        {
+          // subagent_task
+          neograph::graph::NodeContext nodeContext{};
+          nodeContext.instructions = "";
+          nodeContext.provider =
+              neograph::llm::OpenAIProvider::create_shared(provideConfig);
+
+          /// 复制 tool
+          std::vector<neograph::Tool *> toolPtrs;
+          toolPtrs.reserve(tools.size());
+          for (auto &t : tools) {
+            toolPtrs.push_back(t.get());
+          }
+          nodeContext.tools = std::move(toolPtrs);
+
+          const auto nodeName = std::string{"subagent_task"};
+
+          subagentManagerTool->subAgentList.insert(std::make_pair(
+              nodeName, std::make_shared<agentxx::tools::SubAgentNormalTask>(
+                            nodeName,
+                            "Create a isolation messages context sub agent to "
+                            "exec. (need system prompt)",
+                            nodeContext)));
+        }
+
+        tools.push_back(std::move(subagentManagerTool));
+      }
+    }
+
+    /// Main Agent
     neograph::graph::NodeContext nodeContext{};
     nodeContext.instructions = config->systemPrompt;
     nodeContext.provider =
@@ -238,7 +265,6 @@ public:
             "channels",
             {
                 {"messages", {{"type", "list"}, {"reducer", "append"}}},
-                {"__route__", {{"reducer", "overwrite"}}},
             },
         },
         {

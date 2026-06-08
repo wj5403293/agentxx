@@ -6,6 +6,7 @@
 #include "nodes/middleware_handle.h"
 #include "nodes/modelcall.h"
 #include "nodes/toolcall.h"
+#include <ctime>
 #include <format>
 #include <iostream>
 #include <map>
@@ -23,12 +24,19 @@ protected:
 public:
   const std::string name;
   const std::string depict;
+  std::string systemPrompt;
 
   SubAgentTaskBase(const std::string &in_subAgentName,
-                   const std::string &in_subAgentDepict)
-      : name(in_subAgentName), depict(in_subAgentDepict) {}
+                   const std::string &in_subAgentDepict,
+                   const std::string &in_systemPrompt)
+      : name(in_subAgentName), depict(in_subAgentDepict),
+        systemPrompt(in_systemPrompt) {}
 
-  virtual std::shared_ptr<neograph::graph::GraphEngine> getSubgraph() = 0;
+  virtual std::shared_ptr<neograph::graph::GraphEngine> getSubgraph() {
+    assert(nullptr != subgraph);
+    return subgraph;
+  }
+
   virtual ~SubAgentTaskBase() { subgraph = nullptr; }
 };
 
@@ -37,7 +45,7 @@ public:
   SubAgentNormalTask(const std::string &in_subAgentName,
                      const std::string &in_subAgentDepict,
                      const neograph::graph::NodeContext &in_context)
-      : SubAgentTaskBase(in_subAgentName, in_subAgentDepict) {
+      : SubAgentTaskBase(in_subAgentName, in_subAgentDepict, "") {
     createSubgraph(in_context);
   }
 
@@ -47,11 +55,6 @@ public:
           defCreateSubGraphDefine(), context);
       subgraph = std::shared_ptr<neograph::graph::GraphEngine>(inner.release());
     }
-  }
-
-  std::shared_ptr<neograph::graph::GraphEngine> getSubgraph() override {
-    assert(nullptr != subgraph);
-    return subgraph;
   }
 
   inline static neograph::json defCreateSubGraphDefine() {
@@ -165,7 +168,8 @@ public:
                         "system_prompt",
                         {
                             {"type", "string"},
-                            {"description", "Sub-agent system prompt"},
+                            {"description",
+                             "Sub-agent system prompt if subagent not set"},
                         },
                     },
                     {
@@ -179,7 +183,7 @@ public:
             },
             {
                 "required",
-                neograph::json::array({"subagent", "system_prompt", "message"}),
+                neograph::json::array({"subagent", "message"}),
             },
         },
     };
@@ -192,10 +196,6 @@ public:
     auto subagentName = arguments.value("subagent", std::string{});
     if (subagentName.empty()) {
       co_return R"({"error":"Arg `subagent` is empty"})";
-    }
-    auto system_prompt = arguments.value("system_prompt", std::string{});
-    if (system_prompt.empty()) {
-      co_return R"({"error":"Arg `system_prompt` is empty"})";
     }
     auto message = arguments.value("message", std::string{});
     if (message.empty()) {
@@ -220,9 +220,15 @@ public:
     auto subagent = subagentIt->second;
     assert(nullptr != subagent->getSubgraph());
 
+    std::string system_prompt = subagent->systemPrompt;
+    if (system_prompt.empty()) {
+      system_prompt = arguments.value(
+          "system_prompt", std::string{"你是一个专门处理用户请求的辅助助手."});
+    }
+
     try {
       neograph::graph::RunConfig cfg{
-          .thread_id = "session",
+          .thread_id = fmt::format("session_subagent_{}", subagentName),
           .input = {{
               "messages",
               neograph::json::array({
