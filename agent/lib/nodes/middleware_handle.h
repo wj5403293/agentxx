@@ -26,9 +26,7 @@ protected:
   std::string name_;
 
 public:
-  MiddlewareWarpBaseNodeInterface(const std::string &name,
-                                  const neograph::graph::NodeContext &ctx)
-      : name_(name) {}
+  MiddlewareWarpBaseNodeInterface(const std::string &name) : name_(name) {}
 
   asio::awaitable<neograph::graph::NodeOutput>
   run(neograph::graph::NodeInput in) override {
@@ -104,7 +102,7 @@ protected:
 public:
   template <typename... Args>
   MiddlewareWrapHandleBaseNode(
-      const std::string &name, const neograph::graph::NodeContext &ctx,
+      const std::string &name,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext,
       Args &&...args)

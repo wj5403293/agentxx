@@ -30,7 +30,7 @@ public:
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<neograph::graph::LLMCallNode>(
-            name, ctx, in_handleContext, ctx),
+            name, in_handleContext, ctx),
         baseSystemPrompt(ctx.instructions) {}
 
   asio::awaitable<void>

@@ -25,12 +25,13 @@ public:
       std::string_view{"xx_MiddlewareWrapAgentStartCall"};
 
   MiddlewareWrapAgentStartCallNode(
-      const std::string &name, const neograph::graph::NodeContext &ctx,
+      const std::string &name,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<
-            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(
-            name, ctx, in_handleContext, ctx) {}
+            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(name,
+                                                             in_handleContext) {
+  }
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -61,12 +62,13 @@ public:
       std::string_view{"xx_MiddlewareWrapAgentEndCall"};
 
   MiddlewareWrapAgentEndCallNode(
-      const std::string &name, const neograph::graph::NodeContext &ctx,
+      const std::string &name,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<
-            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(
-            name, ctx, in_handleContext, ctx) {}
+            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(name,
+                                                             in_handleContext) {
+  }
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,

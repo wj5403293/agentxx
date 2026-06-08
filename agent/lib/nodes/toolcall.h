@@ -29,7 +29,7 @@ public:
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
       : MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
-            in_name, in_ctx, in_handleContext, in_ctx) {}
+            in_name, in_handleContext, in_ctx) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -47,17 +47,10 @@ public:
   inline static asio::awaitable<void>
   defStdoutLogOnToolcallStart(neograph::graph::NodeInput &in,
                               size_t limitOutput = 0) {
-    const neograph::ChatMessage *assistant_msg = nullptr;
     auto messages = in.state.get_messages();
-    if (false == messages.empty()) {
-      // Find the last assistant message with tool_calls
-      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
-        if (it->role == "assistant" && !it->tool_calls.empty()) {
-          assistant_msg = &(*it);
-          break;
-        }
-      }
-    }
+    auto assistant_msg = agentxx::middleware::MiddlewareWarpHandle<
+        agentxx::middleware::BaseMiddlewareState_c>::
+        getLastAssistantToolcallMessage(messages);
 
     std::ostringstream out{};
     if (assistant_msg) {

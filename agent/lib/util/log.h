@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string_view>
 
-#ifdef LUMENXX_BUILD_TYPE
+#if IS_DEBUG_D
 
 #define XX_LOGD(str, ...)                                                      \
   (std::cerr << fmt::format(str, ##__VA_ARGS__) << std::endl);

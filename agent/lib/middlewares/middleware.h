@@ -233,6 +233,34 @@ public:
       co_await onToolcallEnd(in, result);
     }
   }
+
+  inline static const neograph::ChatMessage *getLastAssistantToolcallMessage(
+      std::vector<neograph::ChatMessage> &messages) {
+    const neograph::ChatMessage *assistant_msg = nullptr;
+    if (false == messages.empty()) {
+      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
+        if (it->role == "assistant" && !it->tool_calls.empty()) {
+          assistant_msg = &(*it);
+          break;
+        }
+      }
+    }
+    return assistant_msg;
+  }
+
+  inline static const neograph::ChatMessage *
+  getLastToolcallResultMessage(std::vector<neograph::ChatMessage> &messages) {
+    const neograph::ChatMessage *tool_msg = nullptr;
+    if (false == messages.empty()) {
+      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
+        if (it->role == "tool") {
+          tool_msg = &(*it);
+          break;
+        }
+      }
+    }
+    return tool_msg;
+  }
 };
 
 class MiddlewareWarpHandleContext {
@@ -243,6 +271,10 @@ public:
   /// <thread_id, itemData>
   /// 每次执行的临时数据，在 [AgentStartCall] 时刷新，在 [AgentEndCall] 时清理
   std::map<std::string, std::map<std::string, std::any>> graphData{};
+
+  /// 用基类声明类型，以便支持插入不同子类
+  /// - 中间的指针是必要的，直接写 std::vector<BaseMiddlewareHandleInterface>
+  /// 的话元素大小是 固定为基类大小，插入子类时内存会被截断，导致后续异常
   std::vector<std::unique_ptr<BaseMiddlewareHandleInterface>> handles{};
 
   MiddlewareWarpHandleContext() {}

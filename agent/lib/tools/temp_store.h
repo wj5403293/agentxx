@@ -17,26 +17,45 @@ namespace tools {
 
 /// 寄存信息，节省模型上下文
 /// TODO: 重启恢复
-class MemoryKVDepositSetTool : public neograph::Tool {
+class TempTextStoreTool : public neograph::Tool {
 protected:
-  std::map<int, std::string> memory{};
+  /// <thread_id, <id, value>>
+  std::map<std::string, std::map<int, std::string>> store{};
 
 public:
-  explicit MemoryKVDepositSetTool() {}
+  explicit TempTextStoreTool() {}
 
-  std::string get_name() const override { return "memory_kv_deposit_set"; }
+  std::string get_name() const override { return "temp_text_store"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "memory_kv_deposit_set",
-        R"(Store text in memory. Return a unique id, used to get text by toolcall `memory_deposit_get`.
-New store text or Set/Delete text by unique id.
+        "temp_text_store",
+        R"(Store text in memory, . Return a unique id, used to get text when need.
+Insert text or get/set/delete text by unique id.
 )",
         neograph::json{
             {"type", "object"},
             {
                 "properties",
                 {
+                    {
+                        "opt",
+                        {
+                            {"type", "string"},
+                            {"enum", neograph::json::array({
+                                         "get",
+                                         "insert",
+                                         "set",
+                                         "delete",
+                                     })},
+                            {"description", R"(operation.
+`get` Get text by unique id
+`insert` New store `text`, return unique id
+`set` Modify `text` by unique id
+`delete` Delete text by unique id
+)"},
+                        },
+                    },
                     {
                         "text",
                         {
@@ -49,28 +68,12 @@ New store text or Set/Delete text by unique id.
                         {
                             {"type", "string"},
                             {"description", "unique id to store text when opt "
-                                            "is `set` or `delete`"},
-                        },
-                    },
-                    {
-                        "opt",
-                        {
-                            {"type", "string"},
-                            {"enum", neograph::json::array({
-                                         "insert",
-                                         "set",
-                                         "delete",
-                                     })},
-                            {"description", R"(operation.
-`insert` New store text, return unique id
-`set` Modify text by unique id
-`delete` Delete text by unique id
-)"},
+                                            "is `get`,`set` or `delete`"},
                         },
                     },
                 },
             },
-            {"required", neograph::json::array({"text"})},
+            {"required", neograph::json::array({"opt"})},
         },
     };
   }
@@ -84,6 +87,7 @@ New store text or Set/Delete text by unique id.
     auto text_opt = arguments.value("opt", std::string{});
 
     if (text_opt == std::string_view{"insert"}) {
+    } else if (text_opt == std::string_view{"get"}) {
     } else if (text_opt == std::string_view{"set"}) {
     } else if (text_opt == std::string_view{"delete"}) {
     } else {

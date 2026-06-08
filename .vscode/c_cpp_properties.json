@@ -20,7 +20,6 @@
             ],
             "defines": [
                 "IS_LINUX_D",
-                "LUMENXX_BUILD_TYPE",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
@@ -52,7 +51,6 @@
             "defines": [
                 "WIN32",
                 "IS_WIN_D",
-                "LUMENXX_BUILD_TYPE",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
@@ -88,7 +86,6 @@
             "defines": [
                 "IS_ANDROID_D",
                 "ANDROID",
-                "LUMENXX_BUILD_TYPE",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"

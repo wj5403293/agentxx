@@ -20,10 +20,12 @@ option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
 set(IS_DEBUG_D    0)
 set(IS_RELEASE_D  1)
 
-if (XX_BUILD_TYPE STREQUAL "DEBUG")
+if (XX_BUILD_TYPE MATCHES "DEBUG")
   set(IS_DEBUG_D    1)
   set(IS_RELEASE_D  0)
 endif()
+add_definitions(-DIS_DEBUG_D=${IS_DEBUG_D})
+add_definitions(-DIS_RELEASE_D=${IS_RELEASE_D})
 add_definitions(-DXX_BUILD_TYPE=${XX_BUILD_TYPE})
 
 set(IS_LINUX_D    0)

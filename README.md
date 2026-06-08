@@ -27,11 +27,11 @@
         - 接收音视频/图片/文本输入，输出键鼠控制
     - ⬜todo_list
     - ⬜sub-agent
-        - sub_task
-        - skill_search+tool_search (延迟加载 mcp tool)
+        - subagent_task (隔离上下文)
+        - skill_search + tool_search (延迟加载 mcp tool)
     - ⬜tree-messages
         - 压缩上下文
-        - ⬜temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
+        - temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
         - 修改历史消息
         - 模型重新生成消息
 - ✅Middleware支持

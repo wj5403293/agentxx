@@ -16,6 +16,7 @@
 #include "tools/get_current_datetime.h"
 #include "tools/skill.h"
 #include "tools/string.h"
+#include "tools/sub_agent.h"
 #include "tools/websearch.h"
 #include "util/log.h"
 #include <format>
@@ -47,6 +48,53 @@ public:
   }
 
   void init() {
+    const auto subagentManagerNodeName = std::string{"subagent_manager"};
+    const auto subagentTaskNodeName = std::string{"subagent_task"};
+    neograph::llm::OpenAIProvider::Config provideConfig{
+        .api_key = config->modelOpenAIApiKey,
+        .base_url = config->modelOpenAIBaseUrl,
+        .default_model = config->modelOpenAIModelName,
+    };
+    /// middleware
+    middlewareHandleContext =
+        std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
+
+    {
+      /// register Node
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{
+              agentxx::nodes::MiddlewareWrapAgentStartCallNode::defNodeType},
+          [this](const std::string &name, const neograph::json &,
+                 const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapAgentStartCallNode>(
+                name, middlewareHandleContext);
+          });
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{
+              agentxx::nodes::MiddlewareWrapAgentEndCallNode::defNodeType},
+          [this](const std::string &name, const neograph::json &,
+                 const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapAgentEndCallNode>(
+                name, middlewareHandleContext);
+          });
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{agentxx::nodes::MiddlewareWrapModelCallNode::defNodeType},
+          [this](const std::string &name, const neograph::json &,
+                 const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<
+                agentxx::nodes::MiddlewareWrapModelCallNode>(
+                name, ctx, middlewareHandleContext);
+          });
+      neograph::graph::NodeFactory::instance().register_type(
+          std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
+          [this](const std::string &name, const neograph::json &,
+                 const neograph::graph::NodeContext &ctx) {
+            return std::make_unique<agentxx::nodes::MiddlewareWrapToolcallNode>(
+                name, ctx, middlewareHandleContext);
+          });
+    }
 
     /// Toolcall
     std::vector<std::unique_ptr<neograph::Tool>> tools{};
@@ -73,6 +121,26 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
       tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
+
+      {
+        // subagent
+        neograph::graph::NodeContext nodeContext{};
+        nodeContext.instructions = "";
+        nodeContext.provider =
+            neograph::llm::OpenAIProvider::create_shared(provideConfig);
+
+        auto subagentManagerTool =
+            std::make_unique<agentxx::tools::SubAgentManagerTool>(
+                subagentManagerNodeName);
+        subagentManagerTool->subAgentList.insert(std::make_pair(
+            subagentTaskNodeName,
+            std::make_shared<agentxx::tools::SubAgentNormalTask>(
+                subagentTaskNodeName,
+                "Create a isolation messages context sub agent to "
+                "exec.",
+                nodeContext)));
+        tools.push_back(std::move(subagentManagerTool));
+      }
 
 #if IS_WIN_D
       tools.push_back(
@@ -101,16 +169,10 @@ public:
     }
 
     {
-      /// middleware
-      middlewareHandleContext =
-          std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
-
       {
         auto skillMiddleware =
             std::make_unique<agentxx::middleware::SkillMiddlewareHandle>(
-                std::set<std::string>{
-                    "/home/coolight/program/agentxx/isolation/skills/"},
-                middlewareHandleContext);
+                config->skillDirPaths, middlewareHandleContext);
         // skillMiddleware->toolcalls.push_back(
         //     std::make_unique<agentxx::tools::SkillTool>());
         middlewareHandleContext->handles.push_back(std::move(skillMiddleware));
@@ -148,6 +210,8 @@ public:
     // Build NodeContext
     neograph::graph::NodeContext nodeContext{};
     nodeContext.instructions = config->systemPrompt;
+    nodeContext.provider =
+        neograph::llm::OpenAIProvider::create_shared(provideConfig);
 
     std::vector<neograph::Tool *> toolPtrs;
     toolPtrs.reserve(tools.size());
@@ -156,22 +220,27 @@ public:
     }
     nodeContext.tools = std::move(toolPtrs);
 
-    neograph::llm::OpenAIProvider::Config provideConfig{
-        .api_key = config->modelOpenAIApiKey,
-        .base_url = config->modelOpenAIBaseUrl,
-        .default_model = config->modelOpenAIModelName,
-    };
-    nodeContext.provider =
-        neograph::llm::OpenAIProvider::create_shared(provideConfig);
-
     auto store = std::make_shared<neograph::graph::InMemoryCheckpointStore>();
 
     // JSON definition equivalent to the Agent::run() ReAct loop:
-    //   __start__ -> llm -> (has_tool_calls ? tools : __end__)
-    //                         tools -> llm  (loop back)
+    //                 ------- sub_agent_task <--- toolcall/sub_agent_task
+    //                 |                            |
+    //                 |<---------------------------|
+    //                 |                            |
+    //                 v                            |
+    //  __start__  -> llm ->  has_tool_calls  ->  tools
+    //                               |
+    //                               v
+    //                            __end__
     auto graphDefinition = neograph::json{
         {"name", config->agentName},
-        {"channels", {{"messages", {{"type", "list"}, {"reducer", "append"}}}}},
+        {
+            "channels",
+            {
+                {"messages", {{"type", "list"}, {"reducer", "append"}}},
+                {"__route__", {{"reducer", "overwrite"}}},
+            },
+        },
         {
             "nodes",
             {
@@ -192,18 +261,18 @@ public:
                     }},
                 },
                 {
+                    "tools",
+                    {{
+                        "type",
+                        agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType,
+                    }},
+                },
+                {
                     "llm",
                     {{
                         "type",
                         agentxx::nodes::MiddlewareWrapModelCallNode::
                             defNodeType,
-                    }},
-                },
-                {
-                    "tools",
-                    {{
-                        "type",
-                        agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType,
                     }},
                 },
             },
@@ -224,47 +293,6 @@ public:
             }),
         },
     };
-
-    {
-      /// register Node
-      neograph::graph::NodeFactory::instance().register_type(
-          std::string{
-              agentxx::nodes::MiddlewareWrapAgentStartCallNode::defNodeType},
-          [handleCtx = middlewareHandleContext](
-              const std::string &name, const neograph::json &,
-              const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<
-                agentxx::nodes::MiddlewareWrapAgentStartCallNode>(name, ctx,
-                                                                  handleCtx);
-          });
-      neograph::graph::NodeFactory::instance().register_type(
-          std::string{
-              agentxx::nodes::MiddlewareWrapAgentEndCallNode::defNodeType},
-          [handleCtx = middlewareHandleContext](
-              const std::string &name, const neograph::json &,
-              const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<
-                agentxx::nodes::MiddlewareWrapAgentEndCallNode>(name, ctx,
-                                                                handleCtx);
-          });
-      neograph::graph::NodeFactory::instance().register_type(
-          std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
-          [handleCtx = middlewareHandleContext](
-              const std::string &name, const neograph::json &,
-              const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<agentxx::nodes::MiddlewareWrapToolcallNode>(
-                name, ctx, handleCtx);
-          });
-      neograph::graph::NodeFactory::instance().register_type(
-          std::string{agentxx::nodes::MiddlewareWrapModelCallNode::defNodeType},
-          [handleCtx = middlewareHandleContext](
-              const std::string &name, const neograph::json &,
-              const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<
-                agentxx::nodes::MiddlewareWrapModelCallNode>(name, ctx,
-                                                             handleCtx);
-          });
-    }
 
     engine = neograph::graph::GraphEngine::compile(graphDefinition, nodeContext,
                                                    store);
