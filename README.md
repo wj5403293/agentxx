@@ -8,12 +8,12 @@
     - ✅返回值自动转换字符编码到 utf8
     - ✅filesystem（已支持 同步 + asio协程异步 文件读写）
         - ls
-        - read_text (full / offset+limit)
-        - read_binary
+        - read_text (full / offset + limit)
+        - read_binary (full / byte offset + limit)
         - write (text/binary)
         - edit_text
         - glob
-        - ⬜grep
+        - grep (text/regex)
     - ✅exec_shell
         - execute_linux_command
         - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
@@ -23,34 +23,31 @@
         - search
         - fetch_url_md (html to markdown)
         - fetch_url (raw resp body)
+    - ✅sub-agent
+        - subagent_task (隔离上下文)
+        - ⬜skill_search + tool_search (延迟加载 mcp tool)
     - ⬜ui_control
         - 接收音视频/图片/文本输入，输出键鼠控制
     - ⬜todo_list
-    - ⬜sub-agent
-        - ✅subagent_task (隔离上下文)
-        - skill_search + tool_search (延迟加载 mcp tool)
     - ⬜tree-messages
         - 压缩上下文
         - temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
-        - 修改历史消息
-        - 模型重新生成消息
+        - ✅消息分支，支持修改历史消息/模型重新生成消息
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅Skill支持
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
-    - ⬜实现 load/offload 动态加载
+    - ⬜动态加载 load/offload 
 - ❌MCP支持（Neograph已实现，但暂时使用有问题）
-- ✅RAG
-- 扩展
+- ⬜RAG
+- ⬜扩展
     - file Graph
 - ⬜Server:
     - Openai api server
     - ACP server
     - A2A server
-- ⬜Tree-context-messages
-    - message 分叉、缩减、总结
 
 ### 功能
 - ⬜翻译/划词翻译
@@ -69,4 +66,4 @@
     - 保留加载的skill在上下文 toolcall 位置不动，压缩上下文时整理 skill 到开头（需要确认效果对比整合在一起）
 
 ## 编译 
-- 
+

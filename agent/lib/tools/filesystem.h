@@ -8,6 +8,7 @@
 #include "asio/stream_file.hpp"
 #include "fmt/format.h"
 #include "glob/glob.hpp"
+#include "util/hyperscan.h"
 #include "util/log.h"
 #include "util/string_util.h"
 #include <asio/as_tuple.hpp>
@@ -153,8 +154,8 @@ public:
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
-                                errCode.message());
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file: {}")", errCode.message())};
         }
 
         if (text_line_offset >= 0 || text_line_limit >= 0) {
@@ -191,9 +192,9 @@ public:
           stream.close();
           if (lineNum <= offset) {
             // offset 超出文件行数
-            co_return fmt::format(
-                R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
-                offset, lineNum);
+            throw std::runtime_error{fmt::format(
+                R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
+                offset, lineNum)};
           }
 
           co_return result.str();
@@ -252,9 +253,9 @@ public:
           stream.close();
           if (lineNum <= offset) {
             // offset 超出文件行数
-            co_return fmt::format(
-                R"({{"error":"Arg `line_offset`({} lines) is out of range of file lines({} lines)."}})",
-                offset, lineNum);
+            throw std::runtime_error{fmt::format(
+                R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
+                offset, lineNum)};
           }
 
           co_return result.str();
@@ -345,8 +346,8 @@ public:
           stream.open(filepath, asio::random_access_file::read_only, errCode);
           if (false == stream.is_open()) {
             stream.close();
-            co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
-                                  errCode.message());
+            throw std::runtime_error{
+                fmt::format(R"(Can not open file: {}")", errCode.message())};
           }
 
           // 读取部分文件
@@ -401,8 +402,8 @@ public:
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
-                                errCode.message());
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file: {}")", errCode.message())};
         }
 
         std::string result;
@@ -598,8 +599,8 @@ public:
                     errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
-                                errCode.message());
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file: {}")", errCode.message())};
         }
 
         if (false == content.empty()) {
@@ -770,8 +771,8 @@ public:
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return fmt::format(R"({{"error": "Can not open file: {}"}})",
-                                errCode.message());
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file: {}")", errCode.message())};
         }
 
         std::string content;
@@ -804,9 +805,8 @@ public:
         stream.open(filepath, asio::stream_file::write_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
-          co_return fmt::format(
-              R"({{"error": "Can not open file to write: {}"}})",
-              errCode.message());
+          throw std::runtime_error{fmt::format(
+              R"(Can not open file to write: {}")", errCode.message())};
         }
         co_await asio::async_write(
             stream, asio::buffer(content),
@@ -901,7 +901,18 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_glob",
-        R"(Find files matching patterns.
+        R"(Find files matching patterns.)",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "pattern",
+                        {
+                            {"type", "string"},
+                            {"description",
+                             R"(Absolute dir or file path and glob pattern.
 
 | Wildcard | Matches | Example
 |--- |--- |--- |
@@ -913,18 +924,7 @@ public:
 | `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
 
 e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.
-)",
-        neograph::json{
-            {"type", "object"},
-            {
-                "properties",
-                {
-                    {
-                        "pattern",
-                        {
-                            {"type", "string"},
-                            {"description",
-                             "Absolute dir path and glob pattern"},
+)"},
                         },
                     },
                 },
@@ -952,6 +952,268 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
     }
 
     co_return result.str();
+  }
+};
+
+class FilesystemGrepTool : public neograph::AsyncTool {
+public:
+  explicit FilesystemGrepTool() {}
+
+  std::string get_name() const override { return "filesystem_grep"; }
+
+  neograph::ChatTool get_definition() const override {
+    return {
+        "filesystem_grep",
+        R"(Searches file contents using regular expressions or text. 
+Supports search of text content by string or full regex syntax through the `text_pattern` parameter. Filters files by pattern with the `file_pattern` parameter.
+)",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "text_pattern_is_regex",
+                        {
+                            {"type", "boolean"},
+                            {"description",
+                             R"(The type of `text_pattern`.
+`true`:  `text_pattern` is regex syntax.
+`false`: `text_pattern` is crude text string.)"},
+                        },
+                    },
+                    {
+                        "text_pattern",
+                        {
+                            {"type", "string"},
+                            {"description",
+                             R"(String or regex syntax to search text content. The text match type depends on the `text_pattern_is_regex` parameter.)"},
+                        },
+                    },
+                    {
+                        "file_pattern",
+                        {
+                            {"type", "string"},
+                            {"description",
+                             R"(Absolute dir or file path and glob pattern.
+
+| Wildcard | Matches | Example
+|--- |--- |--- |
+| `*` | any characters | `*.txt` matches all files with the txt extension |
+| `**` | any name dir recursively | `include/**/*.txt` matches all files with the txt extension in dir `include` and children dirs |
+| `?` | any one character | `???` matches files with 3 characters long |
+| `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
+| `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
+| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+
+e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.)"},
+                        },
+                    },
+                    {
+                        "output_mode",
+                        {
+                            {"type", "string"},
+                            {"enum", neograph::json::array(
+                                         {"files_with_matches", "content"})},
+                            {"description",
+                             R"(Default: `files_with_matches`. 
+Output format:
+'files_with_matches': Only file paths containing matches and count with `file:match_count` format
+'content': Matching lines with file:line:content format)"},
+                        },
+                    },
+                },
+            },
+            {"required", neograph::json::array({
+                             "text_pattern_is_regex",
+                             "text_pattern",
+                             "file_pattern",
+                         })},
+        },
+    };
+  }
+
+  asio::awaitable<std::string> readFileContent(const std::string &filepath) {
+#if defined(ASIO_HAS_FILE)
+    {
+      auto currentIoCtx = co_await asio::this_coro::executor;
+
+      /// 异步读取文件
+      asio::stream_file stream{currentIoCtx};
+      try {
+        asio::error_code errCode;
+        stream.open(filepath, asio::stream_file::read_only, errCode);
+        if (false == stream.is_open()) {
+          stream.close();
+          throw std::runtime_error{fmt::format(
+              R"(Can not open file. Error: {})", errCode.message())};
+        }
+
+        // 读取完整文件
+        std::string data;
+        co_await asio::async_read(
+            stream, asio::dynamic_buffer(data), asio::transfer_all(),
+            asio::redirect_error(asio::use_awaitable, errCode));
+        if (errCode && errCode != asio::error::eof) {
+          throw asio::system_error{errCode};
+        }
+        stream.close();
+        co_return data;
+      } catch (const std::exception &e) {
+        stream.close();
+        XX_LOGD("FilesystemGrepTool exception: {}", e.what());
+        throw e;
+      }
+    }
+#endif
+
+    {
+      /// 同步阻塞读取文件
+      std::ifstream stream;
+      try {
+        stream.open(filepath);
+        if (!stream) {
+          auto ec = std::error_code{errno, std::system_category()};
+          throw std::runtime_error{
+              fmt::format(R"(Can not open file. Error: {})", ec.message())};
+        }
+
+        // 读取完整文件
+        auto result = std::string{std::istreambuf_iterator<char>(stream),
+                                  std::istreambuf_iterator<char>()};
+        stream.close();
+        co_return result;
+      } catch (const std::exception &e) {
+        stream.close();
+        XX_LOGD("FilesystemGrepTool exception: {}", e.what());
+        throw e;
+      }
+    }
+  }
+
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
+    auto text_pattern_is_regex = arguments.value("text_pattern_is_regex", true);
+    auto text_pattern = arguments.value("text_pattern", std::string{});
+    if (text_pattern.empty()) {
+      co_return R"({"error":"Arg `text_pattern` is empty"})";
+    }
+    auto file_pattern = arguments.value("file_pattern", std::string{});
+    if (file_pattern.empty()) {
+      co_return R"({"error":"Arg `file_pattern` is empty"})";
+    }
+    auto output_mode =
+        arguments.value("output_mode", std::string{"files_with_matches"});
+    if (output_mode.empty()) {
+      co_return R"({"error":"Arg `output_mode` is empty"})";
+    }
+
+    auto refilelist = glob::rglob(file_pattern);
+    if (refilelist.empty()) {
+      throw std::runtime_error{"No match `file_pattern` file found"};
+    }
+
+    bool isContainsMode = ("content" != output_mode);
+    auto resultStr = std::ostringstream{};
+    auto resultJson = neograph::json::array();
+
+    if (text_pattern_is_regex) {
+      // 正则匹配
+      auto regex = agentxx::util::XXRegex{text_pattern};
+      for (const auto &item : refilelist) {
+        auto filepath = item.generic_string();
+        auto filetext = co_await readFileContent(filepath);
+        auto matchs = std::vector<agentxx::util::XXRegexMatchResult>{};
+        if (regex.match(filetext, matchs)) {
+          if (isContainsMode) {
+            resultStr << filepath << ":" << matchs.size() << "\n";
+          } else {
+            auto matchsContent = neograph::json::array();
+            size_t index = 0;
+            size_t lineCount = 0;
+
+            for (const auto &match : matchs) {
+              // 计算到 match 时的行数
+              for (size_t i = index; i < match.start; ++i) {
+                if (filetext[i] == '\n') {
+                  ++lineCount;
+                }
+              }
+
+              matchsContent.push_back(neograph::json{
+                  {"content",
+                   std::string_view{filetext}.substr(match.start, match.end)},
+                  {"line", lineCount},
+              });
+              index = match.start;
+            }
+
+            resultJson.push_back(neograph::json{
+                {"filepath", filepath},
+                {"matchs", matchsContent},
+            });
+          }
+        }
+      }
+    } else {
+      // 文本精确匹配
+      auto search = agentxx::util::AhoCorasick{{text_pattern}, false};
+      for (const auto &item : refilelist) {
+        auto filepath = item.generic_string();
+        auto filetext = co_await readFileContent(filepath);
+        auto matchs = search.search(filetext);
+        if (false == matchs.empty()) {
+          if (isContainsMode) {
+            resultStr << filepath << ":" << matchs.size() << "\n";
+          } else {
+            auto matchsContent = neograph::json::array();
+            size_t index = 0;
+            size_t lineCount = 0;
+
+            for (const auto &match : matchs) {
+              // 计算到 match 时的行数
+              for (int i = (int)index; i < match.start; ++i) {
+                if (filetext[i] == '\n') {
+                  ++lineCount;
+                }
+              }
+
+              matchsContent.push_back(neograph::json{
+                  {"content", text_pattern},
+                  {"line", lineCount},
+              });
+              index = match.start;
+            }
+
+            resultJson.push_back(neograph::json{
+                {"filepath", filepath},
+                {"matchs", matchsContent},
+            });
+          }
+        }
+      }
+    }
+
+    if (isContainsMode) {
+      auto str = resultStr.str();
+      if (false == str.empty()) {
+        co_return str;
+      } else {
+        throw std::runtime_error{
+            fmt::format("Found {} files match `file_pattern`, but no match "
+                        "`text_pattern` file found.",
+                        refilelist.size())};
+      }
+    } else {
+      if (false == resultJson.empty()) {
+        co_return resultJson.dump();
+      } else {
+        throw std::runtime_error{
+            fmt::format("Found {} files match `file_pattern`, but no match "
+                        "`text_pattern` file found.",
+                        refilelist.size())};
+      }
+    }
   }
 };
 

@@ -220,7 +220,7 @@ private:
     }
   };
 
-  bool caseInsensitive;
+  bool caseInsensitive;                // 忽略大小写
   std::vector<Node> nodes{};           // Trie节点存储
   std::vector<std::string> patterns{}; // 所有模式串
 };
