@@ -25,6 +25,8 @@
         - fetch_url (raw resp body)
     - ✅sub-agent
         - subagent_task (隔离上下文)
+        - subagent_image_generate
+        - subagent_video_generate
         - ⬜skill_search + tool_search (延迟加载 mcp tool)
     - ⬜ui_control
         - 接收音视频/图片/文本输入，输出键鼠控制

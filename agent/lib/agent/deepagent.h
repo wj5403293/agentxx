@@ -58,12 +58,10 @@ public:
     {
       /// register Node
       neograph::graph::NodeFactory::instance().register_type(
-          std::string{
-              agentxx::nodes::MiddlewareWrapAgentStartCallNode::defNodeType},
+          std::string{agentxx::nodes::AgentStartCallWrapNode::defNodeType},
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<
-                agentxx::nodes::MiddlewareWrapAgentStartCallNode>(
+            return std::make_unique<agentxx::nodes::AgentStartCallWrapNode>(
                 name, middlewareHandleContext);
           });
       neograph::graph::NodeFactory::instance().register_type(
@@ -76,18 +74,17 @@ public:
                 name, middlewareHandleContext);
           });
       neograph::graph::NodeFactory::instance().register_type(
-          std::string{agentxx::nodes::MiddlewareWrapModelCallNode::defNodeType},
+          std::string{agentxx::nodes::ModelCallWrapNode::defNodeType},
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<
-                agentxx::nodes::MiddlewareWrapModelCallNode>(
+            return std::make_unique<agentxx::nodes::ModelCallWrapNode>(
                 name, ctx, middlewareHandleContext);
           });
       neograph::graph::NodeFactory::instance().register_type(
-          std::string{agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType},
+          std::string{agentxx::nodes::ToolcallWrapNode::defNodeType},
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
-            return std::make_unique<agentxx::nodes::MiddlewareWrapToolcallNode>(
+            return std::make_unique<agentxx::nodes::ToolcallWrapNode>(
                 name, ctx, middlewareHandleContext);
           });
     }
@@ -115,12 +112,12 @@ public:
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               [](neograph::graph::NodeInput &in) -> asio::awaitable<void> {
-                return agentxx::nodes::MiddlewareWrapToolcallNode::
+                return agentxx::nodes::ToolcallWrapNode::
                     defStdoutLogOnToolcallStart(in);
               },
               [](const neograph::graph::NodeInput &in,
                  neograph::graph::NodeOutput &result) {
-                return agentxx::nodes::MiddlewareWrapToolcallNode::
+                return agentxx::nodes::ToolcallWrapNode::
                     defStdoutLogOnToolcallEnd(in, result);
               }));
     }
@@ -275,8 +272,7 @@ public:
                     "agent_start",
                     {{
                         "type",
-                        agentxx::nodes::MiddlewareWrapAgentStartCallNode::
-                            defNodeType,
+                        agentxx::nodes::AgentStartCallWrapNode::defNodeType,
                     }},
                 },
                 {
@@ -291,15 +287,14 @@ public:
                     "tools",
                     {{
                         "type",
-                        agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType,
+                        agentxx::nodes::ToolcallWrapNode::defNodeType,
                     }},
                 },
                 {
                     "llm",
                     {{
                         "type",
-                        agentxx::nodes::MiddlewareWrapModelCallNode::
-                            defNodeType,
+                        agentxx::nodes::ModelCallWrapNode::defNodeType,
                     }},
                 },
             },

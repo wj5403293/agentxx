@@ -76,8 +76,7 @@ public:
                     "agent_start",
                     {{
                         "type",
-                        agentxx::nodes::MiddlewareWrapAgentStartCallNode::
-                            defNodeType,
+                        agentxx::nodes::AgentStartCallWrapNode::defNodeType,
                     }},
                 },
                 {
@@ -92,15 +91,14 @@ public:
                     "tools",
                     {{
                         "type",
-                        agentxx::nodes::MiddlewareWrapToolcallNode::defNodeType,
+                        agentxx::nodes::ToolcallWrapNode::defNodeType,
                     }},
                 },
                 {
                     "llm",
                     {{
                         "type",
-                        agentxx::nodes::MiddlewareWrapModelCallNode::
-                            defNodeType,
+                        agentxx::nodes::ModelCallWrapNode::defNodeType,
                     }},
                 },
             },

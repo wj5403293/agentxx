@@ -18,17 +18,17 @@
 namespace agentxx {
 namespace nodes {
 
-class NEOGRAPH_API MiddlewareWrapToolcallNode
-    : public MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode> {
+class NEOGRAPH_API ToolcallWrapNode
+    : public WrapHandleBaseNode<neograph::graph::ToolDispatchNode> {
 protected:
 public:
   inline static constexpr auto defNodeType = std::string_view{"xx_Toolcall"};
 
-  MiddlewareWrapToolcallNode(
+  ToolcallWrapNode(
       const std::string &in_name, const neograph::graph::NodeContext &in_ctx,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : MiddlewareWrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
+      : WrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
             in_name, in_handleContext, in_ctx) {}
 
   asio::awaitable<void>

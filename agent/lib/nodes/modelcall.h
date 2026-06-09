@@ -16,8 +16,8 @@
 namespace agentxx {
 namespace nodes {
 
-class NEOGRAPH_API MiddlewareWrapModelCallNode
-    : public MiddlewareWrapHandleBaseNode<neograph::graph::LLMCallNode> {
+class NEOGRAPH_API ModelCallWrapNode
+    : public WrapHandleBaseNode<neograph::graph::LLMCallNode> {
 protected:
   std::string baseSystemPrompt;
 
@@ -25,12 +25,12 @@ public:
   inline static constexpr auto defNodeType =
       std::string_view{"xx_MiddlewareWrapModelCall"};
 
-  MiddlewareWrapModelCallNode(
+  ModelCallWrapNode(
       const std::string &name, const neograph::graph::NodeContext &ctx,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : MiddlewareWrapHandleBaseNode<neograph::graph::LLMCallNode>(
-            name, in_handleContext, ctx),
+      : WrapHandleBaseNode<neograph::graph::LLMCallNode>(name, in_handleContext,
+                                                         ctx),
         baseSystemPrompt(ctx.instructions) {}
 
   asio::awaitable<void>

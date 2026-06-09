@@ -16,22 +16,19 @@
 namespace agentxx {
 namespace nodes {
 
-class NEOGRAPH_API MiddlewareWrapAgentStartCallNode
-    : public MiddlewareWrapHandleBaseNode<
-          agentxx::nodes::MiddlewareWarpBaseNodeInterface> {
+class NEOGRAPH_API AgentStartCallWrapNode
+    : public WrapHandleBaseNode<agentxx::nodes::WarpBaseNodeInterface> {
 protected:
 public:
   inline static constexpr auto defNodeType =
       std::string_view{"xx_MiddlewareWrapAgentStartCall"};
 
-  MiddlewareWrapAgentStartCallNode(
+  AgentStartCallWrapNode(
       const std::string &name,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : MiddlewareWrapHandleBaseNode<
-            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(name,
-                                                             in_handleContext) {
-  }
+      : WrapHandleBaseNode<agentxx::nodes::WarpBaseNodeInterface>(
+            name, in_handleContext) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -54,8 +51,7 @@ public:
 };
 
 class NEOGRAPH_API MiddlewareWrapAgentEndCallNode
-    : public MiddlewareWrapHandleBaseNode<
-          agentxx::nodes::MiddlewareWarpBaseNodeInterface> {
+    : public WrapHandleBaseNode<agentxx::nodes::WarpBaseNodeInterface> {
 protected:
 public:
   inline static constexpr auto defNodeType =
@@ -65,10 +61,8 @@ public:
       const std::string &name,
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : MiddlewareWrapHandleBaseNode<
-            agentxx::nodes::MiddlewareWarpBaseNodeInterface>(name,
-                                                             in_handleContext) {
-  }
+      : WrapHandleBaseNode<agentxx::nodes::WarpBaseNodeInterface>(
+            name, in_handleContext) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
