@@ -289,7 +289,7 @@ public:
   /// 用基类声明类型，以便支持插入不同子类
   /// - 中间的指针是必要的，直接写 std::vector<BaseMiddlewareHandleInterface>
   /// 的话元素大小是 固定为基类大小，插入子类时内存会被截断，导致后续异常
-  std::vector<std::unique_ptr<BaseMiddlewareHandleInterface>> handles{};
+  std::vector<std::shared_ptr<BaseMiddlewareHandleInterface>> handles{};
 
   MiddlewareWarpHandleContext() {}
 

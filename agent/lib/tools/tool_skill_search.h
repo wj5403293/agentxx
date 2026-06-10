@@ -17,6 +17,13 @@
 namespace agentxx {
 namespace tools {
 
+/// 当主模型在已加载的 tool和skill
+/// 中未找到可以解决用户需求的方法时，可以尝试调用`tool_skill_search`查找可能可用的
+/// tool 或 skill
+/// - 需要实现区分 tool 是可延迟加载的，并区分已加载、未加载，未加载的 tool
+/// 只需要在主模型的上下文中保留 toolname 即可
+/// - 子模型搜索可用的 tool和skill 时，可以预先加载可能需要的 skill
+/// 内容，然后对比后决定具体应当加载的 tool、skill 文件
 class ToolSkillSearchTool : public ::agentxx::tools::SubAgentTaskBase {
 protected:
   inline static constexpr auto defSystemPromptTemplate = std::string_view{R"(
@@ -26,6 +33,7 @@ and then output a JSON object in the format: `{"tool": ["tool_name_1", ""tool_na
 You can output multiple tools and skills at the same time. 
 If no suitable tool is found, output an empty array; similarly, if no suitable skill is found, output an empty array. 
 If neither tools nor skills are suitable, output `{"tool": [], "skill": []}`.
+
 )"};
 
 public:
@@ -39,6 +47,11 @@ public:
             "") {
     createSubgraph(in_context);
     createSystemPrompt(delayTools);
+  }
+
+  asio::awaitable<void> onSubagentEnd(std::string &result) override {
+    // 将 result 转json，读取 tool、skill，加载
+    // 转json失败则不处理
   }
 
   void createSystemPrompt(

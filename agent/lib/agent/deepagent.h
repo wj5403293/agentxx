@@ -19,12 +19,14 @@
 #include "tools/string.h"
 #include "tools/sub_agent.h"
 #include "tools/temp_store.h"
+#include "tools/todo_list.h"
 #include "tools/tool_skill_search.h"
 #include "tools/websearch.h"
 #include "util/log.h"
 #include <format>
 #include <iostream>
 #include <memory>
+#include <middlewares/todo_list.h>
 
 namespace agentxx {
 
@@ -100,25 +102,34 @@ public:
     {
       {
         auto skillMiddleware =
-            std::make_unique<agentxx::middleware::SkillMiddlewareHandle>(
+            std::make_shared<agentxx::middleware::SkillMiddlewareHandle>(
                 config->skillDirPaths, middlewareHandleContext);
         // skillMiddleware->toolcalls.push_back(
         //     std::make_unique<agentxx::tools::SkillTool>());
-        middlewareHandleContext->handles.push_back(std::move(skillMiddleware));
+        middlewareHandleContext->handles.push_back(skillMiddleware);
       }
 
       {
-        auto summarizationMiddleware = std::make_unique<
+        auto summarizationMiddleware = std::make_shared<
             agentxx::middleware::SummarizationMiddlewareHandle>(
             subagentManagerTool.get(), "subagent_task", middlewareHandleContext,
             256 * 1024 * 1024);
-        middlewareHandleContext->handles.push_back(
-            std::move(summarizationMiddleware));
+        middlewareHandleContext->handles.push_back(summarizationMiddleware);
+      }
+
+      {
+        auto todolistMiddleware =
+            std::make_shared<agentxx::middleware::TodolistMiddlewareHandle>(
+                middlewareHandleContext);
+        todolistMiddleware->toolcalls.push_back(
+            std::make_unique<agentxx::tools::WriteTodoListTool>(
+                todolistMiddleware));
+        middlewareHandleContext->handles.push_back(todolistMiddleware);
       }
 
       /// Toolcall  应当作为最后一层
       middlewareHandleContext->handles.push_back(
-          std::make_unique<agentxx::middleware::MiddlewareWarpHandle<
+          std::make_shared<agentxx::middleware::MiddlewareWarpHandle<
               agentxx::middleware::BaseMiddlewareState_c>>(
               "toolcall_log", middlewareHandleContext,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,

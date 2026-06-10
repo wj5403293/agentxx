@@ -32,7 +32,7 @@
         - ⬜subagent_audio_generate
         - ⬜subagent_image_generate
         - ⬜subagent_video_generate
-    - ⬜todo_list
+    - ✅todo_list
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
     - ⬜ui_control

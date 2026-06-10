@@ -37,6 +37,8 @@ public:
     return subgraph;
   }
 
+  virtual asio::awaitable<void> onSubagentEnd(std::string &result) {}
+
   virtual ~SubAgentTaskBase() { subgraph = nullptr; }
 };
 
@@ -245,7 +247,7 @@ public:
 
       std::ostringstream oss;
       XX_LOGD("    ## Subagent - {}", subagent->name);
-      auto result = co_await subagent->getSubgraph()->run_stream_async(
+      co_await subagent->getSubgraph()->run_stream_async(
           cfg, [&oss](const neograph::graph::GraphEvent &event) {
             switch (event.type) {
             case neograph::graph::GraphEvent::Type::NODE_START:
@@ -264,7 +266,9 @@ public:
               break;
             }
           });
-      co_return oss.str();
+      auto result = oss.str();
+      co_await subagent->onSubagentEnd(result);
+      co_return result;
     } catch (const std::exception &e) {
       co_return fmt::format(R"({{"error": "Sub-agent Response failed: {}"}})",
                             e.what());
