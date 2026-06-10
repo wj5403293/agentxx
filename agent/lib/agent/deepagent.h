@@ -5,6 +5,7 @@
 #include "asio/detached.hpp"
 #include "asio/io_context.hpp"
 #include "middlewares/skill.h"
+#include "middlewares/summarization.h"
 #include "neograph/llm/openai_provider.h"
 #include "neograph/mcp/client.h"
 #include "neograph/neograph.h"
@@ -17,6 +18,7 @@
 #include "tools/skill.h"
 #include "tools/string.h"
 #include "tools/sub_agent.h"
+#include "tools/temp_store.h"
 #include "tools/tool_skill_search.h"
 #include "tools/websearch.h"
 #include "util/log.h"
@@ -92,6 +94,9 @@ public:
     /// middleware
     middlewareHandleContext =
         std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
+    auto subagentManagerTool =
+        std::make_unique<agentxx::tools::SubAgentManagerTool>(
+            "subagent_manager");
     {
       {
         auto skillMiddleware =
@@ -100,6 +105,15 @@ public:
         // skillMiddleware->toolcalls.push_back(
         //     std::make_unique<agentxx::tools::SkillTool>());
         middlewareHandleContext->handles.push_back(std::move(skillMiddleware));
+      }
+
+      {
+        auto summarizationMiddleware = std::make_unique<
+            agentxx::middleware::SummarizationMiddlewareHandle>(
+            subagentManagerTool.get(), "subagent_task", middlewareHandleContext,
+            256 * 1024 * 1024);
+        middlewareHandleContext->handles.push_back(
+            std::move(summarizationMiddleware));
       }
 
       /// Toolcall  应当作为最后一层
@@ -147,13 +161,8 @@ public:
       }
     }
     {
-      tools.push_back(
-          std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
-
-      tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
-
+      tools.push_back(std::make_unique<agentxx::tools::TempKVStoreTool>(
+          middlewareHandleContext));
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());
       tools.push_back(
@@ -171,6 +180,13 @@ public:
           std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
       tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
 
+      tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
+      tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
+
+      tools.push_back(
+          std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
+
 #if IS_WIN_D
       tools.push_back(
           std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
@@ -185,10 +201,6 @@ public:
 
       {
         // subagent
-        auto subagentManagerTool =
-            std::make_unique<agentxx::tools::SubAgentManagerTool>(
-                "subagent_manager");
-
         {
           // tool_skill_search
           // - 复制 除了 subagent 的所有 tool/mcp tool/skill 组合上下文到
@@ -263,6 +275,8 @@ public:
             "channels",
             {
                 {"messages", {{"type", "list"}, {"reducer", "append"}}},
+                agentxx::middleware::SummarizationMiddlewareHandle::
+                    defChannelDefine(),
             },
         },
         {

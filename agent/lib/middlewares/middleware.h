@@ -85,6 +85,34 @@ public:
                     neograph::graph::NodeOutput &result) = 0;
 
   virtual ~BaseMiddlewareHandleInterface() = default;
+
+  inline static const neograph::ChatMessage *getLastAssistantToolcallMessage(
+      std::vector<neograph::ChatMessage> &messages) {
+    const neograph::ChatMessage *assistant_msg = nullptr;
+    if (false == messages.empty()) {
+      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
+        if (it->role == "assistant" && !it->tool_calls.empty()) {
+          assistant_msg = &(*it);
+          break;
+        }
+      }
+    }
+    return assistant_msg;
+  }
+
+  inline static const neograph::ChatMessage *
+  getLastToolcallResultMessage(std::vector<neograph::ChatMessage> &messages) {
+    const neograph::ChatMessage *tool_msg = nullptr;
+    if (false == messages.empty()) {
+      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
+        if (it->role == "tool") {
+          tool_msg = &(*it);
+          break;
+        }
+      }
+    }
+    return tool_msg;
+  }
 };
 
 template <BaseMiddlewareStateType T>
@@ -233,43 +261,29 @@ public:
       co_await onToolcallEnd(in, result);
     }
   }
-
-  inline static const neograph::ChatMessage *getLastAssistantToolcallMessage(
-      std::vector<neograph::ChatMessage> &messages) {
-    const neograph::ChatMessage *assistant_msg = nullptr;
-    if (false == messages.empty()) {
-      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
-        if (it->role == "assistant" && !it->tool_calls.empty()) {
-          assistant_msg = &(*it);
-          break;
-        }
-      }
-    }
-    return assistant_msg;
-  }
-
-  inline static const neograph::ChatMessage *
-  getLastToolcallResultMessage(std::vector<neograph::ChatMessage> &messages) {
-    const neograph::ChatMessage *tool_msg = nullptr;
-    if (false == messages.empty()) {
-      for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
-        if (it->role == "tool") {
-          tool_msg = &(*it);
-          break;
-        }
-      }
-    }
-    return tool_msg;
-  }
 };
 
 class MiddlewareWarpHandleContext {
 public:
+  class TempStore {
+  public:
+    std::map<size_t, std::string> store{};
+    size_t tempStoreId = 1;
+
+    size_t getNextTempStoreId() { return tempStoreId++; }
+  };
+
   inline static constexpr std::string graphDataKey_systemMessage{
       "systemMessage"};
 
+  /// <thread_id, <id, value>>
+  /// [会话独立] 可以暂存变量内容，留出 id 到 上下文中，llm 需要时可以通过
+  /// toolcall 读取，压缩上下文时会将部分长文本存入这里替换为 id
+  std::map<std::string, TempStore> tempStore{};
+
   /// <thread_id, itemData>
-  /// 每次执行的临时数据，在 [AgentStartCall] 时刷新，在 [AgentEndCall] 时清理
+  /// [会话独立] 每次执行的临时数据，在 [AgentStartCall] 时刷新，在
+  /// [AgentEndCall] 时清理
   std::map<std::string, std::map<std::string, std::any>> graphData{};
 
   /// 用基类声明类型，以便支持插入不同子类
@@ -278,6 +292,41 @@ public:
   std::vector<std::unique_ptr<BaseMiddlewareHandleInterface>> handles{};
 
   MiddlewareWarpHandleContext() {}
+
+  std::optional<std::string> getTempStoreItemValue(const std::string &thread_id,
+                                                   const int id) {
+    auto it = tempStore.find(thread_id);
+    if (tempStore.end() != it) {
+      auto reslut = it->second.store.find(id);
+      if (it->second.store.end() != reslut) {
+        return reslut->second;
+      }
+    }
+    return std::nullopt;
+  }
+
+  void setTempStoreItemValue(const std::string &thread_id, const int id,
+                             const std::string &value) {
+    tempStore[thread_id].store[id] = value;
+  }
+
+  size_t addTempStoreItemValue(const std::string &thread_id,
+                               const std::string &value) {
+    auto store = tempStore[thread_id];
+    auto id = store.getNextTempStoreId();
+    store.store[id] = value;
+    return id;
+  }
+
+  void removeTempStoreItemValue(const std::string &thread_id, const int id) {
+    auto it = tempStore.find(thread_id);
+    if (tempStore.end() != it) {
+      auto reslutIt = it->second.store.find(id);
+      if (it->second.store.end() != reslutIt) {
+        it->second.store.erase(reslutIt);
+      }
+    }
+  }
 
   template <typename T>
   T &getGraphDataItemValue(const std::string &thread_id,

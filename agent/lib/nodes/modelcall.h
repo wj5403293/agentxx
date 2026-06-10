@@ -1,13 +1,14 @@
 #pragma once
 
 #include "asio/io_context.hpp"
-#include "nodes/middleware_handle.h"
+#include "nodes/warp_handle.h"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
 #include <neograph/llm/rate_limited_provider.h>
 #include <neograph/llm/schema_provider.h>
 #include <neograph/neograph.h>
+#include <neograph/types.h>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -84,7 +85,7 @@ public:
     }
 
     neograph::json sysMsgJson;
-    to_json(sysMsgJson, newSystemMsg);
+    neograph::to_json(sysMsgJson, newSystemMsg);
     if (haveSystemMsg) {
       // 替换 system msg
       msglist[0] = std::move(sysMsgJson);

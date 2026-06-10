@@ -36,11 +36,11 @@ class FileSystemListFileTool : public neograph::AsyncTool {
 public:
   explicit FileSystemListFileTool() {}
 
-  std::string get_name() const override { return "filesystem_listfile"; }
+  std::string get_name() const override { return "filesystem_list_file"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "filesystem_listfile",
+        "filesystem_list_file",
         R"(列出文件夹内的文件和文件夹信息，包含文件大小/Bytes, 类型, 最后写入时间(时间戳/nanoseconds)
 指定文件路径可以得到文件信息.
 可用于检查文件/文件夹是否存在.)",
@@ -512,11 +512,11 @@ class FilesystemWriteFileTool : public neograph::AsyncTool {
 public:
   explicit FilesystemWriteFileTool() {}
 
-  std::string get_name() const override { return "filesystem_writefile"; }
+  std::string get_name() const override { return "filesystem_write_file"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "filesystem_writefile",
+        "filesystem_write_file",
         "创建新文件，或覆盖文件.",
         neograph::json{
             {"type", "object"},

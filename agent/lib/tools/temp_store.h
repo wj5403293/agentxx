@@ -1,5 +1,6 @@
 #pragma once
 
+#include "middlewares/middleware.h"
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -17,20 +18,22 @@ namespace tools {
 
 /// 寄存信息，节省模型上下文
 /// TODO: 重启恢复
-class TempTextStoreTool : public neograph::Tool {
+class TempKVStoreTool : public neograph::Tool {
 protected:
-  /// <thread_id, <id, value>>
-  std::map<std::string, std::map<int, std::string>> store{};
+  std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
 
 public:
-  explicit TempTextStoreTool() {}
+  explicit TempKVStoreTool(
+      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+          in_handleContext)
+      : handleContext(in_handleContext) {}
 
-  std::string get_name() const override { return "temp_text_store"; }
+  std::string get_name() const override { return "temp_kvstore"; }
 
   neograph::ChatTool get_definition() const override {
     return {
-        "temp_text_store",
-        R"(Store text in memory, . Return a unique id, used to get text when need.
+        "temp_kvstore",
+        R"(Store text, return a unique id, used to get text when need.
 Insert text or get/set/delete text by unique id.
 )",
         neograph::json{
@@ -66,7 +69,7 @@ Insert text or get/set/delete text by unique id.
                     {
                         "id",
                         {
-                            {"type", "string"},
+                            {"type", "number"},
                             {"description", "unique id to store text when opt "
                                             "is `get`,`set` or `delete`"},
                         },
@@ -79,17 +82,42 @@ Insert text or get/set/delete text by unique id.
   }
 
   std::string execute(const neograph::json &arguments) override {
-    auto text = arguments.value("text", std::string{});
-    if (text.empty()) {
-      return R"({"error":"Arg `text` is empty"})";
+    auto thread_id = arguments.value("thread_id", std::string{});
+    if (thread_id.empty()) {
+      return R"({"error":"Toolcall inner exec faild, need `thread_id`"})";
     }
-    auto text_id = arguments.value("id", std::string{});
+    size_t text_id = arguments.value<size_t>("id", 0);
+    auto text = arguments.value("text", std::string{});
     auto text_opt = arguments.value("opt", std::string{});
+    if (text_opt.empty()) {
+      return R"({"error":"Arg `opt` is empty"})";
+    }
 
+    auto handlePtr = handleContext.lock();
     if (text_opt == std::string_view{"insert"}) {
+      auto reId = handlePtr->addTempStoreItemValue(thread_id, text);
+      return neograph::json{
+          {"id", reId},
+      }
+          .dump();
     } else if (text_opt == std::string_view{"get"}) {
+      if (text_id <= 0) {
+        return R"({"error":"Arg `id` is empty"})";
+      }
+      auto result = handlePtr->getTempStoreItemValue(thread_id, text_id);
+      return result.value_or(R"({"error":"Not found"})");
     } else if (text_opt == std::string_view{"set"}) {
+      if (text_id <= 0) {
+        return R"({"error":"Arg `id` is empty"})";
+      }
+      handlePtr->setTempStoreItemValue(thread_id, text_id, text);
+      return "success";
     } else if (text_opt == std::string_view{"delete"}) {
+      if (text_id <= 0) {
+        return R"({"error":"Arg `id` is empty"})";
+      }
+      handlePtr->removeTempStoreItemValue(thread_id, text_id);
+      return "success";
     } else {
       return R"({"error":"Arg `opt` is invalid"})";
     }

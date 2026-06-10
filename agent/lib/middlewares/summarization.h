@@ -1,0 +1,421 @@
+#pragma once
+
+#include "asio/io_context.hpp"
+#include "fmt/format.h"
+#include "middlewares/middleware.h"
+#include "tools/sub_agent.h"
+#include "util/string_util.h"
+#include "yaml-cpp/yaml.h"
+#include <atomic>
+#include <cstdlib>
+#include <filesystem>
+#include <functional>
+#include <iostream>
+#include <neograph/llm/rate_limited_provider.h>
+#include <neograph/llm/schema_provider.h>
+#include <neograph/neograph.h>
+#include <neograph/types.h>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace agentxx {
+namespace middleware {
+
+class _SummarizationContext_c {
+public:
+  /// <path, error>
+  std::map<std::string, std::string> loadErrors{};
+};
+
+class _SummarizationMiddlewareState_c : public BaseMiddlewareState_c {
+public:
+  _SummarizationContext_c summarizationContext{};
+
+  _SummarizationMiddlewareState_c() {}
+};
+
+/// 上下文压缩
+/// - `system prompt`、最近的消息 不压缩
+/// - 可压缩的长消息内容用 `temp_kvstore` 暂存，留下 id + depict
+/// - 选择多条消息总结压缩合并为一条
+class SummarizationMiddlewareHandle
+    : public BaseMiddlewareHandle<BaseMiddlewareState_c> {
+protected:
+  agentxx::tools::SubAgentManagerTool *subagentManager;
+  const std::string subagentTaskName;
+  const size_t modelSupportMaxToken;
+  /// 每个 token 大约为 [asciiCharsPerToken] 个 ascii 字符
+  const double asciiCharsPerToken;
+  /// 每个 token 大约为 [unicodeCharsPerToken] 个 unicode(除去 ascii) 字符
+  const double unicodeCharsPerToken;
+  const double tokensPerImage;
+  const double extraTokensPerMessage;
+
+  /// 保留至少最近 N 条消息不被压缩
+  static constexpr size_t keepRecentMessageCount = 4;
+  /// 单条消息内容超过此字节数时考虑暂存到 temp_kvstore
+  static constexpr size_t longContentByteThreshold = 2000;
+  /// 摘要最大输出 token 数
+  static constexpr int summaryMaxTokens = 1024;
+
+public:
+  SummarizationMiddlewareHandle(
+      agentxx::tools::SubAgentManagerTool *in_subagentManager,
+      const std::string &in_subagentTaskName,
+      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext,
+      size_t in_modelSupportMaxToken, double in_asciiCharsPerToken = 4.0,
+      double in_unicodeCharsPerToken = 1.1, double in_tokensPerImage = 400.0,
+      double in_extraTokensPerMessage = 3.0)
+      : BaseMiddlewareHandle<BaseMiddlewareState_c>(
+            "SummarizationMiddlewareHandle", in_handleContext),
+        subagentManager(in_subagentManager),
+        subagentTaskName(in_subagentTaskName),
+        modelSupportMaxToken(in_modelSupportMaxToken),
+        asciiCharsPerToken(in_asciiCharsPerToken),
+        unicodeCharsPerToken(in_unicodeCharsPerToken),
+        tokensPerImage(in_tokensPerImage),
+        extraTokensPerMessage(in_extraTokensPerMessage) {}
+
+  inline static neograph::json defChannelDefine() {
+    return {
+        "summarization-history-messages",
+        {{"type", "list"}, {"reducer", "append"}},
+    };
+  }
+
+  size_t countTokensForUtf8Str(std::string_view in_str) {
+    size_t unicodeCount = 0, asciiCount = 0;
+    for (size_t i = 0, step = 0; i < in_str.size(); i += step) {
+      unsigned char byte = in_str[i];
+      // lenght 6
+      if (byte >= 0xFC) {
+        step = 6;
+      } else if (byte >= 0xF8) {
+        step = 5;
+      } else if (byte >= 0xF0) {
+        step = 4;
+      } else if (byte >= 0xE0) {
+        step = 3;
+      } else if (byte >= 0xC0) {
+        step = 2;
+      } else {
+        step = 1;
+        ++asciiCount;
+        continue;
+      }
+      ++unicodeCount;
+    }
+    return unicodeCount / unicodeCharsPerToken +
+           asciiCount / asciiCharsPerToken;
+  }
+
+  size_t countTokens(const std::vector<neograph::ChatMessage> &messages) {
+    size_t count = 0;
+    for (const auto &item : messages) {
+      count += extraTokensPerMessage + countTokensForUtf8Str(item.role) +
+               countTokensForUtf8Str(item.content);
+      for (const auto &tool : item.tool_calls) {
+        count += countTokensForUtf8Str(tool.id) +
+                 countTokensForUtf8Str(tool.name) +
+                 countTokensForUtf8Str(tool.arguments);
+      }
+      count += tokensPerImage * item.image_urls.size();
+    }
+    return count;
+  }
+
+  std::string messagesToText(const std::vector<neograph::ChatMessage> &msgs,
+                             bool includeSystem = false) {
+    std::ostringstream oss;
+    for (const auto &m : msgs) {
+      if (!includeSystem && m.role == "system") {
+        continue;
+      }
+      oss << "[" << m.role << "]: ";
+      if (!m.content.empty()) {
+        oss << m.content;
+      }
+      if (!m.tool_calls.empty()) {
+        for (const auto &tc : m.tool_calls) {
+          oss << "\n  [toolcall:" << tc.name << "] " << tc.arguments;
+        }
+      }
+      oss << "\n";
+    }
+    return oss.str();
+  }
+
+  asio::awaitable<std::string>
+  doSummarizeWithLLM(const std::vector<neograph::ChatMessage> &messages) {
+    if (nullptr == subagentManager) {
+      co_return std::string{};
+    }
+    auto prompt = messagesToText(messages, false);
+    if (prompt.empty()) {
+      co_return std::string{};
+    }
+
+    try {
+      auto args = neograph::json{
+          {"subagent", subagentTaskName},
+          {"system_prompt",
+           "You are a conversation summarizer. "
+           "Summarize the following conversation messages into a "
+           "concise summary. "
+           "Preserve key decisions, action items, file paths, "
+           "and important context. "
+           "Output ONLY the summary text, no meta-commentary."},
+          {"message",
+           fmt::format("Summarize the following conversation messages:\n\n{}",
+                       prompt)},
+      };
+      co_return co_await subagentManager->execute_async(args);
+    } catch (const std::exception &e) {
+      XX_LOGE("SummarizationMiddlewareHandle llm 压缩失败: {}", e.what());
+    }
+    co_return std::string{};
+  }
+
+  void offloadLongContentToTempStore(
+      neograph::ChatMessage &msg,
+      const std::shared_ptr<MiddlewareWarpHandleContext> &ctx,
+      const std::string &thread_id) {
+    if (msg.content.size() <= longContentByteThreshold) {
+      return;
+    }
+    auto id = ctx->addTempStoreItemValue(thread_id, msg.content);
+    msg.content =
+        fmt::format("[content offloaded to `temp_kvstore`, id={}]", id);
+  }
+
+  void deduplicateFileOperations(std::vector<neograph::ChatMessage> &messages) {
+    std::map<std::string, size_t> lastWriteIndex{};
+    for (size_t i = messages.size(); i > 0; --i) {
+      auto &msg = messages[i];
+      if (msg.role == "tool") {
+        if ("filesystem_list_file" == msg.tool_name ||
+            "filesystem_read_text_file" == msg.tool_name ||
+            "filesystem_read_binary_file" == msg.tool_name) {
+          // 寻找 llm toolcall message
+          int lastMsgIndex = i - 1;
+          int toolcallIndex = -1;
+          for (; lastMsgIndex > 0 &&
+                 false == messages[lastMsgIndex].tool_calls.empty();
+               --lastMsgIndex) {
+            for (size_t i = 0; i < messages[lastMsgIndex].tool_calls.size();
+                 ++i) {
+              if (msg.tool_call_id == messages[lastMsgIndex].tool_calls[i].id) {
+                toolcallIndex = i;
+                break;
+              }
+            }
+            if (toolcallIndex >= 0) {
+              break;
+            }
+          }
+          // 移除重复的 修改/写入文件 toolcall
+          if (toolcallIndex >= 0) {
+            auto args = neograph::json::parse(
+                messages[lastMsgIndex].tool_calls[toolcallIndex].arguments);
+            if (args.is_object() && args["path"].is_string()) {
+              auto argPath = args["path"].get<std::string>();
+              if (lastWriteIndex.contains(argPath)) {
+                // 裁剪 result
+                msg.content =
+                    fmt::format("[Result for `{}` superseded by later read, "
+                                "content truncated]",
+                                argPath);
+              } else {
+                lastWriteIndex[argPath] = i;
+              }
+            }
+          }
+        }
+      } else {
+        for (const auto &tc : msg.tool_calls) {
+          if (tc.name == "filesystem_write_file" ||
+              tc.name == "filesystem_edit_text_file") {
+            // 移除重复的 修改/写入文件 toolcall
+            auto args = neograph::json::parse(tc.arguments);
+            if (args.is_object() && args["path"].is_string()) {
+              auto argPath = args["path"].get<std::string>();
+              if (lastWriteIndex.contains(argPath)) {
+                // 裁剪 result
+                msg.content =
+                    fmt::format("[Result for `{}` superseded by later write, "
+                                "content truncated]",
+                                argPath);
+              } else {
+                lastWriteIndex[argPath] = i;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (size_t i = 0; i < messages.size(); ++i) {
+      auto &msg = messages[i];
+      if (msg.role == "tool" && !msg.content.empty()) {
+        for (const auto &[path, writeIdx] : lastWriteIndex) {
+          if (writeIdx > i && msg.content.find(path) != std::string::npos) {
+            if (msg.content.size() > longContentByteThreshold) {
+              msg.content = fmt::format(
+                  "[file read result for `{}` superseded by later write, "
+                  "content truncated]",
+                  path);
+            }
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  asio::awaitable<void>
+  onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onModelcallStartFunc(neograph::graph::NodeInput &in) override {
+    auto messages = in.state.get_messages();
+    if (messages.empty()) {
+      co_return;
+    }
+    auto count = countTokens(messages);
+    auto handleCtx = handleContext.lock();
+    if (nullptr == handleCtx) {
+      co_return;
+    }
+    auto &thread_id = in.ctx.thread_id;
+
+    if (count >= modelSupportMaxToken * 0.9) {
+      const size_t systemCount =
+          (!messages.empty() && messages[0].role == "system") ? 1 : 0;
+      if (messages.size() > keepRecentMessageCount + systemCount) {
+        size_t oldEnd = messages.size() - keepRecentMessageCount;
+        for (size_t i = oldEnd; i > 0; i--) {
+          // - 如果 llm summary 压缩成功，则末尾消息为 assistant，因此需要追加
+          // tool/user 类型.
+          // - 如果 llm 未压缩，则仍为原消息顺序，截取到哪里都可以.
+          const auto &role = messages[i].role;
+          if ("tool" == role || "user" == role) {
+            break;
+          }
+        }
+
+        const size_t oldStart = systemCount;
+        const size_t oldCount = oldEnd - oldStart;
+        if (oldCount > 0) {
+          auto oldMessages = std::vector<neograph::ChatMessage>{
+              messages.begin() + oldStart, messages.begin() + oldEnd};
+          auto recentMessages = std::vector<neograph::ChatMessage>{
+              messages.begin() + oldEnd, messages.end()};
+
+          /// llm 压缩
+          auto summary = co_await doSummarizeWithLLM(oldMessages);
+
+          neograph::json olgMsgsJson;
+          neograph::to_json(olgMsgsJson, oldMessages);
+          in.state.write("summarization-history-messages", olgMsgsJson);
+
+          std::vector<neograph::ChatMessage> newMessages;
+          if (systemCount > 0) {
+            // 系统消息
+            newMessages.push_back(messages[0]);
+          }
+          if (!summary.empty()) {
+            // 追加压缩后的信息
+            // system | user | assistant | [user/tool]recentMessages
+            newMessages.push_back(neograph::ChatMessage{
+                .role = "user",
+                .content = "[Please compact context to save space]",
+            });
+            newMessages.push_back(neograph::ChatMessage{
+                .role = "assistant",
+                .content = "[Previous conversation summary]: " + summary,
+            });
+          } else {
+            // system | oldMessages | recentMessages
+            for (auto &m : oldMessages) {
+              offloadLongContentToTempStore(m, handleCtx, thread_id);
+            }
+            newMessages.insert(newMessages.end(), oldMessages.begin(),
+                               oldMessages.end());
+          }
+
+          // 添加最近消息
+          newMessages.insert(newMessages.end(), recentMessages.begin(),
+                             recentMessages.end());
+
+          neograph::json newMsgsJson;
+          neograph::to_json(newMsgsJson, newMessages);
+          in.state.overwrite("messages", newMsgsJson);
+        }
+      }
+    } else if (count >= modelSupportMaxToken * 0.7) {
+      deduplicateFileOperations(messages);
+      {
+        auto handleCtxPtr = handleContext.lock();
+        if (nullptr != handleCtxPtr) {
+          for (auto &msg : messages) {
+            offloadLongContentToTempStore(msg, handleCtxPtr, thread_id);
+          }
+        }
+      }
+      neograph::json msgsJson;
+      neograph::to_json(msgsJson, messages);
+      in.state.overwrite("messages", msgsJson);
+    }
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onModelcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onToolcallStartFunc(neograph::graph::NodeInput &in) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onToolcallEndFunc(const neograph::graph::NodeInput &in,
+                    neograph::graph::NodeOutput &result) override {
+    auto handleCtx = handleContext.lock();
+    if (nullptr == handleCtx) {
+      co_return;
+    }
+    auto messages = in.state.get_messages();
+    auto count = countTokens(messages);
+    if (count >= modelSupportMaxToken * 0.7) {
+      for (auto &msg : messages) {
+        if (msg.role == "tool" &&
+            msg.content.size() > longContentByteThreshold) {
+          auto id =
+              handleCtx->addTempStoreItemValue(in.ctx.thread_id, msg.content);
+          msg.content = fmt::format(
+              "[tool result offloaded to `temp_kvstore`, id={}]", id);
+        }
+      }
+      neograph::json msgsJson;
+      neograph::to_json(msgsJson, messages);
+      in.state.overwrite("messages", msgsJson);
+    }
+    co_return;
+  }
+};
+
+} // namespace middleware
+} // namespace agentxx

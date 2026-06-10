@@ -138,7 +138,7 @@ public:
   SkillMiddlewareHandle(
       const std::vector<std::string> &in_initSkillDirPaths,
       std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
-      : BaseMiddlewareHandle<SkillMiddlewareState_c>("SkillManager",
+      : BaseMiddlewareHandle<SkillMiddlewareState_c>("SkillMiddlewareHandle",
                                                      in_handleContext),
         initSkillDirPaths(in_initSkillDirPaths) {}
 

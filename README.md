@@ -23,24 +23,29 @@
         - search
         - fetch_url_md (html to markdown)
         - fetch_url (raw resp body)
+    - ✅tree-messages
+        - temp_kvstore（会话独立，提供 K-V Store允许模型存取变量）
+        - 消息分支，支持修改历史消息/模型重新生成消息
     - ✅sub-agent
         - subagent_task (隔离上下文)
-        - subagent_audio_generate
-        - subagent_image_generate
-        - subagent_video_generate
         - ⬜skill_search + tool_search (延迟加载 mcp tool)
-    - ⬜ui_control
-        - 接收音视频/图片/文本输入，输出键鼠控制
+        - ⬜subagent_audio_generate
+        - ⬜subagent_image_generate
+        - ⬜subagent_video_generate
     - ⬜todo_list
-    - ⬜tree-messages
-        - 压缩上下文
-        - temp_store（会话独立，作为类似内存，提供 K-V 允许模型存取变量）
-        - ✅消息分支，支持修改历史消息/模型重新生成消息
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
+    - ⬜ui_control
+        - 接收音视频/图片/文本输入，输出键鼠控制
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
-- ✅Skill支持
+- ✅压缩上下文`SummarizationMiddleware`
+    - 自动估算 tokens，达到阈值时自动压缩
+    - 裁剪历史消息中过时的文件读写消息
+    - 将部分重要的长消息内容暂存到 `temp_kvstore`，而不压缩，模型需要时可以提取
+    - LLM 总结压缩
+    - 保留最近消息
+- ✅Skill支持`SkillMiddlewareHandle`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
     - ⬜动态加载 load/offload 
 - ❌MCP支持（Neograph已实现，但暂时使用有问题）

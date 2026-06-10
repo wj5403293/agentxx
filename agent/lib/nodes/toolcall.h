@@ -3,7 +3,7 @@
 #include "asio/io_context.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
-#include "nodes/middleware_handle.h"
+#include "nodes/warp_handle.h"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -48,8 +48,7 @@ public:
   defStdoutLogOnToolcallStart(neograph::graph::NodeInput &in,
                               size_t limitOutput = 0) {
     auto messages = in.state.get_messages();
-    auto assistant_msg = agentxx::middleware::MiddlewareWarpHandle<
-        agentxx::middleware::BaseMiddlewareState_c>::
+    auto assistant_msg = agentxx::middleware::BaseMiddlewareHandleInterface::
         getLastAssistantToolcallMessage(messages);
 
     std::ostringstream out{};
