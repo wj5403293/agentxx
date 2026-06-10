@@ -25,6 +25,7 @@
         - fetch_url (raw resp body)
     - ✅sub-agent
         - subagent_task (隔离上下文)
+        - subagent_audio_generate
         - subagent_image_generate
         - subagent_video_generate
         - ⬜skill_search + tool_search (延迟加载 mcp tool)
@@ -46,6 +47,8 @@
 - ⬜RAG
 - ⬜扩展
     - file Graph
+    - 语音识别
+    - 文本转语音
 - ⬜Server:
     - Openai api server
     - ACP server
