@@ -4,7 +4,7 @@
 
 ## 计划实现
 ### 基础模块
-- ⬜Toolcall:
+- Toolcall:
     - ✅返回值自动转换字符编码到 utf8
     - ✅filesystem（已支持 同步 + asio协程异步 文件读写）
         - ls
@@ -74,6 +74,8 @@
     - 将加载的 skill 插入到上下文开头
     - 将加载的 skill 插入到上下文末尾
     - 保留加载的skill在上下文 toolcall 位置不动，压缩上下文时整理 skill 到开头（需要确认效果对比整合在一起）
+- third_party
+    - `codegraph-cpp`: 分析代码文件关系图
 
 ## 编译 
 

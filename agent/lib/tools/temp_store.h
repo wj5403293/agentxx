@@ -84,7 +84,7 @@ Insert text or get/set/delete text by unique id.
   std::string execute(const neograph::json &arguments) override {
     auto thread_id = arguments.value("thread_id", std::string{});
     if (thread_id.empty()) {
-      return R"({"error":"Toolcall inner exec faild, need `thread_id`"})";
+      return R"({"error":"Toolcall inner exec failed, need `thread_id`"})";
     }
     size_t text_id = arguments.value<size_t>("id", 0);
     auto text = arguments.value("text", std::string{});

@@ -37,7 +37,9 @@ public:
     return subgraph;
   }
 
-  virtual asio::awaitable<void> onSubagentEnd(std::string &result) {}
+  virtual asio::awaitable<void> onSubagentEnd(std::string &result) {
+    co_return;
+  }
 
   virtual ~SubAgentTaskBase() { subgraph = nullptr; }
 };

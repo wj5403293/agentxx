@@ -65,7 +65,7 @@ Current System is {}{}, please use linux shell/bash commands.
 #endif
     if (!pipe) {
       auto ec = std::error_code{errno, std::system_category()};
-      co_return fmt::format(R"({{"error":"Exec command faild. Error: {}"}})",
+      co_return fmt::format(R"({{"error":"Exec command failed. Error: {}"}})",
                             ec.message());
     }
 
@@ -152,7 +152,7 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
 #endif
     if (!pipe) {
       auto ec = std::error_code{errno, std::system_category()};
-      co_return fmt::format(R"({{"error":"Exec command faild. Error: {}"}})",
+      co_return fmt::format(R"({{"error":"Exec command failed. Error: {}"}})",
                             ec.message());
     }
 

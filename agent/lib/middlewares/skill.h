@@ -221,7 +221,7 @@ public:
         co_return std::make_pair("", data);
       }
       co_return std::make_pair(
-          "load skill metadata faild, can not found metadata in SKILL.md file",
+          "load skill metadata failed, can not found metadata in SKILL.md file",
           data);
     } catch (const std::exception &e) {
       stream.close();
@@ -276,7 +276,7 @@ public:
                      item.second.dirpath, item.second.description);
       }
       for (const auto &item : skillCache.loadErrors) {
-        fmt::println("┣━ ❌ Load skill faild: {} | {}", item.first,
+        fmt::println("┣━ ❌ Load skill failed: {} | {}", item.first,
                      item.second);
       }
       std::cout << "┗━━━━━━ Skill Load  Done ━━━━━━┛\n" << std::endl;

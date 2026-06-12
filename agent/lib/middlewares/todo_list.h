@@ -24,7 +24,7 @@ class TodolistMiddlewareState_c : public BaseMiddlewareState_c {
 public:
   /// <thread_id, todoListJson>
   /// [会话独立] 任务规划列表，由 todolist tool 读写
-  std::map<std::string, neograph::json> todoStore{};
+  std::map<std::string, neograph::json> todolists{};
 
   TodolistMiddlewareState_c() {}
 };

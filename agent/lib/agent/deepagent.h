@@ -212,20 +212,46 @@ public:
 
       {
         // subagent
-        {
-          // tool_skill_search
-          // - 复制 除了 subagent 的所有 tool/mcp tool/skill 组合上下文到
-          // subagent 中 根据需求分析加载/使用的 tool/skill
-          neograph::graph::NodeContext nodeContext{};
-          nodeContext.instructions = "";
-          nodeContext.provider =
-              neograph::llm::OpenAIProvider::create_shared(provideConfig);
+        // {
+        //   // tool_skill_search
+        //   // - 复制 除了 subagent 的所有 tool/mcp tool/skill 组合上下文到
+        //   // subagent 中 根据需求分析加载/使用的 tool/skill
+        //   neograph::graph::NodeContext nodeContext{};
+        //   nodeContext.instructions = "";
+        //   nodeContext.provider =
+        //       neograph::llm::OpenAIProvider::create_shared(provideConfig);
 
-          subagentManagerTool->subAgentList.insert(std::make_pair(
-              "tool_skill_search",
-              std::make_shared<agentxx::tools::ToolSkillSearchTool>(
-                  nodeContext, std::vector<agentxx::tools::XXToolBase>{})));
-        }
+        //   // 收集延迟加载的 tool 信息
+        //   std::vector<agentxx::tools::ToolSkillSearchTool::DelayToolInfo>
+        //       delayToolInfos;
+        //   for (auto &t : tools) {
+        //     auto *xxTool = dynamic_cast<agentxx::tools::XXToolBase
+        //     *>(t.get()); if (xxTool && xxTool->isDelayLoad) {
+        //       auto def = xxTool->get_definition();
+        //       delayToolInfos.push_back({xxTool->get_name(),
+        //       def.description});
+        //     }
+        //   }
+
+        //   // 给子 agent 提供文件系统 tool，用于搜索和读取 SKILL.md
+        //   std::vector<neograph::Tool *> searchToolPtrs;
+        //   searchToolPtrs.reserve(tools.size());
+        //   for (auto &t : tools) {
+        //     const auto &name = t->get_name();
+        //     if (name == "filesystem_glob" || name == "filesystem_listfile" ||
+        //         name == "filesystem_read_text_file" ||
+        //         name == "filesystem_grep") {
+        //       searchToolPtrs.push_back(t.get());
+        //     }
+        //   }
+        //   nodeContext.tools = std::move(searchToolPtrs);
+
+        //   subagentManagerTool->subAgentList.insert(std::make_pair(
+        //       "tool_skill_search",
+        //       std::make_shared<agentxx::tools::ToolSkillSearchTool>(
+        //           nodeContext, delayToolInfos, config->skillDirPaths,
+        //           middlewareHandleContext)));
+        // }
         {
           // subagent_task
           neograph::graph::NodeContext nodeContext{};

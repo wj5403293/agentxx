@@ -235,6 +235,34 @@ if (LINUX_IO_URING_SUPPORTED)
   )
 endif()
 
+# sqlite
+set(SQLITE_PREFIX ${CMAKE_BINARY_DIR}/sqlite-src)
+set(SQLITE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite/")
+set(SQLITE_BINARY_DIR ${CMAKE_BINARY_DIR}/sqlite-build)
+set(SQLITE_INSTALL_DIR ${CMAKE_BINARY_DIR}/sqlite-install)
+ExternalProject_Add(
+  sqlite_repo
+  PREFIX ${SQLITE_PREFIX}
+  SOURCE_DIR ${SQLITE_SOURCE_DIR}
+  BINARY_DIR ${SQLITE_BINARY_DIR}
+  INSTALL_DIR ${SQLITE_INSTALL_DIR}
+  CONFIGURE_COMMAND 
+      cd ${SQLITE_SOURCE_DIR} && ./configure
+      --prefix=${SQLITE_INSTALL_DIR} 
+      --host=${CMAKE_C_COMPILER_TARGET}
+      CC=${CMAKE_C_COMPILER}
+      CXX=${CMAKE_CXX_COMPILER}
+      AR=${CMAKE_AR}
+      RANLIB=${CMAKE_RANLIB}
+      "CFLAGS=${CMAKE_C_FLAGS} -DANDROID_PLATFORM=${ANDROID_PLATFORM} -DANDROID_ABI=${ANDROID_ABI} -DANDROID_NDK=${ANDROID_NDK} -DANDROID_STL=${ANDROID_STL}"
+  BUILD_COMMAND 
+    cd ${SQLITE_SOURCE_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
+  INSTALL_COMMAND 
+    cd ${SQLITE_SOURCE_DIR} && make install
+  UPDATE_COMMAND ""
+  TEST_COMMAND ""
+)
+
 # fmt
 FetchContent_Declare(
   fmt
@@ -275,6 +303,17 @@ block()
   set(BUILD_SHARED_LIBS             OFF)
   set(BUILD_STATIC_LIBS             ON)
   FetchContent_MakeAvailable(simdjson)
+endblock()
+
+# codegraph-cpp
+FetchContent_Declare(
+  codegraph
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/codegraph-cpp/"
+)
+block()
+  set(BUILD_SHARED_LIBS             OFF)
+  set(BUILD_STATIC_LIBS             ON)
+  FetchContent_MakeAvailable(codegraph)
 endblock()
 
 # vectorscan
@@ -319,7 +358,7 @@ block()
   set(NEOGRAPH_BUILD_PYBIND    OFF CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_A2A       OFF CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_POSTGRES  OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_SQLITE    OFF CACHE BOOL "" FORCE)
+  set(NEOGRAPH_BUILD_SQLITE    ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_ASYNC     ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_LLM       ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_MCP       ON  CACHE BOOL "" FORCE)
@@ -376,7 +415,9 @@ include_directories(${fmt_SOURCE_DIR}/include/)
 include_directories(${uchardet_INSTALL_DIR}/include/)
 include_directories(${LIBICONV_INSTALL_DIR}/include/)
 include_directories(${LIBURING_INSTALL_DIR}/include/)
+include_directories(${SQLITE_SOURCE_DIR}/src/)
 include_directories(${vectorscan_SOURCE_DIR}/src/)
+include_directories(${codegraph_SOURCE_DIR}/include/)
 include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
 include_directories(${html2md_SOURCE_DIR}/include/)
@@ -399,6 +440,7 @@ add_library(agentxx SHARED
 )
 
 add_dependencies(agentxx iconv_repo)
+add_dependencies(agentxx sqlite_repo)
 if (LINUX_IO_URING_SUPPORTED)
   add_dependencies(agentxx liburing_repo)
 endif()
@@ -406,10 +448,12 @@ endif()
 target_link_directories(agentxx PUBLIC 
   ${simdjson_INSTALL_DIR}
   ${fmt_INSTALL_DIR}
-  ${neograph_INSTALL_DIR}
-  ${vectorscan_INSTALL_DIR}/lib/
   ${uchardet_INSTALL_DIR}/lib/
   ${LIBICONV_INSTALL_DIR}/lib/
+  ${vectorscan_INSTALL_DIR}/lib/
+  ${SQLITE_INSTALL_DIR}/lib/
+  ${codegraph_INSTALL_DIR}
+  ${neograph_INSTALL_DIR}
   ${Boost_ROOT}/lib/
 )
 if (LINUX_IO_URING_SUPPORTED)
@@ -424,12 +468,14 @@ target_link_libraries(agentxx PUBLIC
   html2md
   iconv
   libuchardet
+  sqlite3
   neograph::core
   neograph::util
   neograph::async
   neograph::llm
   neograph::mcp
   neograph::acp
+  codegraph_core
 	hs_runtime
 	hs
   yaml-cpp::yaml-cpp

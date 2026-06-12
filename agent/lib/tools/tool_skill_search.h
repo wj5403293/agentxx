@@ -4,6 +4,7 @@
 #include "tools/tool.h"
 #include <filesystem>
 #include <format>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -28,35 +29,142 @@ class ToolSkillSearchTool : public ::agentxx::tools::SubAgentTaskBase {
 protected:
   inline static constexpr auto defSystemPromptTemplate = std::string_view{R"(
 You are an assistant that, based on user requirements, tries to find the appropriate tools and skills to load. 
-You can load additional skill files, analyze the user's needs to determine usable tools and skills, 
-and then output a JSON object in the format: `{"tool": ["tool_name_1", ""tool_name_2""], "skill": ["path/to/skill/file"]}`.
+You can use filesystem tools to search for and read SKILL.md files, analyze the user's needs to determine usable tools and skills, 
+and then output a JSON object in the format: `{{"tool": ["tool_name_1", "tool_name_2"], "skill": ["/absolute/path/to/skill"]}}`.
 You can output multiple tools and skills at the same time. 
 If no suitable tool is found, output an empty array; similarly, if no suitable skill is found, output an empty array. 
-If neither tools nor skills are suitable, output `{"tool": [], "skill": []}`.
+If neither tools nor skills are suitable, output `{{"tool": [], "skill": []}}`.
+
+## Delay-Loadable Tools (available but not yet fully loaded):
+{}
+
+## Skill Search Directories:
+{}
+
+## Workflow:
+1. Analyze the user's requirements to understand what capabilities are needed
+2. Use `filesystem_glob` or `filesystem_listfile` to search for SKILL.md files in the skill directories
+3. Use `filesystem_read_text_file` to read potentially relevant SKILL.md files (use line_limit=1000)
+4. Compare skill content against the user's needs and decide which skills to load
+5. Determine which delay-loadable tools would also help
+6. Output the final JSON with selected tools and skills
+
+Remember: Output ONLY valid JSON, nothing else before or after.
 
 )"};
+
+  struct DelayToolInfo {
+    std::string name;
+    std::string description;
+  };
+
+  std::vector<DelayToolInfo> delayToolInfos;
+  std::vector<std::string> skillDirPaths;
+  std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
+
+  inline static constexpr auto graphDataKey_loadedTools =
+      std::string_view{"toolSkillSearch_loadedTools"};
+  inline static constexpr auto graphDataKey_loadedSkills =
+      std::string_view{"toolSkillSearch_loadedSkills"};
 
 public:
   explicit ToolSkillSearchTool(
       const neograph::graph::NodeContext &in_context,
-      const std::vector<::agentxx::tools::XXToolBase> &delayTools)
+      const std::vector<DelayToolInfo> &in_delayToolInfos,
+      const std::vector<std::string> &in_skillDirPaths,
+      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
+          in_handleContext)
       : ::agentxx::tools::SubAgentTaskBase(
             "tool_skill_search",
             "Search available tool or skill for loading. "
             "(already set system prompt)",
-            "") {
+            ""),
+        delayToolInfos(in_delayToolInfos), skillDirPaths(in_skillDirPaths),
+        handleContext(in_handleContext) {
     createSubgraph(in_context);
-    createSystemPrompt(delayTools);
+    createSystemPrompt();
   }
 
   asio::awaitable<void> onSubagentEnd(std::string &result) override {
-    // 将 result 转json，读取 tool、skill，加载
-    // 转json失败则不处理
+    try {
+      auto jsonResult = neograph::json::parse(result);
+      if (!jsonResult.is_object()) {
+        co_return;
+      }
+
+      auto handleContextPtr = handleContext.lock();
+      if (!handleContextPtr) {
+        co_return;
+      }
+
+      // if (jsonResult["tool"].is_array()) {
+      //   auto &loadedTools =
+      //       handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
+      //           "session", graphDataKey_loadedTools);
+      //   for (const auto &item : jsonResult["tool"]) {
+      //     if (item.is_string()) {
+      //       loadedTools.push_back(item.get<std::string>());
+      //     }
+      //   }
+      // }
+
+      // if (jsonResult["skill"].is_array()) {
+      //   auto &loadedSkills =
+      //       handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
+      //           "session", graphDataKey_loadedSkills);
+      //   for (const auto &item : jsonResult["skill"]) {
+      //     if (item.is_string()) {
+      //       auto skillPath = item.get<std::string>();
+      //       loadedSkills.push_back(skillPath);
+
+      //       auto skillMdPath = skillPath + "/SKILL.md";
+      //       std::ifstream stream(skillMdPath);
+      //       if (stream) {
+      //         auto content =
+      //         std::string{std::istreambuf_iterator<char>(stream),
+      //                                    std::istreambuf_iterator<char>()};
+      //         stream.close();
+      //         if (!content.empty()) {
+      //           auto &systemMsgList =
+      //               handleContextPtr
+      //                   ->getGraphDataItemValue<std::vector<std::string>>(
+      //                       "session",
+      //                       agentxx::middleware::MiddlewareWarpHandleContext::
+      //                           graphDataKey_systemMessage);
+      //           systemMsgList.push_back(fmt::format(
+      //               "\n## Loaded Skill: {}\n\n{}", skillPath, content));
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+    } catch (const std::exception &e) {
+      // 转json失败则不处理
+    }
+    co_return;
   }
 
-  void createSystemPrompt(
-      const std::vector<::agentxx::tools::XXToolBase> &delayTools) {
-    // TODO: 生成 system prompt
+  void createSystemPrompt() {
+    std::ostringstream toolsList;
+    if (delayToolInfos.empty()) {
+      toolsList << "(none)";
+    } else {
+      for (const auto &item : delayToolInfos) {
+        toolsList << fmt::format("- **{}**: {}\n", item.name, item.description);
+      }
+    }
+
+    std::ostringstream skillsDirs;
+    if (skillDirPaths.empty()) {
+      skillsDirs << "(none)";
+    } else {
+      for (const auto &dir : skillDirPaths) {
+        skillsDirs << fmt::format("- {}\n", dir);
+      }
+    }
+
+    systemPrompt =
+        fmt::format(defSystemPromptTemplate, toolsList.str(), skillsDirs.str());
   }
 
   void createSubgraph(const neograph::graph::NodeContext &context) {

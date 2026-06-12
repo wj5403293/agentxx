@@ -21,7 +21,7 @@ namespace tools {
 // The harness provides a tool that agents can use to maintain a
 // structured task list. Features:
 //   - Track multiple tasks with statuses ('pending', 'in_progress',
-//   'completed', 'faild')
+//   'completed', 'failed')
 //   - Persisted in agent state per thread
 //   - Helps agent organize complex multi-step work
 //   - Useful for long-running tasks and planning
@@ -45,11 +45,12 @@ Use this to plan and track complex multi-step tasks. The full todo list will be
 replaced each time you call this tool. Include ALL current tasks, not just new ones.
 
 Each todo item has:
-- state: 'pending', 'in_progress', 'completed', or 'faild'
+- state: 'pending', 'in_progress', 'completed', or 'failed'
 - content: description of the task
 - summary: optional notes about approaches tried, lessons learned, etc.)",
         neograph::json{
             {"type", "object"},
+            {"required", neograph::json::array({"todos"})},
             {
                 "properties",
                 {
@@ -57,61 +58,23 @@ Each todo item has:
                         "todos",
                         {
                             {"type", "array"},
+                            {"items", {{"type", "string"}}},
                             {"description",
                              R"(The full list of todo items. Replace the entire list each call.
-Include all tasks with their current status.)"},
-                            {
-                                "items",
-                                {
-                                    {"type", "object"},
-                                    {
-                                        "properties",
-                                        {
-                                            {
-                                                "state",
-                                                {
-                                                    {"type", "string"},
-                                                    {"enum",
-                                                     neograph::json::array(
-                                                         {"pending",
-                                                          "in_progress",
-                                                          "completed",
-                                                          "faild"})},
-                                                    {"description",
-                                                     "Current status of this "
-                                                     "todo item"},
-                                                },
-                                            },
-                                            {
-                                                "content",
-                                                {
-                                                    {"type", "string"},
-                                                    {"description",
-                                                     "The description of "
-                                                     "the task to do"},
-                                                },
-                                            },
-                                            {
-                                                "summary",
-                                                {
-                                                    {"type", "string"},
-                                                    {"description",
-                                                     R"(Execution summary.
-Record methods tried, issues encountered, optimization suggestions.
-This helps when re-planning and re-executing tasks.)"},
-                                                },
-                                            },
-                                        },
-                                        {"required", neograph::json::array(
-                                                         {"state", "content"})},
-                                    },
-                                },
-                            },
+Include all tasks with their current status. Object struct:
+
+[
+    {
+        "state": "pending", // Current status of this todo item. Type enum, a value of ["pending", "in_progress", "completed", "failed"]
+        "content": "", // The description of the task to do
+        "summary": "" // Execution summary. Record methods tried, issues encountered, optimization suggestions. This helps when re-planning and re-executing tasks.
+    }
+]
+)"},
                         },
                     },
                 },
             },
-            {"required", neograph::json::array({"todos"})},
         },
     };
   }
@@ -120,7 +83,7 @@ This helps when re-planning and re-executing tasks.)"},
   execute_async(const neograph::json &arguments) override {
     auto thread_id = arguments.value("thread_id", std::string{});
     if (thread_id.empty()) {
-      co_return R"({"error":"Toolcall inner exec faild, need `thread_id`"})";
+      co_return R"({"error":"Toolcall inner exec failed, need `thread_id`"})";
     }
 
     auto todosJson = arguments.value("todos", neograph::json::array());
@@ -129,12 +92,9 @@ This helps when re-planning and re-executing tasks.)"},
     }
 
     auto handlePtr = todolistContext.lock();
-    if (nullptr == handlePtr) {
-      co_return R"({"error":"todolistContext is null"})";
-    }
 
     auto state = co_await handlePtr->getStateItem(thread_id);
-    state->todoStore["thread_id"] = todosJson;
+    state->todolists["thread_id"] = todosJson;
 
     co_return "success";
   }
