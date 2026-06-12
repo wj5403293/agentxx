@@ -985,15 +985,17 @@ Supports search of text content by string or full regex syntax through the `text
                     {
                         "text_pattern",
                         {
-                            {"type", "string"},
+                            {"type", "array"},
+                            {"items", {{"type", "string"}}},
                             {"description",
                              R"(String or regex syntax to search text content. The text match type depends on the `text_pattern_is_regex` parameter.)"},
                         },
                     },
                     {
-                        "file_pattern",
+                        "files_pattern",
                         {
-                            {"type", "string"},
+                            {"type", "array"},
+                            {"items", {{"type", "string"}}},
                             {"description",
                              R"(Absolute dir or file path and glob pattern.
 
@@ -1094,13 +1096,15 @@ Output format:
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
     auto text_pattern_is_regex = arguments.value("text_pattern_is_regex", true);
-    auto text_pattern = arguments.value("text_pattern", std::string{});
+    auto text_pattern =
+        arguments.value("text_pattern", std::vector<std::string>{});
     if (text_pattern.empty()) {
       co_return R"({"error":"Arg `text_pattern` is empty"})";
     }
-    auto file_pattern = arguments.value("file_pattern", std::string{});
-    if (file_pattern.empty()) {
-      co_return R"({"error":"Arg `file_pattern` is empty"})";
+    auto files_pattern =
+        arguments.value("files_pattern", std::vector<std::string>{});
+    if (files_pattern.empty()) {
+      co_return R"({"error":"Arg `files_pattern` is empty"})";
     }
     auto output_mode =
         arguments.value("output_mode", std::string{"files_with_matches"});
@@ -1108,9 +1112,15 @@ Output format:
       co_return R"({"error":"Arg `output_mode` is empty"})";
     }
 
-    auto refilelist = glob::rglob(file_pattern);
+    std::vector<std::filesystem::path> refilelist{};
+    for (const auto &path : files_pattern) {
+      auto relist = glob::rglob(files_pattern);
+      refilelist.insert(refilelist.end(),
+                        std::make_move_iterator(relist.begin()),
+                        std::make_move_iterator(relist.end()));
+    }
     if (refilelist.empty()) {
-      throw std::runtime_error{"No match `file_pattern` file found"};
+      throw std::runtime_error{"No match `files_pattern` file found"};
     }
 
     bool isContainsMode = ("content" != output_mode);
@@ -1157,7 +1167,7 @@ Output format:
       }
     } else {
       // 文本精确匹配
-      auto search = agentxx::util::AhoCorasick{{text_pattern}, false};
+      auto search = agentxx::util::AhoCorasick{text_pattern, true};
       for (const auto &item : refilelist) {
         auto filepath = item.generic_string();
         auto filetext = co_await readFileContent(filepath);

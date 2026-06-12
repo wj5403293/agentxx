@@ -38,11 +38,20 @@ public:
     }
   };
 
-  AhoCorasick(std::vector<std::string_view> patterns,
+  AhoCorasick(const std::vector<std::string_view> &patterns,
               bool in_caseInsensitive = true)
       : caseInsensitive(in_caseInsensitive) {
     nodes.emplace_back(); // 初始化根节点
-    for (auto &item : patterns) {
+    for (const auto &item : patterns) {
+      addPattern(item);
+    }
+  }
+
+  AhoCorasick(const std::vector<std::string> &patterns,
+              bool in_caseInsensitive = true)
+      : caseInsensitive(in_caseInsensitive) {
+    nodes.emplace_back(); // 初始化根节点
+    for (const auto &item : patterns) {
       addPattern(item);
     }
   }
