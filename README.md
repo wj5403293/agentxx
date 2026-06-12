@@ -1,6 +1,7 @@
 ## 简介
+[Github agentxx](https://github.com/coolight7/agentxx)
+
 - c++实现 AI Agent，为了减少内存占用、程序包体积，用于普通用户的手机电脑运行而设计
-- 依赖`NeoGraph`，仿照Python著名的 agent 框架`langgraph`，实现常用功能
 
 ## 计划实现
 ### 基础模块
@@ -49,9 +50,9 @@
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
     - ⬜动态加载 load/offload 
 - ❌MCP支持（Neograph已实现，但暂时使用有问题）
-- ⬜RAG
 - ⬜扩展
-    - file Graph
+    - CodeGraph
+    - RAG
     - 语音识别
     - 文本转语音
 - ⬜Server:
@@ -62,7 +63,10 @@
 ### 功能
 - ⬜翻译/划词翻译
 - ⬜根据文本/音视频，生成评论/弹幕
-- ⬜根据图片内容，提取文本并指定文本在图片上的位置
+- ⬜根据图片内容，提取文本和提示并指定文本在图片上的位置
+    - 实现类似游戏中图片内容中的多个提示点，点击扩展到文本内容或提示信息
+- ⬜图片/视频生成，通过 llm 优化提示词后生成返回，可自动检查生成结果，调整提示词重新生成
+- ⬜ASR/TTS
 - ⬜匹配歌词
 - ⬜操作键鼠
 - ⬜操作live2d模型动作
@@ -75,7 +79,36 @@
     - 将加载的 skill 插入到上下文末尾
     - 保留加载的skill在上下文 toolcall 位置不动，压缩上下文时整理 skill 到开头（需要确认效果对比整合在一起）
 - third_party
-    - `codegraph-cpp`: 分析代码文件关系图
+    - `neo-graph`: 图执行核心
+    - `codegraph-cpp`: 分析代码/md文件关系
 
 ## 编译 
+- 拉取项目源码和依赖库
+```sh
+git clone https://github.com/coolight7/agentxx
+cd agentxx
+git submodule update --init
+```
 
+- 编译 Boost
+```sh
+# https://github.com/boostorg/boost
+# 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
+cd boost/
+# 然后编译结果到 agent/third_party/boost-build/
+./bootstrap.sh
+./b2 --prefix=${PWD}/../boost-build
+./b2 install --prefix=${PWD}/../boost-build
+```
+
+- 安装 codegraph-cpp 依赖
+```sh
+cd {项目根目录}/agent/third_party/codegraph-cpp
+npm install --legacy-peer-deps
+```
+
+- 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client
+```sh
+cd {项目根目录}/agent
+./script/client_run.sh
+```

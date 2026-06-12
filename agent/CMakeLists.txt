@@ -133,10 +133,12 @@ include(FetchContent)
 
 # boost
 # https://github.com/boostorg/boost
-# - 下载 release/boost-xxx.7z 解压到 third_party/boost/
-#   cd boost/ && ./bootstrap.sh
-#   ./b2 --prefix=${root}/third_party/boost-build
-#   ./b2 install --prefix=${root}/third_party/boost-build
+# 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
+# 然后编译结果到 agent/third_party/boost-build/
+# cd boost/
+# ./bootstrap.sh
+# ./b2 --prefix=${PWD}/../boost-build
+# ./b2 install --prefix=${PWD}/../boost-build
 set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost-build/")
 add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_ASIO_STANDALONE=1)
