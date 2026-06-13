@@ -43,18 +43,36 @@ public:
         "filesystem_list_file",
         R"(列出文件夹内的文件和文件夹信息，包含文件大小/Bytes, 类型, 最后写入时间(时间戳/nanoseconds)
 指定文件路径可以得到文件信息.
-可用于检查文件/文件夹是否存在.)",
+也可用于检查文件/文件夹是否存在.)",
         neograph::json{
             {"type", "object"},
             {
                 "properties",
-                {{
-                    "path",
+                {
                     {
-                        {"type", "string"},
-                        {"description", "文件或文件夹的绝对路径"},
+                        "path",
+                        {
+                            {"type", "string"},
+                            {"description", "文件或文件夹的绝对路径"},
+                        },
                     },
-                }},
+                    {
+                        "recursive",
+                        {
+                            {"type", "boolean"},
+                            {"description", "默认 `false`. 是否递归子目录"},
+                        },
+                    },
+                    {
+                        "limit",
+                        {
+                            {"type", "number"},
+                            {"description", "默认 `100`. "
+                                            "限制列出的文件、文件夹数量，指定`"
+                                            "limit <= 0`时不限制数量"},
+                        },
+                    },
+                },
             },
             {"required", neograph::json::array({"path"})},
         },
@@ -67,19 +85,42 @@ public:
     if (targetPath.empty()) {
       co_return R"({"error":"Arg `path` is empty"})";
     }
+    auto recursive = arguments.value("recursive", false);
+    auto limit = arguments.value("limit", 100);
 
     auto result = neograph::json::array();
-    for (const auto &entity : std::filesystem::directory_iterator(targetPath)) {
-      result.push_back(neograph::json{
+    auto onAppendItem = [&](const std::filesystem::directory_entry &entity) {
+      auto json = neograph::json{
           {"path", entity.path().generic_string()},
           {"type", (entity.is_directory()      ? "dir"
                     : entity.is_regular_file() ? "file"
                     : entity.is_symlink()      ? "symlink"
                                                : "other")},
-          {"size", size_t(entity.file_size())},
           {"last_write_time",
            entity.last_write_time().time_since_epoch().count()},
-      });
+      };
+      if (entity.is_regular_file()) {
+        json["size"] = size_t(entity.file_size());
+      }
+      result.push_back(json);
+    };
+
+    if (recursive) {
+      for (const auto &entity :
+           std::filesystem::recursive_directory_iterator(targetPath)) {
+        onAppendItem(entity);
+        if (limit > 0 && result.size() >= limit) {
+          break;
+        }
+      }
+    } else {
+      for (const auto &entity :
+           std::filesystem::directory_iterator(targetPath)) {
+        onAppendItem(entity);
+        if (limit > 0 && result.size() >= limit) {
+          break;
+        }
+      }
     }
     co_return result.dump();
   }
@@ -595,7 +636,8 @@ public:
 
         asio::error_code errCode;
         stream.open(filepath,
-                    asio::stream_file::write_only | asio::stream_file::create,
+                    asio::stream_file::write_only | asio::stream_file::create |
+                        asio::stream_file::truncate,
                     errCode);
         if (false == stream.is_open()) {
           stream.close();
@@ -649,8 +691,9 @@ public:
         }
 
         stream.open(filepath, is_binary
-                                  ? std::ios_base::out | std::ios_base::binary
-                                  : std::ios_base::out);
+                                  ? std::ios_base::out | std::ios_base::binary |
+                                        std::ios_base::trunc
+                                  : std::ios_base::out | std::ios_base::trunc);
         if (!stream) {
           auto ec = std::error_code{errno, std::system_category()};
           throw std::runtime_error{fmt::format(
@@ -802,7 +845,10 @@ public:
         }
 
         // 覆盖写入文件内容
-        stream.open(filepath, asio::stream_file::write_only, errCode);
+        stream.open(filepath,
+                    asio::stream_file::write_only | asio::stream_file::create |
+                        asio::stream_file::truncate,
+                    errCode);
         if (false == stream.is_open()) {
           stream.close();
           throw std::runtime_error{fmt::format(
@@ -1113,12 +1159,9 @@ Output format:
     }
 
     std::vector<std::filesystem::path> refilelist{};
-    for (const auto &path : files_pattern) {
-      auto relist = glob::rglob(files_pattern);
-      refilelist.insert(refilelist.end(),
-                        std::make_move_iterator(relist.begin()),
-                        std::make_move_iterator(relist.end()));
-    }
+    auto relist = glob::rglob(files_pattern);
+    refilelist.insert(refilelist.end(), std::make_move_iterator(relist.begin()),
+                      std::make_move_iterator(relist.end()));
     if (refilelist.empty()) {
       throw std::runtime_error{"No match `files_pattern` file found"};
     }
