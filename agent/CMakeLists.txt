@@ -144,6 +144,8 @@ add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_ASIO_STANDALONE=1)
 add_definitions(-DASIO_STANDALONE=1)
 
+include_directories(${Boost_ROOT}/include/)
+
 # iconv
 set(LIBICONV_VERSION 1.18)
 set(LIBICONV_URL "https://ftp.gnu.org/gnu/libiconv/libiconv-${LIBICONV_VERSION}.tar.gz")
@@ -242,6 +244,7 @@ set(SQLITE_PREFIX ${CMAKE_BINARY_DIR}/sqlite-src)
 set(SQLITE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite/")
 set(SQLITE_BINARY_DIR ${CMAKE_BINARY_DIR}/sqlite-build)
 set(SQLITE_INSTALL_DIR ${CMAKE_BINARY_DIR}/sqlite-install)
+set(SQLITE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE")
 ExternalProject_Add(
   sqlite_repo
   PREFIX ${SQLITE_PREFIX}
@@ -256,7 +259,7 @@ ExternalProject_Add(
       CXX=${CMAKE_CXX_COMPILER}
       AR=${CMAKE_AR}
       RANLIB=${CMAKE_RANLIB}
-      "CFLAGS=${CMAKE_C_FLAGS} -DANDROID_PLATFORM=${ANDROID_PLATFORM} -DANDROID_ABI=${ANDROID_ABI} -DANDROID_NDK=${ANDROID_NDK} -DANDROID_STL=${ANDROID_STL}"
+      "CFLAGS=${SQLITE_C_FLAGS} -DANDROID_PLATFORM=${ANDROID_PLATFORM} -DANDROID_ABI=${ANDROID_ABI} -DANDROID_NDK=${ANDROID_NDK} -DANDROID_STL=${ANDROID_STL}"
   BUILD_COMMAND 
     cd ${SQLITE_SOURCE_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
   INSTALL_COMMAND 
@@ -293,18 +296,6 @@ block()
   set(BUILD_SHARED_LIBS     OFF)
   set(BUILD_STATIC_LIBS     ON )
   FetchContent_MakeAvailable(uchardet)
-endblock()
-
-# simdjson
-FetchContent_Declare(
-  simdjson
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/simdjson/"
-  EXCLUDE_FROM_ALL
-)
-block()
-  set(BUILD_SHARED_LIBS             OFF)
-  set(BUILD_STATIC_LIBS             ON)
-  FetchContent_MakeAvailable(simdjson)
 endblock()
 
 # codegraph-cpp
@@ -412,7 +403,6 @@ set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
-include_directories(${simdjson_SOURCE_DIR}/include/)
 include_directories(${fmt_SOURCE_DIR}/include/)
 include_directories(${uchardet_INSTALL_DIR}/include/)
 include_directories(${LIBICONV_INSTALL_DIR}/include/)
@@ -424,7 +414,6 @@ include_directories(${neograph_SOURCE_DIR}/deps/)
 include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
 include_directories(${html2md_SOURCE_DIR}/include/)
 include_directories(${glob_SOURCE_DIR}/single_include/)
-include_directories(${Boost_ROOT}/include/)
 include_directories(${third_party_DIR})
 
 aux_source_directory("./lib/util" DIR_UTIL)
@@ -448,7 +437,6 @@ if (LINUX_IO_URING_SUPPORTED)
 endif()
 
 target_link_directories(agentxx PUBLIC 
-  ${simdjson_INSTALL_DIR}
   ${fmt_INSTALL_DIR}
   ${uchardet_INSTALL_DIR}/lib/
   ${LIBICONV_INSTALL_DIR}/lib/
@@ -466,7 +454,6 @@ endif()
 
 target_link_libraries(agentxx PUBLIC
   fmt::fmt
-  simdjson
   html2md
   iconv
   libuchardet

@@ -1,7 +1,3 @@
-[submodule "agent/third_party/simdjson"]
-	path = agent/third_party/simdjson
-	url = https://github.com/simdjson/simdjson.git
-	branch = v4.6.4
 [submodule "agent/third_party/fmt"]
 	path = agent/third_party/fmt
 	url = https://github.com/fmtlib/fmt

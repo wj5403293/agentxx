@@ -1,7 +1,7 @@
 ## 简介
 [Github agentxx](https://github.com/coolight7/agentxx)
 
-- c++实现 AI Agent，为了减少内存占用、程序包体积，用于普通用户的手机电脑运行而设计
+- C++ 实现 AI Agent，为了减少内存占用、程序包体积，用于普通用户的手机电脑运行而设计
 
 ## 计划实现
 ### 基础模块
@@ -28,14 +28,19 @@
         - temp_kvstore（会话独立，提供 K-V Store允许模型存取变量）
         - 消息分支，支持修改历史消息/模型重新生成消息
     - ✅sub-agent
+        - 一轮 Toolcall 支持并发启动多个 Subagent
         - subagent_task (隔离上下文)
         - ⬜skill_search + tool_search (延迟加载 mcp tool)
         - ⬜subagent_audio_generate
         - ⬜subagent_image_generate
         - ⬜subagent_video_generate
-    - ✅todo_list
+    - ✅planning
+        - 分为两层规划
+        - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
+        - todo_list 描述近期需要实现的任务细节步骤
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
+        - 自动测试
     - ⬜ui_control
         - 接收音视频/图片/文本输入，输出键鼠控制
 - ✅Middleware支持
@@ -73,16 +78,35 @@
 
 ## 目录结构
 - `agent`:
-    - c++实现agent
-- `skill`:
-    - 将加载的 skill 插入到上下文开头
-    - 将加载的 skill 插入到上下文末尾
-    - 保留加载的skill在上下文 toolcall 位置不动，压缩上下文时整理 skill 到开头（需要确认效果对比整合在一起）
-- third_party
+    - c++ 实现 Agent
+- `agent/lib`:
+    - 核心库，包含了内置实现的 toolcall、node、middleware 等，分离编译以便嵌入其他 app 开发使用
+- `agent/client`:
+    - 命令行可执行程序，计划用于启动服务、实现命令行用户交互
+- `agent/test`:
+    - 测试
+- `agent/third_party`
     - `neo-graph`: 图执行核心
-    - `codegraph-cpp`: 分析代码/md文件关系
+        - [原项目](https://github.com/fox1245/NeoGraph)
+        - [Fork 修改](https://github.com/coolight7/NeoGraph)
+            - Toolcall
+                - 调整 Tool 默认为异步执行
+                - 支持并发启动多个 Tool 同时开始执行
+                - toolcall 增加参数 thread_id
+                - McpTool 增加异步操作
+            - NodeInput 允许修改 state，以便支持修改 messages 消息上下文
+            - ChatMessage 支持记录修改历史，以实现记录模型重新生成消息、修改用户消息
+            - LLMCallNode 当 messages 中存在 system message 时不再额外添加
+            - GraphState 增加 overwrite 函数以支持强制覆盖变量
+    - `codegraph-cpp`: 分析代码/md文件关系. 
+        - [原项目](https://github.com/plutoaac/codegraph-cpp)
+        - [Fork 修改](https://github.com/coolight7/codegraph-cpp):
+            - 从支持 c++/python 解析，扩展到支持 js/ts/dart/rust/go/java/kotlin/bash/markdown 等 20+ 种编程语言和文件格式结构
 
 ## 编译 
+- 编译器推荐
+    - Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
+
 - 拉取项目源码和依赖库
 ```sh
 git clone https://github.com/coolight7/agentxx

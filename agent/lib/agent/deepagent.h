@@ -4,6 +4,7 @@
 #include "asio/co_spawn.hpp"
 #include "asio/detached.hpp"
 #include "asio/io_context.hpp"
+#include "middlewares/planning.h"
 #include "middlewares/skill.h"
 #include "middlewares/summarization.h"
 #include "neograph/llm/openai_provider.h"
@@ -15,18 +16,17 @@
 #include "tools/execute_command.h"
 #include "tools/filesystem.h"
 #include "tools/get_current_datetime.h"
+#include "tools/planning.h"
 #include "tools/skill.h"
 #include "tools/string.h"
 #include "tools/sub_agent.h"
 #include "tools/temp_store.h"
-#include "tools/todo_list.h"
 #include "tools/tool_skill_search.h"
 #include "tools/websearch.h"
 #include "util/log.h"
 #include <format>
 #include <iostream>
 #include <memory>
-#include <middlewares/todo_list.h>
 
 namespace agentxx {
 
@@ -119,10 +119,10 @@ public:
 
       {
         auto todolistMiddleware =
-            std::make_shared<agentxx::middleware::TodolistMiddlewareHandle>(
+            std::make_shared<agentxx::middleware::PlanningMiddlewareHandle>(
                 middlewareHandleContext);
         todolistMiddleware->toolcalls.push_back(
-            std::make_unique<agentxx::tools::WriteTodoListTool>(
+            std::make_unique<agentxx::tools::WritePlanningTool>(
                 todolistMiddleware));
         middlewareHandleContext->handles.push_back(todolistMiddleware);
       }
