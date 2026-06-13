@@ -110,7 +110,7 @@ Use `[*]` for start/end. Replace the entire diagram each call.)"},
                         "todos",
                         {
                             {"type", "array"},
-                            {"items", {{"type", "string"}}},
+                            {"items", {{"type", "object"}}},
                             {"description",
                              R"(TACTICAL LAYER: Near-term task items.
 Focus on what you are actively doing NOW and what comes NEXT.
@@ -157,7 +157,7 @@ Item struct:
     if (arguments.contains("todos")) {
       planStore["todos"] = arguments["todos"];
     }
-    state->plannings["thread_id"] = planStore;
+    state->plannings[thread_id] = planStore;
 
     co_return "success";
   }

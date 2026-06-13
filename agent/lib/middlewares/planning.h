@@ -32,61 +32,6 @@ public:
 class PlanningMiddlewareHandle
     : public BaseMiddlewareHandle<PlanningMiddlewareState_c> {
 protected:
-  inline static constexpr std::string_view defTodolistPromptTemplate =
-      std::string_view{R"_(
-
-## Task Plan
-
-### Strategic Overview (State Diagram)
-The state diagram below is your overall roadmap. It shows all major phases,
-their dependencies, and error recovery paths. Use it to understand where you
-are in the workflow and decide what to do next.
-
-```mermaid
-{}
-```
-
-### Tactical Execution (Near-term Tasks)
-The items below are what you are actively working on RIGHT NOW and what comes
-immediately next. Focus on completing the `in_progress` item before moving on.
-
-{}
-
-### Instructions
-- When you start working on a task, mark it `in_progress`
-- When a task succeeds, mark it `completed` and transition to the next phase
-- When a task fails, mark it `failed` and plan a recovery path in the diagram
-- Update the plan via `todolist_write_todos` whenever task status changes
-- Keep `todos` short: only current + next, not the whole plan
-)_"};
-
-  std::string formatTodolistPrompt(const neograph::json &planStore) {
-    auto mermaid = planStore.value("mermaid", std::string{});
-    if (mermaid.empty()) {
-      return "";
-    }
-
-    std::string todosText;
-    if (planStore.contains("todos") && planStore["todos"].is_array()) {
-      std::ostringstream oss;
-      for (const auto &item : planStore["todos"]) {
-        auto state = item.value("state", std::string{"unknown"});
-        auto content = item.value("content", std::string{});
-        auto summary = item.value("summary", std::string{});
-        oss << fmt::format("- [{}] {}", state, content);
-        if (!summary.empty()) {
-          oss << fmt::format("\n  Summary: {}", summary);
-        }
-        oss << "\n";
-      }
-      todosText = oss.str();
-    } else {
-      todosText = "(no detailed task items)";
-    }
-
-    return fmt::format(defTodolistPromptTemplate, mermaid, todosText);
-  }
-
 public:
   PlanningMiddlewareHandle(
       std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
@@ -106,27 +51,32 @@ public:
 
   asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
-    auto todolistState = co_await getStateItem(in.ctx.thread_id);
-
-    auto it = todolistState->plannings.find(in.ctx.thread_id);
-    if (it == todolistState->plannings.end()) {
-      co_return;
-    }
-
-    auto prompt = formatTodolistPrompt(it->second);
-    if (prompt.empty()) {
-      co_return;
-    }
-
     auto handleContextPtr = handleContext.lock();
-    if (nullptr == handleContextPtr) {
-      co_return;
-    }
-    auto &appendSystemMsgList =
+    auto appendSystemPromptList =
         handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
             in.ctx.thread_id, agentxx::middleware::MiddlewareWarpHandleContext::
                                   graphDataKey_systemMessage);
-    appendSystemMsgList.push_back(prompt);
+    appendSystemPromptList.push_back(
+        R"(
+## Planning
+
+You have access to the `planning_write` tool to help you manage and plan complex objectives.
+Use this tool for complex objectives to ensure that you are tracking each necessary step.
+This tool is very helpful for planning complex objectives, and for breaking down these larger complex objectives into smaller steps.
+
+It is critical that you mark todos as completed as soon as you are done with a step. Do not batch up multiple steps before marking them as completed.
+For simple objectives that only require a few steps, it is better to just complete the objective directly and NOT use this tool.
+Writing roadmap and todos takes time and tokens, use it when it is helpful for managing complex many-step problems! But not for simple few-step requests.
+
+### Important To-Do List Usage Notes to Remember
+
+- The `planning_write` tool should never be called multiple times in parallel.
+- Don't be afraid to revise the To-Do list as you go. New information may reveal new tasks that need to be done, or old tasks that are irrelevant.
+
+### Finishing a task
+
+When you finish all work, write your final answer in the message AFTER your last `planning_write` call — not in the same turn as that call. Start the final message with the substantive content the user asked for — the data, computation, summary, or analysis. The user wants the result, not confirmation that the work is done."
+)");
     co_return;
   }
 
