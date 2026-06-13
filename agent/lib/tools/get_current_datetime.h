@@ -22,7 +22,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "get_current_datetime",
-        "Get current date and time.",
+        "Get current date,time and timestamp.",
         neograph::json{},
     };
   }
@@ -32,10 +32,10 @@ public:
     std::chrono::zoned_time local_time{std::chrono::current_zone(), now};
 
     return fmt::format(
-        R"(
-本地时间: {}
-UTC 时间: {}
-)",
+        R"(Timestamp: {} ms
+Local Time: {}
+UTC Time: {})",
+        static_cast<long long>(now.time_since_epoch().count() / 1000 / 1000),
         std::format("{:%Y-%m-%d} {:%H:%M:%S}", local_time, local_time),
         std::format("{:%Y-%m-%d} {:%H:%M:%S}", now, now));
   }
