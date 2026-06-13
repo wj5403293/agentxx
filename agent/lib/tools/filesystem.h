@@ -105,22 +105,26 @@ public:
       result.push_back(json);
     };
 
-    if (recursive) {
-      for (const auto &entity :
-           std::filesystem::recursive_directory_iterator(targetPath)) {
-        onAppendItem(entity);
-        if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
-          break;
+    try {
+      if (recursive) {
+        for (const auto &entity :
+             std::filesystem::recursive_directory_iterator(targetPath)) {
+          onAppendItem(entity);
+          if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
+            break;
+          }
+        }
+      } else {
+        for (const auto &entity :
+             std::filesystem::directory_iterator(targetPath)) {
+          onAppendItem(entity);
+          if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
+            break;
+          }
         }
       }
-    } else {
-      for (const auto &entity :
-           std::filesystem::directory_iterator(targetPath)) {
-        onAppendItem(entity);
-        if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
-          break;
-        }
-      }
+    } catch (const std::exception &e) {
+      result.push_back(neograph::json{"error", e.what()});
     }
     co_return result.dump();
   }
@@ -181,8 +185,8 @@ public:
     if (filepath.empty()) {
       co_return R"({"error":"Arg `path` is empty"})";
     }
-    auto text_line_offset = arguments.value<double>("line_offset", -1);
-    auto text_line_limit = arguments.value<double>("line_limit", -1);
+    auto text_line_offset = arguments.value<long long>("line_offset", -1);
+    auto text_line_limit = arguments.value<long long>("line_limit", -1);
 
 #if defined(ASIO_HAS_FILE)
     {
@@ -492,7 +496,8 @@ public:
                                    : std::numeric_limits<size_t>::max();
 
           // 计算实际需要读取的字节数
-          auto fileSize = stream.tellg();
+          size_t fileSize =
+              static_cast<size_t>(std::filesystem::file_size(filepath));
           auto bytesAvailable =
               std::max((long long)fileSize - (long long)offset, (long long)0);
           auto bytesRead =
@@ -503,7 +508,7 @@ public:
           if (bytesRead <= 0) {
             throw std::runtime_error{fmt::format(
                 R"(Arg `byte_offset`({}) is out of range of file size({}).)",
-                offset, (size_t)fileSize)};
+                offset, fileSize)};
           }
 
           stream.seekg(offset, std::ios::beg);
@@ -515,8 +520,8 @@ public:
           }
 
           std::vector<char> result{};
-          result.resize(bytesRead + 1);
-          stream.read(result.data(), limit);
+          result.resize(bytesRead);
+          stream.read(result.data(), bytesRead);
           std::streamsize realBytesRead = stream.gcount();
 
           stream.close();
@@ -531,7 +536,7 @@ public:
         // 读取完整文件
         auto result = std::string((std::istreambuf_iterator<char>(stream)),
                                   std::istreambuf_iterator<char>());
-        std::streamsize bytesReadLen = stream.gcount();
+        auto bytesReadLen = result.size();
         stream.close();
         co_return neograph::json{
             {"bytes_read_len", bytesReadLen},
@@ -584,8 +589,8 @@ public:
                             {"type", "boolean"},
                             {"description",
                              R"(默认`false`,是否覆盖文件.
-                             如果为`true`,仅创建新文件并写入,若文件已存在则返回失败.
-                             如果为`false`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.)"},
+如果为`true`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.
+如果为`false`,创建新文件并写入,若文件已存在则返回失败.)"},
                         },
                     },
                     {
@@ -594,8 +599,8 @@ public:
                             {"type", "boolean"},
                             {"description",
                              R"(默认`false`,是否按二进制模式写入文件.
-                             如果为`true`,参数`content`应当为base64编码的二进制数据.
-                             如果为`false`,参数`content`视为普通文本,按字符串直接写入文件.)"},
+如果为`true`,参数`content`应当为base64编码的二进制数据.
+如果为`false`,参数`content`视为普通文本,按字符串直接写入文件.)"},
                         },
                     },
                 },
@@ -983,7 +988,7 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
 
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
-    auto patterns = arguments.value("patterns", std::string{});
+    auto patterns = arguments.value("patterns", std::vector<std::string>{});
     if (patterns.empty()) {
       co_return R"({"error":"Arg `patterns` is empty"})";
     }
@@ -1196,8 +1201,8 @@ Output format:
               }
 
               matchsContent.push_back(neograph::json{
-                  {"content",
-                   std::string_view{filetext}.substr(match.start, match.end)},
+                  {"content", std::string_view{filetext}.substr(
+                                  match.start, match.end - match.start)},
                   {"line", lineCount},
               });
               index = match.start;
