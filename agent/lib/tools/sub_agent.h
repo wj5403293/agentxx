@@ -32,7 +32,7 @@ public:
       : name(in_subAgentName), depict(in_subAgentDepict),
         systemPrompt(in_systemPrompt) {}
 
-  virtual std::shared_ptr<neograph::graph::GraphEngine> getSubgraph() {
+  virtual std::shared_ptr<neograph::graph::GraphEngine> getSubgraph() const {
     assert(nullptr != subgraph);
     return subgraph;
   }
@@ -41,7 +41,7 @@ public:
     co_return;
   }
 
-  virtual ~SubAgentTaskBase() { subgraph = nullptr; }
+  virtual ~SubAgentTaskBase() {}
 };
 
 class SubAgentNormalTask : public SubAgentTaskBase {
@@ -213,6 +213,7 @@ public:
         if (false == isFirst) {
           subagentNames << ",";
         }
+        isFirst = false;
       }
       co_return fmt::format(
           R"({{"error":"Arg `subagent` is not one of [{}]"}})",
@@ -244,7 +245,7 @@ public:
                   },
               }),
           }},
-          .resume_if_exists = true,
+          .resume_if_exists = false,
       };
 
       std::ostringstream oss;

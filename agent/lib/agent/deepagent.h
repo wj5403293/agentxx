@@ -390,7 +390,7 @@ public:
                       {"content", line},
                   }}),
               }},
-              .resume_if_exists = true,
+              .resume_if_exists = false,
           };
 
           std::cout << config->agentNameView << ": " << std::flush;
