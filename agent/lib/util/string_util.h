@@ -54,6 +54,7 @@ public:
     for (const auto &item : patterns) {
       addPattern(item);
     }
+    build();
   }
 
   char onCharCode(char ch) const {
