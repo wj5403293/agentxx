@@ -21,7 +21,7 @@
         - ⬜execute_python_command
         - ⬜execute_javascript_command
     - ✅web_search
-        - search
+        - search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
         - fetch_url_md (html to markdown)
         - fetch_url (raw resp body)
     - ✅tree-messages
@@ -55,8 +55,12 @@
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
     - ⬜动态加载 load/offload 
 - ❌MCP支持（Neograph已实现，但暂时使用有问题）
+    - MCP client 
+    - Mcp Server
+        - CodeGraph
+        - Websearch
 - ⬜扩展
-    - CodeGraph
+    - ✅CodeGraph
     - RAG
     - 语音识别
     - 文本转语音

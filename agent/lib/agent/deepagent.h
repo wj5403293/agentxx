@@ -191,7 +191,10 @@ public:
           std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
       tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
 
-      tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>());
+      if (false == config->websearchApiUrl.empty()) {
+        tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>(
+            config->websearchApiUrl, config->websearchConvertHtml2markdown));
+      }
       tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
       tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
 

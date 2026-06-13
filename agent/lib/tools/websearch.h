@@ -19,8 +19,15 @@ namespace agentxx {
 namespace tools {
 
 class WebSearchTool : public neograph::AsyncTool {
+protected:
+  const std::string searchApiUrl;
+  const bool convertHtml2markdown;
+
 public:
-  explicit WebSearchTool() {}
+  explicit WebSearchTool(const std::string &in_searchApiUrl,
+                         bool in_convertHtml2markdown)
+      : searchApiUrl(in_searchApiUrl),
+        convertHtml2markdown(in_convertHtml2markdown) {}
 
   std::string get_name() const override { return "web_search"; }
 
@@ -52,27 +59,48 @@ public:
     if (query.empty()) {
       co_return R"({"error":"Arg `query` is empty"})";
     }
-    // TODO: 更换api
     auto search_url =
-        fmt::format("https://www.baidu.com/s?wd={}",
+        fmt::format(fmt::runtime(searchApiUrl),
                     agentxx::util::HttpClient_c::urlEncode(query));
 
-    auto [resp, resp_err] =
-        co_await agentxx::util::HttpClient_c::fetchMarkdown(search_url);
-    if (resp.has_value()) {
-      auto &data = resp.value();
-      if (data.empty()) {
-        co_return R"({"error": "Empty search result."})";
+    std::optional<std::exception> out_resp_err;
+    if (convertHtml2markdown) {
+      auto [resp, resp_err] = co_await agentxx::util::HttpClient_c::getAsync(
+          search_url, std::chrono::seconds{15});
+      out_resp_err = resp_err;
+      if (resp.has_value()) {
+        auto &respVal = resp.value();
+        if (agentxx::util::HttpClient_c::respIsSucc(respVal)) {
+          auto &data = respVal.body;
+          if (data.empty()) {
+            co_return R"({"error": "Empty search result."})";
+          }
+          const auto maxLength = 8000;
+          if (data.size() > maxLength) {
+            data.resize(maxLength);
+          }
+          co_return data;
+        }
       }
-      const auto maxLength = 8000;
-      if (data.size() > maxLength) {
-        data.resize(maxLength);
+    } else {
+      auto [resp, resp_err] =
+          co_await agentxx::util::HttpClient_c::fetchMarkdown(search_url);
+      out_resp_err = resp_err;
+      if (resp.has_value()) {
+        auto &data = resp.value();
+        if (data.empty()) {
+          co_return R"({"error": "Empty search result."})";
+        }
+        const auto maxLength = 8000;
+        if (data.size() > maxLength) {
+          data.resize(maxLength);
+        }
+        co_return data;
       }
-      co_return data;
     }
     co_return fmt::format(
         R"({{"error":"web_search failed: {}"}})",
-        resp_err.value_or(std::runtime_error("[unknown]")).what());
+        out_resp_err.value_or(std::runtime_error("[unknown]")).what());
   }
 };
 

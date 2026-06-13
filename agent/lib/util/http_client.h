@@ -108,7 +108,7 @@ public:
                             std::optional<std::exception>>{convert.convert(),
                                                            std::nullopt};
       } else {
-        XX_LOGE("fetchMarkdown resp failed: {}", resp.value().status);
+        XX_LOGE("fetchMarkdown resp failed: StatuCode {}", resp.value().status);
       }
     }
     XX_LOGE("fetchMarkdown error: {}",
