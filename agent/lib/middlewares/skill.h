@@ -272,11 +272,12 @@ public:
 
       std::cout << "\n┏━━━━━━ Skill Load Start ━━━━━━┓" << std::endl;
       for (const auto &item : skillCache.skillData) {
-        fmt::println("┣━ ✅ Load skill success: `{}`({}): {}", item.second.name,
-                     item.second.dirpath, item.second.description);
+        fmt::println("┣━ ✅ Load skill metadata success: `{}`({}): {}",
+                     item.second.name, item.second.dirpath,
+                     item.second.description);
       }
       for (const auto &item : skillCache.loadErrors) {
-        fmt::println("┣━ ❌ Load skill failed: {} | {}", item.first,
+        fmt::println("┣━ ❌ Load skill metadata failed: {} | {}", item.first,
                      item.second);
       }
       std::cout << "┗━━━━━━ Skill Load  Done ━━━━━━┛\n" << std::endl;

@@ -8,13 +8,13 @@
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
     - ✅filesystem（已支持 同步 + asio协程异步 文件读写）
-        - ls
+        - ls (file/dir/recursive dir/limit)
         - read_text (full / offset + limit)
         - read_binary (full / byte offset + limit)
         - write (text/binary)
         - edit_text
         - glob
-        - grep (text/regex)
+        - grep (multi text/regex + multi filepath)
     - ✅exec_shell
         - execute_linux_command
         - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)

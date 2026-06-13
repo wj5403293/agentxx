@@ -86,7 +86,7 @@ public:
       co_return R"({"error":"Arg `path` is empty"})";
     }
     auto recursive = arguments.value("recursive", false);
-    auto limit = arguments.value("limit", 100);
+    auto limit = arguments.value<long long>("limit", 100);
 
     auto result = neograph::json::array();
     auto onAppendItem = [&](const std::filesystem::directory_entry &entity) {
@@ -109,7 +109,7 @@ public:
       for (const auto &entity :
            std::filesystem::recursive_directory_iterator(targetPath)) {
         onAppendItem(entity);
-        if (limit > 0 && result.size() >= limit) {
+        if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
           break;
         }
       }
@@ -117,7 +117,7 @@ public:
       for (const auto &entity :
            std::filesystem::directory_iterator(targetPath)) {
         onAppendItem(entity);
-        if (limit > 0 && result.size() >= limit) {
+        if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
           break;
         }
       }
@@ -954,11 +954,12 @@ public:
                 "properties",
                 {
                     {
-                        "pattern",
+                        "patterns",
                         {
-                            {"type", "string"},
+                            {"type", "array"},
+                            {"items", {{"type", "string"}}},
                             {"description",
-                             R"(Absolute dir or file path and glob pattern.
+                             R"(Absolute dir or file path and glob patterns.
 
 | Wildcard | Matches | Example
 |--- |--- |--- |
@@ -975,21 +976,21 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
                     },
                 },
             },
-            {"required", neograph::json::array({"pattern"})},
+            {"required", neograph::json::array({"patterns"})},
         },
     };
   }
 
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
-    auto searchPattern = arguments.value("pattern", std::string{});
-    if (searchPattern.empty()) {
-      co_return R"({"error":"Arg `pattern` is empty"})";
+    auto patterns = arguments.value("patterns", std::string{});
+    if (patterns.empty()) {
+      co_return R"({"error":"Arg `patterns` is empty"})";
     }
 
-    auto relist = glob::rglob(searchPattern);
+    auto relist = glob::rglob(patterns);
     if (relist.empty()) {
-      co_return R"({"error":"No match `pattern` found"})";
+      co_return R"({"error":"No match `patterns` found"})";
     }
 
     auto result = std::ostringstream{};
@@ -1011,7 +1012,7 @@ public:
     return {
         "filesystem_grep",
         R"(Searches file contents using regular expressions or text. 
-Supports search of text content by string or full regex syntax through the `text_pattern` parameter. Filters files by pattern with the `file_pattern` parameter.
+Supports search of text content by string or full regex syntax through the `text_patterns` parameter. Filters files by pattern with the `file_patterns` parameter.
 )",
         neograph::json{
             {"type", "object"},
@@ -1019,26 +1020,26 @@ Supports search of text content by string or full regex syntax through the `text
                 "properties",
                 {
                     {
-                        "text_pattern_is_regex",
+                        "text_patterns_is_regex",
                         {
                             {"type", "boolean"},
                             {"description",
-                             R"(The type of `text_pattern`.
-`true`:  `text_pattern` is regex syntax.
-`false`: `text_pattern` is crude text string.)"},
+                             R"(The type of `text_patterns`.
+`true`:  `text_patterns` are regex syntaxs.
+`false`: `text_patterns` are crude text strings.)"},
                         },
                     },
                     {
-                        "text_pattern",
+                        "text_patterns",
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
                             {"description",
-                             R"(String or regex syntax to search text content. The text match type depends on the `text_pattern_is_regex` parameter.)"},
+                             R"(String or regex syntax to search text content. The text match type depends on the `text_patterns_is_regex` parameter.)"},
                         },
                     },
                     {
-                        "files_pattern",
+                        "file_patterns",
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
@@ -1073,9 +1074,9 @@ Output format:
                 },
             },
             {"required", neograph::json::array({
-                             "text_pattern_is_regex",
-                             "text_pattern",
-                             "file_pattern",
+                             "text_patterns_is_regex",
+                             "text_patterns",
+                             "file_patterns",
                          })},
         },
     };
@@ -1141,16 +1142,17 @@ Output format:
 
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
-    auto text_pattern_is_regex = arguments.value("text_pattern_is_regex", true);
-    auto text_pattern =
-        arguments.value("text_pattern", std::vector<std::string>{});
-    if (text_pattern.empty()) {
-      co_return R"({"error":"Arg `text_pattern` is empty"})";
+    auto text_patterns_is_regex =
+        arguments.value("text_patterns_is_regex", true);
+    auto text_patterns =
+        arguments.value("text_patterns", std::vector<std::string>{});
+    if (text_patterns.empty()) {
+      co_return R"({"error":"Arg `text_patterns` is empty"})";
     }
-    auto files_pattern =
-        arguments.value("files_pattern", std::vector<std::string>{});
-    if (files_pattern.empty()) {
-      co_return R"({"error":"Arg `files_pattern` is empty"})";
+    auto file_patterns =
+        arguments.value("file_patterns", std::vector<std::string>{});
+    if (file_patterns.empty()) {
+      co_return R"({"error":"Arg `file_patterns` is empty"})";
     }
     auto output_mode =
         arguments.value("output_mode", std::string{"files_with_matches"});
@@ -1159,7 +1161,7 @@ Output format:
     }
 
     std::vector<std::filesystem::path> refilelist{};
-    auto relist = glob::rglob(files_pattern);
+    auto relist = glob::rglob(file_patterns);
     refilelist.insert(refilelist.end(), std::make_move_iterator(relist.begin()),
                       std::make_move_iterator(relist.end()));
     if (refilelist.empty()) {
@@ -1170,9 +1172,9 @@ Output format:
     auto resultStr = std::ostringstream{};
     auto resultJson = neograph::json::array();
 
-    if (text_pattern_is_regex) {
+    if (text_patterns_is_regex) {
       // 正则匹配
-      auto regex = agentxx::util::XXRegex{text_pattern};
+      auto regex = agentxx::util::XXRegex{text_patterns};
       for (const auto &item : refilelist) {
         auto filepath = item.generic_string();
         auto filetext = co_await readFileContent(filepath);
@@ -1210,7 +1212,7 @@ Output format:
       }
     } else {
       // 文本精确匹配
-      auto search = agentxx::util::AhoCorasick{text_pattern, true};
+      auto search = agentxx::util::AhoCorasick{text_patterns, true};
       for (const auto &item : refilelist) {
         auto filepath = item.generic_string();
         auto filetext = co_await readFileContent(filepath);
@@ -1232,7 +1234,7 @@ Output format:
               }
 
               matchsContent.push_back(neograph::json{
-                  {"content", text_pattern},
+                  {"content", text_patterns},
                   {"line", lineCount},
               });
               index = match.start;
@@ -1253,8 +1255,8 @@ Output format:
         co_return str;
       } else {
         throw std::runtime_error{
-            fmt::format("Found {} files match `file_pattern`, but no match "
-                        "`text_pattern` file found.",
+            fmt::format("Found {} files match `file_patterns`, but no match "
+                        "`text_patterns` file found.",
                         refilelist.size())};
       }
     } else {
@@ -1262,8 +1264,8 @@ Output format:
         co_return resultJson.dump();
       } else {
         throw std::runtime_error{
-            fmt::format("Found {} files match `file_pattern`, but no match "
-                        "`text_pattern` file found.",
+            fmt::format("Found {} files match `file_patterns`, but no match "
+                        "`text_patterns` file found.",
                         refilelist.size())};
       }
     }
