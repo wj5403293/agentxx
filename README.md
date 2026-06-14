@@ -46,8 +46,9 @@
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅压缩上下文`SummarizationMiddleware`
-    - 自动估算 tokens，达到阈值时自动压缩
-    - 裁剪历史消息中过时的文件读写消息
+    - 自动估算 tokens，达到阈值时自动启动压缩
+    - toolcall 各自实现压缩处理
+        - 裁剪历史消息中过时的文件读写、任务规划、变量读写消息
     - 将部分重要的长消息内容暂存到 `temp_kvstore`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
