@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tools/tool.h"
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -15,12 +16,10 @@
 namespace agentxx {
 namespace tools {
 
-class SkillTool : public neograph::AsyncTool {
+class SkillTool : public XXToolBase {
 protected:
 public:
-  explicit SkillTool() {}
-
-  std::string get_name() const override { return "skill_tool"; }
+  explicit SkillTool() : XXToolBase("skill_tool", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {

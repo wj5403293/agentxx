@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fmt/format.h"
+#include "tools/tool.h"
 #include "util/hyperscan.h"
 #include "util/log.h"
 #include "util/string_util.h"
@@ -21,11 +22,9 @@
 namespace agentxx {
 namespace tools {
 
-class StringHtml2MarkdownTool : public neograph::Tool {
+class StringHtml2MarkdownTool : public XXToolBase {
 public:
-  explicit StringHtml2MarkdownTool() {}
-
-  std::string get_name() const override { return "html_to_markdown"; }
+  explicit StringHtml2MarkdownTool() : XXToolBase("html_to_markdown", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -48,25 +47,24 @@ public:
     };
   }
 
-  std::string execute(const neograph::json &arguments) override {
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
     auto content = arguments.value("content", std::string{});
     if (content.empty()) {
-      return R"({"error":"Arg `content` is empty"})";
+      co_return R"({"error":"Arg `content` is empty"})";
     }
 
     auto options = html2md::Options{
         .splitLines = false,
     };
     auto convert = html2md::Converter{content, &options};
-    return convert.convert();
+    co_return convert.convert();
   }
 };
 
-class StringRegexpTool : public neograph::Tool {
+class StringRegexpTool : public XXToolBase {
 public:
-  explicit StringRegexpTool() {}
-
-  std::string get_name() const override { return "string_regexp"; }
+  explicit StringRegexpTool() : XXToolBase("string_regexp", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -125,18 +123,19 @@ public:
     };
   }
 
-  std::string execute(const neograph::json &arguments) override {
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
     auto content = arguments.value("content", std::string{});
     if (content.empty()) {
-      return R"({"error":"Arg `content` is empty"})";
+      co_return R"({"error":"Arg `content` is empty"})";
     }
     auto match_exps = arguments.value("exps", std::vector<std::string>{});
     if (match_exps.empty()) {
-      return R"({"error":"Arg `exps` is empty"})";
+      co_return R"({"error":"Arg `exps` is empty"})";
     }
     auto match_opt = arguments.value("opt", std::string{});
     if (match_opt.empty()) {
-      return R"({"error":"Arg `opt` is empty"})";
+      co_return R"({"error":"Arg `opt` is empty"})";
     }
 
     auto regex = agentxx::util::XXRegex{match_exps};
@@ -148,7 +147,7 @@ public:
           const auto &item = results[i];
           relist.push_back(content.substr(item.start, item.end - item.start));
         }
-        return neograph::json{
+        co_return neograph::json{
             {"tip", fmt::format("Match found {} items.", results.size())},
             {"result", relist},
         }
@@ -159,18 +158,18 @@ public:
       auto restr = regex.replace(
           content, arguments.value("replace_str", std::string{}), results);
       if (false == results.empty()) {
-        return restr;
+        co_return restr;
       }
     } else if (match_opt == std::string_view{"remove"}) {
       auto results = std::vector<agentxx::util::XXRegexMatchResult>{};
       auto restr = regex.remove(content, results);
       if (false == results.empty()) {
-        return restr;
+        co_return restr;
       }
     } else {
-      return R"({"error":"Arg `opt` is invalid"})";
+      co_return R"({"error":"Arg `opt` is invalid"})";
     }
-    return R"({"error":"No match found"})";
+    co_return R"({"error":"No match found"})";
   }
 };
 } // namespace tools

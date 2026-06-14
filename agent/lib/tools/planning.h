@@ -1,6 +1,7 @@
 #pragma once
 
 #include "middlewares/planning.h"
+#include "tools/tool.h"
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -29,7 +30,7 @@ namespace tools {
 //   - Todo items focus on immediate execution: what's happening now
 //   - Persisted in agent state per thread
 //   - Helps agent organize complex multi-step work
-class WritePlanningTool : public neograph::AsyncTool {
+class WritePlanningTool : public XXToolBase {
 protected:
   std::weak_ptr<agentxx::middleware::PlanningMiddlewareHandle> planningContext;
 
@@ -37,9 +38,8 @@ public:
   explicit WritePlanningTool(
       std::weak_ptr<agentxx::middleware::PlanningMiddlewareHandle>
           in_planningContext)
-      : planningContext(in_planningContext) {}
-
-  std::string get_name() const override { return "planning_write"; }
+      : XXToolBase("planning_write", false),
+        planningContext(in_planningContext) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -133,6 +133,25 @@ Item struct:
     };
   }
 
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle =
+            [](size_t index, std::map<std::string, size_t> &lastWriteIndex,
+               neograph::json &args, neograph::ToolCall &toolcall) {
+              const auto key = "planning_rw:";
+              if (lastWriteIndex.contains(key)) {
+                // 裁剪 result
+                toolcall.arguments =
+                    R"({"tip":"[Outdated Content Truncated]"})";
+              } else {
+                lastWriteIndex[key] = index;
+              }
+            },
+        .responseHandle = nullptr,
+    };
+  }
+
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
     auto thread_id = arguments.value("thread_id", std::string{});
@@ -162,5 +181,6 @@ Item struct:
     co_return "success";
   }
 };
+
 } // namespace tools
 } // namespace agentxx

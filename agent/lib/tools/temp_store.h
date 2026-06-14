@@ -1,6 +1,7 @@
 #pragma once
 
 #include "middlewares/middleware.h"
+#include "tools/tool.h"
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -18,7 +19,7 @@ namespace tools {
 
 /// 寄存信息，节省模型上下文
 /// TODO: 重启恢复
-class TempKVStoreTool : public neograph::Tool {
+class TempKVStoreTool : public XXToolBase {
 protected:
   std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
 
@@ -26,9 +27,41 @@ public:
   explicit TempKVStoreTool(
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : handleContext(in_handleContext) {}
+      : XXToolBase("temp_kvstore", false), handleContext(in_handleContext) {}
 
-  std::string get_name() const override { return "temp_kvstore"; }
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle =
+            [](size_t index, std::map<std::string, size_t> &lastWriteIndex,
+               neograph::json &args, neograph::ToolCall &toolcall) {
+              if (args.is_object() && args["id"].is_string()) {
+                auto argId = args["id"].get<std::string>();
+                const auto key = fmt::format("temp_kvstore:{}", argId);
+                if (lastWriteIndex.contains(key)) {
+                  // 裁剪 result
+                  args["text"] = "[Outdated Message Truncated]";
+                  toolcall.arguments = args.dump();
+                } else {
+                  lastWriteIndex[key] = index;
+                }
+              }
+            },
+        .responseHandle =
+            [](size_t index, std::map<std::string, size_t> &lastWriteIndex,
+               neograph::json &args, neograph::ChatMessage &msg) {
+              if (args.is_object() && args["id"].is_string()) {
+                auto argId = args["id"].get<std::string>();
+                const auto key = fmt::format("temp_kvstore:{}", argId);
+                if (lastWriteIndex.contains(key)) {
+                  msg.content = "[Outdated Content truncated]";
+                } else {
+                  lastWriteIndex[key] = index;
+                }
+              }
+            },
+    };
+  }
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -81,45 +114,46 @@ Insert text or get/set/delete text by unique id.
     };
   }
 
-  std::string execute(const neograph::json &arguments) override {
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
     auto thread_id = arguments.value("thread_id", std::string{});
     if (thread_id.empty()) {
-      return R"({"error":"Toolcall inner exec failed, need `thread_id`"})";
+      co_return R"({"error":"Toolcall inner exec failed, need `thread_id`"})";
     }
     size_t text_id = arguments.value<size_t>("id", 0);
     auto text = arguments.value("text", std::string{});
     auto text_opt = arguments.value("opt", std::string{});
     if (text_opt.empty()) {
-      return R"({"error":"Arg `opt` is empty"})";
+      co_return R"({"error":"Arg `opt` is empty"})";
     }
 
     auto handlePtr = handleContext.lock();
     if (text_opt == std::string_view{"insert"}) {
       auto reId = handlePtr->addTempStoreItemValue(thread_id, text);
-      return neograph::json{
+      co_return neograph::json{
           {"id", reId},
       }
           .dump();
     } else if (text_opt == std::string_view{"get"}) {
       if (text_id <= 0) {
-        return R"({"error":"Arg `id` is empty"})";
+        co_return R"({"error":"Arg `id` is empty"})";
       }
       auto result = handlePtr->getTempStoreItemValue(thread_id, text_id);
-      return result.value_or(R"({"error":"Not found"})");
+      co_return result.value_or(R"({"error":"Not found"})");
     } else if (text_opt == std::string_view{"set"}) {
       if (text_id <= 0) {
-        return R"({"error":"Arg `id` is empty"})";
+        co_return R"({"error":"Arg `id` is empty"})";
       }
       handlePtr->setTempStoreItemValue(thread_id, text_id, text);
-      return "success";
+      co_return "success";
     } else if (text_opt == std::string_view{"delete"}) {
       if (text_id <= 0) {
-        return R"({"error":"Arg `id` is empty"})";
+        co_return R"({"error":"Arg `id` is empty"})";
       }
       handlePtr->removeTempStoreItemValue(thread_id, text_id);
-      return "success";
+      co_return "success";
     } else {
-      return R"({"error":"Arg `opt` is invalid"})";
+      co_return R"({"error":"Arg `opt` is invalid"})";
     }
   }
 };

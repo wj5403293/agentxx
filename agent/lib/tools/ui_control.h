@@ -4,6 +4,7 @@
 #include <neograph/llm/schema_provider.h>
 #include <neograph/neograph.h>
 
+#include "tools/tool.h"
 #include "util/http_client.h"
 #include "util/log.h"
 #include <cstdlib>
@@ -17,11 +18,10 @@
 namespace agentxx {
 namespace tools {
 
-class UIControlKeyboardMouseTool : public neograph::AsyncTool {
+class UIControlKeyboardMouseTool : public XXToolBase {
 public:
-  explicit UIControlKeyboardMouseTool() {}
-
-  std::string get_name() const override { return "ui_control_keyboard_mouse"; }
+  explicit UIControlKeyboardMouseTool()
+      : XXToolBase("ui_control_keyboard_mouse", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

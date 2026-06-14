@@ -2,6 +2,7 @@
 
 #include "asio/io_context.hpp"
 #include "fmt/format.h"
+#include "tools/tool.h"
 #include "util/string_util.h"
 #include "util/util.h"
 #include <cstdlib>
@@ -15,11 +16,10 @@
 namespace agentxx {
 namespace tools {
 
-class ExecuteLinuxCommandTool : public neograph::AsyncTool {
+class ExecuteLinuxCommandTool : public XXToolBase {
 public:
-  explicit ExecuteLinuxCommandTool() {}
-
-  std::string get_name() const override { return "execute_linux_command"; }
+  explicit ExecuteLinuxCommandTool()
+      : XXToolBase("execute_linux_command", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -80,11 +80,10 @@ Current System is {}{}, please use linux shell/bash commands.
 
 /// windows cmd
 /// 支持 WSL
-class ExecuteWindowsCommandTool : public neograph::AsyncTool {
+class ExecuteWindowsCommandTool : public XXToolBase {
 public:
-  explicit ExecuteWindowsCommandTool() {}
-
-  std::string get_name() const override { return "execute_windows_command"; }
+  explicit ExecuteWindowsCommandTool()
+      : XXToolBase("execute_windows_command", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -171,11 +170,9 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
   }
 };
 
-class ExecutePythonTool : public neograph::AsyncTool {
+class ExecutePythonTool : public XXToolBase {
 public:
-  explicit ExecutePythonTool() {}
-
-  std::string get_name() const override { return "execute_python"; }
+  explicit ExecutePythonTool() : XXToolBase("execute_python", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -211,11 +208,9 @@ public:
   }
 };
 
-class ExecuteJavaScriptTool : public neograph::AsyncTool {
+class ExecuteJavaScriptTool : public XXToolBase {
 public:
-  explicit ExecuteJavaScriptTool() {}
-
-  std::string get_name() const override { return "execute_javascript"; }
+  explicit ExecuteJavaScriptTool() : XXToolBase("execute_javascript", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {

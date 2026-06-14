@@ -15,13 +15,19 @@
 #include <vector>
 
 namespace agentxx {
+namespace tools {
+class XXToolBase;
+class XXToolWarp;
+} // namespace tools
+
 namespace middleware {
 
-typedef std::function<asio::awaitable<void>(neograph::graph::NodeInput &in)>
-    onGraphNodeBeforeCallFunc;
-typedef std::function<asio::awaitable<void>(
-    const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>
-    onGraphNodeAfterCallFunc;
+using onGraphNodeBeforeCallFunc =
+    std::function<asio::awaitable<void>(neograph::graph::NodeInput &in)>;
+using onGraphNodeAfterCallFunc = std::function<asio::awaitable<void>(
+    const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>;
+
+class MiddlewareWarpHandleContext;
 
 class BaseMiddlewareState_c {
 public:
@@ -33,8 +39,6 @@ public:
 template <typename T>
 concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
                                   std::derived_from<T, BaseMiddlewareState_c>;
-
-class MiddlewareWarpHandleContext;
 
 /// 接口类型
 /// - 主要用于接收多种泛型参数, 见
@@ -52,7 +56,7 @@ public:
   /// 名称
   std::string name;
   /// 会被添加移动到 agent 中，完成后此处留空数组
-  std::vector<std::unique_ptr<neograph::Tool>> toolcalls{};
+  std::vector<std::unique_ptr<agentxx::tools::XXToolBase>> toolcalls{};
   /// 每个 [Middleware] 全局共享，按会话ID 取值 <thread_id, state>
   std::map<std::string, std::shared_ptr<BaseMiddlewareState_c>> states{};
   std::weak_ptr<MiddlewareWarpHandleContext> handleContext;
@@ -338,6 +342,18 @@ public:
     }
     return std::any_cast<T &>(itemGraphData[key]);
   }
+};
+
+class SummarizationToolHandle_c {
+public:
+  std::function<void(size_t index,
+                     std::map<std::string, size_t> &lastWriteIndex,
+                     neograph::json &, neograph::ToolCall &)>
+      requestHandle;
+  std::function<void(size_t index,
+                     std::map<std::string, size_t> &lastWriteIndex,
+                     neograph::json &, neograph::ChatMessage &)>
+      responseHandle;
 };
 
 } // namespace middleware

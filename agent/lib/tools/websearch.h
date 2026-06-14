@@ -1,16 +1,16 @@
 #pragma once
 
-#include <neograph/llm/rate_limited_provider.h>
-#include <neograph/llm/schema_provider.h>
-#include <neograph/neograph.h>
-
 #include "fmt/format.h"
+#include "tools/tool.h"
 #include "util/http_client.h"
 #include "util/log.h"
 #include <cstdlib>
 #include <format>
 #include <iostream>
 #include <memory>
+#include <neograph/llm/rate_limited_provider.h>
+#include <neograph/llm/schema_provider.h>
+#include <neograph/neograph.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -18,7 +18,7 @@
 namespace agentxx {
 namespace tools {
 
-class WebSearchTool : public neograph::AsyncTool {
+class WebSearchTool : public XXToolBase {
 protected:
   const std::string searchApiUrl;
   const bool convertHtml2markdown;
@@ -26,10 +26,8 @@ protected:
 public:
   explicit WebSearchTool(const std::string &in_searchApiUrl,
                          bool in_convertHtml2markdown)
-      : searchApiUrl(in_searchApiUrl),
+      : XXToolBase("web_search", true), searchApiUrl(in_searchApiUrl),
         convertHtml2markdown(in_convertHtml2markdown) {}
-
-  std::string get_name() const override { return "web_search"; }
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -104,11 +102,9 @@ public:
   }
 };
 
-class FetchUrlTool : public neograph::AsyncTool {
+class FetchUrlTool : public XXToolBase {
 public:
-  explicit FetchUrlTool() {}
-
-  std::string get_name() const override { return "fetch_url"; }
+  explicit FetchUrlTool() : XXToolBase("fetch_url", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -169,11 +165,9 @@ public:
   }
 };
 
-class FetchUrlMarkdownTool : public neograph::AsyncTool {
+class FetchUrlMarkdownTool : public XXToolBase {
 public:
-  explicit FetchUrlMarkdownTool() {}
-
-  std::string get_name() const override { return "fetch_url_markdown"; }
+  explicit FetchUrlMarkdownTool() : XXToolBase("fetch_url_markdown", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

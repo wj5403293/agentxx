@@ -112,8 +112,7 @@ public:
       {
         auto summarizationMiddleware = std::make_shared<
             agentxx::middleware::SummarizationMiddlewareHandle>(
-            subagentManagerTool.get(), "subagent_task", middlewareHandleContext,
-            256 * 1024 * 1024);
+            subagentManagerTool.get(), middlewareHandleContext, 256 * 1024);
         middlewareHandleContext->handles.push_back(summarizationMiddleware);
       }
 
@@ -148,7 +147,7 @@ public:
     }
 
     /// Toolcall
-    std::vector<std::unique_ptr<neograph::Tool>> tools{};
+    std::vector<std::unique_ptr<agentxx::tools::XXToolBase>> tools{};
     {
       /// middleware tools
       for (auto &item : middlewareHandleContext->handles) {
@@ -166,8 +165,10 @@ public:
         if (mcpClient.initialize(config->agentName)) {
           auto mcpTools = mcpClient.get_tools();
           XX_LOGD("append mcp tool size: {}", mcpTools.size());
-          tools.insert(tools.end(), std::make_move_iterator(mcpTools.begin()),
-                       std::make_move_iterator(mcpTools.end()));
+          for (auto &tool : mcpTools) {
+            tools.push_back(std::make_unique<agentxx::tools::XXToolWarp>(
+                true, std::move(tool)));
+          }
         }
       }
     }
@@ -225,7 +226,7 @@ public:
         //       neograph::llm::OpenAIProvider::create_shared(provideConfig);
 
         //   // 收集延迟加载的 tool 信息
-        //   std::vector<agentxx::tools::ToolSkillSearchTool::DelayToolInfo>
+        //   std::vector<agentxx::tools::ToolSkillSearchSubAgentTask::DelayToolInfo>
         //       delayToolInfos;
         //   for (auto &t : tools) {
         //     auto *xxTool = dynamic_cast<agentxx::tools::XXToolBase
@@ -251,7 +252,7 @@ public:
 
         //   subagentManagerTool->subAgentList.insert(std::make_pair(
         //       "tool_skill_search",
-        //       std::make_shared<agentxx::tools::ToolSkillSearchTool>(
+        //       std::make_shared<agentxx::tools::ToolSkillSearchSubAgentTask>(
         //           nodeContext, delayToolInfos, config->skillDirPaths,
         //           middlewareHandleContext)));
         // }
@@ -315,8 +316,6 @@ public:
             "channels",
             {
                 {"messages", {{"type", "list"}, {"reducer", "append"}}},
-                agentxx::middleware::SummarizationMiddlewareHandle::
-                    defChannelDefine(),
             },
         },
         {
@@ -372,7 +371,13 @@ public:
 
     engine = neograph::graph::GraphEngine::compile(graphDefinition, nodeContext,
                                                    store);
-    engine->own_tools(std::move(tools));
+    {
+      auto crudeTools = std::vector<std::unique_ptr<neograph::Tool>>{};
+      for (auto &tool : tools) {
+        crudeTools.push_back(std::move(tool));
+      }
+      engine->own_tools(std::move(crudeTools));
+    }
   }
 
   asio::awaitable<void> runCliAsync() {

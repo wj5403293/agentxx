@@ -108,6 +108,8 @@
             - 从支持 c++/python 解析，扩展到支持 js/ts/dart/rust/go/java/kotlin/bash/markdown 等 20+ 种编程语言和文件格式结构
 
 ## 编译 
+- C++ Standard: Requires C++23 or higher.
+
 - 编译器推荐
     - Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
 

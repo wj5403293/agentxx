@@ -2,6 +2,7 @@
 
 #include "fmt/format.h"
 #include "neograph/neograph.h"
+#include "tools/tool.h"
 #include <format>
 #include <iostream>
 #include <map>
@@ -13,11 +14,10 @@ namespace agentxx {
 namespace tools {
 
 /// 获取系统日期和时间
-class GetCurrentDateTimeTool : public neograph::Tool {
+class GetCurrentDateTimeTool : public XXToolBase {
 public:
-  explicit GetCurrentDateTimeTool() {}
-
-  std::string get_name() const override { return "get_current_datetime"; }
+  explicit GetCurrentDateTimeTool()
+      : XXToolBase("get_current_datetime", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -27,11 +27,12 @@ public:
     };
   }
 
-  std::string execute(const neograph::json &arguments) override {
+  asio::awaitable<std::string>
+  execute_async(const neograph::json &arguments) override {
     auto now = std::chrono::system_clock::now();
     std::chrono::zoned_time local_time{std::chrono::current_zone(), now};
 
-    return fmt::format(
+    co_return fmt::format(
         R"(Timestamp: {} ms
 Local Time: {}
 UTC Time: {})",

@@ -8,6 +8,8 @@
 #include "asio/stream_file.hpp"
 #include "fmt/format.h"
 #include "glob/glob.hpp"
+#include "tools/tool.h"
+#include "util/aho_corasick.h"
 #include "util/hyperscan.h"
 #include "util/log.h"
 #include "util/string_util.h"
@@ -31,12 +33,42 @@
 namespace agentxx {
 namespace tools {
 
-/// ls
-class FileSystemListFileTool : public neograph::AsyncTool {
-public:
-  explicit FileSystemListFileTool() {}
+inline void _defFileRWSummarizationReqHandle(
+    size_t index, std::map<std::string, size_t> &lastWriteIndex,
+    neograph::json &args, neograph::ToolCall &toolcall) {
+  // 移除重复的 读写相同文件 toolcall
+  if (args.is_object() && args["path"].is_string()) {
+    auto argPath = args["path"].get<std::string>();
+    auto key = fmt::format("file_rw:{}", argPath);
+    if (lastWriteIndex.contains(key)) {
+      // 裁剪 result
+      toolcall.arguments = R"({"tip":"[Outdated Message Truncated]"})";
+    } else {
+      lastWriteIndex[key] = index;
+    }
+  }
+};
 
-  std::string get_name() const override { return "filesystem_list_file"; }
+inline void _defFileRWSummarizationRespHandle(
+    size_t index, std::map<std::string, size_t> &lastWriteIndex,
+    neograph::json &args, neograph::ChatMessage &msg) {
+  // 移除重复的 读写相同文件 toolcall
+  if (args.is_object() && args["path"].is_string()) {
+    auto argPath = args["path"].get<std::string>();
+    auto key = fmt::format("file_rw:{}", argPath);
+    if (lastWriteIndex.contains(key)) {
+      msg.content = "[Outdated Content truncated]";
+    } else {
+      lastWriteIndex[key] = index;
+    }
+  }
+};
+
+/// ls
+class FileSystemListFileTool : public XXToolBase {
+public:
+  explicit FileSystemListFileTool()
+      : XXToolBase("filesystem_list_file", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -76,6 +108,14 @@ public:
             },
             {"required", neograph::json::array({"path"})},
         },
+    };
+  }
+
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle = nullptr,
+        .responseHandle = _defFileRWSummarizationRespHandle,
     };
   }
 
@@ -131,12 +171,11 @@ public:
 };
 
 /// read
-class FilesystemReadTextFileTool : public neograph::AsyncTool {
+class FilesystemReadTextFileTool : public XXToolBase {
 protected:
 public:
-  explicit FilesystemReadTextFileTool() {}
-
-  std::string get_name() const override { return "filesystem_read_text_file"; }
+  explicit FilesystemReadTextFileTool()
+      : XXToolBase("filesystem_read_text_file", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -176,6 +215,14 @@ public:
             },
             {"required", neograph::json::array({"path"})},
         },
+    };
+  }
+
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle = nullptr,
+        .responseHandle = _defFileRWSummarizationRespHandle,
     };
   }
 
@@ -321,13 +368,10 @@ public:
 };
 
 /// read
-class FilesystemReadBinaryFileTool : public neograph::AsyncTool {
+class FilesystemReadBinaryFileTool : public XXToolBase {
 public:
-  explicit FilesystemReadBinaryFileTool() {}
-
-  std::string get_name() const override {
-    return "filesystem_read_binary_file";
-  }
+  explicit FilesystemReadBinaryFileTool()
+      : XXToolBase("filesystem_read_binary_file", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -367,6 +411,14 @@ public:
             },
             {"required", neograph::json::array({"path"})},
         },
+    };
+  }
+
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle = nullptr,
+        .responseHandle = _defFileRWSummarizationRespHandle,
     };
   }
 
@@ -554,11 +606,10 @@ public:
 };
 
 /// write
-class FilesystemWriteFileTool : public neograph::AsyncTool {
+class FilesystemWriteFileTool : public XXToolBase {
 public:
-  explicit FilesystemWriteFileTool() {}
-
-  std::string get_name() const override { return "filesystem_write_file"; }
+  explicit FilesystemWriteFileTool()
+      : XXToolBase("filesystem_write_file", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -607,6 +658,14 @@ public:
             },
             {"required", neograph::json::array({"path"})},
         },
+    };
+  }
+
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle = _defFileRWSummarizationReqHandle,
+        .responseHandle = nullptr,
     };
   }
 
@@ -736,11 +795,10 @@ public:
 };
 
 /// edit file
-class FilesystemEditTextFileTool : public neograph::AsyncTool {
+class FilesystemEditTextFileTool : public XXToolBase {
 public:
-  explicit FilesystemEditTextFileTool() {}
-
-  std::string get_name() const override { return "filesystem_edit_text_file"; }
+  explicit FilesystemEditTextFileTool()
+      : XXToolBase("filesystem_edit_text_file", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -787,6 +845,14 @@ public:
             },
             {"required", neograph::json::array({"path", "old_str", "new_str"})},
         },
+    };
+  }
+
+  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  createSummarizationToolHandle() const override {
+    return agentxx::middleware::SummarizationToolHandle_c{
+        .requestHandle = _defFileRWSummarizationReqHandle,
+        .responseHandle = nullptr,
     };
   }
 
@@ -943,11 +1009,9 @@ public:
   }
 };
 
-class FilesystemGlobTool : public neograph::AsyncTool {
+class FilesystemGlobTool : public XXToolBase {
 public:
-  explicit FilesystemGlobTool() {}
-
-  std::string get_name() const override { return "filesystem_glob"; }
+  explicit FilesystemGlobTool() : XXToolBase("filesystem_glob", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -959,7 +1023,7 @@ public:
                 "properties",
                 {
                     {
-                        "patterns",
+                        "file_patterns",
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
@@ -981,21 +1045,22 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
                     },
                 },
             },
-            {"required", neograph::json::array({"patterns"})},
+            {"required", neograph::json::array({"file_patterns"})},
         },
     };
   }
 
   asio::awaitable<std::string>
   execute_async(const neograph::json &arguments) override {
-    auto patterns = arguments.value("patterns", std::vector<std::string>{});
+    auto patterns =
+        arguments.value("file_patterns", std::vector<std::string>{});
     if (patterns.empty()) {
-      co_return R"({"error":"Arg `patterns` is empty"})";
+      co_return R"({"error":"Arg `file_patterns` is empty"})";
     }
 
     auto relist = glob::rglob(patterns);
     if (relist.empty()) {
-      co_return R"({"error":"No match `patterns` found"})";
+      co_return R"({"error":"No match `file_patterns` found"})";
     }
 
     auto result = std::ostringstream{};
@@ -1007,11 +1072,9 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
   }
 };
 
-class FilesystemGrepTool : public neograph::AsyncTool {
+class FilesystemGrepTool : public XXToolBase {
 public:
-  explicit FilesystemGrepTool() {}
-
-  std::string get_name() const override { return "filesystem_grep"; }
+  explicit FilesystemGrepTool() : XXToolBase("filesystem_grep", false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -1170,7 +1233,7 @@ Output format:
     refilelist.insert(refilelist.end(), std::make_move_iterator(relist.begin()),
                       std::make_move_iterator(relist.end()));
     if (refilelist.empty()) {
-      throw std::runtime_error{"No match `files_pattern` file found"};
+      throw std::runtime_error{"No match `file_patterns` file found"};
     }
 
     bool isContainsMode = ("content" != output_mode);
@@ -1217,7 +1280,7 @@ Output format:
       }
     } else {
       // 文本精确匹配
-      auto search = agentxx::util::AhoCorasick{text_patterns, true};
+      auto search = agentxx::util::AhoCorasick<char>{text_patterns, true};
       for (const auto &item : refilelist) {
         auto filepath = item.generic_string();
         auto filetext = co_await readFileContent(filepath);
@@ -1232,7 +1295,7 @@ Output format:
 
             for (const auto &match : matchs) {
               // 计算到 match 时的行数
-              for (int i = (int)index; i < match.start; ++i) {
+              for (size_t i = index; i < match.start; ++i) {
                 if (filetext[i] == '\n') {
                   ++lineCount;
                 }

@@ -25,7 +25,7 @@ namespace tools {
 /// 只需要在主模型的上下文中保留 toolname 即可
 /// - 子模型搜索可用的 tool和skill 时，可以预先加载可能需要的 skill
 /// 内容，然后对比后决定具体应当加载的 tool、skill 文件
-class ToolSkillSearchTool : public ::agentxx::tools::SubAgentTaskBase {
+class ToolSkillSearchSubAgentTask : public ::agentxx::tools::SubAgentTaskBase {
 protected:
   inline static constexpr auto defSystemPromptTemplate = std::string_view{R"(
 You are an assistant that, based on user requirements, tries to find the appropriate tools and skills to load. 
@@ -68,7 +68,7 @@ Remember: Output ONLY valid JSON, nothing else before or after.
       std::string_view{"toolSkillSearch_loadedSkills"};
 
 public:
-  explicit ToolSkillSearchTool(
+  explicit ToolSkillSearchSubAgentTask(
       const neograph::graph::NodeContext &in_context,
       const std::vector<DelayToolInfo> &in_delayToolInfos,
       const std::vector<std::string> &in_skillDirPaths,

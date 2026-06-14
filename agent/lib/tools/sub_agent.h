@@ -6,6 +6,7 @@
 #include "nodes/modelcall.h"
 #include "nodes/toolcall.h"
 #include "nodes/warp_handle.h"
+#include "tools/tool.h"
 #include <ctime>
 #include <format>
 #include <iostream>
@@ -126,14 +127,12 @@ public:
   }
 };
 
-class SubAgentManagerTool : public neograph::AsyncTool {
-  const std::string nodeName;
-
+class SubAgentManagerTool : public XXToolBase {
 public:
   std::map<std::string, std::shared_ptr<SubAgentTaskBase>> subAgentList{};
 
   explicit SubAgentManagerTool(const std::string &in_nodeName)
-      : nodeName(in_nodeName) {}
+      : XXToolBase(in_nodeName, false) {}
 
   std::string get_name() const override { return "subagent_switch"; }
 
