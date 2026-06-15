@@ -7,7 +7,7 @@
 ### 基础模块
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
-    - ✅filesystem（已支持 同步 + asio协程异步 文件读写）
+    - ✅filesystem (已支持 同步 + asio协程异步 文件读写)
         - ls (file/dir/recursive dir/limit)
         - read_text (full / offset + limit)
         - read_binary (full / byte offset + limit)
@@ -25,12 +25,12 @@
         - fetch_url_md (html to markdown)
         - fetch_url (raw resp body)
     - ✅tree-messages
-        - temp_kvstore（会话独立，提供 K-V Store允许模型存取变量）
+        - temp_store (会话独立，提供 Store 允许模型存取变量)
         - 消息分支，支持修改历史消息/模型重新生成消息
     - ✅sub-agent
         - 一轮 Toolcall 支持并发启动多个 Subagent
         - subagent_task (隔离上下文)
-        - ⬜skill_search + tool_search (延迟加载 mcp tool)
+        - ⬜tool_skill_search (延迟加载 tool/skill)
         - ⬜subagent_audio_generate
         - ⬜subagent_image_generate
         - ⬜subagent_video_generate
@@ -55,7 +55,7 @@
 - ✅Skill支持`SkillMiddlewareHandle`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
     - ⬜动态加载 load/offload 
-- ❌MCP支持（Neograph已实现，但暂时使用有问题）
+- ❌MCP支持 (Neograph已实现，但暂时使用有问题)
     - MCP client 
     - Mcp Server
         - CodeGraph

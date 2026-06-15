@@ -126,7 +126,7 @@ public:
       oss << fmt::format("[{}]: ", m.role) << m.content << std::endl;
       if (!m.tool_calls.empty()) {
         for (const auto &tc : m.tool_calls) {
-          oss << fmt::format("[toolcall:{}] {}", tc.name, tc.arguments)
+          oss << fmt::format("  - [toolcall:{}] {}", tc.name, tc.arguments)
               << std::endl;
         }
       }
@@ -173,11 +173,12 @@ Output ONLY the summary text, no meta-commentary.
       return;
     }
     auto id = ctx->addTempStoreItemValue(thread_id, msg.content);
+    msg.summaryContent = msg.content;
     msg.content =
-        fmt::format("[content offloaded to `temp_kvstore`, id={}]", id);
+        fmt::format("[Content offloaded to `temp_kvstore`, id={}]", id);
   }
 
-  void deduplicateFileOperations(std::vector<neograph::ChatMessage> &messages) {
+  void doSummarizeToolcall(std::vector<neograph::ChatMessage> &messages) {
     auto handleContextPtr = handleContext.lock();
     std::map<std::string, size_t> lastWriteIndex{};
     for (size_t i = messages.size(); i > 0; --i) {
@@ -211,19 +212,6 @@ Output ONLY the summary text, no meta-commentary.
           }
 
           itemHandleIt->second.responseHandle(i, lastWriteIndex, args, msg);
-          // 移除重复的 修改/写入文件 toolcall
-          // if (args.is_object() && args["path"].is_string()) {
-          //   auto argPath = args["path"].get<std::string>();
-          //   if (lastWriteIndex.contains(argPath)) {
-          //     // 裁剪 result
-          //     msg.content =
-          //         fmt::format("[Result for `{}` superseded by later read, "
-          //                     "content truncated]",
-          //                     argPath);
-          //   } else {
-          //     lastWriteIndex[argPath] = i;
-          //   }
-          // }
         }
       } else {
         // assistant
@@ -233,21 +221,6 @@ Output ONLY the summary text, no meta-commentary.
               nullptr != itemHandleIt->second.requestHandle) {
             auto args = neograph::json::parse(tc.arguments);
             itemHandleIt->second.requestHandle(i, lastWriteIndex, args, tc);
-            // 移除重复的 修改/写入文件 toolcall
-            // auto args = neograph::json::parse(tc.arguments);
-            // if (args.is_object() && args["path"].is_string()) {
-            //   auto argPath = args["path"].get<std::string>();
-            //   if (lastWriteIndex.contains(argPath)) {
-            //     // 裁剪 result
-            //     tc.arguments =
-            //         fmt::format("[Result for `{}` superseded by later write,
-            //         "
-            //                     "content truncated]",
-            //                     argPath);
-            //   } else {
-            //     lastWriteIndex[argPath] = i;
-            //   }
-            // }
           }
         }
       }
@@ -276,7 +249,21 @@ Output ONLY the summary text, no meta-commentary.
     if (nullptr == handleCtx) {
       co_return;
     }
-    auto &thread_id = in.ctx.thread_id;
+    const auto &thread_id = in.ctx.thread_id;
+    neograph::json newMsgsJson;
+
+    if (count >= modelSupportMaxToken * 0.65) {
+      doSummarizeToolcall(messages);
+      {
+        auto handleCtxPtr = handleContext.lock();
+        if (nullptr != handleCtxPtr) {
+          for (auto &msg : messages) {
+            offloadLongContentToTempStore(msg, handleCtxPtr, thread_id);
+          }
+        }
+      }
+      neograph::to_json(newMsgsJson, messages);
+    }
 
     if (count >= modelSupportMaxToken * 0.9) {
       const size_t systemCount =
@@ -323,39 +310,26 @@ Output ONLY the summary text, no meta-commentary.
             });
             newMessages.push_back(neograph::ChatMessage{
                 .role = "assistant",
-                .content = "[Previous conversation summary]: " + summary,
+                .content = "[Previous conversation summary]: \n" + summary,
             });
           } else {
             // system | oldMessages | recentMessages
-            for (auto &m : oldMessages) {
-              offloadLongContentToTempStore(m, handleCtx, thread_id);
-            }
-            newMessages.insert(newMessages.end(), oldMessages.begin(),
-                               oldMessages.end());
+            newMessages.insert(newMessages.end(),
+                               std::move_iterator(oldMessages.begin()),
+                               std::move_iterator(oldMessages.end()));
           }
 
           // 添加最近消息
-          newMessages.insert(newMessages.end(), recentMessages.begin(),
-                             recentMessages.end());
+          newMessages.insert(newMessages.end(),
+                             std::move_iterator(recentMessages.begin()),
+                             std::move_iterator(recentMessages.end()));
 
-          neograph::json newMsgsJson;
           neograph::to_json(newMsgsJson, newMessages);
-          in.state.overwrite("messages", newMsgsJson);
         }
       }
-    } else if (count >= modelSupportMaxToken * 0.7) {
-      deduplicateFileOperations(messages);
-      {
-        auto handleCtxPtr = handleContext.lock();
-        if (nullptr != handleCtxPtr) {
-          for (auto &msg : messages) {
-            offloadLongContentToTempStore(msg, handleCtxPtr, thread_id);
-          }
-        }
-      }
-      neograph::json msgsJson;
-      neograph::to_json(msgsJson, messages);
-      in.state.overwrite("messages", msgsJson);
+    }
+    if (false == newMsgsJson.empty()) {
+      in.state.overwrite("messages", newMsgsJson);
     }
     co_return;
   }

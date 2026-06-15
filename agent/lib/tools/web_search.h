@@ -96,19 +96,17 @@ public:
         co_return data;
       }
     }
-    co_return fmt::format(
-        R"({{"error":"web_search failed: {}"}})",
-        out_resp_err.value_or(std::runtime_error("[unknown]")).what());
+    throw out_resp_err.value_or(std::runtime_error("[unknown]"));
   }
 };
 
-class FetchUrlTool : public XXToolBase {
+class WebFetchUrlTool : public XXToolBase {
 public:
-  explicit FetchUrlTool() : XXToolBase("fetch_url", true) {}
+  explicit WebFetchUrlTool() : XXToolBase("web_fetch_url", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
-        "fetch_url",
+        "web_fetch_url",
         "(Http GET) 发送GET请求，返回响应体.",
         neograph::json{
             {"type", "object"},
@@ -148,7 +146,7 @@ public:
     if (resp.has_value()) {
       if (false == agentxx::util::HttpClient_c::respIsSucc(resp.value())) {
         co_return fmt::format(
-            R"({{"error":"fetch_url failed, status {}, error: {}"}})",
+            R"({{"error":"web_fetch_url failed, status {}, error: {}"}})",
             resp.value().status,
             resp_err.value_or(std::runtime_error("[none]")).what());
       }
@@ -159,29 +157,20 @@ public:
       }
       co_return data;
     }
-    co_return fmt::format(
-        R"({{"error":"fetch_url failed: {}"}})",
-        resp_err.value_or(std::runtime_error("[unknown]")).what());
+    throw resp_err.value_or(std::runtime_error("[unknown]"));
   }
 };
 
-class FetchUrlMarkdownTool : public XXToolBase {
+class WebFetchUrlMarkdownTool : public XXToolBase {
 public:
-  explicit FetchUrlMarkdownTool() : XXToolBase("fetch_url_markdown", true) {}
+  explicit WebFetchUrlMarkdownTool()
+      : XXToolBase("web_fetch_url_markdown", true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
-        "fetch_url_markdown",
+        "web_fetch_url_markdown",
         R"((Http GET) 拉取一个网页,返回其Markdown格式的页面内容. 
 常用于在 web_search 之后获取具体页面内容.
-如果需要获取MD中的相对路径链接网页,应当结合本次传入的`url`. 例如:
-- 网页`http://example.com/help/`内:
-    - 包含相对路径`model/delete/`(非/开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/delete/`
-    - 包含相对路径`./model/create/`(以.开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/create/`
-    - 包含相对路径`../model/create/`(以..开头为相对路径，上一级目录),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/model/create/`
-    - 包含绝对路径`/model/view/`(以/开头为绝对路径),则替换网页路径得到`http://example.com/model/view/`
-- 网页`http://example.com/help/what.html`内:
-    - 包含相对路径`model/delete/`(非/开头为相对路径),则移除末尾文件名，顺着当前网页末尾拼接，得到的完整链接为`http://example.com/help/model/delete/`
 )",
         neograph::json{
             {"type", "object"},
@@ -191,7 +180,16 @@ public:
                     "url",
                     {
                         {"type", "string"},
-                        {"description", "Absolute http/https URL."},
+                        {"description", R"(Absolute http/https URL.
+如果需要获取MD中的相对路径链接网页,应当结合本次传入的`url`. 例如:
+- 网页`http://example.com/help/`内:
+    - 包含相对路径`model/delete/`(非/开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/delete/`
+    - 包含相对路径`./model/create/`(以.开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/create/`
+    - 包含相对路径`../model/create/`(以..开头为相对路径，上一级目录),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/model/create/`
+    - 包含绝对路径`/model/view/`(以/开头为绝对路径),则替换网页路径得到`http://example.com/model/view/`
+- 网页`http://example.com/help/what.html`内:
+    - 包含相对路径`model/delete/`(非/开头为相对路径),则移除末尾文件名，顺着当前网页末尾拼接，得到的完整链接为`http://example.com/help/model/delete/`
+)"},
                     },
                 }},
             },
@@ -220,9 +218,7 @@ public:
       }
       co_return data;
     }
-    co_return fmt::format(
-        R"({{"error":"fetch_url_markdown failed: {}"}})",
-        resp_err.value_or(std::runtime_error("[unknown]")).what());
+    throw resp_err.value_or(std::runtime_error("[unknown]"));
   }
 };
 } // namespace tools

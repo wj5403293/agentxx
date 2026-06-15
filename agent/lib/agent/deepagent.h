@@ -22,7 +22,7 @@
 #include "tools/sub_agent.h"
 #include "tools/temp_store.h"
 #include "tools/tool_skill_search.h"
-#include "tools/websearch.h"
+#include "tools/web_search.h"
 #include "util/log.h"
 #include <format>
 #include <iostream>
@@ -196,8 +196,9 @@ public:
         tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>(
             config->websearchApiUrl, config->websearchConvertHtml2markdown));
       }
-      tools.push_back(std::make_unique<agentxx::tools::FetchUrlTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FetchUrlMarkdownTool>());
+      tools.push_back(std::make_unique<agentxx::tools::WebFetchUrlTool>());
+      tools.push_back(
+          std::make_unique<agentxx::tools::WebFetchUrlMarkdownTool>());
 
       tools.push_back(
           std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
