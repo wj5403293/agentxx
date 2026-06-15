@@ -8,6 +8,7 @@
 
 using namespace std;
 
+/// 运行可执行 ../script/client_run.sh
 int main(int argn, char **argv) {
 #if IS_LINUX_D
   agentxx::util::signalError(argv[0]);

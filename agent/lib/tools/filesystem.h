@@ -16,6 +16,7 @@
 #include <asio/as_tuple.hpp>
 #include <asio/redirect_error.hpp>
 #include <asio/strand.hpp>
+#include <asio/use_awaitable.hpp>
 #include <asio/write.hpp>
 #include <cstdlib>
 #include <filesystem>
@@ -469,7 +470,7 @@ public:
 
           std::string result;
           auto bytesReadLen = co_await asio::async_read_at(
-              stream, byte_offset, asio::buffer(result, bytesRead),
+              stream, offset, asio::buffer(result, bytesRead),
               asio::redirect_error(asio::use_awaitable, errCode));
           if (errCode && errCode != asio::error::eof) {
             throw asio::system_error{errCode};
