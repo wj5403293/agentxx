@@ -127,7 +127,7 @@ public:
       co_return R"({"error":"Arg `path` is empty"})";
     }
     auto recursive = arguments.value("recursive", false);
-    auto limit = arguments.value<long long>("limit", 100);
+    auto limit = arguments.value<int64_t>("limit", 100);
 
     auto result = neograph::json::array();
     auto onAppendItem = [&](const std::filesystem::directory_entry &entity) {
@@ -151,7 +151,7 @@ public:
         for (const auto &entity :
              std::filesystem::recursive_directory_iterator(targetPath)) {
           onAppendItem(entity);
-          if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
+          if (limit > 0 && static_cast<int64_t>(result.size()) >= limit) {
             break;
           }
         }
@@ -159,7 +159,7 @@ public:
         for (const auto &entity :
              std::filesystem::directory_iterator(targetPath)) {
           onAppendItem(entity);
-          if (limit > 0 && static_cast<long long>(result.size()) >= limit) {
+          if (limit > 0 && static_cast<int64_t>(result.size()) >= limit) {
             break;
           }
         }
@@ -233,8 +233,8 @@ public:
     if (filepath.empty()) {
       co_return R"({"error":"Arg `path` is empty"})";
     }
-    auto text_line_offset = arguments.value<long long>("line_offset", -1);
-    auto text_line_limit = arguments.value<long long>("line_limit", -1);
+    auto text_line_offset = arguments.value<int64_t>("line_offset", -1);
+    auto text_line_limit = arguments.value<int64_t>("line_limit", -1);
 
 #if defined(ASIO_HAS_FILE)
     {
@@ -456,7 +456,7 @@ public:
 
           auto fileSize = stream.size();
           auto bytesAvailable =
-              std::max((long long)fileSize - (long long)offset, (long long)0);
+              std::max((int64_t)fileSize - (int64_t)offset, (int64_t)0);
           auto bytesRead =
               std::min(static_cast<std::streamsize>(limit),
                        static_cast<std::streamsize>(bytesAvailable));
@@ -552,7 +552,7 @@ public:
           size_t fileSize =
               static_cast<size_t>(std::filesystem::file_size(filepath));
           auto bytesAvailable =
-              std::max((long long)fileSize - (long long)offset, (long long)0);
+              std::max((int64_t)fileSize - (int64_t)offset, (int64_t)0);
           auto bytesRead =
               std::min(static_cast<std::streamsize>(limit),
                        static_cast<std::streamsize>(bytesAvailable));

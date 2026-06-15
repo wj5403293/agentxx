@@ -36,7 +36,7 @@ public:
         R"(Timestamp: {} ms
 Local Time: {}
 UTC Time: {})",
-        static_cast<long long>(now.time_since_epoch().count() / 1000 / 1000),
+        now.time_since_epoch().count() / 1000 / 1000,
         std::format("{:%Y-%m-%d} {:%H:%M:%S}", local_time, local_time),
         std::format("{:%Y-%m-%d} {:%H:%M:%S}", now, now));
   }

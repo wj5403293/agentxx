@@ -14,9 +14,7 @@
 
 using namespace agentxx;
 
-FFI_PLUGIN_EXPORT void *agentxx_malloc(unsigned long long size) {
-  return malloc(size);
-}
+FFI_PLUGIN_EXPORT void *agentxx_malloc(size_t size) { return malloc(size); }
 
 FFI_PLUGIN_EXPORT void agentxx_free(const void *ptr) {
   XX_LOGD("agentxx_free : {}", ptr);
