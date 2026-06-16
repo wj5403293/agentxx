@@ -149,10 +149,10 @@ include_directories(${Boost_ROOT}/include/)
 # iconv
 set(LIBICONV_VERSION 1.18)
 set(LIBICONV_URL "https://ftp.gnu.org/gnu/libiconv/libiconv-${LIBICONV_VERSION}.tar.gz")
-set(LIBICONV_PREFIX ${CMAKE_BINARY_DIR}/libiconv-src)
-set(LIBICONV_SOURCE_DIR ${LIBICONV_PREFIX}/src/iconv_repo)
-set(LIBICONV_BINARY_DIR ${CMAKE_BINARY_DIR}/libiconv-build)
-set(LIBICONV_INSTALL_DIR ${CMAKE_BINARY_DIR}/libiconv-install)
+set(LIBICONV_PREFIX "${CMAKE_BINARY_DIR}/libiconv-src")
+set(LIBICONV_SOURCE_DIR "${LIBICONV_PREFIX}/src/iconv_repo")
+set(LIBICONV_BINARY_DIR "${CMAKE_BINARY_DIR}/libiconv-build")
+set(LIBICONV_INSTALL_DIR "${CMAKE_BINARY_DIR}/libiconv-install")
 ExternalProject_Add(
   iconv_repo
   URL ${LIBICONV_URL}
@@ -184,11 +184,11 @@ ExternalProject_Add(
 )
 
 # liburing
-set(LIBURING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/liburing/)
-set(LIBURING_INSTALL_DIR ${CMAKE_BINARY_DIR}/liburing-install)
+set(LIBURING_SOURCE_DIR "${third_party_DIR}/liburing/")
+set(LIBURING_INSTALL_DIR "${CMAKE_BINARY_DIR}/liburing-install")
 if (LINUX_IO_URING_SUPPORTED)
-  set(LIBURING_PREFIX ${CMAKE_BINARY_DIR}/liburing-src)
-  set(LIBURING_BINARY_DIR ${CMAKE_BINARY_DIR}/liburing-build)
+  set(LIBURING_PREFIX "${CMAKE_BINARY_DIR}/liburing-src")
+  set(LIBURING_BINARY_DIR "${CMAKE_BINARY_DIR}/liburing-build")
   ExternalProject_Add(
     liburing_repo
     PREFIX ${LIBURING_PREFIX}
@@ -240,10 +240,10 @@ if (LINUX_IO_URING_SUPPORTED)
 endif()
 
 # sqlite
-set(SQLITE_PREFIX ${CMAKE_BINARY_DIR}/sqlite-src)
-set(SQLITE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite/")
-set(SQLITE_BINARY_DIR ${CMAKE_BINARY_DIR}/sqlite-build)
-set(SQLITE_INSTALL_DIR ${CMAKE_BINARY_DIR}/sqlite-install)
+set(SQLITE_PREFIX "${CMAKE_BINARY_DIR}/sqlite-src")
+set(SQLITE_SOURCE_DIR "${third_party_DIR}/sqlite/")
+set(SQLITE_BINARY_DIR "${CMAKE_BINARY_DIR}/sqlite-build")
+set(SQLITE_INSTALL_DIR "${CMAKE_BINARY_DIR}/sqlite-install")
 set(SQLITE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE")
 ExternalProject_Add(
   sqlite_repo
@@ -271,7 +271,7 @@ ExternalProject_Add(
 # fmt
 FetchContent_Declare(
   fmt
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/fmt/"
+  SOURCE_DIR "${third_party_DIR}/fmt/"
 )
 block()
   set(FMT_PEDANTIC          OFF)
@@ -287,7 +287,7 @@ endblock()
 # uchardet
 FetchContent_Declare(
   uchardet
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/uchardet/"
+  SOURCE_DIR "${third_party_DIR}/uchardet/"
   EXCLUDE_FROM_ALL
 )
 block()
@@ -301,7 +301,7 @@ endblock()
 # codegraph-cpp
 FetchContent_Declare(
   codegraph
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/codegraph-cpp/"
+  SOURCE_DIR "${third_party_DIR}/codegraph-cpp/"
 )
 block()
   set(BUILD_SHARED_LIBS             OFF)
@@ -312,7 +312,7 @@ endblock()
 # vectorscan
 FetchContent_Declare(
   vectorscan
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vectorscan/"
+  SOURCE_DIR "${third_party_DIR}/vectorscan/"
   EXCLUDE_FROM_ALL
 )
 block()
@@ -339,7 +339,7 @@ endblock()
 # neograph
 FetchContent_Declare(
   NeoGraph
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/neograph/"
+  SOURCE_DIR "${third_party_DIR}/neograph/"
   EXCLUDE_FROM_ALL
 )
 block()
@@ -367,7 +367,7 @@ endblock()
 # html2md
 FetchContent_Declare(
   html2md
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/html2md/"
+  SOURCE_DIR "${third_party_DIR}/html2md/"
   EXCLUDE_FROM_ALL
 )
 block()
@@ -383,7 +383,7 @@ endblock()
 # yaml-cpp
 FetchContent_Declare(
   yaml-cpp
-  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/yaml-cpp/"
+  SOURCE_DIR "${third_party_DIR}/yaml-cpp/"
   EXCLUDE_FROM_ALL
 )
 block()
