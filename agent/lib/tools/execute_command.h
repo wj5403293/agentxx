@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "asio/readable_pipe.hpp"
 #include "fmt/format.h"
 #include "tools/tool.h"
 #include "util/string_util.h"
@@ -56,6 +57,39 @@ Current System is {}{}, please use linux shell/bash commands.
     }
 
     // TODO: async
+    // {
+    //   auto ctx = co_await asio::this_coro::executor;
+    //   asio::readable_pipe outpip{ctx}, errpip{ctx};
+    //   // 2. 创建管道，用于接收子进程的输出
+    //   std::unordered_map<boost::process::environment::key,
+    //                      boost::process::environment::value>
+    //       my_env;
+    //   for (const auto &kv : boost::process::environment::current()) {
+    //     if (kv.key().string() != "SECRET") {
+    //       my_env[kv.key()] = kv.value();
+    //     }
+    //   }
+
+    //   auto cmd = boost::process::shell("my-app --help");
+    //   auto exe = cmd.exe();
+
+    //   auto proc = boost::process::process{
+    //       ctx, exe, cmd.args(), boost::process::process_environment(my_env),
+    //       boost::process::process_stdio{.out = outpip, .err = errpip}};
+
+    //   std::string strout, strerr;
+    //   asio::error_code ec;
+    //   asio::read(outpip, asio::dynamic_buffer(strout), ec);
+    //   asio::read(errpip, asio::dynamic_buffer(strerr), ec);
+    //   assert(!ec || (ec == asio::error::eof));
+    //   proc.wait();
+
+    //   std::ostringstream result;
+    //   result << "STDOUT:\n" << strout << std::endl;
+    //   result << "STDERR:\n" << strerr << std::endl;
+    //   result << "Exit code: " << proc.exit_code() << std::endl;
+    //   co_return result.str();
+    // }
 #if IS_WIN_D
     auto pipe = std::unique_ptr<FILE, decltype(&_pclose)>{
         _popen(command.c_str(), "r"), _pclose};

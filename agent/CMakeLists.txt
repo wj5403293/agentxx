@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.28)
 cmake_policy(SET CMP0097 NEW)
 
-project(agentxx VERSION 0.0.1 LANGUAGES C CXX)
+project(agentxx VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
@@ -140,7 +140,6 @@ include(FetchContent)
 # ./b2 --prefix=${PWD}/../boost-build
 # ./b2 install --prefix=${PWD}/../boost-build
 set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost-build/")
-add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_ASIO_STANDALONE=1)
 add_definitions(-DASIO_STANDALONE=1)
 
