@@ -21,50 +21,57 @@
         - ⬜execute_python_command
         - ⬜execute_javascript_command
     - ✅web_search
-        - search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
-        - fetch_url_md (html to markdown)
-        - fetch_url (raw resp body)
-    - ✅tree-messages
-        - temp_store (会话独立，提供 Store 允许模型存取变量)
-        - 消息分支，支持修改历史消息/模型重新生成消息
-    - ✅sub-agent
-        - 一轮 Toolcall 支持并发启动多个 Subagent
-        - subagent_task (隔离上下文)
-        - ⬜tool_skill_search (延迟加载 tool/skill)
-        - ⬜subagent_audio_generate
-        - ⬜subagent_image_generate
-        - ⬜subagent_video_generate
+        - web_search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
+        - ⬜用 subagent 对接外部 llm agent 实现搜索
+        - web_fetch_url_markdown (html to markdown)
+        - web_fetch_url (raw resp body)
     - ✅planning
         - 分为两层规划
         - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
         - todo_list 描述近期需要实现的任务细节步骤
+    - ✅sub-agent
+        - 一轮 Toolcall 支持并发启动多个 Subagent
+        - subagent_task (隔离上下文)
+    - ⬜tool_skill_search (延迟加载 tool/skill)
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
         - 自动测试
-    - ⬜ui_control
-        - 接收音视频/图片/文本输入，输出键鼠控制
+- ✅Tree-Messages
+    - share_kvstore (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
+    - 消息分支，支持修改历史消息/模型重新生成消息
+    - 多会话和历史会话
+- ⬜Memory
+    - 持久记忆
+    - 总结共享记忆
+    - 自定义加载记忆消息
+- ⬜异常处理和中断恢复
+    - 用户终止执行
+    - 节点超时处理
+    - 异常中断恢复执行和自动重试
+    - 主动暂停等待用户响应
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅压缩上下文`SummarizationMiddleware`
     - 自动估算 tokens，达到阈值时自动启动压缩
     - toolcall 各自实现压缩处理
-        - 裁剪历史消息中过时的文件读写、任务规划、变量读写消息
-    - 将部分重要的长消息内容暂存到 `temp_kvstore`，而不压缩，模型需要时可以提取
+        - 裁剪历史消息中过时的 (filesystem)文件读写、(planning)任务规划、(share_kvstore)变量读写消息
+    - 将部分重要的长消息内容暂存到 `share_kvstore`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
 - ✅Skill支持`SkillMiddlewareHandle`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
-    - ⬜动态加载 load/offload 
 - ❌MCP支持 (Neograph已实现，但暂时使用有问题)
-    - MCP client 
+    - MCP client
     - Mcp Server
         - CodeGraph
         - Websearch
 - ⬜扩展
     - ✅CodeGraph
     - RAG
-    - 语音识别
-    - 文本转语音
+    - paddleOCR (图片转文本)
+    - SD.cpp 图片视频生成
+    - FunASR 语音识别
+    - Qwen3-TTS 文本转语音
 - ⬜Server:
     - Openai api server
     - ACP server

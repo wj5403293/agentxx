@@ -17,10 +17,10 @@
 #include "tools/filesystem.h"
 #include "tools/get_current_datetime.h"
 #include "tools/planning.h"
+#include "tools/share_store.h"
 #include "tools/skill.h"
 #include "tools/string.h"
 #include "tools/sub_agent.h"
-#include "tools/temp_store.h"
 #include "tools/tool_skill_search.h"
 #include "tools/web_search.h"
 #include "util/log.h"
@@ -271,7 +271,7 @@ public:
       }
     }
     {
-      tools.push_back(std::make_unique<agentxx::tools::TempKVStoreTool>(
+      tools.push_back(std::make_unique<agentxx::tools::ShareKVStoreTool>(
           middlewareHandleContext));
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());

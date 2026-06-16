@@ -17,17 +17,17 @@
 namespace agentxx {
 namespace tools {
 
-/// 寄存信息，节省模型上下文
-/// TODO: 重启恢复
-class TempKVStoreTool : public XXToolBase {
+/// 寄存信息，节省模型上下文、为 llm、node、skill、tool 之间方便传递数据
+/// TODO: 支持重启恢复
+class ShareKVStoreTool : public XXToolBase {
 protected:
   std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
 
 public:
-  explicit TempKVStoreTool(
+  explicit ShareKVStoreTool(
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : XXToolBase("temp_kvstore", false), handleContext(in_handleContext) {}
+      : XXToolBase("share_kvstore", false), handleContext(in_handleContext) {}
 
   std::optional<agentxx::middleware::SummarizationToolHandle_c>
   createSummarizationToolHandle() const override {
@@ -37,7 +37,7 @@ public:
                neograph::json &args, neograph::ToolCall &toolcall) {
               if (args.is_object() && args["id"].is_string()) {
                 auto argId = args["id"].get<std::string>();
-                const auto key = fmt::format("temp_kvstore:{}", argId);
+                const auto key = fmt::format("share_kvstore:{}", argId);
                 if (lastWriteIndex.contains(key)) {
                   // 裁剪 result
                   args["text"] = "[Outdated Message Truncated]";
@@ -52,7 +52,7 @@ public:
                neograph::json &args, neograph::ChatMessage &msg) {
               if (args.is_object() && args["id"].is_string()) {
                 auto argId = args["id"].get<std::string>();
-                const auto key = fmt::format("temp_kvstore:{}", argId);
+                const auto key = fmt::format("share_kvstore:{}", argId);
                 if (lastWriteIndex.contains(key)) {
                   msg.content = "[Outdated Content truncated]";
                 } else {
@@ -65,7 +65,7 @@ public:
 
   neograph::ChatTool get_definition() const override {
     return {
-        "temp_kvstore",
+        "share_kvstore",
         R"(Store text, return a unique id, used to get text when need.
 Insert text or get/set/delete text by unique id.
 )",
