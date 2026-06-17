@@ -77,6 +77,75 @@ inline size_t utf8GetLength(std::string_view in_str) {
   return length;
 }
 
+inline size_t findIndexByUtf8Length(std::string_view in_str, size_t targetLen) {
+  size_t count = 0;
+  size_t i = 0, step = 0;
+  for (; i < in_str.size();) {
+    unsigned char byte = in_str[i];
+    // lenght 6
+    if (byte >= 0xFC) {
+      step = 6;
+    } else if (byte >= 0xF8) {
+      step = 5;
+    } else if (byte >= 0xF0) {
+      step = 4;
+    } else if (byte >= 0xE0) {
+      step = 3;
+    } else if (byte >= 0xC0) {
+      step = 2;
+    } else {
+      step = 1;
+    }
+    ++count;
+    i += step;
+
+    if (count >= targetLen) {
+      return i;
+    }
+  }
+  // length not found
+  return 0;
+}
+
+/// return <index, lineCount, lastLineIndex>
+inline std::tuple<size_t, size_t, size_t>
+findIndexAndLastLineIndexByUtf8Length(std::string_view in_str,
+                                      size_t targetLen) {
+  if (in_str.size() >= targetLen) {
+    size_t count = 0, lineCount = 0, lastLineIndex = 0;
+    size_t i = 0, step = 0;
+    for (; i < in_str.size();) {
+      const unsigned char byte = in_str[i];
+      // lenght 6
+      if (byte >= 0xFC) {
+        step = 6;
+      } else if (byte >= 0xF8) {
+        step = 5;
+      } else if (byte >= 0xF0) {
+        step = 4;
+      } else if (byte >= 0xE0) {
+        step = 3;
+      } else if (byte >= 0xC0) {
+        step = 2;
+      } else {
+        step = 1;
+        if (byte == (unsigned char)'\n') {
+          ++lineCount;
+          lastLineIndex = i;
+        }
+      }
+      ++count;
+      i += step;
+
+      if (count >= targetLen) {
+        return std::tuple<size_t, size_t, size_t>{i, lineCount, lastLineIndex};
+      }
+    }
+  }
+  // length not found
+  return std::tuple<size_t, size_t, size_t>{0, 0, 0};
+}
+
 inline bool utf8IsContinuationChar(unsigned char ch) {
   return (ch & 0xC0) == 0x80; // 10xxxxxx 的二进制特征：前两位是 10
 }

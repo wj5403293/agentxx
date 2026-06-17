@@ -1,21 +1,21 @@
-## 简介
+# Agentxx
 [Github agentxx](https://github.com/coolight7/agentxx)
 
-- C++ 实现 AI Agent，为了减少内存占用、程序包体积，用于普通用户的手机电脑运行而设计
+- C++ 实现 AI Agent，减少内存占用、程序包体积，为普通性能的手机、电脑等设备上运行而设计
 
 ## 计划实现
 ### 基础模块
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
     - ✅filesystem (已支持 同步 + asio协程异步 文件读写)
-        - ls (file/dir/recursive dir/limit)
-        - read_text (full / offset + limit)
-        - read_binary (full / byte offset + limit)
+        - ls (file/dir/recursive-dir/limit)
+        - read_text (full / offset-limit)
+        - read_binary (full / byte-offset-limit)
         - write (text/binary)
         - edit_text
         - glob
-        - grep (multi text/regex + multi filepath)
-    - ✅exec_shell
+        - grep (multi text/regex multi-filepath)
+    - ✅execute_command
         - execute_linux_command
         - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
         - ⬜execute_python_command
@@ -40,8 +40,8 @@
 - ✅Tree-Messages
     - share_store (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
         - 支持 `line_offset`/`line_limit` 文本分页读取
-        - ⬜自动拦截 tool/subagent 返回值，太长时存储原始内容到 share_store，并留下摘要和 id
-    - ⬜消息摘要，支持存储原始消息到 share_store 后，能识别出 message content 是消息摘要
+        - 自动拦截 tool/subagent 返回值，太长时存储原始内容到 `share_store`, 并留下摘要和 id
+    - ⬜消息摘要，支持存储原始消息到 `share_store` 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
 - ⬜Memory
@@ -63,7 +63,7 @@
     - LLM 总结压缩
     - 保留最近消息
 - ✅Skill支持`SkillMiddlewareHandle`
-    - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `exec_shell`执行
+    - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
 - ❌MCP支持 (Neograph已实现，但暂时使用有问题)
     - MCP client
     - Mcp Server

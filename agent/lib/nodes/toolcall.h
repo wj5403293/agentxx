@@ -44,6 +44,40 @@ public:
     co_await item.onToolcallEndFunc(in, result);
   }
 
+  asio::awaitable<std::string> execTool(neograph::Tool *tool,
+                                        neograph::json &args) const override {
+    constexpr size_t limitLength = 2 * 1024;
+    auto result =
+        co_await neograph::graph::ToolDispatchNode::execTool(tool, args);
+
+    if (result.size() >= limitLength) {
+      // 字节数量超过，按 utf8 长度判断
+      auto [targetIndex, lineCount, lastLineIndex] =
+          agentxx::util::findIndexAndLastLineIndexByUtf8Length(result,
+                                                               limitLength);
+      if (targetIndex > 0) {
+        const auto thread_id = args.value("thread_id", std::string{});
+        assert(false == thread_id.empty());
+        auto handlePtr = handleContext.lock();
+        // 超过限制长度，截断并存储原文
+        auto storeId = handlePtr->addTempStoreItemValue(thread_id, result);
+        // - 如果超过总摘要 1/3，按行摘要，留出行数以便后续用
+        // `share_store` 分页按行取值 否则取总摘要
+        if (lastLineIndex >= targetIndex / 3) {
+          co_return fmt::format(
+              R"([Content offloaded to `share_store`, id={}; Summary {} lines:] {}...)",
+              storeId, lineCount,
+              std::string_view{result}.substr(0, lastLineIndex));
+        } else {
+          co_return fmt::format(
+              R"([Content offloaded to `share_store`, id={}; Summary:] {}...)",
+              storeId, std::string_view{result}.substr(0, targetIndex));
+        }
+      }
+    }
+    co_return result;
+  }
+
   inline static asio::awaitable<void>
   defStdoutLogOnToolcallStart(neograph::graph::NodeInput &in,
                               size_t limitOutput = 0) {

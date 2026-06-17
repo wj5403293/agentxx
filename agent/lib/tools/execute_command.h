@@ -45,7 +45,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
                         },
                     },
                     {
-                        "success_output",
+                        "all_output",
                         {
                             {"type", "boolean"},
                             {"description",
@@ -67,7 +67,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
     if (command.empty()) {
       co_return R"({"error":"Arg `command` is empty"})";
     }
-    auto success_output = arguments.value("success_output", true);
+    auto all_output = arguments.value("all_output", true);
 
     // TODO: async
     // {
@@ -176,6 +176,16 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
                                      : "")},
                         },
                     },
+                    {
+                        "all_output",
+                        {
+                            {"type", "boolean"},
+                            {"description",
+                             R"(Default `true`. 
+`true`: Return all output.
+`false`: Only return the stdout and stderr output when the command faild.)"},
+                        },
+                    },
                 },
             },
             {"required", neograph::json::array({"command"})},
@@ -189,6 +199,7 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
     if (command.empty()) {
       co_return R"({"error":"Arg `command` is empty"})";
     }
+    auto all_output = arguments.value("all_output", true);
 
     // TODO: async
 #if IS_WIN_D

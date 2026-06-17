@@ -281,8 +281,9 @@ public:
       "systemMessage"};
 
   /// <thread_id, <id, value>>
-  /// [会话独立] 可以暂存变量内容，留出 id 到 上下文中，llm 需要时可以通过
-  /// toolcall 读取，压缩上下文时会将部分长文本存入这里替换为 id
+  /// - 存储变量内容，留出 id 到 上下文中，llm 需要时可以通过
+  /// toolcall/share_store 读取
+  /// - 如: 压缩上下文时会将部分长文本存入这里替换为 id
   std::map<std::string, TempStore> tempStore{};
 
   /// <thread_id, itemData>
