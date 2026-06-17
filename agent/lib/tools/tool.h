@@ -21,10 +21,17 @@ protected:
   const std::string name;
 
 public:
+  const bool autoSummaryOutput;
   const bool canDelayLoad;
 
-  explicit XXToolBase(const std::string &in_name, bool in_canDelayLoad)
-      : name(in_name), canDelayLoad(in_canDelayLoad) {}
+  explicit XXToolBase(const std::string &in_name,
+                      bool in_autoSummaryOutput = false,
+                      bool in_canDelayLoad = true)
+      : name(in_name), autoSummaryOutput(in_autoSummaryOutput),
+        canDelayLoad(in_canDelayLoad) {
+    extra["autoSummaryOutput"] = autoSummaryOutput ? "true" : "false";
+    extra["canDelayLoad"] = canDelayLoad ? "true" : "false";
+  }
 
   std::string get_name() const override { return name; }
 
@@ -54,10 +61,12 @@ protected:
 
 public:
   explicit XXToolWarp(
-      bool in_canDelayLoad, std::unique_ptr<neograph::Tool> &&in_inner,
+      bool in_autoSummaryOutput, bool in_canDelayLoad,
+      std::unique_ptr<neograph::Tool> &&in_inner,
       std::optional<agentxx::middleware::SummarizationToolHandle_c>
           in_summarizationHandle = std::nullopt)
-      : XXToolBase("", in_canDelayLoad), inner(std::move(in_inner)),
+      : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad),
+        inner(std::move(in_inner)),
         summarizationHandle(in_summarizationHandle) {}
 
   std::string get_name() const override { return inner->get_name(); }

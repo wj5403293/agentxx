@@ -37,6 +37,7 @@
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
         - 自动测试
+    - ✅get_current_datetime 获取系统时间戳、本地时间、UTC时间
 - ✅Tree-Messages
     - share_store (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
         - 支持 `line_offset`/`line_limit` 文本分页读取

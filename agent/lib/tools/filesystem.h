@@ -69,7 +69,7 @@ inline void _defFileRWSummarizationRespHandle(
 class FileSystemListFileTool : public XXToolBase {
 public:
   explicit FileSystemListFileTool()
-      : XXToolBase("filesystem_list_file", false) {}
+      : XXToolBase("filesystem_list_file", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -176,7 +176,7 @@ class FilesystemReadTextFileTool : public XXToolBase {
 protected:
 public:
   explicit FilesystemReadTextFileTool()
-      : XXToolBase("filesystem_read_text_file", false) {}
+      : XXToolBase("filesystem_read_text_file", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -370,7 +370,7 @@ public:
 class FilesystemReadBinaryFileTool : public XXToolBase {
 public:
   explicit FilesystemReadBinaryFileTool()
-      : XXToolBase("filesystem_read_binary_file", false) {}
+      : XXToolBase("filesystem_read_binary_file", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -608,7 +608,7 @@ Returns binary content as base64 string.)",
 class FilesystemWriteFileTool : public XXToolBase {
 public:
   explicit FilesystemWriteFileTool()
-      : XXToolBase("filesystem_write_file", false) {}
+      : XXToolBase("filesystem_write_file", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -797,7 +797,7 @@ public:
 class FilesystemEditTextFileTool : public XXToolBase {
 public:
   explicit FilesystemEditTextFileTool()
-      : XXToolBase("filesystem_edit_text_file", false) {}
+      : XXToolBase("filesystem_edit_text_file", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -1009,7 +1009,7 @@ public:
 
 class FilesystemGlobTool : public XXToolBase {
 public:
-  explicit FilesystemGlobTool() : XXToolBase("filesystem_glob", false) {}
+  explicit FilesystemGlobTool() : XXToolBase("filesystem_glob", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -1072,7 +1072,7 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
 
 class FilesystemGrepTool : public XXToolBase {
 public:
-  explicit FilesystemGrepTool() : XXToolBase("filesystem_grep", false) {}
+  explicit FilesystemGrepTool() : XXToolBase("filesystem_grep", false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {

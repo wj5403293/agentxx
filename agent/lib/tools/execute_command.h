@@ -20,7 +20,7 @@ namespace tools {
 class ExecuteLinuxCommandTool : public XXToolBase {
 public:
   explicit ExecuteLinuxCommandTool()
-      : XXToolBase("execute_linux_command", false) {}
+      : XXToolBase("execute_linux_command", true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -132,7 +132,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
 class ExecuteWindowsCommandTool : public XXToolBase {
 public:
   explicit ExecuteWindowsCommandTool()
-      : XXToolBase("execute_windows_command", false) {}
+      : XXToolBase("execute_windows_command", true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -232,7 +232,7 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
 
 class ExecutePythonTool : public XXToolBase {
 public:
-  explicit ExecutePythonTool() : XXToolBase("execute_python", false) {}
+  explicit ExecutePythonTool() : XXToolBase("execute_python", true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -270,7 +270,8 @@ public:
 
 class ExecuteJavaScriptTool : public XXToolBase {
 public:
-  explicit ExecuteJavaScriptTool() : XXToolBase("execute_javascript", false) {}
+  explicit ExecuteJavaScriptTool()
+      : XXToolBase("execute_javascript", true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {

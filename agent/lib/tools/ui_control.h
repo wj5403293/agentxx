@@ -21,7 +21,7 @@ namespace tools {
 class UIControlKeyboardMouseTool : public XXToolBase {
 public:
   explicit UIControlKeyboardMouseTool()
-      : XXToolBase("ui_control_keyboard_mouse", true) {}
+      : XXToolBase("ui_control_keyboard_mouse", false, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

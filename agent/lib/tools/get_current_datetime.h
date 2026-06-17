@@ -17,7 +17,7 @@ namespace tools {
 class GetCurrentDateTimeTool : public XXToolBase {
 public:
   explicit GetCurrentDateTimeTool()
-      : XXToolBase("get_current_datetime", true) {}
+      : XXToolBase("get_current_datetime", false, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -33,9 +33,9 @@ public:
     std::chrono::zoned_time local_time{std::chrono::current_zone(), now};
 
     co_return fmt::format(
-        R"(Timestamp: {} ms
-Local Time: {}
-UTC Time: {})",
+        R"(Timestamp: {} millisecond
+Local Time (24Hour): {}
+UTC Time (24Hour): {})",
         now.time_since_epoch().count() / 1000 / 1000,
         std::format("{:%Y-%m-%d} {:%H:%M:%S}", local_time, local_time),
         std::format("{:%Y-%m-%d} {:%H:%M:%S}", now, now));

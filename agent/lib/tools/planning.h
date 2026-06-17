@@ -38,7 +38,7 @@ public:
   explicit WritePlanningTool(
       std::weak_ptr<agentxx::middleware::PlanningMiddlewareHandle>
           in_planningContext)
-      : XXToolBase("planning_write", false),
+      : XXToolBase("planning_write", false, false),
         planningContext(in_planningContext) {}
 
   neograph::ChatTool get_definition() const override {

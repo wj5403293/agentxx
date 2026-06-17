@@ -132,7 +132,7 @@ public:
   std::map<std::string, std::shared_ptr<SubAgentTaskBase>> subAgentList{};
 
   explicit SubAgentManagerTool(const std::string &in_nodeName)
-      : XXToolBase(in_nodeName, false) {}
+      : XXToolBase(in_nodeName, true, false) {}
 
   std::string get_name() const override { return "subagent_switch"; }
 

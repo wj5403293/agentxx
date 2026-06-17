@@ -28,7 +28,8 @@ public:
   explicit ThreadShareStoreTool(
       std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
           in_handleContext)
-      : XXToolBase("share_store", false), handleContext(in_handleContext) {}
+      : XXToolBase("share_store", false, false),
+        handleContext(in_handleContext) {}
 
   std::optional<agentxx::middleware::SummarizationToolHandle_c>
   createSummarizationToolHandle() const override {

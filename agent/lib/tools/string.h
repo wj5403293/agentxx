@@ -24,7 +24,8 @@ namespace tools {
 
 class StringHtml2MarkdownTool : public XXToolBase {
 public:
-  explicit StringHtml2MarkdownTool() : XXToolBase("html_to_markdown", true) {}
+  explicit StringHtml2MarkdownTool()
+      : XXToolBase("html_to_markdown", true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

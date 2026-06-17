@@ -50,7 +50,8 @@ public:
     auto result =
         co_await neograph::graph::ToolDispatchNode::execTool(tool, args);
 
-    if (result.size() >= limitLength) {
+    if ("true" == tool->extra["autoSummaryOutput"] &&
+        result.size() >= limitLength) {
       // 字节数量超过，按 utf8 长度判断
       auto [targetIndex, lineCount, lastLineIndex] =
           agentxx::util::findIndexAndLastLineIndexByUtf8Length(result,

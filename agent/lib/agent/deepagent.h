@@ -169,7 +169,7 @@ public:
           XX_LOGD("append mcp tool size: {}", mcpTools.size());
           for (auto &tool : mcpTools) {
             tools.push_back(std::make_unique<agentxx::tools::XXToolWarp>(
-                true, std::move(tool)));
+                false, true, std::move(tool)));
           }
         }
       }

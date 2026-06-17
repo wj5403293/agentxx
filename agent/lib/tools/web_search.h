@@ -26,7 +26,7 @@ protected:
 public:
   explicit WebSearchTool(const std::string &in_searchApiUrl,
                          bool in_convertHtml2markdown)
-      : XXToolBase("web_search", true), searchApiUrl(in_searchApiUrl),
+      : XXToolBase("web_search", true, true), searchApiUrl(in_searchApiUrl),
         convertHtml2markdown(in_convertHtml2markdown) {}
 
   neograph::ChatTool get_definition() const override {
@@ -102,7 +102,7 @@ public:
 
 class WebFetchUrlTool : public XXToolBase {
 public:
-  explicit WebFetchUrlTool() : XXToolBase("web_fetch_url", true) {}
+  explicit WebFetchUrlTool() : XXToolBase("web_fetch_url", true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -164,7 +164,7 @@ public:
 class WebFetchUrlMarkdownTool : public XXToolBase {
 public:
   explicit WebFetchUrlMarkdownTool()
-      : XXToolBase("web_fetch_url_markdown", true) {}
+      : XXToolBase("web_fetch_url_markdown", true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
