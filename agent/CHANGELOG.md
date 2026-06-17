@@ -3,7 +3,7 @@
 
 ## LOG
 - 2026/06/17
-    - `share_kvstore`支持分页读取
+    - `share_store`支持分页读取
     - 优化 tool 描述，调整参数描述位置
 - 2026/06/08
     - 新增支持 `sub-agent`

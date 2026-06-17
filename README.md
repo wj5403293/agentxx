@@ -20,6 +20,7 @@
         - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
         - ⬜execute_python_command
         - ⬜execute_javascript_command
+        - ⬜拦截输出，自动压缩、提取摘要存储到 share_store
     - ✅web_search
         - web_search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
         - ⬜用 subagent 对接外部 llm agent 实现搜索
@@ -37,8 +38,10 @@
         - 自动循环调整系统提示词、工具提示词等，评估效果
         - 自动测试
 - ✅Tree-Messages
-    - share_kvstore (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
+    - share_store (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
         - 支持 `line_offset`/`line_limit` 文本分页读取
+        - ⬜自动拦截 tool/subagent 返回值，太长时存储原始内容到 share_store，并留下摘要和 id
+    - ⬜消息摘要，支持存储原始消息到 share_store 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
 - ⬜Memory
@@ -55,8 +58,8 @@
 - ✅压缩上下文`SummarizationMiddleware`
     - 自动估算 tokens，达到阈值时自动启动压缩
     - toolcall 各自实现压缩处理
-        - 裁剪历史消息中过时的 (filesystem)文件读写、(planning)任务规划、(share_kvstore)变量读写消息
-    - 将部分重要的长消息内容暂存到 `share_kvstore`，而不压缩，模型需要时可以提取
+        - 裁剪历史消息中过时的 (filesystem)文件读写、(planning)任务规划、(share_store)变量读写消息
+    - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
 - ✅Skill支持`SkillMiddlewareHandle`

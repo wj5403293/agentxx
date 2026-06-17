@@ -37,14 +37,14 @@ public:
 
 /// 上下文压缩
 /// - `system prompt`、最近的消息 不压缩
-/// - 可压缩的长消息内容用 `share_kvstore` 暂存，留下 id + depict
+/// - 可压缩的长消息内容用 `share_store` 暂存，留下 id + depict
 /// - 选择多条消息总结压缩合并为一条
 class SummarizationMiddlewareHandle
     : public BaseMiddlewareHandle<_SummarizationMiddlewareState_c> {
 protected:
   /// 保留至少最近 N 条消息不被压缩
   static constexpr size_t keepRecentMessageCount = 4;
-  /// 单条消息内容超过此字节数时考虑暂存到 share_kvstore
+  /// 单条消息内容超过此字节数时考虑暂存到 share_store
   static constexpr size_t longContentByteThreshold = 2000;
 
   agentxx::tools::SubAgentManagerTool *subagentManager;
@@ -175,7 +175,7 @@ Output ONLY the summary text, no meta-commentary.
     auto id = ctx->addTempStoreItemValue(thread_id, msg.content);
     msg.summaryContent = msg.content;
     msg.content =
-        fmt::format("[Content offloaded to `share_kvstore`, id={}]", id);
+        fmt::format("[Content offloaded to `share_store`, id={}]", id);
   }
 
   void doSummarizeToolcall(std::vector<neograph::ChatMessage> &messages) {
@@ -361,7 +361,7 @@ Output ONLY the summary text, no meta-commentary.
           auto id =
               handleCtx->addTempStoreItemValue(in.ctx.thread_id, msg.content);
           msg.content = fmt::format(
-              "[tool result offloaded to `share_kvstore`, id={}]", id);
+              "[tool result offloaded to `share_store`, id={}]", id);
         }
       }
       neograph::json msgsJson;

@@ -44,6 +44,16 @@ Current System is {}{}, please use linux shell/bash commands.)",
                                              : "")},
                         },
                     },
+                    {
+                        "success_output",
+                        {
+                            {"type", "boolean"},
+                            {"description",
+                             R"(Default `true`. 
+`true`: Return all output.
+`false`: Only return the stdout and stderr output when the command faild.)"},
+                        },
+                    },
                 },
             },
             {"required", neograph::json::array({"command"})},
@@ -57,6 +67,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
     if (command.empty()) {
       co_return R"({"error":"Arg `command` is empty"})";
     }
+    auto success_output = arguments.value("success_output", true);
 
     // TODO: async
     // {
@@ -105,6 +116,8 @@ Current System is {}{}, please use linux shell/bash commands.)",
                             ec.message());
     }
 
+    // TODO: 压缩
+    // TODO: 太长则暂存到 share_store
     std::array<char, 1024> buffer{};
     std::ostringstream result;
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {

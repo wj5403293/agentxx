@@ -175,7 +175,7 @@ public:
       }
     }
     {
-      tools.push_back(std::make_unique<agentxx::tools::ShareKVStoreTool>(
+      tools.push_back(std::make_unique<agentxx::tools::ThreadShareStoreTool>(
           middlewareHandleContext));
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());
