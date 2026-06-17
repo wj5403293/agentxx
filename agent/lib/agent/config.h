@@ -20,8 +20,8 @@ public:
   std::vector<std::string> mcpServerUrls{};
 
   /// TODO: 更换api
-  /// - [duckduckgo] 国内连接不稳定
-  std::string websearchApiUrl = "https://duckduckgo.com/html/?q={}";
+  /// - [duckduckgo] `https://duckduckgo.com/html/?q={}` 国内连接不稳定
+  std::string websearchApiUrl = "";
   bool websearchConvertHtml2markdown = true;
 };
 } // namespace agentxx
