@@ -18,7 +18,6 @@
 #include "tools/get_current_datetime.h"
 #include "tools/planning.h"
 #include "tools/share_store.h"
-#include "tools/skill.h"
 #include "tools/string.h"
 #include "tools/sub_agent.h"
 #include "tools/tool_skill_search.h"
@@ -402,14 +401,30 @@ public:
     }
   }
 
+  static void onHandleEvent(const neograph::graph::GraphEvent &event) {
+    switch (event.type) {
+    case neograph::graph::GraphEvent::Type::NODE_START:
+    case neograph::graph::GraphEvent::Type::NODE_END:
+      break;
+    case neograph::graph::GraphEvent::Type::LLM_TOKEN: {
+      std::cout << event.data.get<std::string>() << std::flush;
+    } break;
+    case neograph::graph::GraphEvent::Type::CHANNEL_WRITE:
+    case neograph::graph::GraphEvent::Type::INTERRUPT:
+    case neograph::graph::GraphEvent::Type::ERROR:
+      break;
+    }
+  };
+
   asio::awaitable<void> runCliAsync() {
     std::cout << ">>> " << std::flush;
 
     for (std::string line; std::getline(std::cin, line);) {
       if (false == line.empty()) {
         try {
+          const auto thread_id = "session";
           neograph::graph::RunConfig cfg{
-              .thread_id = "session",
+              .thread_id = thread_id,
               .input = {{
                   "messages",
                   neograph::json::array({{
@@ -421,21 +436,24 @@ public:
           };
 
           std::cout << config->agentNameView << ": " << std::flush;
-          auto result = co_await engine->run_stream_async(
-              cfg, [](const neograph::graph::GraphEvent &event) {
-                switch (event.type) {
-                case neograph::graph::GraphEvent::Type::NODE_START:
-                case neograph::graph::GraphEvent::Type::NODE_END:
-                  break;
-                case neograph::graph::GraphEvent::Type::LLM_TOKEN: {
-                  std::cout << event.data.get<std::string>() << std::flush;
-                } break;
-                case neograph::graph::GraphEvent::Type::CHANNEL_WRITE:
-                case neograph::graph::GraphEvent::Type::INTERRUPT:
-                case neograph::graph::GraphEvent::Type::ERROR:
-                  break;
-                }
-              });
+          auto result = co_await engine->run_stream_async(cfg, onHandleEvent);
+
+          while (result.interrupted) {
+            std::cout << "\n┏━━━━━━ Interrupted Start ━━━━━━┓" << std::endl;
+            std::cout << "┣━ Interrupted at: " << result.interrupt_node
+                      << std::endl;
+            std::cout << "┣━ Reason: " << result.interrupt_value.dump()
+                      << std::endl;
+            std::cout << "┗━━━━━━ Interrupted  Done ━━━━━━┛\n" << std::endl;
+
+            // Get human input...
+            std::string approval;
+            std::getline(std::cin, approval);
+
+            // Resume with the human's decision
+            result = co_await engine->resume_async(
+                thread_id, {{"approval", approval}}, onHandleEvent);
+          }
         } catch (const std::exception &e) {
           XX_LOGE(R"({{"error": "Agent Response failed: {}"}})", e.what());
         }

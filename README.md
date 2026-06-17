@@ -38,6 +38,7 @@
         - 自动测试
 - ✅Tree-Messages
     - share_kvstore (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
+        - 支持 `line_offset`/`line_limit` 文本分页读取
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
 - ⬜Memory

@@ -181,9 +181,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_read_text_file",
-        "Read text file (e.g.: .txt,.md,.json,.log) contents with line "
-        "numbers, supports offset/limit for large "
-        "files.",
+        R"(Read text file (e.g.: .txt,.md,.json,.log) contents with line numbers, supports offset/limit for large files.)",
         neograph::json{
             {"type", "object"},
             {
@@ -377,9 +375,9 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_read_binary_file",
-        "Read binary file (e.g.: .txt,.md,.json,.log) contents with byte "
-        "offset. Supports offset/limit for large files. Returns binary content "
-        "as base64 string.",
+        R"(Read binary file (e.g.: .txt,.md,.json,.log) contents with byte offset.
+Supports offset/limit for large files.
+Returns binary content as base64 string.)",
         neograph::json{
             {"type", "object"},
             {
@@ -804,8 +802,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_edit_text_file",
-        "Perform exact string replacements in text files(e.g. "
-        "*.txt,*.md,*.cpp).",
+        R"(Perform exact string replacements in text files(e.g. *.txt,*.md,*.cpp).)",
         neograph::json{
             {"type", "object"},
             {
@@ -1080,9 +1077,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "filesystem_grep",
-        R"(Searches file contents using regular expressions or text. 
-Supports search of text content by string or full regex syntax through the `text_patterns` parameter. Filters files by pattern with the `file_patterns` parameter.
-)",
+        R"(Searches file contents using regular expressions or text.)",
         neograph::json{
             {"type", "object"},
             {

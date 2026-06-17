@@ -107,7 +107,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "web_fetch_url",
-        "(Http GET) 发送GET请求，返回响应体.",
+        "(Http GET) 发起网络请求,返回响应体原文.",
         neograph::json{
             {"type", "object"},
             {
@@ -170,8 +170,7 @@ public:
     return {
         "web_fetch_url_markdown",
         R"((Http GET) 拉取一个网页,返回其Markdown格式的页面内容. 
-常用于在 web_search 之后获取具体页面内容.
-)",
+常用于在 web_search 之后获取具体页面内容.)",
         neograph::json{
             {"type", "object"},
             {

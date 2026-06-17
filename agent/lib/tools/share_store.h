@@ -67,8 +67,7 @@ public:
     return {
         "share_kvstore",
         R"(Store text, return a unique id, used to get text when need.
-Insert text or get/set/delete text by unique id.
-)",
+Insert text or get/set/delete text by unique id.)",
         neograph::json{
             {"type", "object"},
             {
@@ -96,7 +95,23 @@ Insert text or get/set/delete text by unique id.
                         "text",
                         {
                             {"type", "string"},
-                            {"description", "text content to store in memory"},
+                            {"description", "待存储的文本内容"},
+                        },
+                    },
+                    {
+                        "line_offset",
+                        {
+                            {"type", "number"},
+                            {"description",
+                             R"(`insert`,`set`时可选. 文本偏移行数,默认`0`表示不偏移.如果偏移超出文件最大行数,将返回错误提示)"},
+                        },
+                    },
+                    {
+                        "line_limit",
+                        {
+                            {"type", "number"},
+                            {"description",
+                             R"(`insert`,`set`时可选. 读取文本行数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件最大行数不报错)"},
                         },
                     },
                     {
@@ -121,10 +136,47 @@ Insert text or get/set/delete text by unique id.
       co_return R"({"error":"Toolcall inner exec failed, need `thread_id`"})";
     }
     size_t text_id = arguments.value<size_t>("id", 0);
+    auto text_line_offset = arguments.value<int64_t>("line_offset", -1);
+    auto text_line_limit = arguments.value<int64_t>("line_limit", -1);
     auto text = arguments.value("text", std::string{});
     auto text_opt = arguments.value("opt", std::string{});
     if (text_opt.empty()) {
       co_return R"({"error":"Arg `opt` is empty"})";
+    }
+
+    if (text_line_offset >= 0 || text_line_limit >= 0) {
+      const auto offset =
+          (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
+      const auto limit = (text_line_limit >= 0)
+                             ? size_t(text_line_limit)
+                             : std::numeric_limits<size_t>::max();
+      auto stream = std::istringstream{text};
+      std::stringstream result{};
+      size_t lineNum = 0;
+
+      for (std::string buf; lineNum < offset + limit; lineNum++) {
+        if (!std::getline(stream, buf)) {
+          if (lineNum >= offset) {
+            result << buf;
+          }
+          break;
+        }
+
+        if (lineNum >= offset) {
+          result << buf;
+        }
+
+        buf.clear();
+      }
+
+      if (lineNum <= offset) {
+        // offset 超出文件行数
+        throw std::runtime_error{fmt::format(
+            R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
+            offset, lineNum)};
+      }
+
+      text = result.str();
     }
 
     auto handlePtr = handleContext.lock();

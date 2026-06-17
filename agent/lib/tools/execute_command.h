@@ -25,11 +25,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "execute_linux_command",
-        fmt::format(R"(Run linux shell commands in the terminal.
-Current System is {}{}, please use linux shell/bash commands.
-)",
-                    agentxx::util::getSystemName(),
-                    agentxx::util::isRunningInWSL() ? "/(WSL)" : ""),
+        "Run linux shell commands in the terminal.",
         neograph::json{
             {"type", "object"},
             {
@@ -39,7 +35,13 @@ Current System is {}{}, please use linux shell/bash commands.
                         "command",
                         {
                             {"type", "string"},
-                            {"description", "Command to execute"},
+                            {"description",
+                             fmt::format(R"(Command to execute.
+Current System is {}{}, please use linux shell/bash commands.)",
+                                         agentxx::util::getSystemName(),
+                                         agentxx::util::isRunningInWSL()
+                                             ? "/(WSL)"
+                                             : "")},
                         },
                     },
                 },
@@ -122,8 +124,20 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "execute_windows_command",
-        fmt::format(
-            R"(Run windows commands in the terminal.
+        R"(Run windows commands in the terminal.)",
+        neograph::json{
+            {"type", "object"},
+            {
+                "properties",
+                {
+                    {
+                        "command",
+                        {
+                            {"type", "string"},
+                            {"description",
+                             fmt::format(
+                                 R"({}
+
 Example:
 {}
 - `cmd.exe`: use windows CMD to run commands. 命令行/终端.
@@ -137,28 +151,16 @@ Example:
 - `Control.exe`: 控制面板
 - `regedit.exe`: 注册表编辑器
 - `calc.exe`: 计算器
-- `notepad.exe`: 纯文本编辑器
-)",
-            agentxx::util::isRunningInWSL() ? R"(
-- Current system is WSL, but can use this tool to execute windows command through cmd.exe, there are some notes:
+- `notepad.exe`: 纯文本编辑器)",
+                                 agentxx::util::isRunningInWSL()
+                                     ? R"(Command to execute, run in Linux(WSL)/Shell.
+Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe /c "win_cmd_str"`.)"
+                                     : "Windows command to execute",
+                                 agentxx::util::isRunningInWSL()
+                                     ? R"(- Current system is WSL, but can use this tool to execute windows command through cmd.exe, there are some notes:
     - Arg `command`(e.g. `cmd.exe /c "{win_cmd_str}"`) is executed in the Linux/WSL shell. However, the `win_cmd_str` actually runs inside the windows terminal.
-    - All win_cmd_str must be executed through cmd.exe (`cmd.exe /c "{win_cmd_str}"`).
-)"
-                                            : ""),
-        neograph::json{
-            {"type", "object"},
-            {
-                "properties",
-                {
-                    {
-                        "command",
-                        {
-                            {"type", "string"},
-                            {"description",
-                             agentxx::util::isRunningInWSL()
-                                 ? R"(Command to execute, run in Linux(WSL)/Shell. 
-Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe /c "win_cmd_str"`)"
-                                 : "Windows command to execute"},
+    - All win_cmd_str must be executed through cmd.exe (`cmd.exe /c "{win_cmd_str}"`).)"
+                                     : "")},
                         },
                     },
                 },
