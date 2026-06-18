@@ -147,8 +147,8 @@ set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
 include(ExternalProject)
 include(FetchContent)
 
-target_compile_definitions(agentxx PUBLIC CPPHTTPLIB_OPENSSL_SUPPORT)
-# asio
+target_compile_definitions(agentxx PUBLIC CPPHTTPLIB_OPENSSL_SUPPORT=1)
+# boost/asio
 target_compile_definitions(agentxx PUBLIC BOOST_ASIO_STANDALONE=1)
 target_compile_definitions(agentxx PUBLIC ASIO_STANDALONE=1)
 if (WINDOWS_IOCP_SUPPORTED)
@@ -165,6 +165,8 @@ if (LINUX_IO_URING_SUPPORTED)
   target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
   message("[agentxx] Enable asio/io_uring")
 endif()
+# boost/process
+target_compile_definitions(agentxx PUBLIC BOOST_PROCESS_USE_STD_FS=1)
 
 # iconv
 set(LIBICONV_VERSION 1.18)
@@ -475,6 +477,7 @@ target_link_libraries(agentxx PUBLIC
 	hs_runtime
 	hs
   yaml-cpp::yaml-cpp
+  boost_process
 )
 if (LINUX_IO_URING_SUPPORTED)
   target_link_libraries(agentxx PUBLIC

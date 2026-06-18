@@ -7,7 +7,7 @@
 ### 基础模块
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
-    - ✅filesystem (已支持 同步 + asio协程异步 文件读写)
+    - ✅filesystem (支持 `同步`/`asio 协程异步` 文件读写)
         - ls (file/dir/recursive-dir/limit)
         - read_text (full / offset-limit)
         - read_binary (full / byte-offset-limit)
@@ -15,7 +15,7 @@
         - edit_text
         - glob
         - grep (multi text/regex multi-filepath)
-    - ✅execute_command
+    - ✅execute_command (支持 `同步`/`Boost.process 协程异步`执行)
         - execute_linux_command
         - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
         - ⬜execute_python_command
@@ -49,6 +49,7 @@
     - 持久记忆
     - 总结共享记忆
     - 自定义加载记忆消息
+- ⬜Permission
 - ⬜异常处理和中断恢复
     - 用户终止执行
     - 节点超时处理
@@ -73,7 +74,7 @@
 - ⬜扩展
     - ✅CodeGraph
     - RAG
-    - paddleOCR (图片转文本)
+    - PaddleOCR (图片转文本)
     - SD.cpp 图片视频生成
     - FunASR 语音识别
     - Qwen3-TTS 文本转语音

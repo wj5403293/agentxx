@@ -423,7 +423,7 @@ public:
       if (false == line.empty()) {
         try {
           const auto thread_id = "session";
-          neograph::graph::RunConfig cfg{
+          auto cfg = neograph::graph::RunConfig{
               .thread_id = thread_id,
               .input = {{
                   "messages",
@@ -432,6 +432,8 @@ public:
                       {"content", line},
                   }}),
               }},
+              .max_steps = 100,
+              .cancel_token = std::make_shared<neograph::graph::CancelToken>(),
               .resume_if_exists = false,
           };
 

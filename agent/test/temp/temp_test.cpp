@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace asio = boost::asio;
-using boost::process::process;
+using boost::process::v2::process;
 
 int main(int /*argv*/, char ** /*argv*/) {
   std::cout << "======= Test Start =======" << std::endl;
@@ -52,7 +52,8 @@ int main(int /*argv*/, char ** /*argv*/) {
   }
   {
     // tag::async_execute[]
-    async_execute(process(ctx, "/usr/bin/g++", {"hello_world.cpp"}))(
+    boost::process::v2::async_execute(
+        process(ctx, "/usr/bin/g++", {"hello_world.cpp"}))(
         asio::cancel_after(std::chrono::seconds(10),
                            asio::cancellation_type::partial)) // <1>
         (asio::cancel_after(std::chrono::seconds(10),

@@ -2,6 +2,9 @@
 - hyperscan 匹配 \w 时包含了换行符
 
 ## LOG
+- 2026/06/18
+    - `asio`改用`Boost.asio`
+    - `execute_command`支持 `Boost.process` 协程异步执行外部命令
 - 2026/06/17
     - `share_store`支持分页读取
     - 优化 tool 描述，调整参数描述位置

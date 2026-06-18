@@ -9,12 +9,12 @@
                 "${workspaceFolder}/agent/third_party/liburing/src/include/",
                 "${workspaceFolder}/agent/third_party/vectorscan/src/",
                 "${workspaceFolder}/agent/third_party/glob/single_include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/third_party/neograph/include/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
-                "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",
                 "${workspaceFolder}/agent/",
                 "${workspaceFolder}/agent/third_party/boost-build/include/boost"
@@ -26,8 +26,7 @@
                 "_UNICODE",
                 "ASIO_HAS_IO_URING",
                 "ASIO_HAS_FILE",
-                "NEOGRAPH_USE_BOODT_ASIO",
-                "NEOGRAPH_ASIO_TARGET_DEFINE=;"
+                "NEOGRAPH_USE_BOODT_ASIO"
             ],
             "compilerPath": "/usr/local/bin/g++",
             "cStandard": "c23",
@@ -41,12 +40,12 @@
                 "${workspaceFolder}/agent/third_party/html2md/include/",
                 "${workspaceFolder}/agent/third_party/vectorscan/src/",
                 "${workspaceFolder}/agent/third_party/glob/single_include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/third_party/neograph/include/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
-                "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",
                 "${workspaceFolder}/agent/"
             ],
@@ -59,8 +58,7 @@
                 "ASIO_HAS_IOCP",
                 "ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE",
                 "ASIO_HAS_FILE",
-                "NEOGRAPH_USE_BOODT_ASIO",
-                "NEOGRAPH_ASIO_TARGET_DEFINE=;"
+                "NEOGRAPH_USE_BOODT_ASIO"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "cl.exe",
@@ -75,12 +73,12 @@
                 "${workspaceFolder}/agent/third_party/html2md/include/",
                 "${workspaceFolder}/agent/third_party/vectorscan/src/",
                 "${workspaceFolder}/agent/third_party/glob/single_include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/third_party/neograph/include/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
-                "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",
                 "${workspaceFolder}/agent/",
                 "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
@@ -92,8 +90,7 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "NEOGRAPH_USE_BOODT_ASIO",
-                "NEOGRAPH_ASIO_TARGET_DEFINE=;"
+                "NEOGRAPH_USE_BOODT_ASIO"
             ],
             "cStandard": "c23",
             "cppStandard": "c++23"
