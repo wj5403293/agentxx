@@ -3,12 +3,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 aux_source_directory(. DIR_client)
 set(NAME_client client)
 
+add_executable(${NAME_client} ${DIR_client})
+
 if (IS_DEBUG_D)
-    add_compile_options("-fsanitize=address")
-    add_link_options("-fsanitize=address")
+    target_compile_options(${NAME_client} PRIVATE "-fsanitize=address")
+    target_link_options(${NAME_client} PRIVATE "-fsanitize=address")
 endif ()
 
-add_executable(${NAME_client} ${DIR_client})
 target_link_libraries(${NAME_client}
 	agentxx
 )

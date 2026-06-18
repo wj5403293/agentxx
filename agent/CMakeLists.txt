@@ -14,6 +14,30 @@ option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
 option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
 
+aux_source_directory("./lib/util" DIR_UTIL)
+aux_source_directory("./lib/tools" DIR_TOOLS)
+aux_source_directory("./lib/nodes" DIR_NODES)
+aux_source_directory("./lib/middlewares" DIR_MIDDLEWARES)
+aux_source_directory("./lib/agent" DIR_AGENT)
+
+add_library(agentxx SHARED
+  ${DIR_UTIL}
+  ${DIR_TOOLS}
+  ${DIR_NODES}
+  ${DIR_MIDDLEWARES}
+  ${DIR_AGENT}
+)
+# 统一输出名称 libagentxx
+# - 不指定时，部分系统，如win可能编译输出缺少前缀 lib
+set_target_properties(agentxx PROPERTIES
+  PUBLIC_HEADER agentxx.h
+  PREFIX "lib"
+  OUTPUT_NAME "agentxx"
+)
+
+add_definitions(-D__STDC_CONSTANT_MACROS)
+target_compile_definitions(agentxx PUBLIC __STDC_CONSTANT_MACROS)
+
 # 仅用于指示是否编译用于调试用途，不代表真实编译类型
 # - [IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
 # 性能的编译将视为 release
@@ -24,9 +48,9 @@ if (XX_BUILD_TYPE MATCHES "DEBUG")
   set(IS_DEBUG_D    1)
   set(IS_RELEASE_D  0)
 endif()
-add_definitions(-DIS_DEBUG_D=${IS_DEBUG_D})
-add_definitions(-DIS_RELEASE_D=${IS_RELEASE_D})
-add_definitions(-DXX_BUILD_TYPE=${XX_BUILD_TYPE})
+target_compile_definitions(agentxx PUBLIC IS_DEBUG_D=${IS_DEBUG_D})
+target_compile_definitions(agentxx PUBLIC IS_RELEASE_D=${IS_RELEASE_D})
+target_compile_definitions(agentxx PUBLIC XX_BUILD_TYPE=${XX_BUILD_TYPE})
 
 set(IS_LINUX_D    0)
 set(IS_WIN_D      0)
@@ -57,27 +81,11 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif()
 endif ()
 
-add_definitions(-DIS_LINUX_D=${IS_LINUX_D})
-add_definitions(-DIS_WIN_D=${IS_WIN_D})
-add_definitions(-DIS_MACOS_D=${IS_MACOS_D})
-add_definitions(-DIS_ANDROID_D=${IS_ANDROID_D})
-add_definitions(-DIS_IOS_D=${IS_IOS_D})
-
-# asio
-if (WINDOWS_IOCP_SUPPORTED)
-  add_definitions(-DASIO_HAS_IOCP=ON)
-  add_definitions(-DBOOST_ASIO_HAS_IOCP=ON)
-  add_definitions(-DASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
-  add_definitions(-DBOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
-  message("[agentxx] Enable asio/iocp")
-endif()
-if (LINUX_IO_URING_SUPPORTED)
-  add_definitions(-DASIO_HAS_IO_URING=ON)
-  add_definitions(-DBOOST_ASIO_HAS_IO_URING=ON)
-  add_definitions(-DASIO_HAS_IO_URING_AS_DEFAULT=ON)
-  add_definitions(-DBOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
-  message("[agentxx] Enable asio/io_uring")
-endif()
+target_compile_definitions(agentxx PUBLIC IS_LINUX_D=${IS_LINUX_D})
+target_compile_definitions(agentxx PUBLIC IS_WIN_D=${IS_WIN_D})
+target_compile_definitions(agentxx PUBLIC IS_MACOS_D=${IS_MACOS_D})
+target_compile_definitions(agentxx PUBLIC IS_ANDROID_D=${IS_ANDROID_D})
+target_compile_definitions(agentxx PUBLIC IS_IOS_D=${IS_IOS_D})
 
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
@@ -123,13 +131,8 @@ message("[agentxx] CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message("[agentxx] EXE_INSTALL_PREFIX: ${EXE_INSTALL_PREFIX}")
 message("[agentxx] CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_definitions(-D__STDC_CONSTANT_MACROS)
-
 # deps
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
-
-include(ExternalProject)
-include(FetchContent)
 
 # boost
 # https://github.com/boostorg/boost
@@ -139,11 +142,29 @@ include(FetchContent)
 # ./bootstrap.sh
 # ./b2 --prefix=${PWD}/../boost-build
 # ./b2 install --prefix=${PWD}/../boost-build
-set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost-build/")
-add_definitions(-DBOOST_ASIO_STANDALONE=1)
-add_definitions(-DASIO_STANDALONE=1)
+set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
 
-include_directories(${Boost_ROOT}/include/)
+include(ExternalProject)
+include(FetchContent)
+
+target_compile_definitions(agentxx PUBLIC CPPHTTPLIB_OPENSSL_SUPPORT)
+# asio
+target_compile_definitions(agentxx PUBLIC BOOST_ASIO_STANDALONE=1)
+target_compile_definitions(agentxx PUBLIC ASIO_STANDALONE=1)
+if (WINDOWS_IOCP_SUPPORTED)
+  target_compile_definitions(agentxx PUBLIC ASIO_HAS_IOCP=ON)
+  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IOCP=ON)
+  target_compile_definitions(agentxx PUBLIC ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
+  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
+  message("[agentxx] Enable asio/iocp")
+endif()
+if (LINUX_IO_URING_SUPPORTED)
+  target_compile_definitions(agentxx PUBLIC ASIO_HAS_IO_URING=ON)
+  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IO_URING=ON)
+  target_compile_definitions(agentxx PUBLIC ASIO_HAS_IO_URING_AS_DEFAULT=ON)
+  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
+  message("[agentxx] Enable asio/io_uring")
+endif()
 
 # iconv
 set(LIBICONV_VERSION 1.18)
@@ -315,6 +336,7 @@ FetchContent_Declare(
   EXCLUDE_FROM_ALL
 )
 block()
+  include_directories(${Boost_ROOT}/include/)
   set(BUILD_UNIT            OFF)
   set(BUILD_TOOLS           OFF)
   set(BUILD_EXAMPLES        OFF)
@@ -400,34 +422,20 @@ endblock()
 # glob
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
-include_directories(${fmt_SOURCE_DIR}/include/)
-include_directories(${uchardet_INSTALL_DIR}/include/)
-include_directories(${LIBICONV_INSTALL_DIR}/include/)
-include_directories(${LIBURING_INSTALL_DIR}/include/)
-include_directories(${SQLITE_SOURCE_DIR}/src/)
-include_directories(${vectorscan_SOURCE_DIR}/src/)
-include_directories(${codegraph_SOURCE_DIR}/include/)
-include_directories(${neograph_SOURCE_DIR}/deps/)
-include_directories(${neograph_SOURCE_DIR}/deps/asio/include/)
-include_directories(${html2md_SOURCE_DIR}/include/)
-include_directories(${glob_SOURCE_DIR}/single_include/)
-include_directories(${third_party_DIR})
-
-aux_source_directory("./lib/util" DIR_UTIL)
-aux_source_directory("./lib/tools" DIR_TOOLS)
-aux_source_directory("./lib/nodes" DIR_NODES)
-aux_source_directory("./lib/middlewares" DIR_MIDDLEWARES)
-aux_source_directory("./lib/agent" DIR_AGENT)
-
-add_library(agentxx SHARED
-  ${DIR_UTIL}
-  ${DIR_TOOLS}
-  ${DIR_NODES}
-  ${DIR_MIDDLEWARES}
-  ${DIR_AGENT}
-)
+target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
+target_include_directories(agentxx PUBLIC ${fmt_SOURCE_DIR}/include/)
+target_include_directories(agentxx PUBLIC ${uchardet_INSTALL_DIR}/include/)
+target_include_directories(agentxx PUBLIC ${LIBICONV_INSTALL_DIR}/include/)
+target_include_directories(agentxx PUBLIC ${LIBURING_INSTALL_DIR}/include/)
+target_include_directories(agentxx PUBLIC ${SQLITE_SOURCE_DIR}/src/)
+target_include_directories(agentxx PUBLIC ${vectorscan_SOURCE_DIR}/src/)
+target_include_directories(agentxx PUBLIC ${codegraph_SOURCE_DIR}/include/)
+target_include_directories(agentxx PUBLIC ${neograph_SOURCE_DIR}/deps/)
+target_include_directories(agentxx PUBLIC ${html2md_SOURCE_DIR}/include/)
+target_include_directories(agentxx PUBLIC ${glob_SOURCE_DIR}/single_include/)
+target_include_directories(agentxx PUBLIC ${Boost_ROOT}/include/boost/)
+target_include_directories(agentxx PUBLIC ${third_party_DIR})
 
 add_dependencies(agentxx iconv_repo)
 add_dependencies(agentxx sqlite_repo)
@@ -474,16 +482,6 @@ if (LINUX_IO_URING_SUPPORTED)
     liburing-ffi.a
   )
 endif()
-
-# 统一输出名称 libagentxx
-# - 不指定时，部分系统，如win可能编译输出缺少前缀 lib
-set_target_properties(agentxx PROPERTIES
-  PUBLIC_HEADER agentxx.h
-  PREFIX "lib"
-  OUTPUT_NAME "agentxx"
-)
-
-target_compile_definitions(agentxx PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
 
 if (AGENTXX_BUILD_CLIENT)
   ADD_SUBDIRECTORY(client)

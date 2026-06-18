@@ -13,10 +13,11 @@
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
                 "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",
-                "${workspaceFolder}/agent/"
+                "${workspaceFolder}/agent/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost"
             ],
             "defines": [
                 "IS_LINUX_D",
@@ -25,7 +26,8 @@
                 "_UNICODE",
                 "ASIO_HAS_IO_URING",
                 "ASIO_HAS_FILE",
-                "BOOST_PROCESS_V2_STANDALONE"
+                "NEOGRAPH_USE_BOODT_ASIO",
+                "NEOGRAPH_ASIO_TARGET_DEFINE=;"
             ],
             "compilerPath": "/usr/local/bin/g++",
             "cStandard": "c23",
@@ -43,7 +45,7 @@
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
                 "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",
                 "${workspaceFolder}/agent/"
@@ -57,7 +59,8 @@
                 "ASIO_HAS_IOCP",
                 "ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE",
                 "ASIO_HAS_FILE",
-                "BOOST_PROCESS_V2_STANDALONE"
+                "NEOGRAPH_USE_BOODT_ASIO",
+                "NEOGRAPH_ASIO_TARGET_DEFINE=;"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "cl.exe",
@@ -76,7 +79,7 @@
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/third_party/neograph/deps/asio/include/",
+                "${workspaceFolder}/agent/third_party/boost-build/include/boost/",
                 "${workspaceFolder}/agent/third_party/boost-build/include/",
                 "${workspaceFolder}/agent/lib/",
                 "${workspaceFolder}/agent/",
@@ -88,7 +91,9 @@
                 "ANDROID",
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "NEOGRAPH_USE_BOODT_ASIO",
+                "NEOGRAPH_ASIO_TARGET_DEFINE=;"
             ],
             "cStandard": "c23",
             "cppStandard": "c++23"

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 script_dir=$(dirname "$0")
-src_dir=$script_dir/../
-build_dir=$script_dir/../build/debug
+src_dir=$script_dir/../test/temp/
+build_dir=$script_dir/../build/temp/debug
 
 cmake -B "$build_dir" -S "$src_dir" -DAGENTXX_BUILD_CLIENT=ON -DAGENTXX_BUILD_TEST=ON -DXX_BUILD_TYPE=DEBUG -DCMAKE_BUILD_TYPE=Debug
 
@@ -24,3 +24,5 @@ if [[ $? -ne 0 ]]; then
     echo "cmake install failed!"
     exit 1
 fi
+
+LD_LIBRARY_PATH=$build_dir/exec $build_dir/exec/test_temp

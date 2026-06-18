@@ -13,6 +13,8 @@
 #include <string_view>
 #include <vector>
 
+namespace asio = ::boost::asio;
+
 namespace agentxx {
 namespace tools {
 

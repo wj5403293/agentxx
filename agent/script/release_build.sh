@@ -2,7 +2,7 @@
 
 script_dir=$(dirname "$0")
 src_dir=$script_dir/../
-build_dir=$src_dir/build/release
+build_dir=$script_dir/../build/release
 
 cmake -B "$build_dir" -S "$src_dir" -DAGENTXX_BUILD_CLIENT=ON -DAGENTXX_BUILD_TEST=ON -DXX_BUILD_TYPE=RELEASE -DCMAKE_BUILD_TYPE=Release
 

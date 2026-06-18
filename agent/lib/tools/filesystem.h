@@ -31,6 +31,8 @@
 #include <string>
 #include <vector>
 
+namespace asio = ::boost::asio;
+
 namespace agentxx {
 namespace tools {
 
@@ -241,7 +243,7 @@ public:
       /// 异步读取文件
       asio::stream_file stream{currentIoCtx};
       try {
-        asio::error_code errCode;
+        neograph_asio_error_code errCode;
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
@@ -269,7 +271,7 @@ public:
               }
               break;
             } else if (errCode) {
-              throw asio::system_error{errCode};
+              throw std::system_error{errCode};
             }
 
             if (lineNum >= offset) {
@@ -297,7 +299,7 @@ public:
             stream, asio::dynamic_buffer(data), asio::transfer_all(),
             asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode && errCode != asio::error::eof) {
-          throw asio::system_error{errCode};
+          throw std::system_error{errCode};
         }
         stream.close();
         co_return data;
@@ -438,7 +440,7 @@ Returns binary content as base64 string.)",
       if (byte_offset >= 0 || byte_limit >= 0) {
         asio::random_access_file stream{currentIoCtx};
         try {
-          asio::error_code errCode;
+          neograph_asio_error_code errCode;
           stream.open(filepath, asio::random_access_file::read_only, errCode);
           if (false == stream.is_open()) {
             stream.close();
@@ -471,7 +473,7 @@ Returns binary content as base64 string.)",
               stream, offset, asio::buffer(result, bytesRead),
               asio::redirect_error(asio::use_awaitable, errCode));
           if (errCode && errCode != asio::error::eof) {
-            throw asio::system_error{errCode};
+            throw std::system_error{errCode};
           }
           stream.close();
           auto readRange = std::string_view{result}.substr(0, bytesReadLen);
@@ -494,7 +496,7 @@ Returns binary content as base64 string.)",
       // 读取完整文件
       asio::stream_file stream{currentIoCtx};
       try {
-        asio::error_code errCode;
+        neograph_asio_error_code errCode;
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
@@ -507,7 +509,7 @@ Returns binary content as base64 string.)",
             stream, asio::dynamic_buffer(result), asio::transfer_all(),
             asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode && errCode != asio::error::eof) {
-          throw asio::system_error{errCode};
+          throw std::system_error{errCode};
         }
         stream.close();
         auto readRange = std::string_view{result}.substr(0, bytesReadLen);
@@ -697,7 +699,7 @@ public:
                           path.parent_path().string())};
         }
 
-        asio::error_code errCode;
+        neograph_asio_error_code errCode;
         stream.open(filepath,
                     asio::stream_file::write_only | asio::stream_file::create |
                         asio::stream_file::truncate,
@@ -724,7 +726,7 @@ public:
                 asio::redirect_error(asio::use_awaitable, errCode));
           }
           if (errCode) {
-            throw asio::system_error{errCode};
+            throw std::system_error{errCode};
           }
         }
 
@@ -879,7 +881,7 @@ public:
           throw std::runtime_error{"File not exist"};
         }
 
-        asio::error_code errCode;
+        neograph_asio_error_code errCode;
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
@@ -893,7 +895,7 @@ public:
             stream, asio::dynamic_buffer(content), asio::transfer_all(),
             asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode && errCode != asio::error::eof) {
-          throw asio::system_error{errCode};
+          throw std::system_error{errCode};
         }
         stream.close();
 
@@ -927,7 +929,7 @@ public:
             stream, asio::buffer(content),
             asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode) {
-          throw asio::system_error{errCode};
+          throw std::system_error{errCode};
         }
 
         stream.close();
@@ -1154,7 +1156,7 @@ Output format:
       /// 异步读取文件
       asio::stream_file stream{currentIoCtx};
       try {
-        asio::error_code errCode;
+        neograph_asio_error_code errCode;
         stream.open(filepath, asio::stream_file::read_only, errCode);
         if (false == stream.is_open()) {
           stream.close();
@@ -1168,7 +1170,7 @@ Output format:
             stream, asio::dynamic_buffer(data), asio::transfer_all(),
             asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode && errCode != asio::error::eof) {
-          throw asio::system_error{errCode};
+          throw std::system_error{errCode};
         }
         stream.close();
         co_return data;

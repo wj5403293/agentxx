@@ -1,8 +1,8 @@
-#include "test_command_tools.hpp"
-#include "test_datetime_tool.hpp"
-#include "test_filesystem_tools.hpp"
-#include "test_string_tools.hpp"
-#include "test_web_search_tools.hpp"
+#include "test_command_tools.h"
+#include "test_datetime_tool.h"
+#include "test_filesystem_tools.h"
+#include "test_string_tools.h"
+#include "test_web_search_tools.h"
 #include "util/log.h"
 #include <asio/awaitable.hpp>
 #include <asio/co_spawn.hpp>
@@ -32,12 +32,12 @@ asio::awaitable<void> test(asio::io_context &ioCtx) {
     }
 
     std::string result;
-    asio::error_code errCode;
+    neograph_asio_error_code errCode;
     auto bytesReadLen = co_await asio::async_read(
         stream, asio::dynamic_buffer(result),
         asio::redirect_error(asio::use_awaitable, errCode));
     if (errCode != asio::error::eof) {
-      throw asio::system_error{errCode};
+      throw std::system_error{errCode};
     }
     stream.close();
     auto readRange = std::string_view{result}.substr(0, bytesReadLen);

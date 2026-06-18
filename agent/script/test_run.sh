@@ -2,7 +2,7 @@
 
 script_dir=$(dirname "$0")
 src_dir=$script_dir/../
-build_dir=$src_dir/build/debug
+build_dir=$script_dir/../build/debug
 
 $script_dir/debug_build.sh
 

@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+namespace asio = ::boost::asio;
+
 namespace agentxx {
 namespace tools {
 
@@ -91,7 +93,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
     //       boost::process::process_stdio{.out = outpip, .err = errpip}};
 
     //   std::string strout, strerr;
-    //   asio::error_code ec;
+    //   neograph_asio_error_code ec;
     //   asio::read(outpip, asio::dynamic_buffer(strout), ec);
     //   asio::read(errpip, asio::dynamic_buffer(strerr), ec);
     //   assert(!ec || (ec == asio::error::eof));
@@ -118,6 +120,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
 
     // TODO: 压缩
     // TODO: 太长则暂存到 share_store
+    // TODO: 超长时存入文件，不在内存逗留
     std::array<char, 1024> buffer{};
     std::ostringstream result;
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
