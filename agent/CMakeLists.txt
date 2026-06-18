@@ -22,13 +22,7 @@ if (CCACHE_PROGRAM)
 endif ()
 
 # libagentxx
-add_library(agentxx SHARED
-  ${DIR_UTIL}
-  ${DIR_TOOLS}
-  ${DIR_NODES}
-  ${DIR_MIDDLEWARES}
-  ${DIR_AGENT}
-)
+add_library(agentxx SHARED)
 
 file(GLOB_RECURSE agentxx_SOURCES "./lib/*.cpp" "./lib/*.cc" "./lib/*.cxx")
 

@@ -114,14 +114,16 @@ include_directories(${Boost_ROOT}/include/)
 include_directories(${Boost_ROOT}/include/boost/)
 include_directories(${third_party_DIR})
 
-aux_source_directory("./" DIR_TEST)
-
 if (IS_DEBUG_D)
     add_compile_options("-fsanitize=address")
     add_link_options("-fsanitize=address")
 endif ()
 
-add_executable(test_temp ${DIR_TEST})
+file(GLOB_RECURSE test_temp_SOURCES "*.cpp" "*.cc" "*.cxx")
+add_executable(test_temp)
+target_sources(test_temp PRIVATE 
+  ${test_temp_SOURCES}
+)
 target_link_directories(test_temp PUBLIC 
 	${Boost_ROOT}/lib/
 )

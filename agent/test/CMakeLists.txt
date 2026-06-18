@@ -5,7 +5,7 @@ set(NAME_test test)
 
 add_executable(${NAME_test})
 
-file(GLOB test_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB test_SOURCES "*.cpp" "*.cc" "*.cxx")
 target_sources(${NAME_test} PRIVATE
 	${test_SOURCES}
 )

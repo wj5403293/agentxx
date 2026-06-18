@@ -4,7 +4,7 @@ set(NAME_client client)
 
 add_executable(${NAME_client})
 
-file(GLOB client_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB_RECURSE client_SOURCES "*.cpp" "*.cc" "*.cxx")
 target_sources(${NAME_client} PRIVATE
 	${client_SOURCES}
 )
