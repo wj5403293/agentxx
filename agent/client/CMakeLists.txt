@@ -1,9 +1,15 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 
-aux_source_directory(. DIR_client)
 set(NAME_client client)
 
-add_executable(${NAME_client} ${DIR_client})
+add_executable(${NAME_client})
+
+file(GLOB client_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+target_sources(${NAME_client} PRIVATE
+	${client_SOURCES}
+)
+
+target_include_directories(${NAME_client} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 if (IS_DEBUG_D)
     target_compile_options(${NAME_client} PRIVATE "-fsanitize=address")

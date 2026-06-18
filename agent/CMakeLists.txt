@@ -14,12 +14,14 @@ option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
 option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
 
-aux_source_directory("./lib/util" DIR_UTIL)
-aux_source_directory("./lib/tools" DIR_TOOLS)
-aux_source_directory("./lib/nodes" DIR_NODES)
-aux_source_directory("./lib/middlewares" DIR_MIDDLEWARES)
-aux_source_directory("./lib/agent" DIR_AGENT)
+# ccache
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+  set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+endif ()
 
+# libagentxx
 add_library(agentxx SHARED
   ${DIR_UTIL}
   ${DIR_TOOLS}
@@ -27,6 +29,13 @@ add_library(agentxx SHARED
   ${DIR_MIDDLEWARES}
   ${DIR_AGENT}
 )
+
+file(GLOB_RECURSE agentxx_SOURCES "./lib/*.cpp" "./lib/*.cc" "./lib/*.cxx")
+
+target_sources(agentxx PRIVATE
+  ${agentxx_SOURCES}
+)
+
 # 统一输出名称 libagentxx
 # - 不指定时，部分系统，如win可能编译输出缺少前缀 lib
 set_target_properties(agentxx PROPERTIES
@@ -182,6 +191,8 @@ ExternalProject_Add(
   SOURCE_DIR ${LIBICONV_SOURCE_DIR}
   BINARY_DIR ${LIBICONV_BINARY_DIR} 
   INSTALL_DIR ${LIBICONV_INSTALL_DIR} 
+  BUILD_ALWAYS OFF
+  UPDATE_DISCONNECTED TRUE
   CONFIGURE_COMMAND 
       cd ${LIBICONV_SOURCE_DIR} && ./configure
       --prefix=${LIBICONV_INSTALL_DIR} 
@@ -424,7 +435,6 @@ endblock()
 # glob
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
-target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
 target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 target_include_directories(agentxx PUBLIC ${fmt_SOURCE_DIR}/include/)
 target_include_directories(agentxx PUBLIC ${uchardet_INSTALL_DIR}/include/)
@@ -437,7 +447,6 @@ target_include_directories(agentxx PUBLIC ${neograph_SOURCE_DIR}/deps/)
 target_include_directories(agentxx PUBLIC ${html2md_SOURCE_DIR}/include/)
 target_include_directories(agentxx PUBLIC ${glob_SOURCE_DIR}/single_include/)
 target_include_directories(agentxx PUBLIC ${Boost_ROOT}/include/boost/)
-target_include_directories(agentxx PUBLIC ${third_party_DIR})
 
 add_dependencies(agentxx iconv_repo)
 add_dependencies(agentxx sqlite_repo)
