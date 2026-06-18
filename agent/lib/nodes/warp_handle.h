@@ -74,7 +74,9 @@ public:
   virtual asio::awaitable<neograph::graph::NodeOutput>
   baseRun(neograph::graph::NodeInput &in) {
     try {
-      co_return co_await neograph::graph::LLMCallNode::run(in);
+      co_return co_await T::run(in);
+    } catch (const neograph::graph::NodeInterrupt &e) {
+      throw e;
     } catch (const std::exception &e) {
       neograph::graph::NodeOutput out;
       out.writes.push_back(neograph::graph::ChannelWrite{
@@ -87,9 +89,9 @@ public:
   }
 
   asio::awaitable<neograph::graph::NodeOutput>
-  run(neograph::graph::NodeInput in) override {
+  run(neograph::graph::NodeInput in) override final {
     co_await onBeforeCallFunc(in);
-    auto result = co_await T::run(in);
+    auto result = co_await baseRun(in);
     co_await onAfterCallFunc(in, result);
     co_return result;
   }
@@ -115,6 +117,8 @@ public:
   baseRun(neograph::graph::NodeInput &in) {
     try {
       co_return co_await T::run(in);
+    } catch (const neograph::graph::NodeInterrupt &e) {
+      throw e;
     } catch (const std::exception &e) {
       XX_LOGE("{}/run exception: {})", nodeName, e.what());
       neograph::graph::NodeOutput out;
@@ -137,7 +141,7 @@ public:
               neograph::graph::NodeOutput &result) = 0;
 
   asio::awaitable<neograph::graph::NodeOutput>
-  run(neograph::graph::NodeInput in) override {
+  run(neograph::graph::NodeInput in) override final {
     neograph::graph::NodeOutput out;
 
     auto handleContextPtr = handleContext.lock();

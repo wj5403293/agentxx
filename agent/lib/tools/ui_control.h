@@ -26,8 +26,7 @@ public:
   neograph::ChatTool get_definition() const override {
     return {
         "ui_control_keyboard_mouse",
-        "网络搜索. 返回一个 markdown 列表结果. "
-        "然后可以使用 `fetch_url_markdown` 拉取网页具体内容.",
+        ". ",
         neograph::json{
             {"type", "object"},
             {

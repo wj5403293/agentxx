@@ -228,17 +228,6 @@ Output ONLY the summary text, no meta-commentary.
   }
 
   asio::awaitable<void>
-  onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
     auto messages = in.state.get_messages();
     if (messages.empty()) {
@@ -331,17 +320,6 @@ Output ONLY the summary text, no meta-commentary.
     if (false == newMsgsJson.empty()) {
       in.state.overwrite("messages", newMsgsJson);
     }
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onModelcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onToolcallStartFunc(neograph::graph::NodeInput &in) override {
     co_return;
   }
 

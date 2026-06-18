@@ -23,7 +23,7 @@ namespace middleware {
 class PlanningMiddlewareState_c : public BaseMiddlewareState_c {
 public:
   /// <thread_id, todoListJson>
-  /// [会话独立] 任务规划列表，由 todolist tool 读写
+  /// [会话独立] 任务规划列表，由 `planning_write` 读写
   std::map<std::string, neograph::json> plannings{};
 
   PlanningMiddlewareState_c() {}
@@ -37,17 +37,6 @@ public:
       std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
       : BaseMiddlewareHandle<PlanningMiddlewareState_c>(
             "PlanningMiddlewareHandle", in_handleContext) {}
-
-  asio::awaitable<void>
-  onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
 
   asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
@@ -79,23 +68,7 @@ When you finish all work, write your final answer in the message AFTER your last
 )");
     co_return;
   }
-
-  asio::awaitable<void>
-  onModelcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onToolcallStartFunc(neograph::graph::NodeInput &in) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onToolcallEndFunc(const neograph::graph::NodeInput &in,
-                    neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
 };
+
 } // namespace middleware
 } // namespace agentxx

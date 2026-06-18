@@ -130,6 +130,39 @@ public:
       std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
       : BaseMiddlewareHandleInterface(in_name, in_handleContext) {}
 
+  asio::awaitable<void>
+  onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onModelcallStartFunc(neograph::graph::NodeInput &in) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onModelcallEndFunc(const neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onToolcallStartFunc(neograph::graph::NodeInput &in) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onToolcallEndFunc(const neograph::graph::NodeInput &in,
+                    neograph::graph::NodeOutput &result) override {
+    co_return;
+  }
+
   /// ================ state ================
   virtual asio::awaitable<void>
   stateReadBlock(const std::function<asio::awaitable<void>()> &func) {
@@ -357,6 +390,74 @@ public:
                      std::map<std::string, size_t> &lastWriteIndex,
                      neograph::json &, neograph::ChatMessage &)>
       responseHandle;
+};
+
+class InterruptHandleArg_c {
+public:
+  class InterruptHandleArgItem_c {
+  public:
+    std::string label;
+    std::string depict;
+    /// bool / int / double / enum / string
+    std::string type;
+
+    inline static InterruptHandleArgItem_c
+    fromJson(const neograph::json &data) {
+      auto result = InterruptHandleArgItem_c{};
+      if (data.is_object()) {
+        if (data["label"].is_string()) {
+          result.label = data["label"].get<std::string>();
+        }
+        if (data["depict"].is_string()) {
+          result.depict = data["depict"].get<std::string>();
+        }
+        if (data["type"].is_string()) {
+          result.type = data["type"].get<std::string>();
+        }
+      }
+      return result;
+    }
+
+    neograph::json toJson() const {
+      return neograph::json{
+          {"label", label},
+          {"depict", depict},
+          {"type", type},
+      };
+    }
+  };
+
+  std::string name;
+  std::vector<InterruptHandleArgItem_c> args;
+
+  void throwInterrupt() {
+    throw neograph::graph::NodeInterrupt{toJson().dump()};
+  }
+
+  inline static InterruptHandleArg_c fromJson(const neograph::json &data) {
+    auto result = InterruptHandleArg_c{};
+    if (data.is_object()) {
+      if (data["name"].is_string()) {
+        result.name = data["name"].get<std::string>();
+      }
+      if (data["args"].is_array()) {
+        for (const auto &arg : data["args"]) {
+        }
+      }
+    }
+    return result;
+  }
+
+  neograph::json toJson() const {
+    auto argsJson = neograph::json::array();
+    for (const auto &item : args) {
+      argsJson.push_back(item.toJson());
+    }
+    return neograph::json{
+        {"name", name},
+        {"args", argsJson},
+    };
+  }
 };
 
 } // namespace middleware

@@ -34,6 +34,9 @@ public:
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) override {
+    auto arg = agentxx::middleware::InterruptHandleArg_c{};
+    arg.throwInterrupt();
+
     co_await item.onToolcallStartFunc(in);
   }
 

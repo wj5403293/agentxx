@@ -100,7 +100,8 @@ public:
     }
     in.state.overwrite("messages", msglist);
 
-    co_return co_await neograph::graph::LLMCallNode::run(in);
+    co_return co_await WrapHandleBaseNode<
+        neograph::graph::LLMCallNode>::baseRun(in);
   }
 };
 } // namespace nodes

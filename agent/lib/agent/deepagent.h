@@ -4,6 +4,7 @@
 #include "asio/co_spawn.hpp"
 #include "asio/detached.hpp"
 #include "asio/io_context.hpp"
+#include "middlewares/permission.h"
 #include "middlewares/planning.h"
 #include "middlewares/skill.h"
 #include "middlewares/summarization.h"
@@ -126,6 +127,13 @@ public:
             std::make_unique<agentxx::tools::WritePlanningTool>(
                 todolistMiddleware));
         middlewareHandleContext->handles.push_back(todolistMiddleware);
+      }
+
+      {
+        auto permissionMiddleware =
+            std::make_shared<agentxx::middleware::PermissionMiddlewareHandle>(
+                middlewareHandleContext);
+        middlewareHandleContext->handles.push_back(permissionMiddleware);
       }
 
       /// Toolcall  应当作为最后一层
@@ -441,13 +449,14 @@ public:
           auto result = co_await engine->run_stream_async(cfg, onHandleEvent);
 
           while (result.interrupted) {
-            std::cout << "\n┏━━━━━━ Interrupted Start ━━━━━━┓" << std::endl;
+            std::cout << "\n┏━━━━━━ Interrupted ━━━━━━┓" << std::endl;
             std::cout << "┣━ Interrupted at: " << result.interrupt_node
                       << std::endl;
-            std::cout << "┣━ Reason: " << result.interrupt_value.dump()
+            std::cout << "┣━ Value: " << result.interrupt_value.dump()
                       << std::endl;
-            std::cout << "┗━━━━━━ Interrupted  Done ━━━━━━┛\n" << std::endl;
+            std::cout << "┗━━━━━━ Interrupted ━━━━━━┛\n" << std::endl;
 
+            neograph::json resume_value;
             // Get human input...
             std::string approval;
             std::getline(std::cin, approval);

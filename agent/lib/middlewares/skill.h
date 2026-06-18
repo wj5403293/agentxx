@@ -286,12 +286,6 @@ public:
   }
 
   asio::awaitable<void>
-  onAgentcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
     if (initSkillDirPaths.empty()) {
       co_return;
@@ -315,23 +309,7 @@ public:
     }
     co_return;
   }
-
-  asio::awaitable<void>
-  onModelcallEndFunc(const neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onToolcallStartFunc(neograph::graph::NodeInput &in) override {
-    co_return;
-  }
-
-  asio::awaitable<void>
-  onToolcallEndFunc(const neograph::graph::NodeInput &in,
-                    neograph::graph::NodeOutput &result) override {
-    co_return;
-  }
 };
+
 } // namespace middleware
 } // namespace agentxx

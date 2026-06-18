@@ -23,9 +23,9 @@
         - ⬜拦截输出，自动压缩、提取摘要存储到 share_store
     - ✅web_search
         - web_search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
-        - ⬜用 subagent 对接外部 llm agent 实现搜索
         - web_fetch_url_markdown (html to markdown)
         - web_fetch_url (raw resp body)
+        - ⬜用 subagent 对接外部 llm agent 实现搜索
     - ✅planning
         - 分为两层规划
         - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
@@ -73,6 +73,7 @@
         - Websearch
 - ⬜扩展
     - ✅CodeGraph
+        ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
     - RAG
     - PaddleOCR (图片转文本)
     - SD.cpp 图片视频生成
