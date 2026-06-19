@@ -172,7 +172,7 @@ Output ONLY the summary text, no meta-commentary.
     if (msg.content.size() <= longContentByteThreshold) {
       return;
     }
-    auto id = ctx->addTempStoreItemValue(thread_id, msg.content);
+    auto id = ctx->addShareStoreItemValue(thread_id, msg.content);
     msg.summaryContent = msg.content;
     msg.content =
         fmt::format("[Content offloaded to `share_store`, id={}]", id);
@@ -234,20 +234,17 @@ Output ONLY the summary text, no meta-commentary.
       co_return;
     }
     auto count = countTokens(messages);
-    auto handleCtx = handleContext.lock();
-    if (nullptr == handleCtx) {
-      co_return;
-    }
+
     const auto &thread_id = in.ctx.thread_id;
     neograph::json newMsgsJson;
 
     if (count >= modelSupportMaxToken * 0.65) {
       doSummarizeToolcall(messages);
       {
-        auto handleCtxPtr = handleContext.lock();
-        if (nullptr != handleCtxPtr) {
+        auto handleContextPtr = handleContext.lock();
+        if (nullptr != handleContextPtr) {
           for (auto &msg : messages) {
-            offloadLongContentToTempStore(msg, handleCtxPtr, thread_id);
+            offloadLongContentToTempStore(msg, handleContextPtr, thread_id);
           }
         }
       }
@@ -326,8 +323,8 @@ Output ONLY the summary text, no meta-commentary.
   asio::awaitable<void>
   onToolcallEndFunc(const neograph::graph::NodeInput &in,
                     neograph::graph::NodeOutput &result) override {
-    auto handleCtx = handleContext.lock();
-    if (nullptr == handleCtx) {
+    auto handleContextPtr = handleContext.lock();
+    if (nullptr == handleContextPtr) {
       co_return;
     }
     auto messages = in.state.get_messages();
@@ -336,8 +333,8 @@ Output ONLY the summary text, no meta-commentary.
       for (auto &msg : messages) {
         if (msg.role == "tool" &&
             msg.content.size() > longContentByteThreshold) {
-          auto id =
-              handleCtx->addTempStoreItemValue(in.ctx.thread_id, msg.content);
+          auto id = handleContextPtr->addShareStoreItemValue(in.ctx.thread_id,
+                                                             msg.content);
           msg.content = fmt::format(
               "[tool result offloaded to `share_store`, id={}]", id);
         }

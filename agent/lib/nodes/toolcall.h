@@ -3,6 +3,7 @@
 #include "asio/io_context.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
+#include "middlewares/permission.h"
 #include "nodes/warp_handle.h"
 #include <cstdlib>
 #include <functional>
@@ -31,11 +32,63 @@ public:
       : WrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
             in_name, in_handleContext, in_ctx) {}
 
+  void
+  onHandleStartError(bool errorRethrow, const std::exception *e,
+                     agentxx::middleware::BaseMiddlewareHandleInterface &item,
+                     neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    // 插入消息，保证消息顺序正确
+    if (false == errorRethrow) {
+      auto msg = neograph::ChatMessage{
+          .role = "tool",
+          .content = fmt::format(
+              R"({{"error": "{}/Start call `{}` exception: {}"}})", nodeName,
+              item.name, (nullptr != e) ? e->what() : "")};
+      auto msgJson = neograph::json{};
+      neograph::to_json(msgJson, msg);
+      result.writes.push_back(neograph::graph::ChannelWrite{
+          "messages",
+          msgJson,
+      });
+    }
+  }
+
+  void onHandleBaseRunError(bool errorRethrow, const std::exception *e,
+                            neograph::graph::NodeInput &in,
+                            neograph::graph::NodeOutput &result) override {
+    // 插入消息，保证消息顺序正确
+    if (false == errorRethrow && nullptr != e) {
+      auto msg = neograph::ChatMessage{
+          .role = "tool",
+          .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
+                                 nodeName, e->what())};
+      auto msgJson = neograph::json{};
+      neograph::to_json(msgJson, msg);
+      result.writes.push_back(neograph::graph::ChannelWrite{
+          "messages",
+          msgJson,
+      });
+    }
+  }
+
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) override {
-    auto arg = agentxx::middleware::InterruptHandleArg_c{};
-    arg.throwInterrupt();
+    auto result = agentxx::middleware::InterruptHandleArg_c::getInterruptResult(
+        in.state, []() {
+          return agentxx::middleware::InterruptHandleArg_c{
+              .name = agentxx::middleware::PermissionMiddlewareHandle::
+                  handleName_default,
+              .inputs =
+                  {
+                      agentxx::middleware::InterruptHandleArg_c::
+                          InterruptHandleInputItem_c{
+                              .label = "hello",
+                              .depict = "hello agentxx!",
+                          },
+                  },
+          };
+        });
 
     co_await item.onToolcallStartFunc(in);
   }
@@ -62,9 +115,10 @@ public:
       if (targetIndex > 0) {
         const auto thread_id = args.value("thread_id", std::string{});
         assert(false == thread_id.empty());
-        auto handlePtr = handleContext.lock();
+        auto handleContextPtr = handleContext.lock();
         // 超过限制长度，截断并存储原文
-        auto storeId = handlePtr->addTempStoreItemValue(thread_id, result);
+        auto storeId =
+            handleContextPtr->addShareStoreItemValue(thread_id, result);
         // - 如果超过总摘要 1/3，按行摘要，留出行数以便后续用
         // `share_store` 分页按行取值 否则取总摘要
         if (lastLineIndex >= targetIndex / 3) {

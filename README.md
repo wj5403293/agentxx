@@ -45,16 +45,6 @@
     - ⬜消息摘要，支持存储原始消息到 `share_store` 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
-- ⬜Memory
-    - 持久记忆
-    - 总结共享记忆
-    - 自定义加载记忆消息
-- ⬜Permission
-- ⬜异常处理和中断恢复
-    - 用户终止执行
-    - 节点超时处理
-    - 异常中断恢复执行和自动重试
-    - 主动暂停等待用户响应
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅压缩上下文`SummarizationMiddleware`
@@ -64,6 +54,15 @@
     - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
+- ⬜异常处理和中断恢复
+    - ✅用户终止执行
+    - ✅暂停等待用户响应
+    - 异常中断恢复执行和自动重试
+- ⬜Permission
+- ⬜Memory
+    - 持久记忆
+    - 总结共享记忆
+    - 自定义加载记忆消息
 - ✅Skill支持`SkillMiddlewareHandle`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
 - ❌MCP支持 (Neograph已实现，但暂时使用有问题)
@@ -104,7 +103,7 @@
     - 命令行可执行程序，计划用于启动服务、实现命令行用户交互
 - `agent/test`:
     - 测试
-- `agent/third_party`
+- `agent/third_party`:
     - `neo-graph`: 图执行核心
         - [原项目](https://github.com/fox1245/NeoGraph)
         - [Fork 修改](https://github.com/coolight7/NeoGraph)

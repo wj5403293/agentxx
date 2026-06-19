@@ -345,6 +345,12 @@ public:
             "channels",
             {
                 {"messages", {{"type", "list"}, {"reducer", "append"}}},
+                {agentxx::middleware::BaseMiddlewareHandleInterface::
+                     channelKey_interruptArg,
+                 {{"reducer", "overwrite"}}},
+                {agentxx::middleware::BaseMiddlewareHandleInterface::
+                     channelKey_interruptResult,
+                 {{"reducer", "overwrite"}}},
             },
         },
         {
@@ -446,24 +452,44 @@ public:
           };
 
           std::cout << config->agentNameView << ": " << std::flush;
-          auto result = co_await engine->run_stream_async(cfg, onHandleEvent);
+          std::optional<neograph::graph::RunResult> result =
+              co_await engine->run_stream_async(cfg, onHandleEvent);
 
-          while (result.interrupted) {
+          while (result.has_value() && result->interrupted) {
+            auto crudeResult = std::move(result);
+            result = std::nullopt;
+
             std::cout << "\n┏━━━━━━ Interrupted ━━━━━━┓" << std::endl;
-            std::cout << "┣━ Interrupted at: " << result.interrupt_node
+            std::cout << "┣━ Interrupted at: " << crudeResult->interrupt_node
                       << std::endl;
-            std::cout << "┣━ Value: " << result.interrupt_value.dump()
+            std::cout << "┣━ Value: " << crudeResult->interrupt_value.dump()
                       << std::endl;
+
+            auto resumeValue = neograph::json{nullptr};
+            auto interruptArg =
+                agentxx::middleware::InterruptHandleArg_c::fromJson(
+                    crudeResult->channel_raw(
+                        agentxx::middleware::BaseMiddlewareHandleInterface::
+                            channelKey_interruptArg));
+            if (false == interruptArg.has_value()) {
+              std::cout << "┣━ Unknown InterruptHanldeArg" << std::endl;
+            } else {
+              auto handleIt = middlewareHandleContext->interruptHandles.find(
+                  interruptArg->name);
+              if (handleIt != middlewareHandleContext->interruptHandles.end()) {
+                // Resume with the human's decision
+                resumeValue = co_await handleIt->second(interruptArg.value());
+              } else {
+                std::cout << "┣━ Interrupt Handle Not Found for: "
+                          << interruptArg->name << std::endl;
+              }
+            }
             std::cout << "┗━━━━━━ Interrupted ━━━━━━┛\n" << std::endl;
-
-            neograph::json resume_value;
-            // Get human input...
-            std::string approval;
-            std::getline(std::cin, approval);
-
-            // Resume with the human's decision
-            result = co_await engine->resume_async(
-                thread_id, {{"approval", approval}}, onHandleEvent);
+            if (false == resumeValue.is_null()) {
+              std::cout << config->agentNameView << " | Resume: " << std::flush;
+              result = co_await engine->resume_async(thread_id, resumeValue,
+                                                     onHandleEvent);
+            }
           }
         } catch (const std::exception &e) {
           XX_LOGE(R"({{"error": "Agent Response failed: {}"}})", e.what());

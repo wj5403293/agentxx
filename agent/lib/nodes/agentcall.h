@@ -36,7 +36,7 @@ public:
     {
       // 创建单次执行的临时数据
       auto ptr = handleContext.lock();
-      ptr->graphData[in.ctx.thread_id] = std::map<std::string, std::any>{};
+      ptr->graphData[in.ctx.thread_id].clear();
     }
 
     co_await item.onAgentcallStartFunc(in);
@@ -76,6 +76,21 @@ public:
               neograph::graph::NodeOutput &result) override {
     co_await item.onAgentcallEndFunc(in, result);
 
+    {
+      // 清理单次执行的临时数据
+      auto ptr = handleContext.lock();
+      auto it = ptr->graphData.find(in.ctx.thread_id);
+      if (it != ptr->graphData.end()) {
+        ptr->graphData.erase(it);
+      }
+    }
+  }
+
+  void
+  onHandleEndError(bool errorRethrow, const std::exception *e,
+                   agentxx::middleware::BaseMiddlewareHandleInterface &item,
+                   const neograph::graph::NodeInput &in,
+                   neograph::graph::NodeOutput &result) override {
     {
       // 清理单次执行的临时数据
       auto ptr = handleContext.lock();

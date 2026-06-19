@@ -181,9 +181,9 @@ Insert text or get/set/delete text by unique id.)",
       text = result.str();
     }
 
-    auto handlePtr = handleContext.lock();
+    auto handleContextPtr = handleContext.lock();
     if (text_opt == std::string_view{"insert"}) {
-      auto reId = handlePtr->addTempStoreItemValue(thread_id, text);
+      auto reId = handleContextPtr->addShareStoreItemValue(thread_id, text);
       co_return neograph::json{
           {"id", reId},
       }
@@ -192,19 +192,20 @@ Insert text or get/set/delete text by unique id.)",
       if (text_id <= 0) {
         co_return R"({"error":"Arg `id` is empty"})";
       }
-      auto result = handlePtr->getTempStoreItemValue(thread_id, text_id);
+      auto result =
+          handleContextPtr->getShareStoreItemValue(thread_id, text_id);
       co_return result.value_or(R"({"error":"Not found"})");
     } else if (text_opt == std::string_view{"set"}) {
       if (text_id <= 0) {
         co_return R"({"error":"Arg `id` is empty"})";
       }
-      handlePtr->setTempStoreItemValue(thread_id, text_id, text);
+      handleContextPtr->setShareStoreItemValue(thread_id, text_id, text);
       co_return "success";
     } else if (text_opt == std::string_view{"delete"}) {
       if (text_id <= 0) {
         co_return R"({"error":"Arg `id` is empty"})";
       }
-      handlePtr->removeTempStoreItemValue(thread_id, text_id);
+      handleContextPtr->removeShareStoreItemValue(thread_id, text_id);
       co_return "success";
     } else {
       co_return R"({"error":"Arg `opt` is invalid"})";

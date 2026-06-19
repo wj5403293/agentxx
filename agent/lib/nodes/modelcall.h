@@ -47,8 +47,46 @@ public:
     co_await item.onModelcallEndFunc(in, result);
   }
 
-  asio::awaitable<neograph::graph::NodeOutput>
-  baseRun(neograph::graph::NodeInput &in) override {
+  void
+  onHandleStartError(bool errorRethrow, const std::exception *e,
+                     agentxx::middleware::BaseMiddlewareHandleInterface &item,
+                     neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) override {
+    // 插入消息，保证消息顺序正确
+    if (false == errorRethrow) {
+      auto msg = neograph::ChatMessage{
+          .role = "assistant",
+          .content = fmt::format(
+              R"({{"error": "{}/Start call `{}` exception: {}"}})", nodeName,
+              item.name, (nullptr != e) ? e->what() : "")};
+      auto msgJson = neograph::json{};
+      neograph::to_json(msgJson, msg);
+      result.writes.push_back(neograph::graph::ChannelWrite{
+          "messages",
+          msgJson,
+      });
+    }
+  }
+  void onHandleBaseRunError(bool errorRethrow, const std::exception *e,
+                            neograph::graph::NodeInput &in,
+                            neograph::graph::NodeOutput &result) override {
+    // 插入消息，保证消息顺序正确
+    if (false == errorRethrow && nullptr != e) {
+      auto msg = neograph::ChatMessage{
+          .role = "assistant",
+          .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
+                                 nodeName, e->what())};
+      auto msgJson = neograph::json{};
+      neograph::to_json(msgJson, msg);
+      result.writes.push_back(neograph::graph::ChannelWrite{
+          "messages",
+          msgJson,
+      });
+    }
+  }
+
+  asio::awaitable<void> baseRun(neograph::graph::NodeInput &in,
+                                neograph::graph::NodeOutput &result) override {
     // 添加 system Msg
     auto msglist = in.state.get("messages");
     bool haveSystemMsg = false;
@@ -100,8 +138,8 @@ public:
     }
     in.state.overwrite("messages", msglist);
 
-    co_return co_await WrapHandleBaseNode<
-        neograph::graph::LLMCallNode>::baseRun(in);
+    co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(in,
+                                                                       result);
   }
 };
 } // namespace nodes

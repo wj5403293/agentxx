@@ -30,6 +30,7 @@ using onGraphNodeAfterCallFunc = std::function<asio::awaitable<void>(
     const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>;
 
 class MiddlewareWarpHandleContext;
+class InterruptHandleArg_c;
 
 class BaseMiddlewareState_c {
 public:
@@ -52,6 +53,9 @@ concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
 class BaseMiddlewareHandleInterface {
 protected:
 public:
+  inline static const std::string channelKey_interruptArg{"xx_interruptArg"};
+  inline static const std::string channelKey_interruptResult{
+      "xx_interruptResults"};
   /// 谨慎存储/修改 middleware 中的变量，
   /// 这是一个agent中所有会话共享的，单会话变量应该放 state 内
 
@@ -118,6 +122,30 @@ public:
       }
     }
     return tool_msg;
+  }
+
+  inline static void
+  printMessages(const std::vector<neograph::ChatMessage> &messages) {
+    size_t index = 0;
+    for (const auto &msg : messages) {
+      ++index;
+      std::string tools;
+      for (const auto &tool : msg.tool_calls) {
+        tools += fmt::format(R"(  - {}/{}
+    {})",
+                             tool.name, tool.id, tool.arguments);
+      }
+      std::cout << fmt::format(R"(
+┏━━━━━━ Message/{} ━━━━━━┓
+┣━ Role: {}
+┣━ Toolcall: 
+{}
+┣━ Content: {}
+┗━━━━━━ Message/{} ━━━━━━┛
+)",
+                               index, msg.role, tools, msg.content, index)
+                << std::endl;
+    }
   }
 };
 
@@ -304,22 +332,21 @@ public:
 
 class MiddlewareWarpHandleContext {
 public:
-  class TempStore {
+  class ThreadShareStore {
   public:
     std::map<size_t, std::string> store{};
-    size_t tempStoreId = 1;
+    size_t storeId = 1;
 
-    size_t getNextTempStoreId() { return tempStoreId++; }
+    size_t getNextId() { return storeId++; }
   };
 
-  inline static constexpr std::string graphDataKey_systemMessage{
-      "systemMessage"};
+  inline static const std::string graphDataKey_systemMessage{"systemMessage"};
 
   /// <thread_id, <id, value>>
   /// - 存储变量内容，留出 id 到 上下文中，llm 需要时可以通过
   /// toolcall/share_store 读取
   /// - 如: 压缩上下文时会将部分长文本存入这里替换为 id
-  std::map<std::string, TempStore> tempStore{};
+  std::map<std::string, ThreadShareStore> shareStore{};
 
   /// <thread_id, itemData>
   /// [会话独立] 每次执行的临时数据，在 [AgentStartCall] 时刷新，在
@@ -331,12 +358,17 @@ public:
   /// 的话元素大小是 固定为基类大小，插入子类时内存会被截断，导致后续异常
   std::vector<std::shared_ptr<BaseMiddlewareHandleInterface>> handles{};
 
+  /// <name, handle>
+  std::map<std::string, std::function<asio::awaitable<neograph::json>(
+                            const InterruptHandleArg_c &)>>
+      interruptHandles{};
+
   MiddlewareWarpHandleContext() {}
 
-  std::optional<std::string> getTempStoreItemValue(const std::string &thread_id,
-                                                   const int id) {
-    auto it = tempStore.find(thread_id);
-    if (tempStore.end() != it) {
+  std::optional<std::string>
+  getShareStoreItemValue(const std::string &thread_id, const int id) {
+    auto it = shareStore.find(thread_id);
+    if (shareStore.end() != it) {
       auto reslut = it->second.store.find(id);
       if (it->second.store.end() != reslut) {
         return reslut->second;
@@ -345,22 +377,22 @@ public:
     return std::nullopt;
   }
 
-  void setTempStoreItemValue(const std::string &thread_id, const int id,
-                             const std::string &value) {
-    tempStore[thread_id].store[id] = value;
+  void setShareStoreItemValue(const std::string &thread_id, const int id,
+                              const std::string &value) {
+    shareStore[thread_id].store[id] = value;
   }
 
-  size_t addTempStoreItemValue(const std::string &thread_id,
-                               const std::string &value) {
-    auto store = tempStore[thread_id];
-    auto id = store.getNextTempStoreId();
+  size_t addShareStoreItemValue(const std::string &thread_id,
+                                const std::string &value) {
+    auto store = shareStore[thread_id];
+    auto id = store.getNextId();
     store.store[id] = value;
     return id;
   }
 
-  void removeTempStoreItemValue(const std::string &thread_id, const int id) {
-    auto it = tempStore.find(thread_id);
-    if (tempStore.end() != it) {
+  void removeShareStoreItemValue(const std::string &thread_id, const int id) {
+    auto it = shareStore.find(thread_id);
+    if (shareStore.end() != it) {
       auto reslutIt = it->second.store.find(id);
       if (it->second.store.end() != reslutIt) {
         it->second.store.erase(reslutIt);
@@ -394,16 +426,18 @@ public:
 
 class InterruptHandleArg_c {
 public:
-  class InterruptHandleArgItem_c {
+  class InterruptHandleInputItem_c {
   public:
     std::string label;
     std::string depict;
-    /// bool / int / double / enum / string
+    /// bool / int / double / string / enum
     std::string type;
+    std::string defaultValue;
+    std::vector<std::string> enumValues;
 
-    inline static InterruptHandleArgItem_c
+    inline static InterruptHandleInputItem_c
     fromJson(const neograph::json &data) {
-      auto result = InterruptHandleArgItem_c{};
+      auto result = InterruptHandleInputItem_c{};
       if (data.is_object()) {
         if (data["label"].is_string()) {
           result.label = data["label"].get<std::string>();
@@ -414,6 +448,13 @@ public:
         if (data["type"].is_string()) {
           result.type = data["type"].get<std::string>();
         }
+        if (data["enumValues"].is_array()) {
+          result.enumValues =
+              data["enumValues"].get<std::vector<std::string>>();
+        }
+        if (data["defaultValue"].is_string()) {
+          result.defaultValue = data["defaultValue"].get<std::string>();
+        }
       }
       return result;
     }
@@ -423,25 +464,57 @@ public:
           {"label", label},
           {"depict", depict},
           {"type", type},
+          {"enumValues", enumValues},
+          {"defaultValue", defaultValue},
       };
     }
   };
 
   std::string name;
-  std::vector<InterruptHandleArgItem_c> args;
+  neograph::json arg;
+  std::vector<InterruptHandleInputItem_c> inputs;
 
-  void throwInterrupt() {
-    throw neograph::graph::NodeInterrupt{toJson().dump()};
+  void throwInterrupt(neograph::graph::GraphState &state) {
+    state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptResult,
+                    neograph::json{nullptr});
+    state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptArg,
+                    toJson());
+    throw neograph::graph::NodeInterrupt{fmt::format("xx-Interrupt: {}", name)};
   }
 
-  inline static InterruptHandleArg_c fromJson(const neograph::json &data) {
+  inline static neograph::json
+  getInterruptResult(neograph::graph::GraphState &state,
+                     std::function<InterruptHandleArg_c(void)> onCreateArg) {
+    auto result =
+        state.get(BaseMiddlewareHandleInterface::channelKey_interruptResult);
+    state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptResult,
+                    neograph::json{nullptr});
+    if (false == result.is_null()) {
+      return result;
+    }
+    auto arg = onCreateArg();
+    arg.throwInterrupt(state);
+    return result;
+  }
+
+  inline static bool isAccordingFormat(const neograph::json &data) {
+    return data.is_object() && data["name"].is_string();
+  }
+
+  inline static std::optional<InterruptHandleArg_c>
+  fromJson(const neograph::json &data) {
+    if (false == isAccordingFormat(data)) {
+      return std::nullopt;
+    }
     auto result = InterruptHandleArg_c{};
     if (data.is_object()) {
       if (data["name"].is_string()) {
         result.name = data["name"].get<std::string>();
       }
-      if (data["args"].is_array()) {
-        for (const auto &arg : data["args"]) {
+      result.arg = data["arg"];
+      if (data["inputs"].is_array()) {
+        for (const auto &input : data["inputs"]) {
+          result.inputs.push_back(InterruptHandleInputItem_c::fromJson(input));
         }
       }
     }
@@ -449,13 +522,14 @@ public:
   }
 
   neograph::json toJson() const {
-    auto argsJson = neograph::json::array();
-    for (const auto &item : args) {
-      argsJson.push_back(item.toJson());
+    auto inputsJson = neograph::json::array();
+    for (const auto &item : inputs) {
+      inputsJson.push_back(item.toJson());
     }
     return neograph::json{
         {"name", name},
-        {"args", argsJson},
+        {"arg", arg},
+        {"inputs", inputsJson},
     };
   }
 };

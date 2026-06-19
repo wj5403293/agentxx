@@ -113,24 +113,6 @@ public:
       : T(name, std::forward<Args>(args)...), nodeName(name),
         handleContext(in_handleContext) {}
 
-  virtual asio::awaitable<neograph::graph::NodeOutput>
-  baseRun(neograph::graph::NodeInput &in) {
-    try {
-      co_return co_await T::run(in);
-    } catch (const neograph::graph::NodeInterrupt &e) {
-      throw e;
-    } catch (const std::exception &e) {
-      XX_LOGE("{}/run exception: {})", nodeName, e.what());
-      neograph::graph::NodeOutput out;
-      out.writes.push_back(neograph::graph::ChannelWrite{
-          "messages",
-          fmt::format(R"({{"error": "{}/run exception: {}"}})", nodeName,
-                      e.what()),
-      });
-      co_return out;
-    }
-  }
-
   virtual asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) = 0;
@@ -140,8 +122,39 @@ public:
               const neograph::graph::NodeInput &in,
               neograph::graph::NodeOutput &result) = 0;
 
+  // 如果是消息节点，应当添加消息，后续不执行 BaseRun
+  virtual void
+  onHandleStartError(bool errorRethrow, const std::exception *e,
+                     agentxx::middleware::BaseMiddlewareHandleInterface &item,
+                     neograph::graph::NodeInput &in,
+                     neograph::graph::NodeOutput &result) {}
+  virtual void onHandleBaseRunError(bool errorRethrow, const std::exception *e,
+                                    neograph::graph::NodeInput &in,
+                                    neograph::graph::NodeOutput &result) {}
+  // 一般不修改 [result]，消息已经由前面的 start/baseRun 添加
+  virtual void
+  onHandleEndError(bool errorRethrow, const std::exception *e,
+                   agentxx::middleware::BaseMiddlewareHandleInterface &item,
+                   const neograph::graph::NodeInput &in,
+                   neograph::graph::NodeOutput &result) {}
+
+  virtual asio::awaitable<void> baseRun(neograph::graph::NodeInput &in,
+                                        neograph::graph::NodeOutput &result) {
+    result = co_await T::run(in);
+  }
+
+  /// 栈式调用和异常处理
+  /// start1 -> start2 -> start3
+  ///             v         |
+  ///           error     baseRun
+  ///             v         |
+  ///  end1  <-  end2  <-  end3
+  ///
+  /// - start 出现错误时，跳过 baseRun，执行对应的 end
   asio::awaitable<neograph::graph::NodeOutput>
   run(neograph::graph::NodeInput in) override final {
+    std::exception_ptr errorPtr;
+    bool errorRethrow = false;
     neograph::graph::NodeOutput out;
 
     auto handleContextPtr = handleContext.lock();
@@ -151,37 +164,62 @@ public:
       auto &item = handleContextPtr->handles[i];
       try {
         co_await onHandleStart(*item, in);
+      } catch (const neograph::graph::NodeInterrupt &e) {
+        errorRethrow = true;
+        onHandleStartError(errorRethrow, &e, *item, in, out);
+        errorPtr = std::current_exception();
+        break;
       } catch (const std::exception &e) {
         XX_LOGE("{}/Start call `{}` exception: {}", nodeName, item->name,
                 e.what());
-        out.writes.push_back(neograph::graph::ChannelWrite{
-            "messages",
-            fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
-                        nodeName, item->name, e.what()),
-        });
+        // 替代 baseRun
+        onHandleStartError(errorRethrow, &e, *item, in, out);
+        errorPtr = std::current_exception();
         break;
       }
     }
 
     if (i >= len) {
-      out = co_await baseRun(in);
+      try {
+        co_await baseRun(in, out);
+      } catch (const neograph::graph::NodeInterrupt &e) {
+        errorRethrow = true;
+        onHandleBaseRunError(errorRethrow, &e, in, out);
+        errorPtr = std::current_exception();
+      } catch (const std::exception &e) {
+        XX_LOGE("{}/run exception: {})", nodeName, e.what());
+        onHandleBaseRunError(errorRethrow, &e, in, out);
+        errorPtr = std::current_exception();
+      }
       i = len;
+    } else if (nullptr != errorPtr) {
+      onHandleBaseRunError(errorRethrow, nullptr, in, out);
     }
 
     for (; i-- > 0;) {
       auto &item = handleContextPtr->handles[i];
-      try {
-        co_await onHandleEnd(*item, in, out);
-      } catch (const std::exception &e) {
-        XX_LOGE("{}/End call `{}` exception: {}", nodeName, item->name,
-                e.what());
-        out.writes.push_back(neograph::graph::ChannelWrite{
-            "messages",
-            fmt::format(R"({{"error": "{}/End call `{}` exception: {}"}})",
-                        nodeName, item->name, e.what()),
-        });
+      if (nullptr != errorPtr) {
+        onHandleEndError(errorRethrow, nullptr, *item, in, out);
+      } else {
+        try {
+          co_await onHandleEnd(*item, in, out);
+        } catch (const neograph::graph::NodeInterrupt &e) {
+          errorRethrow = true;
+          onHandleEndError(errorRethrow, &e, *item, in, out);
+          errorPtr = std::current_exception();
+        } catch (const std::exception &e) {
+          XX_LOGE("{}/End call `{}` exception: {}", nodeName, item->name,
+                  e.what());
+          onHandleEndError(errorRethrow, &e, *item, in, out);
+          errorPtr = std::current_exception();
+        }
       }
     }
+
+    if (errorRethrow) {
+      std::rethrow_exception(errorPtr);
+    }
+
     co_return out;
   }
 };
