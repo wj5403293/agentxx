@@ -431,21 +431,21 @@ public:
   };
 
   asio::awaitable<void> runCliAsync() {
+    const auto thread_id = "session";
+    auto messages = neograph::json::array();
+
     std::cout << ">>> " << std::flush;
 
     for (std::string line; std::getline(std::cin, line);) {
       if (false == line.empty()) {
         try {
-          const auto thread_id = "session";
+          messages.push_back(neograph::json{
+              {"role", "user"},
+              {"content", line},
+          });
           auto cfg = neograph::graph::RunConfig{
               .thread_id = thread_id,
-              .input = {{
-                  "messages",
-                  neograph::json::array({{
-                      {"role", "user"},
-                      {"content", line},
-                  }}),
-              }},
+              .input = {{"messages", messages}},
               .max_steps = 100,
               .cancel_token = std::make_shared<neograph::graph::CancelToken>(),
               .resume_if_exists = false,
@@ -454,6 +454,7 @@ public:
           std::cout << config->agentNameView << ": " << std::flush;
           std::optional<neograph::graph::RunResult> result =
               co_await engine->run_stream_async(cfg, onHandleEvent);
+          messages = result->channel_raw("messages");
 
           while (result.has_value() && result->interrupted) {
             auto crudeResult = std::move(result);
@@ -486,9 +487,10 @@ public:
             }
             std::cout << "┗━━━━━━ Interrupted ━━━━━━┛\n" << std::endl;
             if (false == resumeValue.is_null()) {
-              std::cout << config->agentNameView << " | Resume: " << std::flush;
+              std::cout << config->agentNameView << " [Resume]: " << std::flush;
               result = co_await engine->resume_async(thread_id, resumeValue,
                                                      onHandleEvent);
+              messages = result->channel_raw("messages");
             }
           }
         } catch (const std::exception &e) {
