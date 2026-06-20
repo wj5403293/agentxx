@@ -86,6 +86,8 @@ public:
 
   asio::awaitable<void> baseRun(neograph::graph::NodeInput &in,
                                 neograph::graph::NodeOutput &result) override {
+    auto agentCtxPtr = agentContext.lock();
+
     // 添加 system Msg
     auto msglist = in.state.get("messages");
     bool haveSystemMsg = false;
@@ -100,13 +102,11 @@ public:
     }
 
     {
-      auto agentCtxPtr = agentContext.lock();
       auto &appendSystemMsgList =
           agentCtxPtr->middlewareHandleContext
               ->getGraphDataItemValue<std::vector<std::string>>(
-                  in.ctx.thread_id,
-                  agentxx::middleware::MiddlewareWarpContext::
-                      graphDataKey_systemMessage);
+                  in.ctx.thread_id, agentxx::middleware::MiddlewareWarpContext::
+                                        graphDataKey_systemMessage);
 
       // 清空原本的 content
       newSystemMsg.content = "";
@@ -138,7 +138,7 @@ public:
     }
     in.state.overwrite("messages", msglist);
 
-    {
+    if (agentCtxPtr->agentConfig->logPrintMessagesBeforeLLM) {
       agentxx::middleware::BaseMiddlewareHandleInterface::printMessages(
           in.state.get_messages());
     }

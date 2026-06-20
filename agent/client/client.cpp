@@ -32,6 +32,8 @@ int main(int argn, char **argv) {
       "/home/coolight/program/agentxx/isolation/skills/"};
   // config->mcpServerUrls.push_back("http://172.29.48.1:17001");
 
+  config->logPrintMessagesBeforeLLM = true;
+
   auto agent = agentxx::agent::DeepAgent{config};
   agent.init();
   agent.runCli();

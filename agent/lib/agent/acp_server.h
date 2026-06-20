@@ -17,7 +17,6 @@
 #include <thread>
 
 namespace agentxx {
-
 namespace server {
 
 class UppercaseNode : public neograph::graph::GraphNode {
@@ -164,5 +163,6 @@ int run_server(bool test = false) {
   server.run(); // blocks on std::cin / std::cout
   return 0;
 }
+
 } // namespace server
 } // namespace agentxx

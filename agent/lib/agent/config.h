@@ -25,6 +25,8 @@ public:
   /// - [duckduckgo] `https://duckduckgo.com/html/?q={}` 国内连接不稳定
   std::string websearchApiUrl = "";
   bool websearchConvertHtml2markdown = true;
+
+  bool logPrintMessagesBeforeLLM = false;
 };
 
 } // namespace agent
