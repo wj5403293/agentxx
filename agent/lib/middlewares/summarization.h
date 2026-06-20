@@ -319,32 +319,6 @@ Output ONLY the summary text, no meta-commentary.
     }
     co_return;
   }
-
-  asio::awaitable<void>
-  onToolcallEndFunc(const neograph::graph::NodeInput &in,
-                    neograph::graph::NodeOutput &result) override {
-    auto handleContextPtr = handleContext.lock();
-    if (nullptr == handleContextPtr) {
-      co_return;
-    }
-    auto messages = in.state.get_messages();
-    auto count = countTokens(messages);
-    if (count >= modelSupportMaxToken * 0.7) {
-      for (auto &msg : messages) {
-        if (msg.role == "tool" &&
-            msg.content.size() > longContentByteThreshold) {
-          auto id = handleContextPtr->addShareStoreItemValue(in.ctx.thread_id,
-                                                             msg.content);
-          msg.content = fmt::format(
-              "[tool result offloaded to `share_store`, id={}]", id);
-        }
-      }
-      neograph::json msgsJson;
-      neograph::to_json(msgsJson, messages);
-      in.state.overwrite("messages", msgsJson);
-    }
-    co_return;
-  }
 };
 
 } // namespace middleware

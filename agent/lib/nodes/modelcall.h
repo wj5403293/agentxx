@@ -141,22 +141,6 @@ public:
     {
       agentxx::middleware::BaseMiddlewareHandleInterface::printMessages(
           in.state.get_messages());
-      // auto result =
-      //     agentxx::middleware::InterruptHandleArg_c::getInterruptResult(
-      //         in.state, []() {
-      //           return agentxx::middleware::InterruptHandleArg_c{
-      //               .name = agentxx::middleware::PermissionMiddlewareHandle::
-      //                   handleName_default,
-      //               .inputs =
-      //                   {
-      //                       agentxx::middleware::InterruptHandleArg_c::
-      //                           InterruptHandleInputItem_c{
-      //                               .label = "hello",
-      //                               .depict = "hello agentxx!",
-      //                           },
-      //                   },
-      //           };
-      //         });
     }
 
     co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(in,

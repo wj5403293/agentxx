@@ -25,7 +25,7 @@
         - web_search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
         - web_fetch_url_markdown (html to markdown)
         - web_fetch_url (raw resp body)
-        - ⬜用 subagent 对接外部 llm agent 实现搜索
+        - ⬜subagent 对接外部 llm agent 实现搜索
     - ✅planning
         - 分为两层规划
         - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
@@ -57,7 +57,8 @@
 - ⬜异常处理和中断恢复
     - ✅用户终止执行
     - ✅暂停等待用户响应
-    - 异常中断恢复执行和自动重试
+    - ✅异常中断恢复执行
+    - ⬜自动重试
 - ⬜Permission
 - ⬜Memory
     - 持久记忆

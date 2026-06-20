@@ -1,6 +1,7 @@
 #pragma once
 
 #include "asio/io_context.hpp"
+#include "fmt/format.h"
 #include <any>
 #include <cstdlib>
 #include <functional>
@@ -61,16 +62,15 @@ public:
 
   /// 名称
   std::string name;
+  std::weak_ptr<MiddlewareWarpHandleContext> handleContext;
   /// 会被添加移动到 agent 中，完成后此处留空数组
   std::vector<std::unique_ptr<agentxx::tools::XXToolBase>> toolcalls{};
   /// 每个 [Middleware] 全局共享，按会话ID 取值 <thread_id, state>
   std::map<std::string, std::shared_ptr<BaseMiddlewareState_c>> states{};
-  std::weak_ptr<MiddlewareWarpHandleContext> handleContext;
 
   BaseMiddlewareHandleInterface(
       const std::string &in_name,
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
-      : name(in_name), handleContext(in_handleContext) {}
+      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext);
 
   /// ================ warp call ================
   virtual asio::awaitable<void>
@@ -410,6 +410,10 @@ public:
     }
     return std::any_cast<T &>(itemGraphData[key]);
   }
+
+  asio::awaitable<std::optional<neograph::json>>
+  execInterruptHandle(const std::string &name,
+                      agentxx::middleware::InterruptHandleArg_c &arg);
 };
 
 class SummarizationToolHandle_c {

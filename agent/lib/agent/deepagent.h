@@ -466,7 +466,7 @@ public:
             std::cout << "┣━ Value: " << crudeResult->interrupt_value.dump()
                       << std::endl;
 
-            auto resumeValue = neograph::json{nullptr};
+            std::optional<neograph::json> resumeValue;
             auto interruptArg =
                 agentxx::middleware::InterruptHandleArg_c::fromJson(
                     crudeResult->channel_raw(
@@ -478,17 +478,20 @@ public:
               auto handleIt = middlewareHandleContext->interruptHandles.find(
                   interruptArg->name);
               if (handleIt != middlewareHandleContext->interruptHandles.end()) {
-                // Resume with the human's decision
-                resumeValue = co_await handleIt->second(interruptArg.value());
+                resumeValue =
+                    co_await middlewareHandleContext->execInterruptHandle(
+                        interruptArg->name, interruptArg.value());
               } else {
                 std::cout << "┣━ Interrupt Handle Not Found for: "
                           << interruptArg->name << std::endl;
               }
             }
             std::cout << "┗━━━━━━ Interrupted ━━━━━━┛\n" << std::endl;
-            if (false == resumeValue.is_null()) {
+
+            if (resumeValue.has_value()) {
+              engine->update_state(thread_id, resumeValue.value());
               std::cout << config->agentNameView << " [Resume]: " << std::flush;
-              result = co_await engine->resume_async(thread_id, resumeValue,
+              result = co_await engine->resume_async(thread_id, nullptr,
                                                      onHandleEvent);
               messages = result->channel_raw("messages");
             }
