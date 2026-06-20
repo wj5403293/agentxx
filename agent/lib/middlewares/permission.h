@@ -17,30 +17,30 @@
 namespace agentxx {
 namespace middleware {
 
-class PermissionMiddlewareState_c : public BaseMiddlewareState_c {
+class PermissionMiddlewareState : public BaseMiddlewareState {
 public:
   std::map<std::string, neograph::json> handles{};
 
-  PermissionMiddlewareState_c() {}
+  PermissionMiddlewareState() {}
 };
 
 class PermissionMiddlewareHandle
-    : public BaseMiddlewareHandle<PermissionMiddlewareState_c> {
+    : public BaseMiddlewareHandle<PermissionMiddlewareState> {
 protected:
 public:
   PermissionMiddlewareHandle(
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
-      : BaseMiddlewareHandle<PermissionMiddlewareState_c>(
-            "PermissionMiddlewareHandle", in_handleContext) {
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : BaseMiddlewareHandle<PermissionMiddlewareState>(
+            "PermissionMiddlewareHandle", in_agentContext) {
     registerInterruptHandles();
   }
 
   inline static constexpr std::string handleName_default = "default";
 
   void registerInterruptHandles() {
-    auto handleContextPtr = handleContext.lock();
-    handleContextPtr->interruptHandles[handleName_default] =
-        [](const agentxx::middleware::InterruptHandleArg_c &handleArg)
+    auto agentCtxPtr = agentContext.lock();
+    agentCtxPtr->middlewareHandleContext->interruptHandles[handleName_default] =
+        [](const agentxx::middleware::InterruptHandleArg &handleArg)
         -> asio::awaitable<neograph::json> {
       auto result = neograph::json::array();
       std::cout << "\n  ┏━━━━━━ Input ━━━━━━┓" << std::endl;

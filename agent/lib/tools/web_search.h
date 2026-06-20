@@ -57,18 +57,17 @@ public:
     if (query.empty()) {
       co_return R"({"error":"Arg `query` is empty"})";
     }
-    auto search_url =
-        fmt::format(fmt::runtime(searchApiUrl),
-                    agentxx::util::HttpClient_c::urlEncode(query));
+    auto search_url = fmt::format(fmt::runtime(searchApiUrl),
+                                  agentxx::util::HttpClient::urlEncode(query));
 
     std::optional<std::exception> out_resp_err;
     if (convertHtml2markdown) {
-      auto [resp, resp_err] = co_await agentxx::util::HttpClient_c::getAsync(
+      auto [resp, resp_err] = co_await agentxx::util::HttpClient::getAsync(
           search_url, std::chrono::seconds{15});
       out_resp_err = resp_err;
       if (resp.has_value()) {
         auto &respVal = resp.value();
-        if (agentxx::util::HttpClient_c::respIsSucc(respVal)) {
+        if (agentxx::util::HttpClient::respIsSucc(respVal)) {
           auto &data = respVal.body;
           if (data.empty()) {
             co_return R"({"error": "Empty search result."})";
@@ -82,7 +81,7 @@ public:
       }
     } else {
       auto [resp, resp_err] =
-          co_await agentxx::util::HttpClient_c::fetchMarkdown(search_url);
+          co_await agentxx::util::HttpClient::fetchMarkdown(search_url);
       out_resp_err = resp_err;
       if (resp.has_value()) {
         auto &data = resp.value();
@@ -141,10 +140,10 @@ public:
     }
     int timeout = int(arguments.value<double>("timeout", 60.0));
 
-    auto [resp, resp_err] = co_await agentxx::util::HttpClient_c::getAsync(
+    auto [resp, resp_err] = co_await agentxx::util::HttpClient::getAsync(
         url, std::chrono::seconds(timeout));
     if (resp.has_value()) {
-      if (false == agentxx::util::HttpClient_c::respIsSucc(resp.value())) {
+      if (false == agentxx::util::HttpClient::respIsSucc(resp.value())) {
         co_return fmt::format(
             R"({{"error":"web_fetch_url failed, status {}, error: {}"}})",
             resp.value().status,
@@ -205,7 +204,7 @@ public:
     }
 
     auto [resp, resp_err] =
-        co_await agentxx::util::HttpClient_c::fetchMarkdown(url);
+        co_await agentxx::util::HttpClient::fetchMarkdown(url);
     if (resp.has_value()) {
       auto &data = resp.value();
       if (data.empty()) {

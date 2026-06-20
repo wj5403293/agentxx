@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agent/context.h"
 #include "middlewares/middleware.h"
 #include "tools/tool.h"
 #include <filesystem>
@@ -22,18 +23,17 @@ namespace tools {
 /// TODO: 支持重启恢复
 class ThreadShareStoreTool : public XXToolBase {
 protected:
-  std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
+  std::weak_ptr<agentxx::agent::AgentContext> agentContext;
 
 public:
   explicit ThreadShareStoreTool(
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
-      : XXToolBase("share_store", false, false),
-        handleContext(in_handleContext) {}
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("share_store", false, false), agentContext(in_agentContext) {
+  }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle =
             [](size_t index, std::map<std::string, size_t> &lastWriteIndex,
                neograph::json &args, neograph::ToolCall &toolcall) {
@@ -181,9 +181,11 @@ Insert text or get/set/delete text by unique id.)",
       text = result.str();
     }
 
-    auto handleContextPtr = handleContext.lock();
+    auto agentContextPtr = agentContext.lock();
     if (text_opt == std::string_view{"insert"}) {
-      auto reId = handleContextPtr->addShareStoreItemValue(thread_id, text);
+      auto reId =
+          agentContextPtr->middlewareHandleContext->addShareStoreItemValue(
+              thread_id, text);
       co_return neograph::json{
           {"id", reId},
       }
@@ -193,19 +195,22 @@ Insert text or get/set/delete text by unique id.)",
         co_return R"({"error":"Arg `id` is empty"})";
       }
       auto result =
-          handleContextPtr->getShareStoreItemValue(thread_id, text_id);
+          agentContextPtr->middlewareHandleContext->getShareStoreItemValue(
+              thread_id, text_id);
       co_return result.value_or(R"({"error":"Not found"})");
     } else if (text_opt == std::string_view{"set"}) {
       if (text_id <= 0) {
         co_return R"({"error":"Arg `id` is empty"})";
       }
-      handleContextPtr->setShareStoreItemValue(thread_id, text_id, text);
+      agentContextPtr->middlewareHandleContext->setShareStoreItemValue(
+          thread_id, text_id, text);
       co_return "success";
     } else if (text_opt == std::string_view{"delete"}) {
       if (text_id <= 0) {
         co_return R"({"error":"Arg `id` is empty"})";
       }
-      handleContextPtr->removeShareStoreItemValue(thread_id, text_id);
+      agentContextPtr->middlewareHandleContext->removeShareStoreItemValue(
+          thread_id, text_id);
       co_return "success";
     } else {
       co_return R"({"error":"Arg `opt` is invalid"})";

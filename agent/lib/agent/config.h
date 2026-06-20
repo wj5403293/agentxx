@@ -4,7 +4,9 @@
 #include <vector>
 
 namespace agentxx {
-class AgentxxConfig_c {
+namespace agent {
+
+class AgentConfig {
 public:
   std::string agentName = "Agentxx";
   std::string agentNameView = "萝卜";
@@ -24,4 +26,6 @@ public:
   std::string websearchApiUrl = "";
   bool websearchConvertHtml2markdown = true;
 };
+
+} // namespace agent
 } // namespace agentxx

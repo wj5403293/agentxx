@@ -12,7 +12,7 @@
 namespace agentxx {
 namespace util {
 
-class HttpClient_c {
+class HttpClient {
 public:
   static inline std::pair<std::string, std::string>
   splitUrl(const std::string &url) {

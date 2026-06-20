@@ -4,13 +4,12 @@
 agentxx::middleware::BaseMiddlewareHandleInterface::
     BaseMiddlewareHandleInterface(
         const std::string &in_name,
-        std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-            in_handleContext)
-    : name(in_name), handleContext(in_handleContext) {}
+        std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+    : name(in_name), agentContext(in_agentContext) {}
 
 asio::awaitable<std::optional<neograph::json>>
-agentxx::middleware::MiddlewareWarpHandleContext::execInterruptHandle(
-    const std::string &name, agentxx::middleware::InterruptHandleArg_c &arg) {
+agentxx::middleware::MiddlewareWarpContext::execInterruptHandle(
+    const std::string &name, agentxx::middleware::InterruptHandleArg &arg) {
   auto handleIt = interruptHandles.find(arg.name);
   if (handleIt != interruptHandles.end()) {
     auto resumeValue = co_await handleIt->second(arg);

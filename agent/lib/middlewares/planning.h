@@ -20,31 +20,32 @@
 namespace agentxx {
 namespace middleware {
 
-class PlanningMiddlewareState_c : public BaseMiddlewareState_c {
+class PlanningMiddlewareState : public BaseMiddlewareState {
 public:
   /// <thread_id, todoListJson>
   /// [会话独立] 任务规划列表，由 `planning_write` 读写
   std::map<std::string, neograph::json> plannings{};
 
-  PlanningMiddlewareState_c() {}
+  PlanningMiddlewareState() {}
 };
 
 class PlanningMiddlewareHandle
-    : public BaseMiddlewareHandle<PlanningMiddlewareState_c> {
+    : public BaseMiddlewareHandle<PlanningMiddlewareState> {
 protected:
 public:
   PlanningMiddlewareHandle(
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
-      : BaseMiddlewareHandle<PlanningMiddlewareState_c>(
-            "PlanningMiddlewareHandle", in_handleContext) {}
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : BaseMiddlewareHandle<PlanningMiddlewareState>(
+            "PlanningMiddlewareHandle", in_agentContext) {}
 
   asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
-    auto handleContextPtr = handleContext.lock();
+    auto agentCtxPtr = agentContext.lock();
     auto appendSystemPromptList =
-        handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
-            in.ctx.thread_id, agentxx::middleware::MiddlewareWarpHandleContext::
-                                  graphDataKey_systemMessage);
+        agentCtxPtr->middlewareHandleContext
+            ->getGraphDataItemValue<std::vector<std::string>>(
+                in.ctx.thread_id, agentxx::middleware::MiddlewareWarpContext::
+                                      graphDataKey_systemMessage);
     appendSystemPromptList.push_back(
         R"(
 ## Planning

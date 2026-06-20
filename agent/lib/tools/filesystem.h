@@ -114,9 +114,9 @@ public:
     };
   }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle = nullptr,
         .responseHandle = _defFileRWSummarizationRespHandle,
     };
@@ -219,9 +219,9 @@ public:
     };
   }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle = nullptr,
         .responseHandle = _defFileRWSummarizationRespHandle,
     };
@@ -415,9 +415,9 @@ Returns binary content as base64 string.)",
     };
   }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle = nullptr,
         .responseHandle = _defFileRWSummarizationRespHandle,
     };
@@ -662,9 +662,9 @@ public:
     };
   }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle = _defFileRWSummarizationReqHandle,
         .responseHandle = nullptr,
     };
@@ -848,9 +848,9 @@ public:
     };
   }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle = _defFileRWSummarizationReqHandle,
         .responseHandle = nullptr,
     };

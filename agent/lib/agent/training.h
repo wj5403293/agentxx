@@ -10,6 +10,7 @@
 #include <util/log.h>
 
 namespace agentxx {
+namespace agent {
 
 /// 单个训练测试用例
 struct TrainingTestCase {
@@ -107,12 +108,12 @@ Output ONLY a JSON object with the following schema:
 };
 
 // ======================== 训练模式 ========================
-class TrainingAgent_c {
+class TrainingAgent {
 protected:
-  std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
+  std::shared_ptr<agentxx::agent::AgentConfig> config = nullptr;
 
 public:
-  TrainingAgent_c(std::shared_ptr<agentxx::AgentxxConfig_c> in_config)
+  TrainingAgent(std::shared_ptr<agentxx::agent::AgentConfig> in_config)
       : config(in_config) {
     assert(nullptr != config);
   }
@@ -354,4 +355,5 @@ public:
   }
 };
 
+} // namespace agent
 } // namespace agentxx

@@ -25,18 +25,17 @@ public:
 
   AgentStartCallWrapNode(
       const std::string &name,
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : WrapHandleBaseNode<agentxx::nodes::WarpBaseNodeInterface>(
-            name, in_handleContext) {}
+            name, in_agentContext) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
                 neograph::graph::NodeInput &in) override {
     {
       // 创建单次执行的临时数据
-      auto ptr = handleContext.lock();
-      ptr->graphData[in.ctx.thread_id].clear();
+      auto ptr = agentContext.lock();
+      ptr->middlewareHandleContext->graphData[in.ctx.thread_id].clear();
     }
 
     co_await item.onAgentcallStartFunc(in);
@@ -59,10 +58,9 @@ public:
 
   MiddlewareWrapAgentEndCallNode(
       const std::string &name,
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : WrapHandleBaseNode<agentxx::nodes::WarpBaseNodeInterface>(
-            name, in_handleContext) {}
+            name, in_agentContext) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -78,10 +76,10 @@ public:
 
     {
       // 清理单次执行的临时数据
-      auto ptr = handleContext.lock();
-      auto it = ptr->graphData.find(in.ctx.thread_id);
-      if (it != ptr->graphData.end()) {
-        ptr->graphData.erase(it);
+      auto ptr = agentContext.lock();
+      auto it = ptr->middlewareHandleContext->graphData.find(in.ctx.thread_id);
+      if (it != ptr->middlewareHandleContext->graphData.end()) {
+        ptr->middlewareHandleContext->graphData.erase(it);
       }
     }
   }
@@ -93,10 +91,10 @@ public:
                    neograph::graph::NodeOutput &result) override {
     {
       // 清理单次执行的临时数据
-      auto ptr = handleContext.lock();
-      auto it = ptr->graphData.find(in.ctx.thread_id);
-      if (it != ptr->graphData.end()) {
-        ptr->graphData.erase(it);
+      auto ptr = agentContext.lock();
+      auto it = ptr->middlewareHandleContext->graphData.find(in.ctx.thread_id);
+      if (it != ptr->middlewareHandleContext->graphData.end()) {
+        ptr->middlewareHandleContext->graphData.erase(it);
       }
     }
   }

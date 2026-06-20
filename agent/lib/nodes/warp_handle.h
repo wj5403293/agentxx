@@ -101,17 +101,16 @@ template <BaseGraphNodeType T>
 class NEOGRAPH_API WrapHandleBaseNode : public T {
 protected:
   std::string nodeName;
-  std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
+  std::weak_ptr<agentxx::agent::AgentContext> agentContext;
 
 public:
   template <typename... Args>
   WrapHandleBaseNode(
       const std::string &name,
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext,
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext,
       Args &&...args)
       : T(name, std::forward<Args>(args)...), nodeName(name),
-        handleContext(in_handleContext) {}
+        agentContext(in_agentContext) {}
 
   virtual asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -157,11 +156,11 @@ public:
     bool errorRethrow = false;
     neograph::graph::NodeOutput out;
 
-    auto handleContextPtr = handleContext.lock();
-    const auto len = handleContextPtr->handles.size();
+    auto agentCtxPtr = agentContext.lock();
+    const auto len = agentCtxPtr->middlewareHandleContext->handles.size();
     size_t i = 0;
     for (; i < len; ++i) {
-      auto &item = handleContextPtr->handles[i];
+      auto &item = agentCtxPtr->middlewareHandleContext->handles[i];
       try {
         co_await onHandleStart(*item, in);
       } catch (const neograph::graph::NodeInterrupt &e) {
@@ -197,7 +196,7 @@ public:
     }
 
     for (; i-- > 0;) {
-      auto &item = handleContextPtr->handles[i];
+      auto &item = agentCtxPtr->middlewareHandleContext->handles[i];
       if (nullptr != errorPtr) {
         onHandleEndError(errorRethrow, nullptr, *item, in, out);
       } else {

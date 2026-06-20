@@ -23,16 +23,16 @@
 namespace agentxx {
 namespace middleware {
 
-class _SummarizationContext_c {
+class _SummarizationContext {
 public:
   std::list<std::vector<neograph::ChatMessage>> oldMessagesHistory{};
 };
 
-class _SummarizationMiddlewareState_c : public BaseMiddlewareState_c {
+class _SummarizationMiddlewareState : public BaseMiddlewareState {
 public:
-  _SummarizationContext_c summarizationContext{};
+  _SummarizationContext summarizationContext{};
 
-  _SummarizationMiddlewareState_c() {}
+  _SummarizationMiddlewareState() {}
 };
 
 /// 上下文压缩
@@ -40,7 +40,7 @@ public:
 /// - 可压缩的长消息内容用 `share_store` 暂存，留下 id + depict
 /// - 选择多条消息总结压缩合并为一条
 class SummarizationMiddlewareHandle
-    : public BaseMiddlewareHandle<_SummarizationMiddlewareState_c> {
+    : public BaseMiddlewareHandle<_SummarizationMiddlewareState> {
 protected:
   /// 保留至少最近 N 条消息不被压缩
   static constexpr size_t keepRecentMessageCount = 4;
@@ -58,16 +58,16 @@ protected:
 
 public:
   /// 压缩 tool 时处理函数
-  std::map<std::string, SummarizationToolHandle_c> summarizationToolHandles{};
+  std::map<std::string, SummarizationToolHandle> summarizationToolHandles{};
 
   SummarizationMiddlewareHandle(
       agentxx::tools::SubAgentManagerTool *in_subagentManager,
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext,
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext,
       size_t in_modelSupportMaxToken, double in_asciiCharsPerToken = 4.0,
       double in_unicodeCharsPerToken = 1.1, double in_tokensPerImage = 400.0,
       double in_extraTokensPerMessage = 3.0)
-      : BaseMiddlewareHandle<_SummarizationMiddlewareState_c>(
-            "SummarizationMiddlewareHandle", in_handleContext),
+      : BaseMiddlewareHandle<_SummarizationMiddlewareState>(
+            "SummarizationMiddlewareHandle", in_agentContext),
         subagentManager(in_subagentManager),
         modelSupportMaxToken(in_modelSupportMaxToken),
         asciiCharsPerToken(in_asciiCharsPerToken),
@@ -167,7 +167,7 @@ Output ONLY the summary text, no meta-commentary.
 
   void offloadLongContentToTempStore(
       neograph::ChatMessage &msg,
-      const std::shared_ptr<MiddlewareWarpHandleContext> &ctx,
+      const std::shared_ptr<MiddlewareWarpContext> &ctx,
       const std::string &thread_id) {
     if (msg.content.size() <= longContentByteThreshold) {
       return;
@@ -179,7 +179,7 @@ Output ONLY the summary text, no meta-commentary.
   }
 
   void doSummarizeToolcall(std::vector<neograph::ChatMessage> &messages) {
-    auto handleContextPtr = handleContext.lock();
+    auto agentCtxPtr = agentContext.lock();
     std::map<std::string, size_t> lastWriteIndex{};
     for (size_t i = messages.size(); i > 0; --i) {
       auto &msg = messages[i];
@@ -241,11 +241,10 @@ Output ONLY the summary text, no meta-commentary.
     if (count >= modelSupportMaxToken * 0.65) {
       doSummarizeToolcall(messages);
       {
-        auto handleContextPtr = handleContext.lock();
-        if (nullptr != handleContextPtr) {
-          for (auto &msg : messages) {
-            offloadLongContentToTempStore(msg, handleContextPtr, thread_id);
-          }
+        auto agentCtxPtr = agentContext.lock();
+        for (auto &msg : messages) {
+          offloadLongContentToTempStore(
+              msg, agentCtxPtr->middlewareHandleContext, thread_id);
         }
       }
       neograph::to_json(newMsgsJson, messages);

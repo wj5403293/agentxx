@@ -133,9 +133,9 @@ Item struct:
     };
   }
 
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {
-    return agentxx::middleware::SummarizationToolHandle_c{
+    return agentxx::middleware::SummarizationToolHandle{
         .requestHandle =
             [](size_t index, std::map<std::string, size_t> &lastWriteIndex,
                neograph::json &args, neograph::ToolCall &toolcall) {

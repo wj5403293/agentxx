@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agent/context.h"
 #include "asio/io_context.hpp"
 #include "fmt/format.h"
 #include <any>
@@ -30,23 +31,23 @@ using onGraphNodeBeforeCallFunc =
 using onGraphNodeAfterCallFunc = std::function<asio::awaitable<void>(
     const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>;
 
-class MiddlewareWarpHandleContext;
-class InterruptHandleArg_c;
+class MiddlewareWarpContext;
+class InterruptHandleArg;
 
-class BaseMiddlewareState_c {
+class BaseMiddlewareState {
 public:
-  BaseMiddlewareState_c() {}
+  BaseMiddlewareState() {}
 
-  virtual ~BaseMiddlewareState_c() {}
+  virtual ~BaseMiddlewareState() {}
 };
 
 template <typename T>
-concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
-                                  std::derived_from<T, BaseMiddlewareState_c>;
+concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState> ||
+                                  std::derived_from<T, BaseMiddlewareState>;
 
 /// 接口类型
 /// - 主要用于接收多种泛型参数, 见
-/// [MiddlewareWarpHandleContext::handles]，handles
+/// [MiddlewareWarpContext::handles]，handles
 ///   需要接收多种不同继承后的模版类型
 ///   BaseMiddlewareHandle<BaseMiddlewareStateType>，当 state
 ///   被继承时编译会失败，因此拉出 [BaseMiddlewareHandleInterface] 无 state
@@ -54,6 +55,8 @@ concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState_c> ||
 class BaseMiddlewareHandleInterface {
 protected:
 public:
+  inline static const std::string channelKey_interruptMessages{
+      "xx_interruptMessages"};
   inline static const std::string channelKey_interruptArg{"xx_interruptArg"};
   inline static const std::string channelKey_interruptResult{
       "xx_interruptResults"};
@@ -62,15 +65,15 @@ public:
 
   /// 名称
   std::string name;
-  std::weak_ptr<MiddlewareWarpHandleContext> handleContext;
+  std::weak_ptr<agentxx::agent::AgentContext> agentContext;
   /// 会被添加移动到 agent 中，完成后此处留空数组
   std::vector<std::unique_ptr<agentxx::tools::XXToolBase>> toolcalls{};
   /// 每个 [Middleware] 全局共享，按会话ID 取值 <thread_id, state>
-  std::map<std::string, std::shared_ptr<BaseMiddlewareState_c>> states{};
+  std::map<std::string, std::shared_ptr<BaseMiddlewareState>> states{};
 
   BaseMiddlewareHandleInterface(
       const std::string &in_name,
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext);
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext);
 
   /// ================ warp call ================
   virtual asio::awaitable<void>
@@ -155,8 +158,8 @@ protected:
 public:
   BaseMiddlewareHandle(
       const std::string &in_name,
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
-      : BaseMiddlewareHandleInterface(in_name, in_handleContext) {}
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : BaseMiddlewareHandleInterface(in_name, in_agentContext) {}
 
   asio::awaitable<void>
   onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
@@ -229,7 +232,7 @@ public:
 
   virtual asio::awaitable<void> saveStateItem(const std::string &thread_id,
                                               bool offload = true) {
-    std::shared_ptr<agentxx::middleware::BaseMiddlewareState_c> oldEntity =
+    std::shared_ptr<agentxx::middleware::BaseMiddlewareState> oldEntity =
         nullptr;
     bool doSave = false;
     if (offload) {
@@ -270,14 +273,14 @@ public:
 
   MiddlewareWarpHandle(
       const std::string &in_name,
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext,
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext,
       const onGraphNodeBeforeCallFunc &in_onAgentcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onAgentcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onModelcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onModelcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onToolcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onToolcallEnd = nullptr)
-      : BaseMiddlewareHandle<T>(in_name, in_handleContext),
+      : BaseMiddlewareHandle<T>(in_name, in_agentContext),
         onAgentcallStart(in_onAgentcallStart),
         onAgentcallEnd(in_onAgentcallEnd),
         onModelcallStart(in_onModelcallStart),
@@ -330,7 +333,7 @@ public:
   }
 };
 
-class MiddlewareWarpHandleContext {
+class MiddlewareWarpContext {
 public:
   class ThreadShareStore {
   public:
@@ -360,10 +363,10 @@ public:
 
   /// <name, handle>
   std::map<std::string, std::function<asio::awaitable<neograph::json>(
-                            const InterruptHandleArg_c &)>>
+                            const InterruptHandleArg &)>>
       interruptHandles{};
 
-  MiddlewareWarpHandleContext() {}
+  MiddlewareWarpContext() {}
 
   std::optional<std::string>
   getShareStoreItemValue(const std::string &thread_id, const int id) {
@@ -413,10 +416,10 @@ public:
 
   asio::awaitable<std::optional<neograph::json>>
   execInterruptHandle(const std::string &name,
-                      agentxx::middleware::InterruptHandleArg_c &arg);
+                      agentxx::middleware::InterruptHandleArg &arg);
 };
 
-class SummarizationToolHandle_c {
+class SummarizationToolHandle {
 public:
   std::function<void(size_t index,
                      std::map<std::string, size_t> &lastWriteIndex,
@@ -428,9 +431,9 @@ public:
       responseHandle;
 };
 
-class InterruptHandleArg_c {
+class InterruptHandleArg {
 public:
-  class InterruptHandleInputItem_c {
+  class InterruptHandleInputItem {
   public:
     std::string label;
     std::string depict;
@@ -439,9 +442,9 @@ public:
     std::string defaultValue;
     std::vector<std::string> enumValues;
 
-    inline static InterruptHandleInputItem_c
+    inline static InterruptHandleInputItem
     fromJson(const neograph::json &data) {
-      auto result = InterruptHandleInputItem_c{};
+      auto result = InterruptHandleInputItem{};
       if (data.is_object()) {
         if (data["label"].is_string()) {
           result.label = data["label"].get<std::string>();
@@ -476,9 +479,12 @@ public:
 
   std::string name;
   neograph::json arg;
-  std::vector<InterruptHandleInputItem_c> inputs;
+  std::vector<InterruptHandleInputItem> inputs;
 
   void throwInterrupt(neograph::graph::GraphState &state) {
+    std::cout << state.get("messages") << std::endl;
+    state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptMessages,
+                    state.get("messages"));
     state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptResult,
                     neograph::json{nullptr});
     state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptArg,
@@ -486,13 +492,16 @@ public:
     throw neograph::graph::NodeInterrupt{fmt::format("xx-Interrupt: {}", name)};
   }
 
+  /// - 一般应当在 Node 中触发,中断恢复会重新执行这个
+  /// Node,中断前的代码会重复执行!
   inline static neograph::json
   getInterruptResult(neograph::graph::GraphState &state,
-                     std::function<InterruptHandleArg_c(void)> onCreateArg) {
+                     std::function<InterruptHandleArg(void)> onCreateArg) {
     auto result =
         state.get(BaseMiddlewareHandleInterface::channelKey_interruptResult);
-    state.overwrite(BaseMiddlewareHandleInterface::channelKey_interruptResult,
-                    neograph::json{nullptr});
+    state.remove(BaseMiddlewareHandleInterface::channelKey_interruptResult);
+    std::cout << "Interrup Result: " << result << " " << result.is_null()
+              << std::endl;
     if (false == result.is_null()) {
       return result;
     }
@@ -505,12 +514,12 @@ public:
     return data.is_object() && data["name"].is_string();
   }
 
-  inline static std::optional<InterruptHandleArg_c>
+  inline static std::optional<InterruptHandleArg>
   fromJson(const neograph::json &data) {
     if (false == isAccordingFormat(data)) {
       return std::nullopt;
     }
-    auto result = InterruptHandleArg_c{};
+    auto result = InterruptHandleArg{};
     if (data.is_object()) {
       if (data["name"].is_string()) {
         result.name = data["name"].get<std::string>();
@@ -518,7 +527,7 @@ public:
       result.arg = data["arg"];
       if (data["inputs"].is_array()) {
         for (const auto &input : data["inputs"]) {
-          result.inputs.push_back(InterruptHandleInputItem_c::fromJson(input));
+          result.inputs.push_back(InterruptHandleInputItem::fromJson(input));
         }
       }
     }

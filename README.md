@@ -30,9 +30,7 @@
         - 分为两层规划
         - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
         - todo_list 描述近期需要实现的任务细节步骤
-    - ✅sub-agent
-        - 一轮 Toolcall 支持并发启动多个 Subagent
-        - subagent_task (隔离上下文)
+    - ✅Sub-Agent
     - ⬜tool_skill_search (延迟加载 tool/skill)
     - ⬜self-upgrade
         - 自动循环调整系统提示词、工具提示词等，评估效果
@@ -45,6 +43,12 @@
     - ⬜消息摘要，支持存储原始消息到 `share_store` 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
+- ✅Sub-Agent
+    - 借由 Tool 实现, 允许 llm/代码 异步启动 SubAgent
+    - Toolcall 支持并发，因此支持同时启动运行多个 Subagent
+    - 内置实现:
+        - subagent_task (仅隔离上下文)
+        - tool_skill_search
 - ✅Middleware支持
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅压缩上下文`SummarizationMiddleware`

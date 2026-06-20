@@ -2,6 +2,9 @@
 - hyperscan 匹配 \w 时包含了换行符
 
 ## LOG
+- 2026/06/20
+    - 支持主动中断、恢复执行
+    - 修复消息上下文拼接问题
 - 2026/06/18
     - `asio`改用`Boost.asio`
     - `execute_command`支持 `Boost.process` 协程异步执行外部命令

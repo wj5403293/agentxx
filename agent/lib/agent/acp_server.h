@@ -18,7 +18,7 @@
 
 namespace agentxx {
 
-namespace acpserver {
+namespace server {
 
 class UppercaseNode : public neograph::graph::GraphNode {
 public:
@@ -148,7 +148,7 @@ int run_server(bool test = false) {
   auto engine = build_engine();
 
   neograph::json info{
-      {"name", "agentxx-acpserver"},
+      {"name", "agentxx-server"},
       {"version", "0.1.0"},
   };
 
@@ -164,5 +164,5 @@ int run_server(bool test = false) {
   server.run(); // blocks on std::cin / std::cout
   return 0;
 }
-} // namespace acpserver
+} // namespace server
 } // namespace agentxx

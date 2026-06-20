@@ -1,3 +1,4 @@
+#include "agent/config.h"
 #include "agent/deepagent.h"
 #include "util/log.h"
 #include "util/string_util.h"
@@ -15,7 +16,7 @@ int main(int argn, char **argv) {
 #endif
   std::cout << "======= Agentxx Client =======" << std::endl;
 
-  auto config = std::make_shared<agentxx::AgentxxConfig_c>();
+  auto config = std::make_shared<agentxx::agent::AgentConfig>();
   config->modelOpenAIBaseUrl = "http://172.29.48.1:7070";
   config->systemPrompt = R"(
 1. 你(LLM/Agent)的名字是`萝卜`，平常聊天非需要无需提及自己的名字。
@@ -31,7 +32,7 @@ int main(int argn, char **argv) {
       "/home/coolight/program/agentxx/isolation/skills/"};
   // config->mcpServerUrls.push_back("http://172.29.48.1:17001");
 
-  auto agent = agentxx::DeepAgent{config};
+  auto agent = agentxx::agent::DeepAgent{config};
   agent.init();
   agent.runCli();
   return 0;

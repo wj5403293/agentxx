@@ -1,6 +1,7 @@
 #pragma once
 
 #include "agent/config.h"
+#include "agent/context.h"
 #include "asio/co_spawn.hpp"
 #include "asio/detached.hpp"
 #include "asio/io_context.hpp"
@@ -24,12 +25,12 @@
 #include "tools/tool_skill_search.h"
 #include "tools/web_search.h"
 #include "util/log.h"
-#include <format>
 #include <functional>
 #include <iostream>
 #include <memory>
 
 namespace agentxx {
+namespace agent {
 
 class DeepAgent {
 protected:
@@ -41,20 +42,19 @@ protected:
   /// asio::this_coro::executor` 获取当前异步函数运行时绑定的 io_context
   std::shared_ptr<asio::io_context> ioCtx = nullptr;
   std::unique_ptr<neograph::graph::GraphEngine> engine = nullptr;
-  std::shared_ptr<agentxx::AgentxxConfig_c> config = nullptr;
-  std::shared_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-      middlewareHandleContext = nullptr;
-  agentxx::tools::SubAgentManagerTool *subagentManagerToolPtr = nullptr;
+  std::shared_ptr<AgentContext> agentContext = nullptr;
 
 public:
-  DeepAgent(std::shared_ptr<agentxx::AgentxxConfig_c> in_config)
-      : config(in_config) {
-    assert(nullptr != config);
-    assert(config->modelOpenAIBaseUrl.empty() == false);
+  DeepAgent(std::shared_ptr<agentxx::agent::AgentConfig> in_config) {
     ioCtx = std::make_shared<asio::io_context>();
+    agentContext = std::make_shared<AgentContext>();
+    agentContext->agentConfig = in_config;
+    assert(nullptr != in_config);
+    assert(in_config->modelOpenAIBaseUrl.empty() == false);
   }
 
   void init() {
+    auto config = agentContext->agentConfig;
     neograph::llm::OpenAIProvider::Config provideConfig{
         .api_key = config->modelOpenAIApiKey,
         .base_url = config->modelOpenAIBaseUrl,
@@ -68,7 +68,7 @@ public:
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
             return std::make_unique<agentxx::nodes::AgentStartCallWrapNode>(
-                name, middlewareHandleContext);
+                name, agentContext);
           });
       neograph::graph::NodeFactory::instance().register_type(
           std::string{
@@ -76,71 +76,75 @@ public:
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
             return std::make_unique<
-                agentxx::nodes::MiddlewareWrapAgentEndCallNode>(
-                name, middlewareHandleContext);
+                agentxx::nodes::MiddlewareWrapAgentEndCallNode>(name,
+                                                                agentContext);
           });
       neograph::graph::NodeFactory::instance().register_type(
           std::string{agentxx::nodes::ModelCallWrapNode::defNodeType},
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
             return std::make_unique<agentxx::nodes::ModelCallWrapNode>(
-                name, ctx, middlewareHandleContext);
+                name, ctx, agentContext);
           });
       neograph::graph::NodeFactory::instance().register_type(
           std::string{agentxx::nodes::ToolcallWrapNode::defNodeType},
           [this](const std::string &name, const neograph::json &,
                  const neograph::graph::NodeContext &ctx) {
             return std::make_unique<agentxx::nodes::ToolcallWrapNode>(
-                name, ctx, middlewareHandleContext);
+                name, ctx, agentContext);
           });
     }
 
     /// middleware
-    middlewareHandleContext =
-        std::make_shared<agentxx::middleware::MiddlewareWarpHandleContext>();
+    agentContext->middlewareHandleContext =
+        std::make_shared<agentxx::middleware::MiddlewareWarpContext>();
     auto subagentManagerTool =
         std::make_unique<agentxx::tools::SubAgentManagerTool>(
             "subagent_manager");
-    subagentManagerToolPtr = subagentManagerTool.get();
+    agentContext->subagentManagerToolPtr = subagentManagerTool.get();
     {
       {
         auto skillMiddleware =
             std::make_shared<agentxx::middleware::SkillMiddlewareHandle>(
-                config->skillDirPaths, middlewareHandleContext);
+                config->skillDirPaths, agentContext);
         // skillMiddleware->toolcalls.push_back(
         //     std::make_unique<agentxx::tools::SkillTool>());
-        middlewareHandleContext->handles.push_back(skillMiddleware);
+        agentContext->middlewareHandleContext->handles.push_back(
+            skillMiddleware);
       }
 
       {
         auto summarizationMiddleware = std::make_shared<
             agentxx::middleware::SummarizationMiddlewareHandle>(
-            subagentManagerTool.get(), middlewareHandleContext, 256 * 1024);
-        middlewareHandleContext->handles.push_back(summarizationMiddleware);
+            subagentManagerTool.get(), agentContext, 256 * 1024);
+        agentContext->middlewareHandleContext->handles.push_back(
+            summarizationMiddleware);
       }
 
       {
         auto todolistMiddleware =
             std::make_shared<agentxx::middleware::PlanningMiddlewareHandle>(
-                middlewareHandleContext);
+                agentContext);
         todolistMiddleware->toolcalls.push_back(
             std::make_unique<agentxx::tools::WritePlanningTool>(
                 todolistMiddleware));
-        middlewareHandleContext->handles.push_back(todolistMiddleware);
+        agentContext->middlewareHandleContext->handles.push_back(
+            todolistMiddleware);
       }
 
       {
         auto permissionMiddleware =
             std::make_shared<agentxx::middleware::PermissionMiddlewareHandle>(
-                middlewareHandleContext);
-        middlewareHandleContext->handles.push_back(permissionMiddleware);
+                agentContext);
+        agentContext->middlewareHandleContext->handles.push_back(
+            permissionMiddleware);
       }
 
       /// Toolcall  应当作为最后一层
-      middlewareHandleContext->handles.push_back(
+      agentContext->middlewareHandleContext->handles.push_back(
           std::make_shared<agentxx::middleware::MiddlewareWarpHandle<
-              agentxx::middleware::BaseMiddlewareState_c>>(
-              "toolcall_log", middlewareHandleContext,
+              agentxx::middleware::BaseMiddlewareState>>(
+              "toolcall_log", agentContext,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
@@ -160,7 +164,7 @@ public:
     std::vector<std::unique_ptr<agentxx::tools::XXToolBase>> tools{};
     {
       /// middleware tools
-      for (auto &item : middlewareHandleContext->handles) {
+      for (auto &item : agentContext->middlewareHandleContext->handles) {
         if (false == item->toolcalls.empty()) {
           tools.insert(tools.end(),
                        std::make_move_iterator(item->toolcalls.begin()),
@@ -183,8 +187,8 @@ public:
       }
     }
     {
-      tools.push_back(std::make_unique<agentxx::tools::ThreadShareStoreTool>(
-          middlewareHandleContext));
+      tools.push_back(
+          std::make_unique<agentxx::tools::ThreadShareStoreTool>(agentContext));
       tools.push_back(
           std::make_unique<agentxx::tools::FileSystemListFileTool>());
       tools.push_back(
@@ -346,6 +350,9 @@ public:
             {
                 {"messages", {{"type", "list"}, {"reducer", "append"}}},
                 {agentxx::middleware::BaseMiddlewareHandleInterface::
+                     channelKey_interruptMessages,
+                 {{"reducer", "overwrite"}}},
+                {agentxx::middleware::BaseMiddlewareHandleInterface::
                      channelKey_interruptArg,
                  {{"reducer", "overwrite"}}},
                 {agentxx::middleware::BaseMiddlewareHandleInterface::
@@ -431,6 +438,7 @@ public:
   };
 
   asio::awaitable<void> runCliAsync() {
+    bool isFirstMsg = true;
     const auto thread_id = "session";
     auto messages = neograph::json::array();
 
@@ -448,13 +456,24 @@ public:
               .input = {{"messages", messages}},
               .max_steps = 100,
               .cancel_token = std::make_shared<neograph::graph::CancelToken>(),
-              .resume_if_exists = false,
+              // - [resume_if_exists]=true 时, 会读取历史记录, 并将 input
+              // 追加进去
+              // - [resume_if_exists]=false 时, 消息被 input 覆盖
+              .resume_if_exists = isFirstMsg,
           };
 
-          std::cout << config->agentNameView << ": " << std::flush;
+          std::cout << agentContext->agentConfig->agentNameView << ": "
+                    << std::flush;
           std::optional<neograph::graph::RunResult> result =
               co_await engine->run_stream_async(cfg, onHandleEvent);
-          messages = result->channel_raw("messages");
+          if (result->interrupted) {
+            messages = result->channel_raw(
+                agentxx::middleware::BaseMiddlewareHandleInterface::
+                    channelKey_interruptMessages);
+          } else {
+            messages = result->channel_raw("messages");
+          }
+          isFirstMsg = false;
 
           while (result.has_value() && result->interrupted) {
             auto crudeResult = std::move(result);
@@ -468,19 +487,21 @@ public:
 
             std::optional<neograph::json> resumeValue;
             auto interruptArg =
-                agentxx::middleware::InterruptHandleArg_c::fromJson(
+                agentxx::middleware::InterruptHandleArg::fromJson(
                     crudeResult->channel_raw(
                         agentxx::middleware::BaseMiddlewareHandleInterface::
                             channelKey_interruptArg));
             if (false == interruptArg.has_value()) {
               std::cout << "┣━ Unknown InterruptHanldeArg" << std::endl;
             } else {
-              auto handleIt = middlewareHandleContext->interruptHandles.find(
-                  interruptArg->name);
-              if (handleIt != middlewareHandleContext->interruptHandles.end()) {
-                resumeValue =
-                    co_await middlewareHandleContext->execInterruptHandle(
-                        interruptArg->name, interruptArg.value());
+              auto handleIt =
+                  agentContext->middlewareHandleContext->interruptHandles.find(
+                      interruptArg->name);
+              if (handleIt != agentContext->middlewareHandleContext
+                                  ->interruptHandles.end()) {
+                resumeValue = co_await agentContext->middlewareHandleContext
+                                  ->execInterruptHandle(interruptArg->name,
+                                                        interruptArg.value());
               } else {
                 std::cout << "┣━ Interrupt Handle Not Found for: "
                           << interruptArg->name << std::endl;
@@ -489,11 +510,26 @@ public:
             std::cout << "┗━━━━━━ Interrupted ━━━━━━┛\n" << std::endl;
 
             if (resumeValue.has_value()) {
-              engine->update_state(thread_id, resumeValue.value());
-              std::cout << config->agentNameView << " [Resume]: " << std::flush;
+              engine->update_state(
+                  thread_id, [&](neograph::graph::GraphState &state) {
+                    state.overwrite(
+                        agentxx::middleware::BaseMiddlewareHandleInterface::
+                            channelKey_interruptResult,
+                        resumeValue.value());
+                    state.overwrite("messages", messages);
+                  });
+
+              std::cout << agentContext->agentConfig->agentNameView
+                        << " [Resume]: " << std::flush;
               result = co_await engine->resume_async(thread_id, nullptr,
                                                      onHandleEvent);
-              messages = result->channel_raw("messages");
+              if (result->interrupted) {
+                messages = result->channel_raw(
+                    agentxx::middleware::BaseMiddlewareHandleInterface::
+                        channelKey_interruptMessages);
+              } else {
+                messages = result->channel_raw("messages");
+              }
             }
           }
         } catch (const std::exception &e) {
@@ -514,4 +550,6 @@ public:
 
   ~DeepAgent() { engine = nullptr; }
 };
+
+} // namespace agent
 }; // namespace agentxx

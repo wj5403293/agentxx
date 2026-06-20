@@ -25,12 +25,11 @@ protected:
 public:
   inline static constexpr auto defNodeType = std::string_view{"xx_Toolcall"};
 
-  ToolcallWrapNode(
-      const std::string &in_name, const neograph::graph::NodeContext &in_ctx,
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
+  ToolcallWrapNode(const std::string &in_name,
+                   const neograph::graph::NodeContext &in_ctx,
+                   std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : WrapHandleBaseNode<neograph::graph::ToolDispatchNode>(
-            in_name, in_handleContext, in_ctx) {}
+            in_name, in_agentContext, in_ctx) {}
 
   void
   onHandleStartError(bool errorRethrow, const std::exception *e,
@@ -99,10 +98,11 @@ public:
       if (targetIndex > 0) {
         const auto thread_id = args.value("thread_id", std::string{});
         assert(false == thread_id.empty());
-        auto handleContextPtr = handleContext.lock();
+        auto agentCtxPtr = agentContext.lock();
         // 超过限制长度，截断并存储原文
         auto storeId =
-            handleContextPtr->addShareStoreItemValue(thread_id, result);
+            agentCtxPtr->middlewareHandleContext->addShareStoreItemValue(
+                thread_id, result);
         // - 如果超过总摘要 1/3，按行摘要，留出行数以便后续用
         // `share_store` 分页按行取值 否则取总摘要
         if (lastLineIndex >= targetIndex / 3) {

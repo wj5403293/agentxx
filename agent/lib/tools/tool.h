@@ -37,10 +37,10 @@ public:
 
   std::string get_name() const override { return name; }
 
-  virtual std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  virtual std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const {
     return std::nullopt;
-    // return agentxx::middleware::SummarizationToolHandle_c{
+    // return agentxx::middleware::SummarizationToolHandle{
     //     .requestHandle =
     //         [](size_t index, std::map<std::string, size_t> &lastWriteIndex,
     //            neograph::json &args, neograph::ToolCall &toolcall) {
@@ -58,14 +58,14 @@ public:
 class XXToolWarp : public XXToolBase {
 protected:
   std::unique_ptr<neograph::Tool> inner;
-  std::optional<agentxx::middleware::SummarizationToolHandle_c>
+  std::optional<agentxx::middleware::SummarizationToolHandle>
       summarizationHandle;
 
 public:
   explicit XXToolWarp(
       bool in_autoSummaryOutput, bool in_canDelayLoad,
       std::unique_ptr<neograph::Tool> &&in_inner,
-      std::optional<agentxx::middleware::SummarizationToolHandle_c>
+      std::optional<agentxx::middleware::SummarizationToolHandle>
           in_summarizationHandle = std::nullopt)
       : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad),
         inner(std::move(in_inner)),

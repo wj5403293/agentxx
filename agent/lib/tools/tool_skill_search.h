@@ -62,7 +62,7 @@ Remember: Output ONLY valid JSON, nothing else before or after.
 
   std::vector<DelayToolInfo> delayToolInfos;
   std::vector<std::string> skillDirPaths;
-  std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext> handleContext;
+  std::weak_ptr<agentxx::agent::AgentContext> agentContext;
 
   inline static constexpr auto graphDataKey_loadedTools =
       std::string_view{"toolSkillSearch_loadedTools"};
@@ -74,15 +74,14 @@ public:
       const neograph::graph::NodeContext &in_context,
       const std::vector<DelayToolInfo> &in_delayToolInfos,
       const std::vector<std::string> &in_skillDirPaths,
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : ::agentxx::tools::SubAgentTaskBase(
             "tool_skill_search",
             "Search available tool or skill for loading. "
             "(already set system prompt)",
             ""),
         delayToolInfos(in_delayToolInfos), skillDirPaths(in_skillDirPaths),
-        handleContext(in_handleContext) {
+        agentContext(in_agentContext) {
     createSubgraph(in_context);
     createSystemPrompt();
   }
@@ -94,14 +93,14 @@ public:
         co_return;
       }
 
-      auto handleContextPtr = handleContext.lock();
-      if (!handleContextPtr) {
+      auto agentCtxPtr = agentContext.lock();
+      if (!agentCtxPtr) {
         co_return;
       }
 
       // if (jsonResult["tool"].is_array()) {
       //   auto &loadedTools =
-      //       handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
+      //       agentCtxPtr->getGraphDataItemValue<std::vector<std::string>>(
       //           "session", graphDataKey_loadedTools);
       //   for (const auto &item : jsonResult["tool"]) {
       //     if (item.is_string()) {
@@ -112,7 +111,7 @@ public:
 
       // if (jsonResult["skill"].is_array()) {
       //   auto &loadedSkills =
-      //       handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
+      //       agentCtxPtr->getGraphDataItemValue<std::vector<std::string>>(
       //           "session", graphDataKey_loadedSkills);
       //   for (const auto &item : jsonResult["skill"]) {
       //     if (item.is_string()) {
@@ -128,10 +127,10 @@ public:
       //         stream.close();
       //         if (!content.empty()) {
       //           auto &systemMsgList =
-      //               handleContextPtr
+      //               agentCtxPtr
       //                   ->getGraphDataItemValue<std::vector<std::string>>(
       //                       "session",
-      //                       agentxx::middleware::MiddlewareWarpHandleContext::
+      //                       agentxx::middleware::MiddlewareWarpContext::
       //                           graphDataKey_systemMessage);
       //           systemMsgList.push_back(fmt::format(
       //               "\n## Loaded Skill: {}\n\n{}", skillPath, content));

@@ -26,11 +26,10 @@ public:
   inline static constexpr auto defNodeType =
       std::string_view{"xx_MiddlewareWrapModelCall"};
 
-  ModelCallWrapNode(
-      const std::string &name, const neograph::graph::NodeContext &ctx,
-      std::weak_ptr<agentxx::middleware::MiddlewareWarpHandleContext>
-          in_handleContext)
-      : WrapHandleBaseNode<neograph::graph::LLMCallNode>(name, in_handleContext,
+  ModelCallWrapNode(const std::string &name,
+                    const neograph::graph::NodeContext &ctx,
+                    std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : WrapHandleBaseNode<neograph::graph::LLMCallNode>(name, in_agentContext,
                                                          ctx),
         baseSystemPrompt(ctx.instructions) {}
 
@@ -101,12 +100,13 @@ public:
     }
 
     {
-      auto handleContextPtr = handleContext.lock();
+      auto agentCtxPtr = agentContext.lock();
       auto &appendSystemMsgList =
-          handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
-              in.ctx.thread_id,
-              agentxx::middleware::MiddlewareWarpHandleContext::
-                  graphDataKey_systemMessage);
+          agentCtxPtr->middlewareHandleContext
+              ->getGraphDataItemValue<std::vector<std::string>>(
+                  in.ctx.thread_id,
+                  agentxx::middleware::MiddlewareWarpContext::
+                      graphDataKey_systemMessage);
 
       // 清空原本的 content
       newSystemMsg.content = "";

@@ -20,7 +20,7 @@
 namespace agentxx {
 namespace middleware {
 
-class _SkillMetadata_c {
+class _SkillMetadata {
 public:
   std::string dirpath;
 
@@ -67,25 +67,25 @@ public:
   std::string mdText;
 };
 
-class _SkillContext_c {
+class _SkillContext {
 public:
   /// <path, data>
-  std::map<std::string, _SkillMetadata_c> skillData{};
+  std::map<std::string, _SkillMetadata> skillData{};
 
   /// <path, error>
   std::map<std::string, std::string> loadErrors{};
 };
 
-class SkillMiddlewareState_c : public BaseMiddlewareState_c {
+class SkillMiddlewareState : public BaseMiddlewareState {
 public:
   std::string cacheFormatSkillPrompt;
-  _SkillContext_c skillContext{};
+  _SkillContext skillContext{};
 
-  SkillMiddlewareState_c() {}
+  SkillMiddlewareState() {}
 };
 
 class SkillMiddlewareHandle
-    : public BaseMiddlewareHandle<SkillMiddlewareState_c> {
+    : public BaseMiddlewareHandle<SkillMiddlewareState> {
 protected:
   inline static constexpr std::string_view defSkillPromptTemplate =
       std::string_view{R"_(
@@ -131,15 +131,15 @@ Remember: Skills make you more capable and consistent. When in doubt, check if a
   /// 初始化后固定，按指定的文件夹扫描 SKILL.md
   const std::vector<std::string> initSkillDirPaths;
 
-  _SkillContext_c skillCache{};
+  _SkillContext skillCache{};
   bool haveLoadSkillMetadata = false;
 
 public:
   SkillMiddlewareHandle(
       const std::vector<std::string> &in_initSkillDirPaths,
-      std::weak_ptr<MiddlewareWarpHandleContext> in_handleContext)
-      : BaseMiddlewareHandle<SkillMiddlewareState_c>("SkillMiddlewareHandle",
-                                                     in_handleContext),
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : BaseMiddlewareHandle<SkillMiddlewareState>("SkillMiddlewareHandle",
+                                                   in_agentContext),
         initSkillDirPaths(in_initSkillDirPaths) {}
 
   std::string formatSkillsMetadataList() {
@@ -160,10 +160,10 @@ public:
   }
 
   /// <error, metadata>
-  asio::awaitable<std::pair<std::string, agentxx::middleware::_SkillMetadata_c>>
+  asio::awaitable<std::pair<std::string, agentxx::middleware::_SkillMetadata>>
   readSkillFile(std::string_view dirpath) {
     auto data =
-        agentxx::middleware::_SkillMetadata_c{.dirpath = std::string{dirpath}};
+        agentxx::middleware::_SkillMetadata{.dirpath = std::string{dirpath}};
     std::ifstream stream;
     try {
       stream.open(std::string{dirpath} + "/SKILL.md");
@@ -299,12 +299,12 @@ public:
             fmt::format(defSkillPromptTemplate, formatSkillsMetadataList());
       }
 
-      auto handleContextPtr = handleContext.lock();
+      auto agentCtxPtr = agentContext.lock();
       auto &appendSystemMsgList =
-          handleContextPtr->getGraphDataItemValue<std::vector<std::string>>(
-              in.ctx.thread_id,
-              agentxx::middleware::MiddlewareWarpHandleContext::
-                  graphDataKey_systemMessage);
+          agentCtxPtr->middlewareHandleContext
+              ->getGraphDataItemValue<std::vector<std::string>>(
+                  in.ctx.thread_id, agentxx::middleware::MiddlewareWarpContext::
+                                        graphDataKey_systemMessage);
       appendSystemMsgList.push_back(skillState->cacheFormatSkillPrompt);
     }
     co_return;
