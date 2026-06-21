@@ -314,10 +314,6 @@ Returns the most relevant documents with their content, source, and similarity s
               auto &doc = result.back();
               fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )",
                            doc.title, doc.content.size(), itemPath);
-              for (const auto &str : doc.content) {
-                fmt::println("  - Size: {} | {}", str.size(),
-                             agentxx::util::utf8GetLengthCheckAvail(str));
-              }
             }
           }
         }
@@ -326,10 +322,6 @@ Returns the most relevant documents with their content, source, and similarity s
           auto &doc = result.back();
           fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )", doc.title,
                        doc.content.size(), itemPath);
-          for (const auto &str : doc.content) {
-            fmt::println("  - Size: {} | {}", str.size(),
-                         agentxx::util::utf8GetLengthCheckAvail(str));
-          }
         }
       }
     }
