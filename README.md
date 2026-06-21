@@ -20,7 +20,7 @@
         - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
         - ⬜execute_python_command
         - ⬜execute_javascript_command
-        - ⬜拦截输出，自动压缩、提取摘要存储到 share_store
+        - ✅拦截输出，自动压缩、提取摘要存储到 share_store
     - ✅web_search
         - web_search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
         - web_fetch_url_markdown (html to markdown)
@@ -31,14 +31,13 @@
         - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
         - todo_list 描述近期需要实现的任务细节步骤
     - ✅Sub-Agent
+    - ✅RAGSearch
     - ⬜tool_skill_search (延迟加载 tool/skill)
-    - ⬜self-upgrade
-        - 自动循环调整系统提示词、工具提示词等，评估效果
-        - 自动测试
     - ✅get_current_datetime 获取系统时间戳、本地时间、UTC时间
 - ✅Tree-Messages
-    - share_store (会话独立，提供 Store 允许模型存取变量，skill、tool之间传递数据)
+    - share_store (允许存取变量，在 llm-messages、skill、tool 之间传递数据)
         - 支持 `line_offset`/`line_limit` 文本分页读取
+        - 压缩上下文时会将部分内容存储到 `share_store`
         - 自动拦截 tool/subagent 返回值，太长时存储原始内容到 `share_store`, 并留下摘要和 id
     - ⬜消息摘要，支持存储原始消息到 `share_store` 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
@@ -49,7 +48,7 @@
     - 内置实现:
         - subagent_task (仅隔离上下文)
         - tool_skill_search
-- ✅Middleware支持
+- ✅Middleware
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
 - ✅压缩上下文`SummarizationMiddleware`
     - 自动估算 tokens，达到阈值时自动启动压缩
@@ -58,11 +57,13 @@
     - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
-- ✅异常处理和中断恢复
-    - 用户终止执行
-    - 暂停等待用户响应
-    - 异常中断恢复执行
+- ✅异常处理和自动重试
     - Toolcall/LLM 节点自动重试
+    - Toolcall/LLM 节点异常时自动添加消息到上下文，保持消息顺序正确
+    - 保持 Middleware 拦截执行的顺序和异常处理正确
+- ✅中断恢复
+    - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
+    - 支持用户取消执行
 - ⬜Permission
 - ⬜Memory
     - 持久记忆
@@ -75,6 +76,10 @@
     - Mcp Server
         - CodeGraph
         - Websearch
+- ⬜Self-upgrade
+    - 自动循环调整系统提示词、工具提示词等，评估效果
+    - 自动测试
+    - 空闲时自动优化 skill、prompt
 - ⬜扩展
     - ✅CodeGraph
         - ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
