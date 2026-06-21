@@ -20,6 +20,7 @@ public:
   std::string systemPrompt = "You are a helpful assistant.";
   std::vector<std::string> skillDirPaths{};
   std::vector<std::string> mcpServerUrls{};
+  std::vector<std::string> ragDocsPaths{};
 
   /// TODO: 更换api
   /// - [duckduckgo] `https://duckduckgo.com/html/?q={}` 国内连接不稳定

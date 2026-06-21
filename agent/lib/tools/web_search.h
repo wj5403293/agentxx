@@ -60,11 +60,11 @@ public:
     auto search_url = fmt::format(fmt::runtime(searchApiUrl),
                                   agentxx::util::HttpClient::urlEncode(query));
 
-    std::optional<std::exception> out_resp_err;
+    std::optional<std::string> out_resp_err;
     if (convertHtml2markdown) {
-      auto [resp, resp_err] = co_await agentxx::util::HttpClient::getAsync(
+      auto resp = co_await agentxx::util::HttpClient::getAsync(
           search_url, std::chrono::seconds{15});
-      out_resp_err = resp_err;
+      out_resp_err = resp.error_or("unknown");
       if (resp.has_value()) {
         auto &respVal = resp.value();
         if (agentxx::util::HttpClient::respIsSucc(respVal)) {
@@ -80,9 +80,8 @@ public:
         }
       }
     } else {
-      auto [resp, resp_err] =
-          co_await agentxx::util::HttpClient::fetchMarkdown(search_url);
-      out_resp_err = resp_err;
+      auto resp = co_await agentxx::util::HttpClient::fetchMarkdown(search_url);
+      out_resp_err = resp.error_or("unknown");
       if (resp.has_value()) {
         auto &data = resp.value();
         if (data.empty()) {
@@ -95,7 +94,7 @@ public:
         co_return data;
       }
     }
-    throw out_resp_err.value_or(std::runtime_error("[unknown]"));
+    throw std::runtime_error(out_resp_err.value_or("[unknown]"));
   }
 };
 
@@ -140,14 +139,13 @@ public:
     }
     int timeout = int(arguments.value<double>("timeout", 60.0));
 
-    auto [resp, resp_err] = co_await agentxx::util::HttpClient::getAsync(
+    auto resp = co_await agentxx::util::HttpClient::getAsync(
         url, std::chrono::seconds(timeout));
     if (resp.has_value()) {
       if (false == agentxx::util::HttpClient::respIsSucc(resp.value())) {
         co_return fmt::format(
             R"({{"error":"web_fetch_url failed, status {}, error: {}"}})",
-            resp.value().status,
-            resp_err.value_or(std::runtime_error("[none]")).what());
+            resp.value().status, resp.error_or("[unknown]"));
       }
 
       auto &data = resp.value().body;
@@ -156,7 +154,7 @@ public:
       }
       co_return data;
     }
-    throw resp_err.value_or(std::runtime_error("[unknown]"));
+    throw std::runtime_error(resp.error_or("[unknown]"));
   }
 };
 
@@ -203,8 +201,7 @@ public:
       co_return R"({"error":"Arg `url` is empty"})";
     }
 
-    auto [resp, resp_err] =
-        co_await agentxx::util::HttpClient::fetchMarkdown(url);
+    auto resp = co_await agentxx::util::HttpClient::fetchMarkdown(url);
     if (resp.has_value()) {
       auto &data = resp.value();
       if (data.empty()) {
@@ -216,7 +213,7 @@ public:
       }
       co_return data;
     }
-    throw resp_err.value_or(std::runtime_error("[unknown]"));
+    throw std::runtime_error(resp.error_or("[unknown]"));
   }
 };
 } // namespace tools

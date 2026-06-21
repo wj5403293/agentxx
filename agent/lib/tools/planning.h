@@ -50,7 +50,8 @@ public:
 A Mermaid stateDiagram-v2 that captures the OVERALL workflow — the big picture.
 This is your roadmap: major phases, dependencies between tasks, error recovery
 paths, and the start-to-finish flow. Update this diagram whenever the plan
-changes (new tasks, completed phases, dead ends).
+changes (new tasks, completed phases, dead ends). After the execution is completed, 
+an overall summary should be made.
 
 State diagram conventions:
 - Use `[*]` for start/end pseudo-states

@@ -110,6 +110,7 @@ add_definitions(-DASIO_STANDALONE=1)
 # add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_PROCESS_USE_STD_FS=1)
 
+include_directories(${third_party_DIR}/PaddleOCR/deploy/cpp_infer/)
 include_directories(${Boost_ROOT}/include/)
 include_directories(${Boost_ROOT}/include/boost/)
 include_directories(${third_party_DIR})

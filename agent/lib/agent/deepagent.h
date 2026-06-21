@@ -19,6 +19,7 @@
 #include "tools/filesystem.h"
 #include "tools/get_current_datetime.h"
 #include "tools/planning.h"
+#include "tools/rag_search.h"
 #include "tools/share_store.h"
 #include "tools/string.h"
 #include "tools/sub_agent.h"
@@ -53,7 +54,7 @@ public:
     assert(in_config->modelOpenAIBaseUrl.empty() == false);
   }
 
-  void init() {
+  asio::awaitable<void> init() {
     auto config = agentContext->agentConfig;
     neograph::llm::OpenAIProvider::Config provideConfig{
         .api_key = config->modelOpenAIApiKey,
@@ -205,6 +206,26 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
       tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
+
+      if (false == config->ragDocsPaths.empty()) {
+        auto docs = co_await agentxx::tools::RAGSearchTool::scanDocument(
+            config->ragDocsPaths);
+        auto client = std::make_shared<agentxx::tools::EmbeddingClient>(
+            config->modelOpenAIBaseUrl, config->modelOpenAIApiKey,
+            config->modelOpenAIModelName);
+        auto docsStore =
+            std::make_shared<agentxx::tools::RAGSearchTool::VectorStore>(
+                client);
+        std::cout << "\n┏━━━━━━ RAG embedding ━━━━━━┓" << std::endl;
+        if (co_await docsStore->addDocuments(std::move(docs))) {
+          fmt::println("┣━ ✅ success: append {} docs", docs.size());
+        } else {
+          std::cout << "┣━ ❌ failed" << std::endl;
+        }
+        std::cout << "┗━━━━━━ RAG embedding ━━━━━━┛\n" << std::endl;
+        tools.push_back(
+            std::make_unique<agentxx::tools::RAGSearchTool>(docsStore));
+      }
 
       if (false == config->websearchApiUrl.empty()) {
         tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>(
@@ -420,6 +441,8 @@ public:
       }
       engine->own_tools(std::move(crudeTools));
     }
+
+    co_return;
   }
 
   static void onHandleEvent(const neograph::graph::GraphEvent &event) {
@@ -455,6 +478,7 @@ public:
               .thread_id = thread_id,
               .input = {{"messages", messages}},
               .max_steps = 100,
+              .stream_mode = neograph::graph::StreamMode::ALL,
               .cancel_token = std::make_shared<neograph::graph::CancelToken>(),
               // - [resume_if_exists]=true 时, 会读取历史记录, 并将 input
               // 追加进去
@@ -543,7 +567,10 @@ public:
   void runCli() {
     asio::co_spawn(
         *ioCtx,
-        [this]() -> asio::awaitable<void> { co_return co_await runCliAsync(); },
+        [this]() -> asio::awaitable<void> {
+          co_await init();
+          co_return co_await runCliAsync();
+        },
         asio::detached);
     ioCtx->run();
   }

@@ -18,6 +18,7 @@
 namespace agentxx {
 namespace tools {
 
+/// TODO: 尝试 subagent 提交结果时使用 toolcall，以便规范其传输结果的格式
 /// 当主模型在已加载的 tool和skill
 /// 中未找到可以解决用户需求的方法时，可以尝试调用`tool_skill_search`查找可能可用的
 /// tool 或 skill

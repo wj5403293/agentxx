@@ -76,9 +76,10 @@ inline size_t utf8GetLength(std::string_view in_str) {
   return length;
 }
 
-inline size_t findIndexByUtf8Length(std::string_view in_str, size_t targetLen) {
+inline size_t findIndexByUtf8Length(std::string_view in_str, size_t targetLen,
+                                    size_t start = 0) {
   size_t count = 0;
-  size_t i = 0, step = 0;
+  size_t i = start, step = 0;
   for (; i < in_str.size();) {
     unsigned char byte = in_str[i];
     // lenght 6

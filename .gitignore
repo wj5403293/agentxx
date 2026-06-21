@@ -1,5 +1,4 @@
-/isolation/workspace/*
-/isolation/skills/public/*
+/isolation/*
 /package/*
 /resource/temp/*
 .langgraph_api

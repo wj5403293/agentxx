@@ -25,11 +25,11 @@ namespace tools {
 class StringHtml2MarkdownTool : public XXToolBase {
 public:
   explicit StringHtml2MarkdownTool()
-      : XXToolBase("html_to_markdown", true, true) {}
+      : XXToolBase("string_html_to_markdown", true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
-        "html_to_markdown",
+        "string_html_to_markdown",
         R"(HTML to markdown)",
         neograph::json{
             {"type", "object"},

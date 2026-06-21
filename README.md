@@ -77,8 +77,14 @@
         - Websearch
 - ⬜扩展
     - ✅CodeGraph
-        ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
-    - RAG
+        - ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
+    - ✅RAG
+        - 文本分割方式:
+            - 分块 + 20%重叠
+            - ✅定长分割
+            - ⬜字符分割
+            - ⬜结构分割 (较长的再进行字符分割)
+            - ⬜语义分割
     - PaddleOCR (图片转文本)
     - SD.cpp 图片视频生成
     - FunASR 语音识别
