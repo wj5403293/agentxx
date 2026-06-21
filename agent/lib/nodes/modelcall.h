@@ -150,10 +150,10 @@ public:
             in, result);
         co_return;
       } catch (const std::exception &e) {
-        if (retry < agentCtxPtr->agentConfig->llmRetry) {
+        if (retry < agentCtxPtr->agentConfig->llmMaxRetry) {
           retry++;
           XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
-                  agentCtxPtr->agentConfig->llmRetry, e.what());
+                  agentCtxPtr->agentConfig->llmMaxRetry, e.what());
         } else {
           throw;
         }

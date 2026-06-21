@@ -21,19 +21,29 @@ namespace tools {
 class XXToolBase : public neograph::AsyncTool {
 protected:
   const std::string name;
-  const size_t retry;
 
 public:
+  /// - 自动压缩 tool 输出，当长度超过限制值
+  /// [agentxx::agent::AgentConfig::toolcallSummaryLimitOutputLength] 时，且该
+  /// tool 启用 [autoSummaryOutput] 则进行压缩
   const bool autoSummaryOutput;
+  /// - 延迟加载
+  /// - `true`: 该 tool 在初始时仅记录名称等简短信息在 system prompt，由
+  /// `tool_skill_search` 检索查找合适的 tool 后才加载全量信息并支持LLM调用
   const bool canDelayLoad;
+  /// - 最大重试次数
+  /// - 如果 [maxRetry] > 0，当 tool 执行抛出异常时，进行重试
+  /// - 最多执行 1 + maxRetry(retry) 次
+  const size_t maxRetry;
 
   explicit XXToolBase(const std::string &in_name,
                       bool in_autoSummaryOutput = false,
-                      bool in_canDelayLoad = true, size_t in_retry = 0)
+                      bool in_canDelayLoad = true, size_t in_maxRetry = 0)
       : name(in_name), autoSummaryOutput(in_autoSummaryOutput),
-        canDelayLoad(in_canDelayLoad), retry(in_retry) {
+        canDelayLoad(in_canDelayLoad), maxRetry(in_maxRetry) {
     extra["autoSummaryOutput"] = autoSummaryOutput ? "true" : "false";
     extra["canDelayLoad"] = canDelayLoad ? "true" : "false";
+    extra["maxRetry"] = std::to_string(maxRetry);
   }
 
   std::string get_name() const override { return name; }
@@ -56,6 +66,9 @@ public:
   }
 };
 
+/// - 封装原始的 [neograph::Tool] 类型，添加额外功能
+/// - 部分函数 (如 MCP) 返回的 tool 类型是原始的 [neograph::Tool]，可以用
+/// [XXToolWarp] 进行封装扩展功能
 class XXToolWarp : public XXToolBase {
 protected:
   std::unique_ptr<neograph::Tool> inner;
@@ -64,11 +77,12 @@ protected:
 
 public:
   explicit XXToolWarp(
-      bool in_autoSummaryOutput, bool in_canDelayLoad, ,
-      size_t in_retry = 0 std::unique_ptr<neograph::Tool> && in_inner,
+      std::unique_ptr<neograph::Tool> &&in_inner,
+      bool in_autoSummaryOutput = false, bool in_canDelayLoad = false,
+      size_t in_maxRetry = 0,
       std::optional<agentxx::middleware::SummarizationToolHandle>
           in_summarizationHandle = std::nullopt)
-      : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad, in_retry),
+      : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad, in_maxRetry),
         inner(std::move(in_inner)),
         summarizationHandle(in_summarizationHandle) {}
 

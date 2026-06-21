@@ -85,10 +85,37 @@ public:
 
   asio::awaitable<std::string> execTool(neograph::Tool *tool,
                                         neograph::json &args) const override {
-    constexpr size_t limitLength = 2 * 1024;
-    auto result =
-        co_await neograph::graph::ToolDispatchNode::execTool(tool, args);
+    size_t maxRetry = 0;
+    {
+      auto str = tool->extra["maxRetry"];
+      auto result =
+          std::from_chars(str.c_str(), str.c_str() + str.size(), maxRetry);
+      if (result.ec != std::errc{}) {
+        maxRetry = 0;
+      }
+    }
 
+    std::string result;
+    size_t retry = 0;
+    do {
+      try {
+        result =
+            co_await neograph::graph::ToolDispatchNode::execTool(tool, args);
+        break;
+      } catch (const std::exception &e) {
+        if (retry < maxRetry) {
+          retry++;
+          XX_LOGD("ToolCallNode {} retry: {}/{} | {}", tool->get_name(), retry,
+                  maxRetry, e.what());
+        } else {
+          throw;
+        }
+      }
+    } while (true);
+
+    auto agentCtxPtr = agentContext.lock();
+    const size_t limitLength =
+        agentCtxPtr->agentConfig->toolcallSummaryLimitOutputLength;
     if ("true" == tool->extra["autoSummaryOutput"] &&
         result.size() >= limitLength) {
       // 字节数量超过，按 utf8 长度判断
@@ -98,7 +125,6 @@ public:
       if (targetIndex > 0) {
         const auto thread_id = args.value("thread_id", std::string{});
         assert(false == thread_id.empty());
-        auto agentCtxPtr = agentContext.lock();
         // 超过限制长度，截断并存储原文
         auto storeId =
             agentCtxPtr->middlewareHandleContext->addShareStoreItemValue(

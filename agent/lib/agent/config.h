@@ -17,6 +17,7 @@ public:
 
   std::string currentSystemName;
   bool isSystemWSL = false;
+
   std::string systemPrompt = "You are a helpful assistant.";
   std::vector<std::string> skillDirPaths{};
   std::vector<std::string> mcpServerUrls{};
@@ -24,7 +25,11 @@ public:
 
   /// LLM 节点最大重试次数
   /// - 最多执行 1 + 3(retry) = 4 次
-  size_t llmRetry = 3;
+  size_t llmMaxRetry = 3;
+  /// - 当 toolcall 启用了 [agentxx::tools::XXToolBase::autoSummaryOutput]
+  /// 且输出超过限制值 [toolcallSummaryLimitOutputLength] 时进行压缩
+  /// - 功能实现见 [agentxx::node::ToolcallWrapNode::execTool]
+  size_t toolcallSummaryLimitOutputLength = 2 * 1024;
 
   /// TODO: 更换api
   /// - [duckduckgo] `https://duckduckgo.com/html/?q={}` 国内连接不稳定
