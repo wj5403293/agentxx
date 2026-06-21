@@ -90,7 +90,7 @@ public:
           endpoint.tls, opts);
       co_return std::expected<neograph::async::HttpResponse, std::string>{
           std::move(resp)};
-    } catch (const std::system_error &e) {
+    } catch (const std::exception &e) {
       XX_LOGE("http_get failed ({}): {}", url, e.what());
       co_return std::unexpected{e.what()};
     }
@@ -103,21 +103,22 @@ public:
     if (endpoint.prefix.empty()) {
       endpoint.prefix = "/";
     }
-    auto cli = httplib::Client{fmt::format(
-        "{}://{}:{}", endpoint.tls ? "https" : "http", endpoint.host,
-        (endpoint.port.empty() ? (endpoint.tls ? "443" : "80")
-                               : endpoint.port))};
-    cli.set_read_timeout(30, 0);
-
-    httplib::Headers headers = {
-        {"accept-language", "zh-CN,zh;q=0.9"},
-        {"Content-Type", "application/json"},
-        {"User-Agent",
-         R"(Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.160 Safari/537.36)"},
-    };
-    cli.set_default_headers(headers);
 
     try {
+      auto cli = httplib::Client{fmt::format(
+          "{}://{}:{}", endpoint.tls ? "https" : "http", endpoint.host,
+          (endpoint.port.empty() ? (endpoint.tls ? "443" : "80")
+                                 : endpoint.port))};
+      cli.set_read_timeout(30, 0);
+
+      httplib::Headers headers = {
+          {"accept-language", "zh-CN,zh;q=0.9"},
+          {"Content-Type", "application/json"},
+          {"User-Agent",
+           R"(Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.160 Safari/537.36)"},
+      };
+      cli.set_default_headers(headers);
+
       auto resp = cli.Post(endpoint.prefix, body.dump(), "application/json");
       if (respIsSucc(resp)) {
         co_return std::expected<::httplib::Result, std::string>{
@@ -126,7 +127,7 @@ public:
         XX_LOGE("http_post failed ({}): {}", url, resp->status);
         co_return std::unexpected{std::to_string(resp->status)};
       }
-    } catch (const std::system_error &e) {
+    } catch (const std::exception &e) {
       XX_LOGE("http_post failed ({}): {}", url, e.what());
       co_return std::unexpected{e.what()};
     }
@@ -152,7 +153,7 @@ public:
           std::move(headers), endpoint.tls, opts);
       co_return std::expected<neograph::async::HttpResponse, std::string>{
           std::move(resp)};
-    } catch (const std::system_error &e) {
+    } catch (const std::exception &e) {
       XX_LOGE("http_post failed ({}): {}", url, e.what());
       co_return std::unexpected{e.what()};
     }

@@ -143,8 +143,22 @@ public:
           in.state.get_messages());
     }
 
-    co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(in,
-                                                                       result);
+    size_t retry = 0;
+    do {
+      try {
+        co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(
+            in, result);
+        co_return;
+      } catch (const std::exception &e) {
+        if (retry < agentCtxPtr->agentConfig->llmRetry) {
+          retry++;
+          XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
+                  agentCtxPtr->agentConfig->llmRetry, e.what());
+        } else {
+          throw;
+        }
+      }
+    } while (true);
   }
 };
 } // namespace nodes

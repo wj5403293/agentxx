@@ -21,6 +21,7 @@ namespace tools {
 class XXToolBase : public neograph::AsyncTool {
 protected:
   const std::string name;
+  const size_t retry;
 
 public:
   const bool autoSummaryOutput;
@@ -28,9 +29,9 @@ public:
 
   explicit XXToolBase(const std::string &in_name,
                       bool in_autoSummaryOutput = false,
-                      bool in_canDelayLoad = true)
+                      bool in_canDelayLoad = true, size_t in_retry = 0)
       : name(in_name), autoSummaryOutput(in_autoSummaryOutput),
-        canDelayLoad(in_canDelayLoad) {
+        canDelayLoad(in_canDelayLoad), retry(in_retry) {
     extra["autoSummaryOutput"] = autoSummaryOutput ? "true" : "false";
     extra["canDelayLoad"] = canDelayLoad ? "true" : "false";
   }
@@ -63,11 +64,11 @@ protected:
 
 public:
   explicit XXToolWarp(
-      bool in_autoSummaryOutput, bool in_canDelayLoad,
-      std::unique_ptr<neograph::Tool> &&in_inner,
+      bool in_autoSummaryOutput, bool in_canDelayLoad, ,
+      size_t in_retry = 0 std::unique_ptr<neograph::Tool> && in_inner,
       std::optional<agentxx::middleware::SummarizationToolHandle>
           in_summarizationHandle = std::nullopt)
-      : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad),
+      : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad, in_retry),
         inner(std::move(in_inner)),
         summarizationHandle(in_summarizationHandle) {}
 
