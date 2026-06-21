@@ -42,10 +42,10 @@ public:
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
     auto agentCtxPtr = agentContext.lock();
     auto appendSystemPromptList =
-        agentCtxPtr->middlewareHandleContext
-            ->getGraphDataItemValue<std::vector<std::string>>(
-                in.ctx.thread_id, agentxx::middleware::MiddlewareWarpContext::
-                                      graphDataKey_systemMessage);
+        agentCtxPtr->middlewareHandleContext->getGraphDataItemValue<
+            std::vector<std::string>>(
+            in.ctx.thread_id,
+            agentxx::middleware::MiddlewareContext::graphDataKey_systemMessage);
     appendSystemPromptList.push_back(
         R"(
 ## Planning

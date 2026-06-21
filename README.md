@@ -57,6 +57,10 @@
     - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
+- ⬜Memory
+    - 持久记忆
+    - 总结共享记忆
+    - 自定义加载记忆消息
 - ✅异常处理和自动重试
     - Toolcall/LLM 节点自动重试
     - Toolcall/LLM 节点异常时自动添加消息到上下文，保持消息顺序正确
@@ -65,10 +69,6 @@
     - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
     - 支持用户取消执行
 - ⬜Permission
-- ⬜Memory
-    - 持久记忆
-    - 总结共享记忆
-    - 自定义加载记忆消息
 - ✅Skill支持`SkillMiddlewareHandle`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
 - ❌MCP支持 (Neograph已实现，但暂时使用有问题)

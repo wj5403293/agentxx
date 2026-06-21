@@ -105,7 +105,7 @@ public:
       auto &appendSystemMsgList =
           agentCtxPtr->middlewareHandleContext
               ->getGraphDataItemValue<std::vector<std::string>>(
-                  in.ctx.thread_id, agentxx::middleware::MiddlewareWarpContext::
+                  in.ctx.thread_id, agentxx::middleware::MiddlewareContext::
                                         graphDataKey_systemMessage);
 
       // 清空原本的 content
@@ -151,6 +151,7 @@ public:
         co_return;
       } catch (const std::exception &e) {
         if (retry < agentCtxPtr->agentConfig->llmMaxRetry) {
+          // TODO: 延时等待
           retry++;
           XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
                   agentCtxPtr->agentConfig->llmMaxRetry, e.what());

@@ -303,7 +303,7 @@ public:
       auto &appendSystemMsgList =
           agentCtxPtr->middlewareHandleContext
               ->getGraphDataItemValue<std::vector<std::string>>(
-                  in.ctx.thread_id, agentxx::middleware::MiddlewareWarpContext::
+                  in.ctx.thread_id, agentxx::middleware::MiddlewareContext::
                                         graphDataKey_systemMessage);
       appendSystemMsgList.push_back(skillState->cacheFormatSkillPrompt);
     }

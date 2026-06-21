@@ -131,7 +131,7 @@ public:
       //               agentCtxPtr
       //                   ->getGraphDataItemValue<std::vector<std::string>>(
       //                       "session",
-      //                       agentxx::middleware::MiddlewareWarpContext::
+      //                       agentxx::middleware::MiddlewareContext::
       //                           graphDataKey_systemMessage);
       //           systemMsgList.push_back(fmt::format(
       //               "\n## Loaded Skill: {}\n\n{}", skillPath, content));

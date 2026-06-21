@@ -85,6 +85,18 @@ public:
 
   asio::awaitable<std::string> execTool(neograph::Tool *tool,
                                         neograph::json &args) const override {
+    auto agentCtxPtr = agentContext.lock();
+    {
+      // 权限检查
+      auto it = agentCtxPtr->permissionHandle->handles.find(tool->get_name());
+      if (it != agentCtxPtr->permissionHandle->handles.end()) {
+        auto allow = co_await it->second(*tool);
+        if (false == allow) {
+          co_return "[Permission denied]";
+        }
+      }
+    }
+
     size_t maxRetry = 0;
     {
       auto str = tool->extra["maxRetry"];
@@ -113,7 +125,6 @@ public:
       }
     } while (true);
 
-    auto agentCtxPtr = agentContext.lock();
     const size_t limitLength =
         agentCtxPtr->agentConfig->toolcallSummaryLimitOutputLength;
     if ("true" == tool->extra["autoSummaryOutput"] &&

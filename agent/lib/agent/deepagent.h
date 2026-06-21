@@ -98,12 +98,19 @@ public:
 
     /// middleware
     agentContext->middlewareHandleContext =
-        std::make_shared<agentxx::middleware::MiddlewareWarpContext>();
+        std::make_shared<agentxx::middleware::MiddlewareContext>();
     auto subagentManagerTool =
         std::make_unique<agentxx::tools::SubAgentManagerTool>(
             "subagent_manager");
     agentContext->subagentManagerToolPtr = subagentManagerTool.get();
     {
+      {
+        auto permissionMiddleware =
+            std::make_shared<agentxx::middleware::PermissionMiddlewareHandle>(
+                agentContext);
+        agentContext->middlewareHandleContext->handles.push_back(
+            permissionMiddleware);
+      }
       {
         auto skillMiddleware =
             std::make_shared<agentxx::middleware::SkillMiddlewareHandle>(
@@ -113,7 +120,6 @@ public:
         agentContext->middlewareHandleContext->handles.push_back(
             skillMiddleware);
       }
-
       {
         auto summarizationMiddleware = std::make_shared<
             agentxx::middleware::SummarizationMiddlewareHandle>(
@@ -121,24 +127,15 @@ public:
         agentContext->middlewareHandleContext->handles.push_back(
             summarizationMiddleware);
       }
-
       {
-        auto todolistMiddleware =
+        auto planningMiddleware =
             std::make_shared<agentxx::middleware::PlanningMiddlewareHandle>(
                 agentContext);
-        todolistMiddleware->toolcalls.push_back(
+        planningMiddleware->toolcalls.push_back(
             std::make_unique<agentxx::tools::WritePlanningTool>(
-                todolistMiddleware));
+                planningMiddleware));
         agentContext->middlewareHandleContext->handles.push_back(
-            todolistMiddleware);
-      }
-
-      {
-        auto permissionMiddleware =
-            std::make_shared<agentxx::middleware::PermissionMiddlewareHandle>(
-                agentContext);
-        agentContext->middlewareHandleContext->handles.push_back(
-            permissionMiddleware);
+            planningMiddleware);
       }
 
       /// Toolcall  应当作为最后一层

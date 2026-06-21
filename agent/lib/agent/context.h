@@ -8,8 +8,9 @@
 
 namespace agentxx {
 namespace middleware {
-class MiddlewareWarpContext;
-}
+class MiddlewareContext;
+class PermissionMiddlewareHandle;
+} // namespace middleware
 
 namespace tools {
 class SubAgentManagerTool;
@@ -22,8 +23,10 @@ class AgentConfig;
 class AgentContext {
 public:
   std::shared_ptr<agentxx::agent::AgentConfig> agentConfig = nullptr;
-  std::shared_ptr<agentxx::middleware::MiddlewareWarpContext>
+  std::shared_ptr<agentxx::middleware::MiddlewareContext>
       middlewareHandleContext = nullptr;
+  std::shared_ptr<agentxx::middleware::PermissionMiddlewareHandle>
+      permissionHandle;
   agentxx::tools::SubAgentManagerTool *subagentManagerToolPtr = nullptr;
 };
 } // namespace agent

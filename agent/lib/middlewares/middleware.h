@@ -31,7 +31,7 @@ using onGraphNodeBeforeCallFunc =
 using onGraphNodeAfterCallFunc = std::function<asio::awaitable<void>(
     const neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result)>;
 
-class MiddlewareWarpContext;
+class MiddlewareContext;
 class InterruptHandleArg;
 
 class BaseMiddlewareState {
@@ -47,7 +47,7 @@ concept BaseMiddlewareStateType = std::same_as<T, BaseMiddlewareState> ||
 
 /// 接口类型
 /// - 主要用于接收多种泛型参数, 见
-/// [MiddlewareWarpContext::handles]，handles
+/// [MiddlewareContext::handles]，handles
 ///   需要接收多种不同继承后的模版类型
 ///   BaseMiddlewareHandle<BaseMiddlewareStateType>，当 state
 ///   被继承时编译会失败，因此拉出 [BaseMiddlewareHandleInterface] 无 state
@@ -333,7 +333,7 @@ public:
   }
 };
 
-class MiddlewareWarpContext {
+class MiddlewareContext {
 public:
   class ThreadShareStore {
   public:
@@ -343,6 +343,7 @@ public:
     size_t getNextId() { return storeId++; }
   };
 
+  inline static constexpr std::string interruptHandleName_default = "default";
   inline static const std::string graphDataKey_systemMessage{"systemMessage"};
 
   /// <thread_id, <id, value>>
@@ -366,7 +367,9 @@ public:
                             const InterruptHandleArg &)>>
       interruptHandles{};
 
-  MiddlewareWarpContext() {}
+  MiddlewareContext() { registerInterruptHandles(); }
+
+  void registerInterruptHandles();
 
   std::optional<std::string>
   getShareStoreItemValue(const std::string &thread_id, const int id) {
@@ -492,6 +495,7 @@ public:
     throw neograph::graph::NodeInterrupt{fmt::format("xx-Interrupt: {}", name)};
   }
 
+  /// TODO: 支持 tool 内中断，支持多 tool 并发执行时正确中断恢复
   /// - 一般应当在 Node 中触发,中断恢复会重新执行这个
   /// Node,中断前的代码会重复执行!
   inline static neograph::json

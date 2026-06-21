@@ -165,10 +165,10 @@ Output ONLY the summary text, no meta-commentary.
     co_return std::string{};
   }
 
-  void offloadLongContentToTempStore(
-      neograph::ChatMessage &msg,
-      const std::shared_ptr<MiddlewareWarpContext> &ctx,
-      const std::string &thread_id) {
+  void
+  offloadLongContentToTempStore(neograph::ChatMessage &msg,
+                                const std::shared_ptr<MiddlewareContext> &ctx,
+                                const std::string &thread_id) {
     if (msg.content.size() <= longContentByteThreshold) {
       return;
     }
