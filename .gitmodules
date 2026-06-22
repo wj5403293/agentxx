@@ -24,7 +24,7 @@
 [submodule "agent/third_party/liburing"]
 	path = agent/third_party/liburing
 	url = https://github.com/axboe/liburing
-	branch = 2.14
+	branch = liburing-2.14
 [submodule "agent/third_party/codegraph-cpp"]
 	path = agent/third_party/codegraph-cpp
 	url = https://github.com/coolight7/codegraph-cpp
