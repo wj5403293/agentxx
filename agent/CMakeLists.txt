@@ -23,6 +23,7 @@ endif ()
 
 # libagentxx
 add_library(agentxx SHARED)
+set_target_properties(agentxx PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 
 file(GLOB_RECURSE agentxx_SOURCES "./lib/*.cpp" "./lib/*.cc" "./lib/*.cxx")
 
