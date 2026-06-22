@@ -34,4 +34,6 @@ if (IS_WIN_D)
 	)
 endif ()
 
+add_dependencies(${NAME_client} agentxx)
+
 install(TARGETS ${NAME_client} DESTINATION "${EXE_INSTALL_PREFIX}")
