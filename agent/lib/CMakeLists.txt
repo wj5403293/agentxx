@@ -69,7 +69,7 @@ target_link_directories(agentxx PUBLIC
   ${CODEGRAPH_INSTALL_DIR}/lib/
   ${NEOGRAPH_INSTALL_DIR}/lib/
   ${vectorscan_INSTALL_DIR}/lib/
-  ${BOOST_INSTALL_DIR}
+  ${BOOST_LIBRARY_DIR}
 )
 if (LINUX_IO_URING_SUPPORTED)
   target_link_directories(agentxx PUBLIC 

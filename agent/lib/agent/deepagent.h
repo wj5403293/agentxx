@@ -105,11 +105,11 @@ public:
     agentContext->subagentManagerToolPtr = subagentManagerTool.get();
     {
       {
-        auto permissionMiddleware =
+        agentContext->permissionMiddleware =
             std::make_shared<agentxx::middleware::PermissionMiddlewareHandle>(
                 agentContext);
         agentContext->middlewareHandleContext->handles.push_back(
-            permissionMiddleware);
+            agentContext->permissionMiddleware);
       }
       {
         auto skillMiddleware =

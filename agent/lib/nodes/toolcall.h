@@ -88,8 +88,9 @@ public:
     auto agentCtxPtr = agentContext.lock();
     {
       // 权限检查
-      auto it = agentCtxPtr->permissionHandle->handles.find(tool->get_name());
-      if (it != agentCtxPtr->permissionHandle->handles.end()) {
+      auto it =
+          agentCtxPtr->permissionMiddleware->handles.find(tool->get_name());
+      if (it != agentCtxPtr->permissionMiddleware->handles.end()) {
         auto allow = co_await it->second(*tool);
         if (false == allow) {
           co_return "[Permission denied]";

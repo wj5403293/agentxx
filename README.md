@@ -68,7 +68,10 @@
 - ✅中断恢复
     - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
     - 支持用户取消执行
-- ⬜Permission
+- ✅Permission
+    - ✅允许指定 tool 调用前拦截，决定 允许、拒绝 或中断提示询问
+    - ⬜预设常见的权限限制
+    - ⬜沙盒执行 shell/file RW
 - ✅Skill支持`SkillMiddlewareHandle`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
 - ❌MCP支持 (Neograph已实现，但暂时使用有问题)

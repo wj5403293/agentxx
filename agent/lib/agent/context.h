@@ -26,7 +26,7 @@ public:
   std::shared_ptr<agentxx::middleware::MiddlewareContext>
       middlewareHandleContext = nullptr;
   std::shared_ptr<agentxx::middleware::PermissionMiddlewareHandle>
-      permissionHandle;
+      permissionMiddleware;
   agentxx::tools::SubAgentManagerTool *subagentManagerToolPtr = nullptr;
 };
 } // namespace agent

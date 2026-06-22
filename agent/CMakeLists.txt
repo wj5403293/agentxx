@@ -109,7 +109,7 @@ message("[agentxx] CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 # deps
 set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
-# boost
+# boost 系统安装库 或 自行编译
 # https://github.com/boostorg/boost
 # 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
 # 然后编译结果到 agent/third_party/boost-build/
@@ -117,9 +117,22 @@ set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 # ./bootstrap.sh
 # ./b2 --prefix=${PWD}/../boost-build
 # ./b2 install --prefix=${PWD}/../boost-build
-set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
-set(BOOST_INCLUDE_DIR "${BOOST_ROOT}/include/")
-set(BOOST_INSTALL_DIR "${BOOST_ROOT}/lib/")
+if ((NOT DEFINED BOOST_ROOT) OR (NOT EXISTS ${BOOST_ROOT}))
+  # 尝试 third_party
+  set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+endif()
+if(DEFINED BOOST_ROOT AND EXISTS ${BOOST_ROOT})
+  # 已定义 BOOST_ROOT 且存在
+  set(BOOST_INCLUDE_DIR "${BOOST_ROOT}/include/")
+  set(BOOST_LIBRARY_DIR "${BOOST_ROOT}/lib/")
+else ()
+    # 尝试 find
+    find_package(Boost QUIET)
+    if(Boost_FOUND)
+      set(BOOST_INCLUDE_DIR ${Boost_INCLUDE_DIRS})
+      set(BOOST_LIBRARY_DIR ${Boost_LIBRARY_DIRS})
+    endif()
+endif()
 
 set(_AGENTXX_COMMON_CMAKE_ARGS
     -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
