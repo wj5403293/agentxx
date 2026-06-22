@@ -21,25 +21,7 @@ if (CCACHE_PROGRAM)
   set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
 endif ()
 
-# libagentxx
-add_library(agentxx SHARED)
-
-file(GLOB_RECURSE agentxx_SOURCES "./lib/*.cpp" "./lib/*.cc" "./lib/*.cxx")
-
-target_sources(agentxx PRIVATE
-  ${agentxx_SOURCES}
-)
-
-# 统一输出名称 libagentxx
-# - 不指定时，部分系统，如win可能编译输出缺少前缀 lib
-set_target_properties(agentxx PROPERTIES
-  PUBLIC_HEADER agentxx.h
-  PREFIX "lib"
-  OUTPUT_NAME "agentxx"
-)
-
-add_definitions(-D__STDC_CONSTANT_MACROS)
-target_compile_definitions(agentxx PUBLIC __STDC_CONSTANT_MACROS)
+add_compile_definitions(__STDC_CONSTANT_MACROS=1)
 
 # 仅用于指示是否编译用于调试用途，不代表真实编译类型
 # - [IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
@@ -51,9 +33,6 @@ if (XX_BUILD_TYPE MATCHES "DEBUG")
   set(IS_DEBUG_D    1)
   set(IS_RELEASE_D  0)
 endif()
-target_compile_definitions(agentxx PUBLIC IS_DEBUG_D=${IS_DEBUG_D})
-target_compile_definitions(agentxx PUBLIC IS_RELEASE_D=${IS_RELEASE_D})
-target_compile_definitions(agentxx PUBLIC XX_BUILD_TYPE=${XX_BUILD_TYPE})
 
 set(IS_LINUX_D    0)
 set(IS_WIN_D      0)
@@ -83,12 +62,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
       set(LINUX_IO_URING_SUPPORTED OFF)
   endif()
 endif ()
-
-target_compile_definitions(agentxx PUBLIC IS_LINUX_D=${IS_LINUX_D})
-target_compile_definitions(agentxx PUBLIC IS_WIN_D=${IS_WIN_D})
-target_compile_definitions(agentxx PUBLIC IS_MACOS_D=${IS_MACOS_D})
-target_compile_definitions(agentxx PUBLIC IS_ANDROID_D=${IS_ANDROID_D})
-target_compile_definitions(agentxx PUBLIC IS_IOS_D=${IS_IOS_D})
 
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
@@ -150,26 +123,26 @@ set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
 include(ExternalProject)
 include(FetchContent)
 
-target_compile_definitions(agentxx PUBLIC CPPHTTPLIB_OPENSSL_SUPPORT=1)
+add_compile_definitions(CPPHTTPLIB_OPENSSL_SUPPORT=1)
 # boost/asio
-target_compile_definitions(agentxx PUBLIC BOOST_ASIO_STANDALONE=1)
-target_compile_definitions(agentxx PUBLIC ASIO_STANDALONE=1)
+add_compile_definitions(BOOST_ASIO_STANDALONE=1)
+add_compile_definitions(ASIO_STANDALONE=1)
 if (WINDOWS_IOCP_SUPPORTED)
-  target_compile_definitions(agentxx PUBLIC ASIO_HAS_IOCP=ON)
-  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IOCP=ON)
-  target_compile_definitions(agentxx PUBLIC ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
-  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
+  add_compile_definitions(ASIO_HAS_IOCP=ON)
+  add_compile_definitions(BOOST_ASIO_HAS_IOCP=ON)
+  add_compile_definitions(ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
+  add_compile_definitions(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
   message("[agentxx] Enable asio/iocp")
 endif()
 if (LINUX_IO_URING_SUPPORTED)
-  target_compile_definitions(agentxx PUBLIC ASIO_HAS_IO_URING=ON)
-  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IO_URING=ON)
-  target_compile_definitions(agentxx PUBLIC ASIO_HAS_IO_URING_AS_DEFAULT=ON)
-  target_compile_definitions(agentxx PUBLIC BOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
+  add_compile_definitions(ASIO_HAS_IO_URING=ON)
+  add_compile_definitions(BOOST_ASIO_HAS_IO_URING=ON)
+  add_compile_definitions(ASIO_HAS_IO_URING_AS_DEFAULT=ON)
+  add_compile_definitions(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
   message("[agentxx] Enable asio/io_uring")
 endif()
 # boost/process
-target_compile_definitions(agentxx PUBLIC BOOST_PROCESS_USE_STD_FS=1)
+add_compile_definitions(BOOST_PROCESS_USE_STD_FS=1)
 
 # iconv
 set(LIBICONV_VERSION 1.18)
@@ -429,67 +402,7 @@ endblock()
 # glob
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
-target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
-# 标记为 SYSTEM 防止 include 影响 warning 转 error 判断
-target_include_directories(agentxx SYSTEM PUBLIC ${fmt_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${uchardet_INSTALL_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${LIBICONV_INSTALL_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${LIBURING_INSTALL_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${SQLITE_SOURCE_DIR}/src/)
-target_include_directories(agentxx SYSTEM PUBLIC ${vectorscan_SOURCE_DIR}/src/)
-target_include_directories(agentxx SYSTEM PUBLIC ${codegraph_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${neograph_SOURCE_DIR}/deps/)
-target_include_directories(agentxx SYSTEM PUBLIC ${html2md_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${glob_SOURCE_DIR}/single_include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${Boost_ROOT}/include/boost/)
-
-add_dependencies(agentxx iconv_repo)
-add_dependencies(agentxx sqlite_repo)
-if (LINUX_IO_URING_SUPPORTED)
-  add_dependencies(agentxx liburing_repo)
-endif()
-
-target_link_directories(agentxx PUBLIC 
-  ${fmt_INSTALL_DIR}
-  ${uchardet_INSTALL_DIR}/lib/
-  ${LIBICONV_INSTALL_DIR}/lib/
-  ${vectorscan_INSTALL_DIR}/lib/
-  ${SQLITE_INSTALL_DIR}/lib/
-  ${codegraph_INSTALL_DIR}
-  ${neograph_INSTALL_DIR}
-  ${Boost_ROOT}/lib/
-)
-if (LINUX_IO_URING_SUPPORTED)
-  target_link_directories(agentxx PUBLIC 
-    ${LIBURING_INSTALL_DIR}/lib/
-  )
-endif()
-
-target_link_libraries(agentxx PUBLIC
-  fmt::fmt
-  html2md
-  iconv
-  libuchardet
-  sqlite3
-  neograph::core
-  neograph::util
-  neograph::async
-  neograph::llm
-  neograph::mcp
-  neograph::acp
-  codegraph_core
-	hs_runtime
-	hs
-  yaml-cpp::yaml-cpp
-  boost_process
-)
-if (LINUX_IO_URING_SUPPORTED)
-  target_link_libraries(agentxx PUBLIC
-    liburing.a 
-    liburing-ffi.a
-  )
-endif()
-
+ADD_SUBDIRECTORY(lib)
 if (AGENTXX_BUILD_CLIENT)
   ADD_SUBDIRECTORY(client)
   add_dependencies(client agentxx)
@@ -499,6 +412,8 @@ if (AGENTXX_BUILD_TEST)
   add_dependencies(test agentxx)
 endif()
 
-if (DEFINED XX_BUILD_TYPE)
-  install(TARGETS agentxx DESTINATION "${EXE_INSTALL_PREFIX}")
+add_dependencies(agentxx iconv_repo)
+add_dependencies(agentxx sqlite_repo)
+if (LINUX_IO_URING_SUPPORTED)
+  add_dependencies(agentxx liburing_repo)
 endif()
