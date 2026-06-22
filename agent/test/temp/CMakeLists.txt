@@ -104,15 +104,15 @@ set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/")
 include(ExternalProject)
 include(FetchContent)
 
-set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/boost-build/")
+set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/boost-build/")
 add_definitions(-DBOOST_ASIO_STANDALONE=1)
 add_definitions(-DASIO_STANDALONE=1)
 # add_definitions(-DBOOST_PROCESS_V2_STANDALONE=1)
 add_definitions(-DBOOST_PROCESS_USE_STD_FS=1)
 
 include_directories(${third_party_DIR}/PaddleOCR/deploy/cpp_infer/)
-include_directories(${Boost_ROOT}/include/)
-include_directories(${Boost_ROOT}/include/boost/)
+include_directories(${BOOST_ROOT}/include/)
+include_directories(${BOOST_ROOT}/include/boost/)
 include_directories(${third_party_DIR})
 
 if (IS_DEBUG_D)
@@ -126,7 +126,7 @@ target_sources(test_temp PRIVATE
   ${test_temp_SOURCES}
 )
 target_link_directories(test_temp PUBLIC 
-	${Boost_ROOT}/lib/
+	${BOOST_ROOT}/lib/
 )
 target_link_libraries(test_temp
 	boost_process

@@ -2,8 +2,8 @@
 
 #include "fmt/format.h"
 #include "tools/tool.h"
-#include "util/hyperscan.h"
 #include "util/log.h"
+#include "util/regex.h"
 #include "util/string_util.h"
 #include <cstdlib>
 #include <filesystem>

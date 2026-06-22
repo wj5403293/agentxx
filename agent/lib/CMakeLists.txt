@@ -36,6 +36,9 @@ target_compile_definitions(agentxx PUBLIC IS_WIN_D=${IS_WIN_D})
 target_compile_definitions(agentxx PUBLIC IS_MACOS_D=${IS_MACOS_D})
 target_compile_definitions(agentxx PUBLIC IS_ANDROID_D=${IS_ANDROID_D})
 target_compile_definitions(agentxx PUBLIC IS_IOS_D=${IS_IOS_D})
+if (AGENTXX_ENABLE_HYPERSCAN)
+  target_compile_definitions(agentxx PUBLIC AGENTXX_ENABLE_HYPERSCAN=1)
+endif()
 
 target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
 # 标记为 SYSTEM 防止 include 影响 warning 转 error 判断
@@ -45,27 +48,28 @@ target_include_directories(agentxx SYSTEM PUBLIC ${LIBICONV_INSTALL_DIR}/include
 target_include_directories(agentxx SYSTEM PUBLIC ${LIBURING_INSTALL_DIR}/include/)
 target_include_directories(agentxx SYSTEM PUBLIC ${SQLITE_SOURCE_DIR}/src/)
 target_include_directories(agentxx SYSTEM PUBLIC ${vectorscan_SOURCE_DIR}/src/)
-target_include_directories(agentxx SYSTEM PUBLIC ${codegraph_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${neograph_SOURCE_DIR}/deps/)
 target_include_directories(agentxx SYSTEM PUBLIC ${html2md_SOURCE_DIR}/include/)
 target_include_directories(agentxx SYSTEM PUBLIC ${glob_SOURCE_DIR}/single_include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${Boost_ROOT}/include/boost/)
+target_include_directories(agentxx SYSTEM PUBLIC ${CODEGRAPH_SOURCE_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${NEOGRAPH_SOURCE_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${BOOST_INCLUDE_DIR}/)
+target_include_directories(agentxx SYSTEM PUBLIC ${BOOST_INCLUDE_DIR}/boost/)
+target_include_directories(agentxx SYSTEM PUBLIC ${NEOGRAPH_SOURCE_DIR}/deps/)
 
 if (IS_DEBUG_D)
     target_compile_options(agentxx PRIVATE "-fsanitize=address")
     target_link_options(agentxx PRIVATE "-fsanitize=address")
 endif ()
 
-
 target_link_directories(agentxx PUBLIC 
   ${fmt_INSTALL_DIR}
   ${uchardet_INSTALL_DIR}/lib/
   ${LIBICONV_INSTALL_DIR}/lib/
-  ${vectorscan_INSTALL_DIR}/lib/
   ${SQLITE_INSTALL_DIR}/lib/
-  ${codegraph_INSTALL_DIR}
-  ${neograph_INSTALL_DIR}
-  ${Boost_ROOT}/lib/
+  ${CODEGRAPH_INSTALL_DIR}/lib/
+  ${NEOGRAPH_INSTALL_DIR}/lib/
+  ${vectorscan_INSTALL_DIR}/lib/
+  ${BOOST_INSTALL_DIR}
 )
 if (LINUX_IO_URING_SUPPORTED)
   target_link_directories(agentxx PUBLIC 
@@ -79,12 +83,12 @@ target_link_libraries(agentxx PUBLIC
   iconv
   libuchardet
   sqlite3
-  neograph::core
-  neograph::util
-  neograph::async
-  neograph::llm
-  neograph::mcp
-  neograph::acp
+  neograph_core
+  neograph_util
+  neograph_async
+  neograph_llm
+  neograph_mcp
+  neograph_acp
   codegraph_core
 	hs_runtime
 	hs
@@ -96,6 +100,14 @@ if (LINUX_IO_URING_SUPPORTED)
     liburing.a 
     liburing-ffi.a
   )
+endif()
+
+add_dependencies(agentxx iconv_repo)
+add_dependencies(agentxx sqlite_repo)
+add_dependencies(agentxx codegraph_repo)
+add_dependencies(agentxx neograph_repo)
+if (LINUX_IO_URING_SUPPORTED)
+  add_dependencies(agentxx liburing_repo)
 endif()
 
 install(TARGETS agentxx DESTINATION "${EXE_INSTALL_PREFIX}")

@@ -26,7 +26,8 @@
                 "_UNICODE",
                 "ASIO_HAS_IO_URING",
                 "ASIO_HAS_FILE",
-                "NEOGRAPH_USE_BOODT_ASIO"
+                "NEOGRAPH_USE_BOODT_ASIO",
+                "AGENTXX_ENABLE_HYPERSCAN"
             ],
             "compilerPath": "/usr/local/bin/g++",
             "cStandard": "c23",

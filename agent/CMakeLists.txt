@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
 option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
+option(AGENTXX_ENABLE_HYPERSCAN ON)
 
 # ccache
 find_program(CCACHE_PROGRAM ccache)
@@ -118,7 +119,23 @@ set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 # ./bootstrap.sh
 # ./b2 --prefix=${PWD}/../boost-build
 # ./b2 install --prefix=${PWD}/../boost-build
-set(Boost_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+set(BOOST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/include/")
+set(BOOST_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/lib/")
+
+if (IS_WIN_D)
+  set(OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
+  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+  IF (IS_DEBUG_D)
+    set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+    set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+    set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+  else ()
+    set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+    set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+    set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+  endif()
+endif()
 
 include(ExternalProject)
 include(FetchContent)
@@ -144,6 +161,32 @@ endif()
 # boost/process
 add_compile_definitions(BOOST_PROCESS_USE_STD_FS=1)
 
+# 在 project() 之后定义公共变量列表
+set(_AGENTXX_COMMON_CMAKE_ARGS
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DCMAKE_AR=${CMAKE_AR}
+    -DCMAKE_RANLIB=${CMAKE_RANLIB}
+    -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+    -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+    -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}
+    -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
+    -DCMAKE_STATIC_LINKER_FLAGS=${CMAKE_STATIC_LINKER_FLAGS}
+    -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+    -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
+    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+    -DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}
+    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}
+    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}
+    -DANDROID_PLATFORM=${ANDROID_PLATFORM}
+    -DANDROID_ABI=${ANDROID_ABI}
+    -DANDROID_NDK=${ANDROID_NDK}
+    -DANDROID_STL=${ANDROID_STL}
+    -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+)
+
 # iconv
 set(LIBICONV_VERSION 1.18)
 set(LIBICONV_URL "https://ftp.gnu.org/gnu/libiconv/libiconv-${LIBICONV_VERSION}.tar.gz")
@@ -160,6 +203,8 @@ ExternalProject_Add(
   INSTALL_DIR ${LIBICONV_INSTALL_DIR} 
   BUILD_ALWAYS OFF
   UPDATE_DISCONNECTED TRUE
+  CMAKE_ARGS 
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
   CONFIGURE_COMMAND 
       cd ${LIBICONV_SOURCE_DIR} && ./configure
       --prefix=${LIBICONV_INSTALL_DIR} 
@@ -196,35 +241,7 @@ if (LINUX_IO_URING_SUPPORTED)
     BINARY_DIR ${LIBURING_BINARY_DIR}
     INSTALL_DIR ${LIBURING_INSTALL_DIR}
     CMAKE_ARGS 
-      -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
-      -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
-      "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-      "-DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
-      "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY}"
-      "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}" 
-      "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}"
-
-      "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}"
-      "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
-      "-DANDROID_ABI=${ANDROID_ABI}"
-      "-DANDROID_NDK=${ANDROID_NDK}"
-      "-DANDROID_STL=${ANDROID_STL}"
-      "-DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}"
-      "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}"
-
-      "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
-      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-      "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-
-      "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
-      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-      "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
-      "-DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}"
-      "-DCMAKE_C_FLAGS_PROFILE=${CMAKE_C_FLAGS_PROFILE}"
-      "-DCMAKE_CXX_FLAGS_PROFILE=${CMAKE_CXX_FLAGS_PROFILE}"
-      "-DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}"
-      "-DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}"
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
     CONFIGURE_COMMAND 
         cd ${LIBURING_SOURCE_DIR} && ./configure
         --prefix=${LIBURING_INSTALL_DIR}
@@ -251,6 +268,8 @@ ExternalProject_Add(
   SOURCE_DIR ${SQLITE_SOURCE_DIR}
   BINARY_DIR ${SQLITE_BINARY_DIR}
   INSTALL_DIR ${SQLITE_INSTALL_DIR}
+  CMAKE_ARGS 
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
   CONFIGURE_COMMAND 
       cd ${SQLITE_SOURCE_DIR} && ./configure
       --prefix=${SQLITE_INSTALL_DIR} 
@@ -265,6 +284,58 @@ ExternalProject_Add(
   INSTALL_COMMAND 
     cd ${SQLITE_SOURCE_DIR} && make install
   UPDATE_COMMAND ""
+  TEST_COMMAND ""
+)
+
+# codegraph-cpp
+set(CODEGRAPH_PREFIX "${CMAKE_BINARY_DIR}/sqlite-src")
+set(CODEGRAPH_BINARY_DIR "${CMAKE_BINARY_DIR}/sqlite-build")
+set(CODEGRAPH_INSTALL_DIR "${CMAKE_BINARY_DIR}/sqlite-install")
+ExternalProject_Add(
+  codegraph_repo
+  SOURCE_DIR "${third_party_DIR}/codegraph-cpp/"
+  PREFIX ${CODEGRAPH_PREFIX}
+  BINARY_DIR ${CODEGRAPH_BINARY_DIR}
+  INSTALL_DIR ${CODEGRAPH_INSTALL_DIR}
+  CMAKE_ARGS 
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON
+  DEPENDS      sqlite_repo
+  TEST_COMMAND ""
+)
+
+# neograph
+set(NEOGRAPH_PREFIX "${CMAKE_BINARY_DIR}/neograph-src")
+set(NEOGRAPH_BINARY_DIR "${CMAKE_BINARY_DIR}/neograph-build")
+set(NEOGRAPH_INSTALL_DIR "${CMAKE_BINARY_DIR}/neograph-install")
+if (LINUX_IO_URING_SUPPORTED)
+  include_directories(${LIBURING_INSTALL_DIR}/include/)
+endif()
+ExternalProject_Add(
+  neograph_repo
+  SOURCE_DIR "${third_party_DIR}/neograph/"
+  PREFIX ${NEOGRAPH_PREFIX}
+  BINARY_DIR ${NEOGRAPH_BINARY_DIR}
+  INSTALL_DIR ${NEOGRAPH_INSTALL_DIR}
+  CMAKE_ARGS 
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+      -DNEOGRAPH_BUILD_EXAMPLES=OFF
+      -DNEOGRAPH_BUILD_TESTS=OFF
+      -DNEOGRAPH_BUILD_PYBIND=OFF
+      -DNEOGRAPH_BUILD_A2A=OFF
+      -DNEOGRAPH_BUILD_POSTGRES=OFF
+      -DNEOGRAPH_BUILD_SQLITE=ON
+      -DNEOGRAPH_BUILD_ASYNC=ON
+      -DNEOGRAPH_BUILD_LLM=ON
+      -DNEOGRAPH_BUILD_MCP=ON
+      -DNEOGRAPH_BUILD_ACP=ON
+      -DNEOGRAPH_BUILD_UTIL=ON
+      -DNEOGRAPH_USE_LIBCURL=ON
+      -DNEOGRAPH_INSTALL_HEADERS=OFF
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON
+  DEPENDS      sqlite_repo
   TEST_COMMAND ""
 )
 
@@ -298,72 +369,35 @@ block()
   FetchContent_MakeAvailable(uchardet)
 endblock()
 
-# codegraph-cpp
-FetchContent_Declare(
-  codegraph
-  SOURCE_DIR "${third_party_DIR}/codegraph-cpp/"
-)
-block()
-  set(BUILD_SHARED_LIBS             OFF)
-  set(BUILD_STATIC_LIBS             ON)
-  FetchContent_MakeAvailable(codegraph)
-endblock()
-
-# vectorscan
-FetchContent_Declare(
-  vectorscan
-  SOURCE_DIR "${third_party_DIR}/vectorscan/"
-  EXCLUDE_FROM_ALL
-)
-block()
-  include_directories(${Boost_ROOT}/include/)
-  set(BUILD_UNIT            OFF)
-  set(BUILD_TOOLS           OFF)
-  set(BUILD_EXAMPLES        OFF)
-  set(BUILD_BENCHMARKS      OFF)
-  set(BUILD_DOC             OFF)
-  set(BUILD_SHARED_LIBS     OFF)
-  set(BUILD_STATIC_LIBS     ON )
-  set(FAT_RUNTIME           OFF)
-  set(USE_CPU_NATIVE        ON )
-  set(BUILD_AVX2            ON )
-  set(BUILD_AVX512          ON )
-  set(BUILD_AVX512VBMI      ON )
-  set(BUILD_SIMDE_BACKEND   OFF)
-  set(BUILD_SIMDE_NATIVE    OFF)
-  # set(BUILD_SVE            ON)
-  # set(BUILD_SVE2           ON)
-  # set(BUILD_SVE2_BITPERM   ON)
-  FetchContent_MakeAvailable(vectorscan)
-endblock()
-
-# neograph
-FetchContent_Declare(
-  NeoGraph
-  SOURCE_DIR "${third_party_DIR}/neograph/"
-  EXCLUDE_FROM_ALL
-)
-block()
-  if (LINUX_IO_URING_SUPPORTED)
-    include_directories(${LIBURING_INSTALL_DIR}/include/)
-  endif()
-  set(NEOGRAPH_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_PYBIND    OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_A2A       OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_POSTGRES  OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_SQLITE    ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_ASYNC     ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_LLM       ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_MCP       ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_ACP       ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_UTIL      ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_INSTALL_HEADERS OFF CACHE BOOL "" FORCE)
-  set(BUILD_SHARED_LIBS             OFF)
-  set(BUILD_STATIC_LIBS             ON)
-  FetchContent_MakeAvailable(NeoGraph)
-endblock()
+if (AGENTXX_ENABLE_HYPERSCAN)
+  # vectorscan
+  FetchContent_Declare(
+    vectorscan
+    SOURCE_DIR "${third_party_DIR}/vectorscan/"
+    EXCLUDE_FROM_ALL
+  )
+  block()
+    include_directories(${BOOST_INCLUDE_DIR})
+    set(BUILD_UNIT            OFF)
+    set(BUILD_TOOLS           OFF)
+    set(BUILD_EXAMPLES        OFF)
+    set(BUILD_BENCHMARKS      OFF)
+    set(BUILD_DOC             OFF)
+    set(BUILD_SHARED_LIBS     OFF)
+    set(BUILD_STATIC_LIBS     ON )
+    set(FAT_RUNTIME           OFF)
+    set(USE_CPU_NATIVE        ON )
+    set(BUILD_AVX2            ON )
+    set(BUILD_AVX512          ON )
+    set(BUILD_AVX512VBMI      ON )
+    set(BUILD_SIMDE_BACKEND   OFF)
+    set(BUILD_SIMDE_NATIVE    OFF)
+    # set(BUILD_SVE            ON)
+    # set(BUILD_SVE2           ON)
+    # set(BUILD_SVE2_BITPERM   ON)
+    FetchContent_MakeAvailable(vectorscan)
+  endblock()
+endif()
 
 # html2md
 FetchContent_Declare(
@@ -410,10 +444,4 @@ endif()
 if (AGENTXX_BUILD_TEST) 
   ADD_SUBDIRECTORY(test)
   add_dependencies(test agentxx)
-endif()
-
-add_dependencies(agentxx iconv_repo)
-add_dependencies(agentxx sqlite_repo)
-if (LINUX_IO_URING_SUPPORTED)
-  add_dependencies(agentxx liburing_repo)
 endif()

@@ -1,7 +1,5 @@
 #pragma once
 #include "log.h"
-#include <hs_compile.h>
-#include <hs_runtime.h>
 #include <string>
 #include <vector>
 
@@ -13,6 +11,10 @@ struct XXRegexMatchResult {
   size_t start;
   size_t end;
 };
+
+#if defined(AGENTXX_ENABLE_HYPERSCAN)
+#include <hs_compile.h>
+#include <hs_runtime.h>
 
 class XXRegex {
 public:
@@ -237,5 +239,165 @@ private:
   hs_database_t *hs_db;     // Hyperscan编译后的正则数据库
   hs_scratch_t *hs_scratch; // Hyperscan扫描缓冲区
 };
+
+#else
+#include <regex>
+
+class XXRegex {
+public:
+  // 原标志常量保持相同值（仅兼容，内部不再使用 Hyperscan 标志位）
+  inline static constexpr unsigned int defHSFlags_normal = 0;
+  inline static constexpr unsigned int defHSFlags_onlyContains = 0;
+
+  // 禁止拷贝
+  XXRegex(const XXRegex &) = delete;
+  XXRegex &operator=(const XXRegex &) = delete;
+
+  // 单模式构造函数
+  XXRegex(const std::string &regstr, unsigned int flags = defHSFlags_normal)
+      : valid_(false), multi_mode_(false) {
+    try {
+      regex_ =
+          std::regex(regstr, std::regex::ECMAScript | std::regex::optimize);
+      valid_ = true;
+    } catch (const std::regex_error &e) {
+      XX_LOGE("Regex编译失败: {} | {}", e.what(), regstr);
+    }
+  }
+
+  // 多模式构造函数
+  XXRegex(const std::vector<std::string> &regstrs,
+          unsigned int flags = defHSFlags_normal)
+      : valid_(false), multi_mode_(true) {
+    regexes_.reserve(regstrs.size());
+    for (const auto &str : regstrs) {
+      try {
+        regexes_.emplace_back(str,
+                              std::regex::ECMAScript | std::regex::optimize);
+      } catch (const std::regex_error &e) {
+        XX_LOGE("Regex编译失败: {} | {}", e.what(), str);
+        regexes_.clear();
+        return;
+      }
+    }
+    valid_ = true;
+  }
+
+  // 移动构造
+  XXRegex(XXRegex &&other) noexcept
+      : regex_(std::move(other.regex_)), regexes_(std::move(other.regexes_)),
+        valid_(other.valid_), multi_mode_(other.multi_mode_) {
+    other.valid_ = false;
+  }
+
+  // 移动赋值
+  XXRegex &operator=(XXRegex &&other) noexcept {
+    if (this != &other) {
+      regex_ = std::move(other.regex_);
+      regexes_ = std::move(other.regexes_);
+      valid_ = other.valid_;
+      multi_mode_ = other.multi_mode_;
+      other.valid_ = false;
+    }
+    return *this;
+  }
+
+  ~XXRegex() = default;
+
+  // 匹配：返回所有合并后的非重叠区间
+  bool match(const std::string &input,
+             std::vector<XXRegexMatchResult> &results) const {
+    results.clear();
+    if (!valid_)
+      return false;
+
+    std::vector<std::pair<size_t, size_t>> raw_matches;
+
+    // 收集所有原始匹配区间
+    auto collect = [&](const std::regex &re) {
+      std::sregex_iterator begin(input.begin(), input.end(), re);
+      std::sregex_iterator end;
+      for (auto it = begin; it != end; ++it) {
+        const std::smatch &m = *it;
+        raw_matches.emplace_back(m.position(), m.position() + m.length());
+      }
+    };
+
+    if (multi_mode_) {
+      for (const auto &re : regexes_) {
+        collect(re);
+      }
+    } else {
+      collect(regex_);
+    }
+
+    if (raw_matches.empty()) {
+      return false;
+    }
+
+    // 按起始位置排序
+    std::sort(raw_matches.begin(), raw_matches.end());
+
+    // 合并重叠与相邻区间（相邻定义：end + 1 == next.start）
+    XXRegexMatchResult current{raw_matches[0].first, raw_matches[0].second};
+    results.push_back(current);
+    for (size_t i = 1; i < raw_matches.size(); ++i) {
+      auto &last = results.back();
+      if (raw_matches[i].first <= last.end + 1) { // 重叠或相邻
+        last.end = std::max(last.end, raw_matches[i].second);
+      } else {
+        results.push_back({raw_matches[i].first, raw_matches[i].second});
+      }
+    }
+
+    return true;
+  }
+
+  // 移除匹配子串
+  std::string remove(const std::string &input,
+                     std::vector<XXRegexMatchResult> &results) const {
+    std::string result;
+    if (match(input, results)) {
+      size_t index = 0;
+      for (const auto &m : results) {
+        result += input.substr(index, m.start - index);
+        index = m.end;
+      }
+      if (index < input.length())
+        result += input.substr(index);
+    } else {
+      result = input;
+    }
+    return result;
+  }
+
+  // 替换匹配子串
+  std::string replace(const std::string &input, const std::string &target,
+                      std::vector<XXRegexMatchResult> &results) const {
+    std::string result;
+    if (match(input, results)) {
+      size_t index = 0;
+      for (const auto &m : results) {
+        result += input.substr(index, m.start - index);
+        result += target;
+        index = m.end;
+      }
+      if (index < input.length())
+        result += input.substr(index);
+    } else {
+      result = input;
+    }
+    return result;
+  }
+
+private:
+  std::regex regex_;                // 单模式
+  std::vector<std::regex> regexes_; // 多模式
+  bool valid_ = false;              // 编译是否成功
+  bool multi_mode_ = false;         // 是否多模式
+};
+
+#endif
+
 } // namespace util
 } // namespace agentxx

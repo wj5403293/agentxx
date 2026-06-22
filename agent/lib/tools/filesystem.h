@@ -10,8 +10,8 @@
 #include "glob/glob.hpp"
 #include "tools/tool.h"
 #include "util/aho_corasick.h"
-#include "util/hyperscan.h"
 #include "util/log.h"
+#include "util/regex.h"
 #include "util/string_util.h"
 #include <asio/as_tuple.hpp>
 #include <asio/redirect_error.hpp>
