@@ -2,9 +2,9 @@
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
 src_dir=$(cd "$script_dir/../" && pwd)
-build_dir=$(cd "$script_dir/../build/debug" && pwd)
+build_dir=$(cd "$script_dir/../build/win-debug" && pwd)
 
-$script_dir/debug_build.sh
+$script_dir/mingw_debug_build.sh
 
 if [[ $? -ne 0 ]]; then
     exit $?

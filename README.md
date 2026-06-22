@@ -153,44 +153,11 @@ cd agentxx
 git submodule update --init
 ```
 
-- 编译 Boost 1.91
-- - linux/bash:
-```sh
-# https://github.com/boostorg/boost
-# 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
-cd boost/
-# 然后编译结果到 agent/third_party/boost-build/
-./bootstrap.sh
-./b2 --prefix=${PWD}/../boost-build
-./b2 install --prefix=${PWD}/../boost-build
-```
-- - windows/cmd:
-```sh
-cd boost\
-# 然后编译结果到 agent/third_party/boost-build/
-.\bootstrap.bat
-.\b2 --prefix=%CD%/../boost-build
-.\b2 install --prefix=%CD%/../boost-build
-
-# power shell 使用:
-# .\b2 --prefix=$PWD/../boost-build
-# .\b2 install --prefix=$PWD/../boost-build
-```
-
 - 安装 codegraph-cpp 依赖
 ```sh
 cd {项目根目录}/agent/third_party/codegraph-cpp
 npm install --legacy-peer-deps
 ```
 
-- 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client
-- - linux:
-```sh
-cd {项目根目录}/agent
-./script/client_run.sh
-```
-- - windows:
-```sh
-cd {项目根目录}/agent
-./script/client_run.bat
-```
+- [Linux/WSL 可执行程序/动态库编译 .so](/docs/build/linux.md)
+- [Windows 可执行程序/动态库编译 .dll](/docs/build/windows.md)
