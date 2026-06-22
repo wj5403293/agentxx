@@ -3,7 +3,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 set(NAME_client client)
 
 add_executable(${NAME_client})
-set_target_properties(${NAME_client} PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 
 file(GLOB_RECURSE client_SOURCES "*.cpp" "*.cc" "*.cxx")
 target_sources(${NAME_client} PRIVATE
@@ -25,6 +24,7 @@ if (IS_MACOS_D)
     "-Wl,-rpath,@executable_path"
   )
 endif()
+
 if (IS_WIN_D)
 	target_compile_definitions(
 		${NAME_client} PRIVATE

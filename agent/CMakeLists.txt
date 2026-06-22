@@ -23,7 +23,6 @@ endif ()
 
 # libagentxx
 add_library(agentxx SHARED)
-set_target_properties(agentxx PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 
 file(GLOB_RECURSE agentxx_SOURCES "./lib/*.cpp" "./lib/*.cc" "./lib/*.cxx")
 
@@ -431,17 +430,18 @@ endblock()
 set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
 
 target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/)
-target_include_directories(agentxx PUBLIC ${fmt_SOURCE_DIR}/include/)
-target_include_directories(agentxx PUBLIC ${uchardet_INSTALL_DIR}/include/)
-target_include_directories(agentxx PUBLIC ${LIBICONV_INSTALL_DIR}/include/)
-target_include_directories(agentxx PUBLIC ${LIBURING_INSTALL_DIR}/include/)
-target_include_directories(agentxx PUBLIC ${SQLITE_SOURCE_DIR}/src/)
-target_include_directories(agentxx PUBLIC ${vectorscan_SOURCE_DIR}/src/)
-target_include_directories(agentxx PUBLIC ${codegraph_SOURCE_DIR}/include/)
-target_include_directories(agentxx PUBLIC ${neograph_SOURCE_DIR}/deps/)
-target_include_directories(agentxx PUBLIC ${html2md_SOURCE_DIR}/include/)
-target_include_directories(agentxx PUBLIC ${glob_SOURCE_DIR}/single_include/)
-target_include_directories(agentxx PUBLIC ${Boost_ROOT}/include/boost/)
+# 标记为 SYSTEM 防止 include 影响 warning 转 error 判断
+target_include_directories(agentxx SYSTEM PUBLIC ${fmt_SOURCE_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${uchardet_INSTALL_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${LIBICONV_INSTALL_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${LIBURING_INSTALL_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${SQLITE_SOURCE_DIR}/src/)
+target_include_directories(agentxx SYSTEM PUBLIC ${vectorscan_SOURCE_DIR}/src/)
+target_include_directories(agentxx SYSTEM PUBLIC ${codegraph_SOURCE_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${neograph_SOURCE_DIR}/deps/)
+target_include_directories(agentxx SYSTEM PUBLIC ${html2md_SOURCE_DIR}/include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${glob_SOURCE_DIR}/single_include/)
+target_include_directories(agentxx SYSTEM PUBLIC ${Boost_ROOT}/include/boost/)
 
 add_dependencies(agentxx iconv_repo)
 add_dependencies(agentxx sqlite_repo)

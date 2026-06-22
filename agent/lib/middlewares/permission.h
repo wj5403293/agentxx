@@ -41,7 +41,7 @@ public:
   void registerHandles() {
     handles["filesystem_list_file"] =
         [](const neograph::Tool &item) -> asio::awaitable<bool> {
-
+      co_return true;
     };
   }
 };

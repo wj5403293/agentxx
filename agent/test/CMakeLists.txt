@@ -24,6 +24,7 @@ if (IS_MACOS_D)
     "-Wl,-rpath,@executable_path"
   )
 endif()
+
 if (IS_WIN_D)
 	target_compile_definitions(
 		${NAME_test} PRIVATE
