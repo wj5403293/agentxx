@@ -343,7 +343,7 @@ public:
     size_t getNextId() { return storeId++; }
   };
 
-  inline static constexpr std::string interruptHandleName_default = "default";
+  inline static const std::string interruptHandleName_default = "default";
   inline static const std::string graphDataKey_systemMessage{"systemMessage"};
 
   /// <thread_id, <id, value>>

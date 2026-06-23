@@ -1,11 +1,17 @@
 #include "string_util.h"
+#include "uchardet/uchardet.h"
 #include <algorithm>
 #include <cstring>
 #include <iconv.h>
 #include <map>
 #include <set>
-#include <uchardet/uchardet.h>
 #include <vector>
+
+#if defined(__GNUC__) || defined(__clang__)
+#define AUTO_DESTROY __attribute__((destructor))
+#else
+#define AUTO_DESTROY
+#endif
 
 const agentxx::util::IgnoreCaseSet g_encoding_priorities = {
     "UTF-8", "UTF-16", "GB2312", "GBK", "GB18030",
@@ -20,7 +26,7 @@ const size_t defShortStringLength = 30;
 
 static uchardet_t cChardetHandle = uchardet_new();
 
-__attribute__((destructor)) void chardetDestroyHandle() {
+AUTO_DESTROY void chardetDestroyHandle() {
   if (nullptr != cChardetHandle) {
     uchardet_delete(cChardetHandle);
     cChardetHandle = nullptr;

@@ -14,6 +14,7 @@ option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
 option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
 option(AGENTXX_ENABLE_HYPERSCAN "Add HyperScan for regex support. Use std::regex if disable." ON)
+option(AGENTXX_ENABLE_CODEGRAPH "Add CodeGraph-CPP for code analysis." ON)
 
 # ccache
 find_program(CCACHE_PROGRAM ccache)
@@ -214,6 +215,20 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
   -DBOOST_PROCESS_USE_STD_FS=1
 )
 
+if (IS_WIN_D)
+  set(OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
+  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+  IF (IS_DEBUG_D)
+    set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+    set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+    set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+  else ()
+    set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+    set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+    set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+  endif()
+endif()
+
 include(ExternalProject)
 include(FetchContent)
 
@@ -283,6 +298,9 @@ block()
   set(BUILD_STATIC_LIBS         ON)
   FetchContent_MakeAvailable(sqlite3)
 endblock()
+FetchContent_GetProperties(sqlite3)
+# set(SQLite3_INCLUDE_DIR "D:\\0Acoolight\\Program\\cpp\\agentxx\\agent\\build\\debug\\_deps\\sqlite3_ext-src")
+# set(SQLite3_LIBRARY sqlite3)
 
 # fmt
 FetchContent_Declare(
@@ -293,10 +311,10 @@ block()
   set(FMT_PEDANTIC          OFF)
   set(FMT_INSTALL           OFF)
   set(FMT_WERROR            OFF)
-  set(BUILD_SHARED_LIBS     OFF)
-  set(BUILD_STATIC_LIBS     ON )
   set(FMT_DOC               OFF)
   set(FMT_TEST              OFF)
+  set(BUILD_SHARED_LIBS     OFF)
+  set(BUILD_STATIC_LIBS     ON )
   FetchContent_MakeAvailable(fmt)
 endblock()
 
@@ -313,17 +331,20 @@ block()
   set(BUILD_STATIC_LIBS     ON )
   FetchContent_MakeAvailable(uchardet)
 endblock()
+FetchContent_GetProperties(uchardet)
 
 # codegraph-cpp
-FetchContent_Declare(
-  codegraph
-  SOURCE_DIR "${third_party_DIR}/codegraph-cpp/"
-)
-block()
-  set(BUILD_SHARED_LIBS             OFF)
-  set(BUILD_STATIC_LIBS             ON)
-  FetchContent_MakeAvailable(codegraph)
-endblock()
+if (AGENTXX_ENABLE_CODEGRAPH)
+  FetchContent_Declare(
+    codegraph
+    SOURCE_DIR "${third_party_DIR}/codegraph-cpp/"
+  )
+  block()
+    set(BUILD_SHARED_LIBS             OFF)
+    set(BUILD_STATIC_LIBS             ON)
+    FetchContent_MakeAvailable(codegraph)
+  endblock()
+endif()
 
 if (AGENTXX_ENABLE_HYPERSCAN)
   # vectorscan
@@ -375,7 +396,7 @@ block()
   set(NEOGRAPH_BUILD_MCP       ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_ACP       ON  CACHE BOOL "" FORCE)
   set(NEOGRAPH_BUILD_UTIL      ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_USE_LIBCURL     ON  CACHE BOOL "" FORCE)
+  set(NEOGRAPH_USE_LIBCURL     OFF  CACHE BOOL "" FORCE)
   set(NEOGRAPH_INSTALL_HEADERS OFF CACHE BOOL "" FORCE)
   set(BUILD_SHARED_LIBS             OFF)
   set(BUILD_STATIC_LIBS             ON)

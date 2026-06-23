@@ -93,9 +93,6 @@ target_link_libraries(agentxx PUBLIC
   neograph_llm
   neograph_mcp
   neograph_acp
-  codegraph_core
-	hs_runtime
-	hs
   yaml-cpp::yaml-cpp
   boost_process
 )
@@ -103,6 +100,17 @@ if (LINUX_IO_URING_SUPPORTED)
   target_link_libraries(agentxx PUBLIC
     liburing.a 
     liburing-ffi.a
+  )
+endif()
+if (AGENTXX_ENABLE_HYPERSCAN)
+  target_link_libraries(agentxx PUBLIC
+    hs_runtime
+    hs
+  )
+endif()
+if (AGENTXX_ENABLE_CODEGRAPH)
+  target_link_libraries(agentxx PUBLIC
+    codegraph_core
   )
 endif()
 

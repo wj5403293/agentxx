@@ -4,7 +4,6 @@
 #include "util.h"
 #include <csignal>
 #include <ctime>
-#include <execinfo.h>
 #include <iostream>
 #include <string_view>
 
@@ -34,10 +33,12 @@
 
 #endif
 
+#if IS_LINUX_D
+
+#include <execinfo.h>
+
 namespace agentxx {
 namespace util {
-
-#if IS_LINUX_D
 
 inline static std::string _exe_path{};
 
@@ -149,12 +150,18 @@ inline void signalError(std::string_view exepath) {
   signal(SIGSEGV, signal_handler);
 }
 
+}; // namespace util
+}; // namespace agentxx
+
 #else
 
+namespace agentxx {
+namespace util {
 inline void printStack() {}
 
 inline void signalError(std::string_view exepath) {}
 
-#endif
 }; // namespace util
 }; // namespace agentxx
+
+#endif
