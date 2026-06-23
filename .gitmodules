@@ -31,3 +31,6 @@
 [submodule "agent/third_party/sqlite3-cmake"]
 	path = agent/third_party/sqlite3-cmake
 	url = https://github.com/coolight7/sqlite3-cmake/
+[submodule "agent/third_party/libiconv-native"]
+	path = agent/third_party/libiconv-native
+	url = https://github.com/coolight7/libiconv-native
