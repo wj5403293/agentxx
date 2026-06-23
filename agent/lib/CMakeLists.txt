@@ -21,7 +21,6 @@ set_target_properties(agentxx PROPERTIES
 if (LINUX_IO_URING_SUPPORTED)
   add_dependencies(agentxx liburing_repo)
 endif()
-add_dependencies(agentxx iconv_repo)
 
 if (IS_WIN_D)
 	target_compile_definitions(

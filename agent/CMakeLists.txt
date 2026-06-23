@@ -217,43 +217,6 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
 include(ExternalProject)
 include(FetchContent)
 
-# iconv
-set(LIBICONV_VERSION 1.18)
-set(LIBICONV_URL "https://ftp.gnu.org/gnu/libiconv/libiconv-${LIBICONV_VERSION}.tar.gz")
-set(LIBICONV_SOURCE_DIR "${LIBICONV_PREFIX}/src/iconv_repo")
-set(LIBICONV_BINARY_DIR "${CMAKE_BINARY_DIR}/libiconv-build")
-set(LIBICONV_INSTALL_DIR "${CMAKE_BINARY_DIR}/libiconv-install")
-ExternalProject_Add(
-  iconv_repo
-  URL ${LIBICONV_URL}
-  SOURCE_DIR ${LIBICONV_SOURCE_DIR}
-  BINARY_DIR ${LIBICONV_BINARY_DIR} 
-  INSTALL_DIR ${LIBICONV_INSTALL_DIR} 
-  BUILD_ALWAYS OFF
-  UPDATE_DISCONNECTED TRUE
-  CONFIGURE_COMMAND 
-      cd ${LIBICONV_BINARY_DIR} && ${LIBICONV_SOURCE_DIR}/configure
-      --prefix=${LIBICONV_INSTALL_DIR} 
-      --host=${CMAKE_C_COMPILER_TARGET}
-      --enable-static=yes
-      --enable-shared=no
-      --enable-pic
-      --disable-rpath
-      --disable-nls
-      --disable-libiconv-close
-      CC=${CMAKE_C_COMPILER}
-      CXX=${CMAKE_CXX_COMPILER}
-      AR=${CMAKE_AR}
-      RANLIB=${CMAKE_RANLIB}
-      "CFLAGS=${CMAKE_C_FLAGS}"
-  BUILD_COMMAND 
-    cd ${LIBICONV_BINARY_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
-  INSTALL_COMMAND 
-    cd ${LIBICONV_BINARY_DIR} && make install
-  UPDATE_COMMAND ""
-  TEST_COMMAND ""
-)
-
 # liburing
 set(LIBURING_SOURCE_DIR "${third_party_DIR}/liburing/")
 set(LIBURING_INSTALL_DIR "${CMAKE_BINARY_DIR}/liburing-install")
@@ -279,6 +242,20 @@ if (LINUX_IO_URING_SUPPORTED)
   )
   include_directories(${LIBURING_INSTALL_DIR}/include/)
 endif()
+
+# iconv
+FetchContent_Declare(
+  libiconv
+  SOURCE_DIR "${third_party_DIR}/libiconv-native/"
+  EXCLUDE_FROM_ALL
+)
+block()
+  set(ICONV_ENABLE_EXTRA    OFF)
+  set(ICONV_EMBED_MODE      OFF)
+  set(BUILD_SHARED_LIBS     OFF)
+  set(BUILD_STATIC_LIBS     ON)
+  FetchContent_MakeAvailable(libiconv)
+endblock()
 
 # sqlite
 FetchContent_Declare(
