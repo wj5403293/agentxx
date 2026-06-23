@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.28)
 cmake_policy(SET CMP0097 NEW)
 
-project(agentxx VERSION 0.1.0 LANGUAGES C CXX)
+project(agentxx_project VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
@@ -63,27 +63,73 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif()
 endif ()
 
-if (XX_TOOLCHAIN_FILE AND NOT IS_WIN_D)
-  message("[agentxx] 指定 XX_TOOLCHAIN_FILE 交叉编译时应当为 WIN")
-  return()
-endif()
-
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
 
+set(_AGENTXX_COMMON_C_CXX_FLAGS)
+
+if (MSVC) 
+  set(_AGENTXX_COMMON_C_CXX_FLAGS 
+    "${_AGENTXX_COMMON_C_CXX_FLAGS} /D__STDC_CONSTANT_MACROS=1 /DCPPHTTPLIB_OPENSSL_SUPPORT=1 /DBOOST_ASIO_STANDALONE=1 /DASIO_STANDALONE=1 /DBOOST_PROCESS_USE_STD_FS=1"
+  )
+  if (WINDOWS_IOCP_SUPPORTED)
+    set(_AGENTXX_COMMON_C_CXX_FLAGS 
+      "${_AGENTXX_COMMON_C_CXX_FLAGS} /DASIO_HAS_IOCP=ON /DBOOST_ASIO_HAS_IOCP=ON /DASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON /DBOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON"
+    )
+    message("[agentxx] Enable asio/iocp")
+  endif()
+  if (LINUX_IO_URING_SUPPORTED)
+    set(_AGENTXX_COMMON_C_CXX_FLAGS
+      "${_AGENTXX_COMMON_C_CXX_FLAGS} /DASIO_HAS_IO_URING=ON /DBOOST_ASIO_HAS_IO_URING=ON /DASIO_HAS_IO_URING_AS_DEFAULT=ON /DBOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON"
+    )
+    message("[agentxx] Enable asio/io_uring")
+  endif()
+else ()
+  set(_AGENTXX_COMMON_C_CXX_FLAGS
+    ${_AGENTXX_COMMON_C_CXX_FLAGS}
+    -D__STDC_CONSTANT_MACROS=1
+    -DCPPHTTPLIB_OPENSSL_SUPPORT=1
+    # boost/asio
+    -DBOOST_ASIO_STANDALONE=1
+    -DASIO_STANDALONE=1
+    # boost/process
+    -DBOOST_PROCESS_USE_STD_FS=1
+  )
+  if (WINDOWS_IOCP_SUPPORTED)
+    set(_AGENTXX_COMMON_C_CXX_FLAGS
+      ${_AGENTXX_COMMON_C_CXX_FLAGS}
+      -DASIO_HAS_IOCP=ON
+      -DBOOST_ASIO_HAS_IOCP=ON
+      -DASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON
+      -DBOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON
+    )
+    message("[agentxx] Enable asio/iocp")
+  endif()
+  if (LINUX_IO_URING_SUPPORTED)
+    set(_AGENTXX_COMMON_C_CXX_FLAGS
+      ${_AGENTXX_COMMON_C_CXX_FLAGS}
+      -DASIO_HAS_IO_URING=ON
+      -DBOOST_ASIO_HAS_IO_URING=ON
+      -DASIO_HAS_IO_URING_AS_DEFAULT=ON
+      -DBOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON
+    )
+    message("[agentxx] Enable asio/io_uring")
+  endif()
+endif()
+
 message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 if (MSVC)
-		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}    /utf-8 /MD /wd4200 /std:c17")
-		set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE}  /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
-		set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}    /utf-8 /MD /wd4200 /std:c17")
-		set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE}  /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
-		set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}      /utf-8 /MD /wd4200 /std:c17")
-		set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}    /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
+		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /std:c17 /D_GNU_SOURCE")
+		set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
+		set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /std:c17 /D_GNU_SOURCE")
+		set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
+		set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /std:c17 /D_GNU_SOURCE")
+		set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
 
     # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(_AGENTXX_C_FLAGS   "-fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17")
-    set(_AGENTXX_CXX_FLAGS "-fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
+    set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
+    set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
     set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
 
     if (DEFINED CMAKE_CONFIGURATION_TYPES)
@@ -107,13 +153,13 @@ else ()
   return()
 endif ()
 
-set(EXE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/exec")
+set(AGENTXX_EXEC_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/exec")
 message("[agentxx] CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-message("[agentxx] EXE_INSTALL_PREFIX: ${EXE_INSTALL_PREFIX}")
+message("[agentxx] AGENTXX_EXEC_INSTALL_PREFIX: ${AGENTXX_EXEC_INSTALL_PREFIX}")
 message("[agentxx] CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # deps
-set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
+set(agentxx_third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 
 # boost 系统安装库 或 自行编译
 # https://github.com/boostorg/boost
@@ -123,20 +169,21 @@ set(third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 # ./bootstrap.sh
 # ./b2 --prefix=${PWD}/../boost-build
 # ./b2 install --prefix=${PWD}/../boost-build
-if ((NOT DEFINED BOOST_ROOT) OR (NOT EXISTS ${BOOST_ROOT}))
-  # 尝试 third_party
-  set(BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
-endif()
-if(DEFINED BOOST_ROOT AND EXISTS ${BOOST_ROOT})
-  # 已定义 BOOST_ROOT 且存在
-  set(BOOST_INCLUDE_DIR "${BOOST_ROOT}/include/")
-  set(BOOST_LIBRARY_DIR "${BOOST_ROOT}/lib/")
-else ()
-    # 尝试 find
-    find_package(Boost QUIET)
-    if(Boost_FOUND)
-      set(BOOST_INCLUDE_DIR ${Boost_INCLUDE_DIRS})
-      set(BOOST_LIBRARY_DIR ${Boost_LIBRARY_DIRS})
+if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
+    # 尝试预编译目录
+    set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+    if (EXISTS ${_BOOST_DIR})
+        set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
+    else()
+        # 尝试系统 find_package
+        find_package(Boost QUIET)
+        if (Boost_FOUND)
+            # 从 Boost_INCLUDE_DIRS 推导出根目录
+            get_filename_component(BOOST_ROOT "${Boost_INCLUDE_DIRS}/.." ABSOLUTE)
+            set(BOOST_ROOT ${BOOST_ROOT} CACHE PATH "Boost root directory" FORCE)
+        else()
+            message(FATAL_ERROR "Boost not found. Please set BOOST_ROOT.")
+        endif()
     endif()
 endif()
 
@@ -154,65 +201,28 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
     "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
 
-    "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS} -D_GNU_SOURCE"
+    "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-    "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE} -D_GNU_SOURCE"
+    "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
     "-DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}"
-    "-DCMAKE_C_FLAGS_PROFILE=${CMAKE_C_FLAGS_PROFILE} -D_GNU_SOURCE"
+    "-DCMAKE_C_FLAGS_PROFILE=${CMAKE_C_FLAGS_PROFILE}"
     "-DCMAKE_CXX_FLAGS_PROFILE=${CMAKE_CXX_FLAGS_PROFILE}"
-    "-DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG} -D_GNU_SOURCE"
+    "-DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}"
     "-DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}"
     "-DLDFLAGS=${LDFLAGS}"
-)
 
-add_compile_definitions(__STDC_CONSTANT_MACROS=1)
-add_compile_definitions(CPPHTTPLIB_OPENSSL_SUPPORT=1)
-set(_AGENTXX_COMMON_CMAKE_ARGS
-  ${_AGENTXX_COMMON_CMAKE_ARGS}
-  -D__STDC_CONSTANT_MACROS=1
-  -DCPPHTTPLIB_OPENSSL_SUPPORT=1
-)
-# boost/asio
-add_compile_definitions(BOOST_ASIO_STANDALONE=1)
-add_compile_definitions(ASIO_STANDALONE=1)
-set(_AGENTXX_COMMON_CMAKE_ARGS
-  ${_AGENTXX_COMMON_CMAKE_ARGS}
-  -DBOOST_ASIO_STANDALONE=1
-  -DASIO_STANDALONE=1
-)
-if (WINDOWS_IOCP_SUPPORTED)
-  add_compile_definitions(ASIO_HAS_IOCP=ON)
-  add_compile_definitions(BOOST_ASIO_HAS_IOCP=ON)
-  add_compile_definitions(ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
-  add_compile_definitions(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON)
-  set(_AGENTXX_COMMON_CMAKE_ARGS
-    ${_AGENTXX_COMMON_CMAKE_ARGS}
-    -DASIO_HAS_IOCP=ON
-    -DBOOST_ASIO_HAS_IOCP=ON
-    -DASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON
-    -DBOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE=ON
-  )
-  message("[agentxx] Enable asio/iocp")
-endif()
-if (LINUX_IO_URING_SUPPORTED)
-  add_compile_definitions(ASIO_HAS_IO_URING=ON)
-  add_compile_definitions(BOOST_ASIO_HAS_IO_URING=ON)
-  add_compile_definitions(ASIO_HAS_IO_URING_AS_DEFAULT=ON)
-  add_compile_definitions(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON)
-  set(_AGENTXX_COMMON_CMAKE_ARGS
-    ${_AGENTXX_COMMON_CMAKE_ARGS}
-    -DASIO_HAS_IO_URING=ON
-    -DBOOST_ASIO_HAS_IO_URING=ON
-    -DASIO_HAS_IO_URING_AS_DEFAULT=ON
-    -DBOOST_ASIO_HAS_IO_URING_AS_DEFAULT=ON
-  )
-  message("[agentxx] Enable asio/io_uring")
-endif()
-# boost/process
-add_compile_definitions(BOOST_PROCESS_USE_STD_FS=1)
-set(_AGENTXX_COMMON_CMAKE_ARGS
-  ${_AGENTXX_COMMON_CMAKE_ARGS}
-  -DBOOST_PROCESS_USE_STD_FS=1
+    "-DBOOST_ROOT=${BOOST_ROOT}"
+
+    -DXX_BUILD_TYPE=${XX_BUILD_TYPE}
+    -DIS_DEBUG_D=${IS_DEBUG_D}
+    -DIS_RELEASE_D=${IS_RELEASE_D}
+    -DIS_LINUX_D=${IS_LINUX_D}
+    -DIS_WIN_D=${IS_WIN_D}
+    -DIS_MACOS_D=${IS_MACOS_D}  
+    -DIS_ANDROID_D=${IS_ANDROID_D}
+    -DIS_IOS_D=${IS_IOS_D}
+    "-DAGENTXX_EXEC_INSTALL_PREFIX=${AGENTXX_EXEC_INSTALL_PREFIX}"
+    "-Dagentxx_third_party_DIR=${agentxx_third_party_DIR}"
 )
 
 if (IS_WIN_D)
@@ -233,7 +243,7 @@ include(ExternalProject)
 include(FetchContent)
 
 # liburing
-set(LIBURING_SOURCE_DIR "${third_party_DIR}/liburing/")
+set(LIBURING_SOURCE_DIR "${agentxx_third_party_DIR}/liburing/")
 set(LIBURING_INSTALL_DIR "${CMAKE_BINARY_DIR}/liburing-install")
 if (LINUX_IO_URING_SUPPORTED)
   set(LIBURING_BINARY_DIR "${CMAKE_BINARY_DIR}/liburing-build")
@@ -252,200 +262,225 @@ if (LINUX_IO_URING_SUPPORTED)
       cd ${LIBURING_SOURCE_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
     INSTALL_COMMAND 
       cd ${LIBURING_SOURCE_DIR} && make install
-    UPDATE_COMMAND ""
     TEST_COMMAND ""
   )
   include_directories(${LIBURING_INSTALL_DIR}/include/)
 endif()
 
 # iconv
-FetchContent_Declare(
-  libiconv
-  SOURCE_DIR "${third_party_DIR}/libiconv-native/"
-  EXCLUDE_FROM_ALL
+ExternalProject_Add(
+  libiconv_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/libiconv-native/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DICONV_ENABLE_EXTRA=OFF
+    -DICONV_EMBED_MODE=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
 )
-block()
-  set(ICONV_ENABLE_EXTRA    OFF)
-  set(ICONV_EMBED_MODE      OFF)
-  set(BUILD_SHARED_LIBS     OFF)
-  set(BUILD_STATIC_LIBS     ON)
-  FetchContent_MakeAvailable(libiconv)
-endblock()
 
 # sqlite
-FetchContent_Declare(
-  sqlite3
-  SOURCE_DIR "${third_party_DIR}/sqlite3-cmake/"
-  EXCLUDE_FROM_ALL
+# https://sqlite.org/download.html
+# 复制版本和链接 sqlite-amalgamation-xxx.zip 
+ExternalProject_Add(
+  sqlite3_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/sqlite3-cmake/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DSQLITE3_SOURCE_DIR="${agentxx_third_party_DIR}/sqlite"
+    -DSQLITE3_VERSION="3.53.2"
+    -DSQLITE3_URL="https://sqlite.org/2026/sqlite-amalgamation-3530200.zip"
+    -Dsqlite3_ENABLE_THREADSAFE=ON
+    -Dsqlite3_ENABLE_DYNAMIC_EXTENSIONS=OFF
+    -Dsqlite3_ENABLE_MATH=ON
+    -Dsqlite3_ENABLE_FTS3=OFF
+    -Dsqlite3_ENABLE_FTS4=ON
+    -Dsqlite3_ENABLE_FTS5=ON
+    -Dsqlite3_ENABLE_RTREE=ON
+    -Dsqlite3_ENABLE_SESSION=OFF
+    -Dsqlite3_OMIT_DEPRECATED=ON
+    -Dsqlite3_BUILD_SHARED_LIBS=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
 )
-block()
-  # https://sqlite.org/download.html
-  # 复制链接 sqlite-amalgamation-xxx.zip 
-  set(SQLITE3_VERSION           "3.53.2")
-  # set(SQLITE3_SOURCE_DIR        "${third_party_DIR}/sqlite")
-  set(SQLITE3_URL               "https://sqlite.org/2026/sqlite-amalgamation-3530200.zip")
-  set(sqlite3_ENABLE_THREADSAFE ON)
-  set(sqlite3_ENABLE_DYNAMIC_EXTENSIONS OFF)
-  set(sqlite3_ENABLE_MATH       ON)
-  set(sqlite3_ENABLE_FTS3       OFF)
-  set(sqlite3_ENABLE_FTS4       ON)
-  set(sqlite3_ENABLE_FTS5       ON)
-  set(sqlite3_ENABLE_RTREE      ON)
-  set(sqlite3_ENABLE_SESSION    OFF)
-  set(sqlite3_OMIT_DEPRECATED   ON)
-  set(sqlite3_BUILD_SHARED_LIBS OFF)
-  set(BUILD_SHARED_LIBS         OFF)
-  set(BUILD_STATIC_LIBS         ON)
-  FetchContent_MakeAvailable(sqlite3)
-endblock()
-FetchContent_GetProperties(sqlite3)
-# set(SQLite3_INCLUDE_DIR "D:\\0Acoolight\\Program\\cpp\\agentxx\\agent\\build\\debug\\_deps\\sqlite3_ext-src")
-# set(SQLite3_LIBRARY sqlite3)
 
 # fmt
-FetchContent_Declare(
-  fmt
-  SOURCE_DIR "${third_party_DIR}/fmt/"
+ExternalProject_Add(
+  fmt_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/fmt/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DFMT_PEDANTIC=OFF
+    -DFMT_INSTALL=OFF
+    -DFMT_WERROR=OFF
+    -DFMT_DOC=OFF
+    -DFMT_TEST=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
 )
-block()
-  set(FMT_PEDANTIC          OFF)
-  set(FMT_INSTALL           OFF)
-  set(FMT_WERROR            OFF)
-  set(FMT_DOC               OFF)
-  set(FMT_TEST              OFF)
-  set(BUILD_SHARED_LIBS     OFF)
-  set(BUILD_STATIC_LIBS     ON )
-  FetchContent_MakeAvailable(fmt)
-endblock()
 
 # uchardet
-FetchContent_Declare(
-  uchardet
-  SOURCE_DIR "${third_party_DIR}/uchardet/"
-  EXCLUDE_FROM_ALL
+ExternalProject_Add(
+  uchardet_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/uchardet/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DCHECK_SSE2=ON
+    -DBUILD_BINARY=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
 )
-block()
-  set(CHECK_SSE2            ON)
-  set(BUILD_BINARY          OFF)
-  set(BUILD_SHARED_LIBS     OFF)
-  set(BUILD_STATIC_LIBS     ON )
-  FetchContent_MakeAvailable(uchardet)
-endblock()
-FetchContent_GetProperties(uchardet)
 
 # codegraph-cpp
 if (AGENTXX_ENABLE_CODEGRAPH)
-  FetchContent_Declare(
-    codegraph
-    SOURCE_DIR "${third_party_DIR}/codegraph-cpp/"
+  ExternalProject_Add(
+    codegraph_repo
+    DEPENDS sqlite3_repo
+    SOURCE_DIR "${agentxx_third_party_DIR}/codegraph-cpp/"
+    CMAKE_ARGS
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON
+    TEST_COMMAND ""
   )
-  block()
-    set(BUILD_SHARED_LIBS             OFF)
-    set(BUILD_STATIC_LIBS             ON)
-    FetchContent_MakeAvailable(codegraph)
-  endblock()
 endif()
 
 if (AGENTXX_ENABLE_HYPERSCAN)
   # vectorscan
-  FetchContent_Declare(
-    vectorscan
-    SOURCE_DIR "${third_party_DIR}/vectorscan/"
-    EXCLUDE_FROM_ALL
+  ExternalProject_Add(
+    vectorscan_repo
+    SOURCE_DIR "${agentxx_third_party_DIR}/vectorscan/"
+    CMAKE_ARGS
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+      "-DBOOST_ROOT=${BOOST_ROOT}"
+      -DBUILD_UNIT=OFF
+      -DBUILD_TOOLS=OFF
+      -DBUILD_EXAMPLES=OFF
+      -DBUILD_BENCHMARKS=OFF
+      -DBUILD_DOC=OFF
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON 
+      -DFAT_RUNTIME=OFF
+      -DUSE_CPU_NATIVE=ON 
+      -DBUILD_AVX2=ON 
+      -DBUILD_AVX512=ON 
+      -DBUILD_AVX512VBMI=ON 
+      -DBUILD_SIMDE_BACKEND=OFF
+      -DBUILD_SIMDE_NATIVE=OFF
+    TEST_COMMAND ""
   )
-  block()
-    include_directories(${BOOST_INCLUDE_DIR})
-    set(BUILD_UNIT            OFF)
-    set(BUILD_TOOLS           OFF)
-    set(BUILD_EXAMPLES        OFF)
-    set(BUILD_BENCHMARKS      OFF)
-    set(BUILD_DOC             OFF)
-    set(BUILD_SHARED_LIBS     OFF)
-    set(BUILD_STATIC_LIBS     ON )
-    set(FAT_RUNTIME           OFF)
-    set(USE_CPU_NATIVE        ON )
-    set(BUILD_AVX2            ON )
-    set(BUILD_AVX512          ON )
-    set(BUILD_AVX512VBMI      ON )
-    set(BUILD_SIMDE_BACKEND   OFF)
-    set(BUILD_SIMDE_NATIVE    OFF)
-    # set(BUILD_SVE            ON)
-    # set(BUILD_SVE2           ON)
-    # set(BUILD_SVE2_BITPERM   ON)
-    FetchContent_MakeAvailable(vectorscan)
-  endblock()
 else()
   message("[agentxx] Disable Hyperscan")
 endif()
 
 # neograph
-FetchContent_Declare(
-  NeoGraph
-  SOURCE_DIR "${third_party_DIR}/neograph/"
-  EXCLUDE_FROM_ALL
+ExternalProject_Add(
+  neograph_repo
+  DEPENDS sqlite3_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/neograph/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    "-DBOOST_ROOT=${BOOST_ROOT}"
+    -DNEOGRAPH_BUILD_EXAMPLES=OFF
+    -DNEOGRAPH_BUILD_TESTS=OFF
+    -DNEOGRAPH_BUILD_PYBIND=OFF
+    -DNEOGRAPH_BUILD_A2A=OFF
+    -DNEOGRAPH_BUILD_POSTGRES=OFF
+    -DNEOGRAPH_BUILD_SQLITE=ON
+    -DNEOGRAPH_BUILD_ASYNC=ON
+    -DNEOGRAPH_BUILD_LLM=ON
+    -DNEOGRAPH_BUILD_MCP=ON
+    -DNEOGRAPH_BUILD_ACP=ON
+    -DNEOGRAPH_BUILD_UTIL=ON
+    -DNEOGRAPH_USE_LIBCURL=OFF
+    -DNEOGRAPH_INSTALL_HEADERS=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
 )
-block()
-  set(NEOGRAPH_BUILD_EXAMPLES  OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_TESTS     OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_PYBIND    OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_A2A       OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_POSTGRES  OFF CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_SQLITE    ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_ASYNC     ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_LLM       ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_MCP       ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_ACP       ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_BUILD_UTIL      ON  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_USE_LIBCURL     OFF  CACHE BOOL "" FORCE)
-  set(NEOGRAPH_INSTALL_HEADERS OFF CACHE BOOL "" FORCE)
-  set(BUILD_SHARED_LIBS             OFF)
-  set(BUILD_STATIC_LIBS             ON)
-  FetchContent_MakeAvailable(NeoGraph)
-endblock()
 
 # html2md
-FetchContent_Declare(
-  html2md
-  SOURCE_DIR "${third_party_DIR}/html2md/"
-  EXCLUDE_FROM_ALL
+ExternalProject_Add(
+  html2md_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/html2md/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DBUILD_EXE=OFF
+    -DBUILD_DOC=OFF
+    -DBUILD_TEST=OFF
+    -DPYTHON_BINDINGS=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
 )
-block()
-  set(BUILD_EXE                 OFF)
-  set(BUILD_DOC                 OFF)
-  set(BUILD_TEST                OFF)
-  set(PYTHON_BINDINGS           OFF)
-  set(BUILD_SHARED_LIBS         OFF)
-  set(BUILD_STATIC_LIBS         ON)
-  FetchContent_MakeAvailable(html2md)
-endblock()
 
 # yaml-cpp
-FetchContent_Declare(
-  yaml-cpp
-  SOURCE_DIR "${third_party_DIR}/yaml-cpp/"
-  EXCLUDE_FROM_ALL
+ExternalProject_Add(
+  yaml_cpp_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/yaml-cpp/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DYAML_CPP_BUILD_CONTRIB=OFF
+    -DYAML_CPP_BUILD_TOOLS=ON
+    -DYAML_BUILD_SHARED_LIBS=OFF
+    -DYAML_CPP_INSTALL=OFF
+    -DYAML_ENABLE_PIC=ON
+    -DYAML_CPP_BUILD_TESTS=ON
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON 
+  TEST_COMMAND ""
 )
-block()
-  set(YAML_CPP_BUILD_CONTRIB          OFF)
-  set(YAML_CPP_BUILD_TOOLS            ON)
-  set(YAML_BUILD_SHARED_LIBS          OFF)
-  set(YAML_CPP_INSTALL                OFF)
-  set(YAML_ENABLE_PIC                 ON)
-  set(YAML_CPP_BUILD_TESTS            ON)
-  set(BUILD_SHARED_LIBS               OFF)
-  set(BUILD_STATIC_LIBS               ON )
-  FetchContent_MakeAvailable(yaml-cpp)
-endblock()
 
 # glob
-set(glob_SOURCE_DIR "${third_party_DIR}/glob/")
+ExternalProject_Add(
+  glob_repo
+  SOURCE_DIR "${agentxx_third_party_DIR}/glob/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+  TEST_COMMAND ""
+)
 
-ADD_SUBDIRECTORY(lib)
+ExternalProject_Add(
+  libagentxx_repo
+  DEPENDS 
+    liburing_repo
+    libiconv_repo
+    sqlite3_repo
+    fmt_repo
+    uchardet_repo
+    codegraph_repo
+    vectorscan_repo
+    neograph_repo
+    html2md_repo
+    yaml_cpp_repo
+    glob_repo
+  SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/"
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+  TEST_COMMAND ""
+)
+
 if (AGENTXX_BUILD_CLIENT)
-  ADD_SUBDIRECTORY(client)
-  add_dependencies(client agentxx)
+  ExternalProject_Add(
+    agentxx_client_repo
+    DEPENDS libagentxx_repo
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/client/"
+    CMAKE_ARGS
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+    TEST_COMMAND ""
+  )
 endif()
-if (AGENTXX_BUILD_TEST) 
-  ADD_SUBDIRECTORY(test)
-  add_dependencies(test agentxx)
+if (AGENTXX_BUILD_TEST)
+  ExternalProject_Add(
+    agentxx_test_repo
+    DEPENDS libagentxx_repo
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/"
+    CMAKE_ARGS
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+    TEST_COMMAND ""
+  )
 endif()

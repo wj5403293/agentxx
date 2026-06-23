@@ -1,6 +1,6 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 
-set(NAME_agentxx agentxx)
+project(agentxx VERSION 0.1.0 LANGUAGES C CXX)
 
 add_library(agentxx SHARED)
 
@@ -16,11 +16,8 @@ set_target_properties(agentxx PROPERTIES
   PUBLIC_HEADER agentxx.h
   PREFIX "lib"
   OUTPUT_NAME "agentxx"
+  CXX_STANDARD 23
 )
-
-if (LINUX_IO_URING_SUPPORTED)
-  add_dependencies(agentxx liburing_repo)
-endif()
 
 if (IS_WIN_D)
 	target_compile_definitions(
@@ -44,7 +41,7 @@ if (AGENTXX_ENABLE_HYPERSCAN)
   target_compile_definitions(agentxx PUBLIC AGENTXX_ENABLE_HYPERSCAN=1)
 endif()
 
-target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # 标记为 SYSTEM 防止 include 影响 warning 转 error 判断
 target_include_directories(agentxx SYSTEM PUBLIC ${fmt_SOURCE_DIR}/include/)
 target_include_directories(agentxx SYSTEM PUBLIC ${uchardet_INSTALL_DIR}/include/)
@@ -65,53 +62,63 @@ if (IS_DEBUG_D)
     target_link_options(agentxx PRIVATE "-fsanitize=address")
 endif ()
 
+find_package(Boost REQUIRED)
+find_package(iconv REQUIRED)
+find_package(fmt REQUIRED)
+find_package(uchardet REQUIRED)
+find_package(codegraph REQUIRED)
+find_package(neograph REQUIRED)
+find_package(html2md REQUIRED)
+find_package(yaml-cpp REQUIRED)
+find_package(glob REQUIRED)
+
 target_link_directories(agentxx PUBLIC 
-  ${fmt_INSTALL_DIR}
-  ${uchardet_INSTALL_DIR}/lib/
-  ${LIBICONV_INSTALL_DIR}/lib/
-  ${SQLITE_INSTALL_DIR}/lib/
-  ${CODEGRAPH_INSTALL_DIR}/lib/
-  ${NEOGRAPH_INSTALL_DIR}/lib/
-  ${vectorscan_INSTALL_DIR}/lib/
   ${BOOST_LIBRARY_DIR}
 )
-if (LINUX_IO_URING_SUPPORTED)
-  target_link_directories(agentxx PUBLIC 
-    ${LIBURING_INSTALL_DIR}/lib/
-  )
-endif()
 
 target_link_libraries(agentxx PUBLIC
+  Iconv::Iconv
   fmt::fmt
   html2md
-  iconv
-  libuchardet
+  uchardet::libuchardet
   sqlite3
-  neograph_core
-  neograph_util
-  neograph_async
-  neograph_llm
-  neograph_mcp
-  neograph_acp
+  neograph::core
+  neograph::util
+  neograph::async
+  neograph::llm
+  neograph::mcp
+  neograph::acp
   yaml-cpp::yaml-cpp
-  boost_process
+  boost::process
 )
-if (LINUX_IO_URING_SUPPORTED)
-  target_link_libraries(agentxx PUBLIC
-    liburing.a 
-    liburing-ffi.a
-  )
-endif()
 if (AGENTXX_ENABLE_HYPERSCAN)
-  target_link_libraries(agentxx PUBLIC
-    hs_runtime
-    hs
+  find_package(vectorscan REQUIRED)
+  target_link_libraries(agentxx PUBLIC 
+    vectorscan
   )
 endif()
 if (AGENTXX_ENABLE_CODEGRAPH)
-  target_link_libraries(agentxx PUBLIC
-    codegraph_core
+  find_package(codegraph REQUIRED)
+  target_link_libraries(agentxx PUBLIC 
+    codegraph-cpp::codegraph_core
   )
 endif()
 
-install(TARGETS agentxx DESTINATION "${EXE_INSTALL_PREFIX}")
+install(TARGETS agentxx DESTINATION "${AGENTXX_EXEC_INSTALL_PREFIX}")
+
+include(cmake/CPM.cmake)
+CPMAddPackage(
+        NAME PackageProject.cmake
+        GITHUB_REPOSITORY TheLartians/PackageProject.cmake
+        VERSION 1.3
+)
+string(TOLOWER ${PROJECT_NAME}/version.h VERSION_HEADER_LOCATION)
+packageProject(
+        NAME ${PROJECT_NAME}
+        VERSION ${PROJECT_VERSION}
+        BINARY_DIR ${PROJECT_BINARY_DIR}
+        INCLUDE_DIR ${PROJECT_SOURCE_DIR}/lib
+        INCLUDE_DESTINATION include/${PROJECT_NAME}
+        VERSION_HEADER "${VERSION_HEADER_LOCATION}"
+        DEPENDENCIES ""
+)

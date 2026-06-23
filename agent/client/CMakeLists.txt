@@ -1,39 +1,38 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 
-set(NAME_client client)
+project(agentxx_cli VERSION 0.1.0 LANGUAGES C CXX)
 
-add_executable(${NAME_client})
+add_executable(agentxx_cli)
 
 file(GLOB_RECURSE client_SOURCES "*.cpp" "*.cc" "*.cxx")
-target_sources(${NAME_client} PRIVATE
+target_sources(agentxx_cli PRIVATE
 	${client_SOURCES}
 )
 
-target_include_directories(${NAME_client} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../)
+target_include_directories(agentxx_cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (IS_DEBUG_D)
-    target_compile_options(${NAME_client} PRIVATE "-fsanitize=address")
-    target_link_options(${NAME_client} PRIVATE "-fsanitize=address")
+    target_compile_options(agentxx_cli PRIVATE "-fsanitize=address")
+    target_link_options(agentxx_cli PRIVATE "-fsanitize=address")
 endif ()
 
-target_link_libraries(${NAME_client}
+find_package(libagentxx REQUIRED)
+target_link_libraries(agentxx_cli
 	agentxx
 )
 if (IS_MACOS_D)
-  target_link_options(${NAME_client} PRIVATE 
+  target_link_options(agentxx_cli PRIVATE 
     "-Wl,-rpath,@executable_path"
   )
 endif()
 
 if (IS_WIN_D)
 	target_compile_definitions(
-		${NAME_client} PRIVATE
+		agentxx_cli PRIVATE
 		strdup=_strdup
 		strcasecmp=_stricmp
 		strncasecmp=_strnicmp
 	)
 endif ()
 
-add_dependencies(${NAME_client} agentxx)
-
-install(TARGETS ${NAME_client} DESTINATION "${EXE_INSTALL_PREFIX}")
+install(TARGETS agentxx_cli DESTINATION "${AGENTXX_EXEC_INSTALL_PREFIX}")
