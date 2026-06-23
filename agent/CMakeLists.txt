@@ -282,33 +282,31 @@ if (LINUX_IO_URING_SUPPORTED)
 endif()
 
 # sqlite
-set(SQLITE_SOURCE_DIR "${third_party_DIR}/sqlite/")
-set(SQLITE_BINARY_DIR "${CMAKE_BINARY_DIR}/sqlite-build")
-set(SQLITE_INSTALL_DIR "${CMAKE_BINARY_DIR}/sqlite-install")
-set(SQLITE_C_FLAGS "${CMAKE_C_FLAGS} -D_GNU_SOURCE")
-ExternalProject_Add(
-  sqlite_repo
-  SOURCE_DIR ${SQLITE_SOURCE_DIR}
-  BINARY_DIR ${SQLITE_BINARY_DIR}
-  INSTALL_DIR ${SQLITE_INSTALL_DIR}
-  CONFIGURE_COMMAND 
-      cd ${SQLITE_BINARY_DIR} && ${SQLITE_SOURCE_DIR}/configure
-      --prefix=${SQLITE_INSTALL_DIR}
-      --host=${CMAKE_C_COMPILER_TARGET}
-      CC=${CMAKE_C_COMPILER}
-      CXX=${CMAKE_CXX_COMPILER}
-      AR=${CMAKE_AR}
-      RANLIB=${CMAKE_RANLIB}
-      "CFLAGS=${SQLITE_C_FLAGS}"
-      "CXXFLAGS=${CMAKE_CXX_FLAGS}" 
-      "LDFLAGS=${LDFLAGS}"
-  BUILD_COMMAND 
-    cd ${SQLITE_BINARY_DIR} && make -j${CMAKE_BUILD_PARALLEL_LEVEL}
-  INSTALL_COMMAND 
-    cd ${SQLITE_BINARY_DIR} && make install
-  UPDATE_COMMAND ""
-  TEST_COMMAND ""
+FetchContent_Declare(
+  sqlite3
+  SOURCE_DIR "${third_party_DIR}/sqlite3-cmake/"
+  EXCLUDE_FROM_ALL
 )
+block()
+  # https://sqlite.org/download.html
+  # 复制链接 sqlite-amalgamation-xxx.zip 
+  set(SQLITE3_VERSION           "3.53.2")
+  # set(SQLITE3_SOURCE_DIR        "${third_party_DIR}/sqlite")
+  set(SQLITE3_URL               "https://sqlite.org/2026/sqlite-amalgamation-3530200.zip")
+  set(sqlite3_ENABLE_THREADSAFE ON)
+  set(sqlite3_ENABLE_DYNAMIC_EXTENSIONS OFF)
+  set(sqlite3_ENABLE_MATH       ON)
+  set(sqlite3_ENABLE_FTS3       OFF)
+  set(sqlite3_ENABLE_FTS4       ON)
+  set(sqlite3_ENABLE_FTS5       ON)
+  set(sqlite3_ENABLE_RTREE      ON)
+  set(sqlite3_ENABLE_SESSION    OFF)
+  set(sqlite3_OMIT_DEPRECATED   ON)
+  set(sqlite3_BUILD_SHARED_LIBS OFF)
+  set(BUILD_SHARED_LIBS         OFF)
+  set(BUILD_STATIC_LIBS         ON)
+  FetchContent_MakeAvailable(sqlite3)
+endblock()
 
 # fmt
 FetchContent_Declare(
