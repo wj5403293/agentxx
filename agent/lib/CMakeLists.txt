@@ -18,6 +18,12 @@ set_target_properties(agentxx PROPERTIES
   OUTPUT_NAME "agentxx"
 )
 
+if (LINUX_IO_URING_SUPPORTED)
+  add_dependencies(agentxx liburing_repo)
+endif()
+add_dependencies(agentxx iconv_repo)
+add_dependencies(agentxx sqlite_repo)
+
 if (IS_WIN_D)
 	target_compile_definitions(
 		agentxx PRIVATE
@@ -101,11 +107,5 @@ if (LINUX_IO_URING_SUPPORTED)
     liburing-ffi.a
   )
 endif()
-
-if (LINUX_IO_URING_SUPPORTED)
-  add_dependencies(agentxx liburing_repo)
-endif()
-add_dependencies(agentxx iconv_repo)
-add_dependencies(agentxx sqlite_repo)
 
 install(TARGETS agentxx DESTINATION "${EXE_INSTALL_PREFIX}")

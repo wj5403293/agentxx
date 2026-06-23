@@ -1,8 +1,8 @@
 #!/bin/bash
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
-src_dir=$(cd "$script_dir/../" && pwd)
-build_dir=$(cd "$script_dir/../build/debug" && pwd)
+src_dir="$script_dir/../"
+build_dir="$script_dir/../build/debug"
 
 $script_dir/debug_build.sh
 

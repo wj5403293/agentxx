@@ -1,8 +1,8 @@
 #!/bin/bash
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
-src_dir=$(cd "$script_dir/../" && pwd)
-build_dir=$(cd "$script_dir/../build/win-debug" && pwd)
+src_dir="$script_dir/../"
+build_dir="$script_dir/../build/win-debug"
 
 $script_dir/mingw_debug_build.sh
 
