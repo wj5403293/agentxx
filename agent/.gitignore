@@ -3,6 +3,7 @@
 /third_party/llvm-mingw-msvcrt-x86_64/
 /third_party/boost-build/
 /third_party/OpenSSL/
+/third_party/sqlite/
 /third_party/paddle_inference/
 /third_party/paddle_inference_model/
 /third_party/PaddleOCR/

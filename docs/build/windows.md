@@ -6,6 +6,20 @@
     - Clang/llvm
 
 ## 开始
+### 安装 VS-Studio-2026、cmake、pkg-config
+- 安装 cmake
+    - https://cmake.org/download/
+    - 选择win版本安装，如: cmake-x.x.x-windows-x86_64.msi
+    - https://github.com/Kitware/CMake/releases/download/v4.4.0-rc2/cmake-4.4.0-rc2-windows-x86_64.msi
+- 安装 pkg-config
+```pwsh
+# 管理员身份打开 powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+choco install pkgconfiglite
+
+pkg-config --version
+```
 ### Clang/llvm 编译
 - 下载交叉编译工具链:
     - https://github.com/mstorsjo/llvm-mingw/releases
@@ -19,17 +33,25 @@ mv llvm-mingw-20260616-msvcrt-x86_64 llvm-mingw-msvcrt-x86_64
 ```
 ### Boost 编译
 - 安装或编译 Boost 1.91
-- 自行编译:
+- 自行编译, windows CMD:
 ```sh
 cd boost\
 # 然后编译结果到 agent/third_party/boost-build/
 .\bootstrap.bat
-.\b2 --prefix=%CD%/../boost-build
-.\b2 install --prefix=%CD%/../boost-build
 
-# power shell 使用:
-# .\b2 --prefix=$PWD/../boost-build
-# .\b2 install --prefix=$PWD/../boost-build
+set "boost_source_dir=%CD%"
+
+set "boost_install_dir=%CD%/../boost-build"
+mkdir "%boost_install_dir%"
+cd "%boost_install_dir%"
+set "boost_install_dir=%CD%"
+cd "%boost_source_dir%"
+
+.\b2 install --layout=system --prefix="%boost_install_dir%" link=static address-model=64
+```
+- PowerShell 使用:
+```sh
+.\b2 install --layout=system --prefix="$PWD/../boost-build" link=static address-model=64
 ```
 ### agentxx 编译
 - - 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client:

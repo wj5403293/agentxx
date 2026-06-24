@@ -15,6 +15,7 @@ option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
 option(AGENTXX_ENABLE_HYPERSCAN "Add HyperScan for regex support. Use std::regex if disable." ON)
 option(AGENTXX_ENABLE_CODEGRAPH "Add CodeGraph-CPP for code analysis." ON)
+option(AGENTXX_ENABLE_CUSTOM_CURL "Use custom curl." ON)
 
 # ccache
 find_program(CCACHE_PROGRAM ccache)
@@ -345,6 +346,46 @@ ExternalProject_Add(
   TEST_COMMAND ""
 )
 
+if (AGENTXX_ENABLE_CUSTOM_CURL)
+  # curl
+  ExternalProject_Add(
+    curl_repo
+    SOURCE_DIR "${agentxx_third_party_DIR}/curl/"
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
+    CMAKE_ARGS
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+      -DBUILD_CURL_EXE=OFF
+      -DCURL_DISABLE_INSTALL=OFF
+      -DBUILD_CURL_EXE=OFF
+      -DCURL_BUILD_EVERYTHING=OFF
+      -DENABLE_UNICODE=ON
+      -DCURL_LTO=ON
+      -DENABLE_DEBUG=OFF
+      -DCURL_DROP_UNUSED=ON
+      -DCURL_USE_CMAKECONFIG=ON
+      -DCURL_USE_PKGCONFIG=ON
+      -DCURL_ENABLE_EXPORT_TARGET=ON
+      -DUSE_LIBIDN2=OFF
+      -DCURL_USE_LIBPSL=OFF
+      -DCURL_USE_LIBSSH2=OFF
+      -DCURL_USE_LIBSSH=OFF
+      -DCURL_USE_GSASL=OFF
+      -DCURL_USE_GSSAPI=OFF
+      -DCURL_USE_LIBBACKTRACE=OFF
+      -DBUILD_LIBCURL_DOCS=OFF
+      -DBUILD_MISC_DOCS=OFF
+      -DENABLE_CURL_MANUAL=OFF
+      -DENABLE_IPV6=ON
+      -DCURL_ENABLE_SSL=ON
+      -DCURL_USE_OPENSSL=ON
+      -DBUILD_TESTING=OFF
+      -DBUILD_EXAMPLES=OFF
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON
+    TEST_COMMAND ""
+  )
+endif()
+
 # codegraph-cpp
 if (AGENTXX_ENABLE_CODEGRAPH)
   ExternalProject_Add(
@@ -416,6 +457,9 @@ ExternalProject_Add(
     -DBUILD_STATIC_LIBS=ON
   TEST_COMMAND ""
 )
+if (AGENTXX_ENABLE_CUSTOM_CURL)
+  add_dependencies(neograph_repo curl_repo)
+endif()
 
 # html2md
 ExternalProject_Add(
@@ -464,13 +508,10 @@ ExternalProject_Add(
 ExternalProject_Add(
   agentxx_lib_repo
   DEPENDS 
-    liburing_repo
     libiconv_repo
     sqlite3_repo
     fmt_repo
     uchardet_repo
-    codegraph_repo
-    vectorscan_repo
     neograph_repo
     html2md_repo
     yaml_cpp_repo
@@ -482,6 +523,15 @@ ExternalProject_Add(
     -Dneograph_SOURCE_DIR=${neograph_SOURCE_DIR}
   TEST_COMMAND ""
 )
+if (AGENTXX_LINUX_IO_URING_SUPPORTED)
+  add_dependencies(agentxx_lib_repo liburing_repo)
+endif()
+if (AGENTXX_ENABLE_HYPERSCAN)
+  add_dependencies(agentxx_lib_repo vectorscan_repo)
+endif()
+if (AGENTXX_ENABLE_CODEGRAPH)
+  add_dependencies(agentxx_lib_repo codegraph_repo)
+endif()
 
 if (AGENTXX_BUILD_CLIENT)
   ExternalProject_Add(

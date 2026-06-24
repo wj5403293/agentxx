@@ -102,7 +102,7 @@ target_link_libraries(agentxx PUBLIC
   neograph_core
   yyjson
   # === neograph ^^^
-  SQLite::SQLite3
+  SQLite3::SQLite3
   CURL::libcurl
   OpenSSL::SSL
   OpenSSL::Crypto

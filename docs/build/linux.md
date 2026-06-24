@@ -15,8 +15,10 @@
 cd boost/
 # 然后编译结果到 agent/third_party/boost-build/
 ./bootstrap.sh
-./b2 --prefix=${PWD}/../boost-build
-./b2 install --prefix=${PWD}/../boost-build
+
+boost_install_dir=$(cd "$(dirname "$0")" && pwd)
+
+./b2 install --layout=system --prefix=${boost_install_dir} link=static address-model=64
 ```
 - 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client:
 ```sh
