@@ -43,19 +43,8 @@ endif()
 
 target_include_directories(agentxx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # 标记为 SYSTEM 防止 include 影响 warning 转 error 判断
-target_include_directories(agentxx SYSTEM PUBLIC ${fmt_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${uchardet_INSTALL_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${LIBICONV_INSTALL_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${LIBURING_INSTALL_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${SQLITE3_INSTALL_DIR}/src/)
-target_include_directories(agentxx SYSTEM PUBLIC ${vectorscan_SOURCE_DIR}/src/)
-target_include_directories(agentxx SYSTEM PUBLIC ${html2md_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${glob_SOURCE_DIR}/single_include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${CODEGRAPH_SOURCE_DIR}/include/)
-target_include_directories(agentxx SYSTEM PUBLIC ${NEOGRAPH_SOURCE_DIR}/include/)
 target_include_directories(agentxx SYSTEM PUBLIC ${BOOST_INCLUDE_DIR}/)
 target_include_directories(agentxx SYSTEM PUBLIC ${BOOST_INCLUDE_DIR}/boost/)
-target_include_directories(agentxx SYSTEM PUBLIC ${NEOGRAPH_SOURCE_DIR}/deps/)
 
 if (IS_DEBUG_D)
     target_compile_options(agentxx PRIVATE "-fsanitize=address")
@@ -91,6 +80,12 @@ target_link_libraries(agentxx PUBLIC
   yaml-cpp::yaml-cpp
   boost::process
 )
+if (AGENTXX_LINUX_IO_URING_SUPPORTED)
+  find_package(liburing REQUIRED)
+  target_link_libraries(agentxx PUBLIC 
+    liburing
+  )
+endif()
 if (AGENTXX_ENABLE_HYPERSCAN)
   find_package(vectorscan REQUIRED)
   target_link_libraries(agentxx PUBLIC 
@@ -100,13 +95,13 @@ endif()
 if (AGENTXX_ENABLE_CODEGRAPH)
   find_package(codegraph REQUIRED)
   target_link_libraries(agentxx PUBLIC 
-    codegraph-cpp::codegraph_core
+    codegraph_core
   )
 endif()
 
 install(TARGETS agentxx DESTINATION "${AGENTXX_EXEC_INSTALL_PREFIX}")
 
-include(cmake/CPM.cmake)
+include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/CPM.cmake")
 CPMAddPackage(
         NAME PackageProject.cmake
         GITHUB_REPOSITORY TheLartians/PackageProject.cmake
