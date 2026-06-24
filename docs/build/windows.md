@@ -39,14 +39,15 @@ cd boost\
 # 然后编译结果到 agent/third_party/boost-build/
 .\bootstrap.bat
 
+# 创建 boost-build 目录，并回到 boost 目录
 set "boost_source_dir=%CD%"
-
 set "boost_install_dir=%CD%/../boost-build"
 mkdir "%boost_install_dir%"
 cd "%boost_install_dir%"
 set "boost_install_dir=%CD%"
 cd "%boost_source_dir%"
 
+# 编译/安装
 .\b2 install --layout=system --prefix="%boost_install_dir%" link=static address-model=64
 ```
 - PowerShell 使用:

@@ -2,6 +2,8 @@
 rem set utf8
 chcp 65001 > NUL
 
+set "crude_dir=%CD%"
+
 set "script_dir=%~dp0"
 set "src_dir=%script_dir%\..\"
 set "build_dir=%script_dir%\..\build\debug"
@@ -16,7 +18,7 @@ mkdir %build_dir%
 cd %build_dir%
 set build_dir=%CD%
 
-echo %build_dir%
+cd %crude_dir%
 
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DAGENTXX_BUILD_CLIENT=ON -DAGENTXX_BUILD_TEST=ON -DXX_BUILD_TYPE=DEBUG -DCMAKE_BUILD_TYPE=Debug -DAGENTXX_ENABLE_HYPERSCAN=OFF -DAGENTXX_ENABLE_CODEGRAPH=OFF -A x64 -DCMAKE_SYSTEM_PROCESSOR=AMD64 -B %build_dir% -S %src_dir%
 if %ERRORLEVEL% neq 0 (
