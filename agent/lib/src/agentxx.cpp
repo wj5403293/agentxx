@@ -1,10 +1,9 @@
-#include "agentxx.h"
-#include "util/log.h"
+#include "agentxx/agentxx.h"
+#include "agentxx/util/log.h"
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <string_view>
-
 
 using namespace agentxx;
 

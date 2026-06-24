@@ -1,7 +1,7 @@
-#include "agent/config.h"
-#include "agent/deepagent.h"
-#include "util/log.h"
-#include "util/string_util.h"
+#include "agentxx/agent/config.h"
+#include "agentxx/agent/deepagent.h"
+#include "agentxx/util/log.h"
+#include "agentxx/util/string_util.h"
 #include <fstream>
 #include <iostream>
 #include <map>

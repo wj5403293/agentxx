@@ -1,5 +1,5 @@
-#include "middleware.h"
-#include "tools/tool.h"
+#include "agentxx/middlewares/middleware.h"
+#include "agentxx/tools/tool.h"
 
 agentxx::middleware::BaseMiddlewareHandleInterface::
     BaseMiddlewareHandleInterface(

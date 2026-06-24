@@ -1,7 +1,7 @@
 # The Flutter tooling requires that developers have CMake 3.10 or later
 # installed. You should not increase this version, as doing so will cause
 # the plugin to fail to compile for some customers of the plugin.
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.30)
 cmake_policy(SET CMP0097 NEW)
 
 project(agentxx_project VERSION 0.1.0 LANGUAGES C CXX)
@@ -200,8 +200,10 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     # "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
     # "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
     # "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+    "-DCMAKE_PREFIX_PATH=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_INSTALL_PREFIX=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
@@ -249,18 +251,17 @@ include(FetchContent)
 
 # liburing
 set(LIBURING_SOURCE_DIR "${agentxx_third_party_DIR}/liburing/")
-set(LIBURING_INSTALL_DIR "${CMAKE_BINARY_DIR}/liburing-install")
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   set(LIBURING_BINARY_DIR "${CMAKE_BINARY_DIR}/liburing-build")
   ExternalProject_Add(
     liburing_repo
     SOURCE_DIR ${LIBURING_SOURCE_DIR}
     BINARY_DIR ${LIBURING_BINARY_DIR}
-    INSTALL_DIR ${LIBURING_INSTALL_DIR}
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CONFIGURE_COMMAND 
         cd ${LIBURING_SOURCE_DIR} && 
         ${LIBURING_SOURCE_DIR}/configure
-        --prefix=${LIBURING_INSTALL_DIR}
+        --prefix=${AGENTXX_INSTALL_DIR}
         --cc=${CMAKE_C_COMPILER}
         --cxx=${CMAKE_CXX_COMPILER}
     BUILD_COMMAND 
@@ -292,10 +293,9 @@ ExternalProject_Add(
 ExternalProject_Add(
   sqlite3_repo
   SOURCE_DIR "${agentxx_third_party_DIR}/sqlite3-cmake/"
-  INSTALL_DIR ${SQLITE3_CMAKE_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${SQLITE3_CMAKE_INSTALL_DIR}"
     "-DSQLITE3_SOURCE_DIR=${agentxx_third_party_DIR}/sqlite"
     "-DSQLITE3_VERSION=3.53.2"
     "-DSQLITE3_URL=https://sqlite.org/2026/sqlite-amalgamation-3530200.zip"
@@ -315,14 +315,12 @@ ExternalProject_Add(
 )
 
 # fmt
-set(FMT_INSTALL_DIR "${CMAKE_BINARY_DIR}/fmt-install")
 ExternalProject_Add(
   fmt_repo
   SOURCE_DIR "${agentxx_third_party_DIR}/fmt/"
-  INSTALL_DIR ${FMT_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
-    ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${FMT_INSTALL_DIR}"
+    ${_AGENTXX_COMMON_CMAKE_ARGS}=
     -DFMT_PEDANTIC=OFF
     -DFMT_INSTALL=ON
     -DFMT_WERROR=OFF
@@ -334,14 +332,12 @@ ExternalProject_Add(
 )
 
 # uchardet
-set(UCHARDET_INSTALL_DIR "${CMAKE_BINARY_DIR}/uchardet-install")
 ExternalProject_Add(
   uchardet_repo
   SOURCE_DIR "${agentxx_third_party_DIR}/uchardet/"
-  INSTALL_DIR ${UCHARDET_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${UCHARDET_INSTALL_DIR}"
     -DCHECK_SSE2=ON
     -DBUILD_BINARY=OFF
     -DBUILD_SHARED_LIBS=OFF
@@ -351,15 +347,13 @@ ExternalProject_Add(
 
 # codegraph-cpp
 if (AGENTXX_ENABLE_CODEGRAPH)
-  set(CODEGRAPH_INSTALL_DIR "${CMAKE_BINARY_DIR}/codegraph-install")
   ExternalProject_Add(
     codegraph_repo
     DEPENDS sqlite3_repo
     SOURCE_DIR "${agentxx_third_party_DIR}/codegraph-cpp/"
-    INSTALL_DIR ${CODEGRAPH_INSTALL_DIR}
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
-      "-DCMAKE_INSTALL_PREFIX=${CODEGRAPH_INSTALL_DIR}"
       -DBUILD_SHARED_LIBS=OFF
       -DBUILD_STATIC_LIBS=ON
     TEST_COMMAND ""
@@ -368,14 +362,12 @@ endif()
 
 if (AGENTXX_ENABLE_HYPERSCAN)
   # vectorscan
-  set(VECTORSCAN_INSTALL_DIR "${CMAKE_BINARY_DIR}/vectorscan-install")
   ExternalProject_Add(
     vectorscan_repo
     SOURCE_DIR "${agentxx_third_party_DIR}/vectorscan/"
-    INSTALL_DIR ${VECTORSCAN_INSTALL_DIR}
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
-      "-DCMAKE_INSTALL_PREFIX=${VECTORSCAN_INSTALL_DIR}"
       "-DBOOST_ROOT=${BOOST_ROOT}"
       -DBUILD_UNIT=OFF
       -DBUILD_TOOLS=OFF
@@ -398,15 +390,14 @@ else()
 endif()
 
 # neograph
-set(NEOGRAPH_INSTALL_DIR "${CMAKE_BINARY_DIR}/neograph-install")
+set(neograph_SOURCE_DIR "${agentxx_third_party_DIR}/neograph/")
 ExternalProject_Add(
   neograph_repo
   DEPENDS sqlite3_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/neograph/"
-  INSTALL_DIR ${NEOGRAPH_INSTALL_DIR}
+  SOURCE_DIR ${neograph_SOURCE_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${NEOGRAPH_INSTALL_DIR}"
     "-DBOOST_ROOT=${BOOST_ROOT}"
     -DNEOGRAPH_BUILD_EXAMPLES=OFF
     -DNEOGRAPH_BUILD_TESTS=OFF
@@ -427,14 +418,12 @@ ExternalProject_Add(
 )
 
 # html2md
-set(HTML2MD_INSTALL_DIR "${CMAKE_BINARY_DIR}/html2md-install")
 ExternalProject_Add(
   html2md_repo
   SOURCE_DIR "${agentxx_third_party_DIR}/html2md/"
-  INSTALL_DIR ${HTML2MD_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${HTML2MD_INSTALL_DIR}"
     -DBUILD_EXE=OFF
     -DBUILD_DOC=OFF
     -DBUILD_TEST=OFF
@@ -445,14 +434,12 @@ ExternalProject_Add(
 )
 
 # yaml-cpp
-set(YAML_CPP_INSTALL_DIR "${CMAKE_BINARY_DIR}/yaml-cpp-install")
 ExternalProject_Add(
   yaml_cpp_repo
   SOURCE_DIR "${agentxx_third_party_DIR}/yaml-cpp/"
-  INSTALL_DIR ${YAML_CPP_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${YAML_CPP_INSTALL_DIR}"
     -DYAML_CPP_BUILD_CONTRIB=OFF
     -DYAML_CPP_BUILD_TOOLS=ON
     -DYAML_BUILD_SHARED_LIBS=OFF
@@ -465,20 +452,17 @@ ExternalProject_Add(
 )
 
 # glob
-set(GLOB_INSTALL_DIR "${CMAKE_BINARY_DIR}/glob-install")
 ExternalProject_Add(
   glob_repo
   SOURCE_DIR "${agentxx_third_party_DIR}/glob/"
-  INSTALL_DIR ${GLOB_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${GLOB_INSTALL_DIR}"
   TEST_COMMAND ""
 )
 
-set(LIBAGENTXX_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-install")
 ExternalProject_Add(
-  libagentxx_repo
+  agentxx_lib_repo
   DEPENDS 
     liburing_repo
     libiconv_repo
@@ -492,36 +476,32 @@ ExternalProject_Add(
     yaml_cpp_repo
     glob_repo
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/"
-  INSTALL_DIR ${LIBAGENTXX_INSTALL_DIR}
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DCMAKE_INSTALL_PREFIX=${LIBAGENTXX_INSTALL_DIR}"
+    -Dneograph_SOURCE_DIR=${neograph_SOURCE_DIR}
   TEST_COMMAND ""
 )
 
 if (AGENTXX_BUILD_CLIENT)
-  set(AGENTXX_CLI_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-cli-install")
   ExternalProject_Add(
     agentxx_client_repo
-    DEPENDS libagentxx_repo
+    DEPENDS agentxx_lib_repo
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/client/"
-    INSTALL_DIR ${AGENTXX_CLI_INSTALL_DIR}
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
-      "-DCMAKE_INSTALL_PREFIX=${AGENTXX_CLI_INSTALL_DIR}"
     TEST_COMMAND ""
   )
 endif()
 if (AGENTXX_BUILD_TEST)
-  set(AGENTXX_TEST_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-test-install")
   ExternalProject_Add(
     agentxx_test_repo
-    DEPENDS libagentxx_repo
+    DEPENDS agentxx_lib_repo
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/"
-    INSTALL_DIR ${AGENTXX_TEST_INSTALL_DIR}
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
-      "-DCMAKE_INSTALL_PREFIX=${AGENTXX_TEST_INSTALL_DIR}"
     TEST_COMMAND ""
   )
 endif()

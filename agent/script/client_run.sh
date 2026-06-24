@@ -10,4 +10,4 @@ if [[ $? -ne 0 ]]; then
     exit $?
 fi
 
-LD_LIBRARY_PATH=$build_dir/exec $build_dir/exec/client
+LD_LIBRARY_PATH=$build_dir/exec $build_dir/exec/agentxx_cli

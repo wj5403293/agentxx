@@ -1,7 +1,7 @@
 #pragma once
 
+#include "agentxx/tools/string.h"
 #include "neograph/neograph.h"
-#include "tools/string.h"
 #include <asio/awaitable.hpp>
 #include <iostream>
 #include <string>
