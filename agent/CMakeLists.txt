@@ -158,14 +158,14 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
     set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
     set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
     
-    set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_C_FLAGS}   -O3 -flto")
-    set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_CXX_FLAGS} -O3 -flto")
-		set(CMAKE_C_FLAGS_MINSIZEREL       "${CMAKE_C_FLAGS_MINSIZEREL}       ${_AGENTXX_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL}     ${_AGENTXX_CXX_FLAGS}")
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO}   ${_AGENTXX_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${_AGENTXX_CXX_FLAGS}")
-    set(CMAKE_C_FLAGS_DEBUG            "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}   -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-    set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+    set(CMAKE_C_FLAGS_RELEASE          "${_AGENTXX_C_FLAGS}   -O3 -flto ${CMAKE_C_FLAGS_RELEASE}")
+    set(CMAKE_CXX_FLAGS_RELEASE        "${_AGENTXX_CXX_FLAGS} -O3 -flto ${CMAKE_CXX_FLAGS_RELEASE}")
+		set(CMAKE_C_FLAGS_MINSIZEREL       "${_AGENTXX_C_FLAGS}   ${CMAKE_C_FLAGS_MINSIZEREL}")
+		set(CMAKE_CXX_FLAGS_MINSIZEREL     "${_AGENTXX_CXX_FLAGS} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+		set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${_AGENTXX_C_FLAGS}   ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${_AGENTXX_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+    set(CMAKE_C_FLAGS_DEBUG            "${_AGENTXX_C_FLAGS}   -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls ${CMAKE_C_FLAGS_DEBUG}")
+    set(CMAKE_CXX_FLAGS_DEBUG          "${_AGENTXX_CXX_FLAGS} -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls ${CMAKE_CXX_FLAGS_DEBUG}")
 
     if (IS_RELEASE_D)
       set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
@@ -218,11 +218,11 @@ if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
     if (EXISTS ${_BOOST_DIR})
       set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
     else ()
-        # 尝试系统 find_package
-        find_package(Boost REQUIRED)
-        if (NOT Boost_FOUND)
-            message(FATAL_ERROR "Boost not found. Please set BOOST_ROOT.")
-        endif()
+      # 尝试系统 find_package
+      find_package(Boost REQUIRED)
+      if (NOT Boost_FOUND)
+        message(FATAL_ERROR "Boost not found. Please set BOOST_ROOT.")
+      endif()
     endif()
 
     unset(_BOOST_DIR)
@@ -232,30 +232,37 @@ endif()
 set (OPENSSL_USE_STATIC_LIBS ON)
 if (NOT DEFINED OPENSSL_ROOT_DIR OR NOT EXISTS ${OPENSSL_ROOT_DIR})
   # 预编译目录
-  set(OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
-  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+  set(_OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
 
-  if (IS_WIN_D)
-    # 动态链接标准库
-    if (IS_DEBUG_D)
-      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-    else ()
-      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+  if (EXISTS ${_OPENSSL_ROOT_DIR})
+    set(OPENSSL_ROOT_DIR ${_OPENSSL_ROOT_DIR} CACHE PATH "OpenSSL root directory" FORCE)
+    if (IS_WIN_D)
+      # 动态链接标准库
+      set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+      if (IS_DEBUG_D)
+        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+        set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+        set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+      else ()
+        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+        set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+        set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+      endif()
     endif()
   else()
+    # 尝试系统 find_package
     find_package(OpenSSL REQUIRED)
     if (NOT OpenSSL_FOUND)
-        message(FATAL_ERROR "OpenSSL not found. Please set OPENSSL_ROOT.")
+      message(FATAL_ERROR "OpenSSL not found. Please set OPENSSL_ROOT.")
     endif()
   endif()
+
+  unset(_OPENSSL_ROOT_DIR)
 endif()
 
 set(_AGENTXX_COMMON_CMAKE_ARGS
-    "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
+    # "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}" # 传递后会导致 sqlite 编译检查出错
+    "-DCMAKE_CROSSCOMPILING=${CMAKE_CROSSCOMPILING}"
     "-DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}"
     "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
     "-DCMAKE_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
@@ -263,17 +270,18 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE}" 
     "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}"
 
-    "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
     "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
     "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     "-DCMAKE_PREFIX_PATH=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_INSTALL_PREFIX=${AGENTXX_INSTALL_DIR}"
-    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 
     -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}
     -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+    -DCMAKE_POLICY_DEFAULT_CMP0144=NEW
 
+    "-DCMAKE_CONFIGURATION_TYPES=${CMAKE_CONFIGURATION_TYPES}"
+    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
     "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
@@ -287,6 +295,7 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DLDFLAGS=${LDFLAGS}"
 
     "-DBOOST_ROOT=${BOOST_ROOT}"
+    "-DBoost_ROOT=${BOOST_ROOT}"
     -DBOOST_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}
     -DBoost_USE_STATIC_RUNTIME=${Boost_USE_STATIC_RUNTIME}
     -DBoost_USE_DEBUG_LIBS=${Boost_USE_DEBUG_LIBS}
@@ -365,7 +374,7 @@ ExternalProject_Add(
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DSQLITE3_SOURCE_DIR=${AGENTXX_THIRD_PARTY_DIR}/sqlite"
+    "-DSQLITE3_SOURCE_DIR="
     "-DSQLITE3_VERSION=3.53.2"
     "-DSQLITE3_URL=https://sqlite.org/2026/sqlite-amalgamation-3530200.zip"
     -Dsqlite3_ENABLE_THREADSAFE=ON
@@ -492,7 +501,6 @@ if (AGENTXX_ENABLE_HYPERSCAN)
       -DBUILD_AVX2=ON 
       -DBUILD_AVX512=ON 
       -DBUILD_AVX512VBMI=ON 
-      -DSANITIZE=""
       -DBUILD_SIMDE_BACKEND=OFF
       -DBUILD_SIMDE_NATIVE=OFF
     TEST_COMMAND ""
