@@ -20,7 +20,6 @@
 #include <asio/write.hpp>
 #include <cstdlib>
 #include <filesystem>
-#include <format>
 #include <iostream>
 #include <limits>
 #include <memory>

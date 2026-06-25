@@ -15,11 +15,21 @@ file(GLOB test_SOURCES
 target_sources(agentxx_test PRIVATE
 	${test_SOURCES}
 )
+
+set_target_properties(agentxx_test PROPERTIES
+  VS_GLOBAL_VcpkgEnabled false
+)
+
 target_include_directories(agentxx_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (IS_DEBUG_D)
-    target_compile_options(agentxx_test PRIVATE "-fsanitize=address")
-    target_link_options(agentxx_test PRIVATE "-fsanitize=address")
+  if (MSVC)
+    target_compile_options(agentxx_cli PRIVATE "/fsanitize=address")
+    target_link_options(agentxx_cli PRIVATE "/fsanitize=address")
+  else()
+    target_compile_options(agentxx_cli PRIVATE "-fsanitize=address")
+    target_link_options(agentxx_cli PRIVATE "-fsanitize=address")
+  endif ()
 endif ()
 
 find_package(PkgConfig REQUIRED)

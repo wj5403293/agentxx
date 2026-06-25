@@ -5,7 +5,6 @@
 #include "agentxx/util/string_util.h"
 #include <expected>
 #include <filesystem>
-#include <format>
 #include <iostream>
 #include <map>
 #include <memory>

@@ -119,6 +119,7 @@ else ()
 endif()
 
 message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 if (MSVC)
 		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /std:c17 /D_GNU_SOURCE")
 		set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /MD /wd4200 /Zc:__cplusplus /std:c++latest")
@@ -142,8 +143,8 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
       set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     else ()
       if (IS_DEBUG_D)
-        set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+        set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}   ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
       else ()
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}   ${_AGENTXX_C_FLAGS}     ")
         set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS}   ")
@@ -204,6 +205,7 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DCMAKE_PREFIX_PATH=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_INSTALL_PREFIX=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+    -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
@@ -322,11 +324,13 @@ ExternalProject_Add(
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    -DFMT_PEDANTIC=OFF
+    -DFMT_PEDANTIC=ON
     -DFMT_INSTALL=ON
     -DFMT_WERROR=OFF
     -DFMT_DOC=OFF
     -DFMT_TEST=OFF
+    -DFMT_OS=OFF
+    -DFMT_UNICODE=ON
     -DBUILD_SHARED_LIBS=OFF
     -DBUILD_STATIC_LIBS=ON
   TEST_COMMAND ""

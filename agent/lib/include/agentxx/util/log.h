@@ -2,11 +2,9 @@
 
 #include "agentxx/util/util.h"
 #include "fmt/format.h"
-#include <csignal>
 #include <ctime>
 #include <iostream>
 #include <string_view>
-
 
 #if IS_DEBUG_D
 
@@ -36,6 +34,7 @@
 
 #if IS_LINUX_D
 
+#include <csignal>
 #include <execinfo.h>
 
 namespace agentxx {

@@ -5,7 +5,6 @@
 #include "agentxx/util/log.h"
 #include "fmt/format.h"
 #include <cstdlib>
-#include <format>
 #include <iostream>
 #include <memory>
 #include <neograph/llm/rate_limited_provider.h>

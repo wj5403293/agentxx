@@ -7,7 +7,6 @@
 #include <asio/ip/tcp.hpp>
 #include <asio/this_coro.hpp>
 #include <expected>
-#include <format>
 #include <httplib.h>
 #include <neograph/async/endpoint.h>
 #include <neograph/async/http_client.h>

@@ -4,7 +4,6 @@
 #include "agentxx/middlewares/middleware.h"
 #include "agentxx/tools/tool.h"
 #include <filesystem>
-#include <format>
 #include <iostream>
 #include <map>
 #include <memory>

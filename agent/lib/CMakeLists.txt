@@ -25,6 +25,7 @@ set_target_properties(agentxx PROPERTIES
   OUTPUT_NAME "agentxx"
   CXX_STANDARD 23
   LINK_LIBRARIES_STRATEGY "REORDER_MINIMALLY"
+  VS_GLOBAL_VcpkgEnabled false
 )
 
 if (IS_WIN_D)

@@ -3,11 +3,11 @@
 #include "agentxx/agent/config.h"
 #include "neograph/llm/openai_provider.h"
 #include "neograph/neograph.h"
-#include <format>
+#include <agentxx/util/log.h>
+#include <fmt/core.h>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <util/log.h>
 
 namespace agentxx {
 namespace agent {
@@ -261,7 +261,7 @@ public:
 
       for (int iter = 0; iter < trainCfg.maxIterations; ++iter) {
         const auto threadId =
-            std::format("training_{}_{}", caseIdx, testCase.name);
+            fmt::format("training_{}_{}", caseIdx, testCase.name);
 
         if (trainCfg.verbose) {
           XX_LOGD("[Training] Case '{}' Iteration {}/{}", testCase.name,
