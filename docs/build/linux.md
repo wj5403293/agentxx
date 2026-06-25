@@ -37,6 +37,26 @@ cd "$boost_source_dir"
 # 如果想重新构建，可以先执行清理:
 # ./b2 --clean-all
 ```
+### 源码编译 openssl
+- 编译
+```sh
+cd {项目根目录}/agent/third_party/
+wget https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz
+tar -xzvf openssl-4.0.1.tar.gz
+cd openssl-4.0.1
+
+openssl_source_dir=$PWD
+openssl_build_dir="$openssl_source_dir/../OpenSSL"
+mkdir -p "$openssl_build_dir"
+openssl_build_dir=$(cd "$openssl_build_dir" && pwd)
+
+cd "$openssl_source_dir"
+
+./Configure no-shared --pic --prefix="$openssl_build_dir" --openssldir="$openssl_build_dir" '-Wl,-rpath,$(LIBRPATH)'
+make
+make install
+```
+### agentxx 编译
 - 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client:
 ```sh
 cd {项目根目录}/agent

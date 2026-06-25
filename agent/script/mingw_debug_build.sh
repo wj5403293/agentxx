@@ -30,7 +30,8 @@ cmake -DGCC_ARCH=x86-64 -DCOMPILER_TOOLCHAIN=clang \
     -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
     -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
     -G Ninja -B "$build_dir" -S "$src_dir" \
-    -DAGENTXX_BUILD_CLIENT=ON -DAGENTXX_BUILD_TEST=ON -DXX_BUILD_TYPE=DEBUG -DCMAKE_BUILD_TYPE=Debug
+    -DAGENTXX_BUILD_CLIENT=ON -DAGENTXX_BUILD_TEST=ON -DAGENTXX_ENABLE_CUSTOM_CURL=ON \
+    -DXX_BUILD_TYPE=DEBUG -DCMAKE_BUILD_TYPE=Debug
 
 if [[ $? -ne 0 ]]; then
     echo "cmake config failed!"
@@ -44,7 +45,7 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-cmake --install "$build_dir" --config Debug
+cmake --install "$build_dir" --config debug
 
 if [[ $? -ne 0 ]]; then
     echo "cmake install failed!"

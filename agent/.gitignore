@@ -5,6 +5,8 @@
 /third_party/boost-build-debug/
 /third_party/boost-build-release/
 /third_party/OpenSSL/
+/third_party/openssl/
+/third_party/openssl*
 /third_party/sqlite/
 /third_party/paddle_inference/
 /third_party/paddle_inference_model/
