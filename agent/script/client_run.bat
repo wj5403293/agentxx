@@ -12,4 +12,4 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
-%build_dir%\exec\agentxx_client.exe
+%build_dir%\exec\agentxx_cli.exe

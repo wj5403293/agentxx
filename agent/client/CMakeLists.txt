@@ -41,7 +41,7 @@ find_package(Glob REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 
-find_package(agentxx REQUIRED)
+find_package(agentxx_static REQUIRED)
 
 target_link_directories(agentxx_cli PUBLIC
   ${CMAKE_PREFIX_PATH}/lib/
@@ -57,7 +57,7 @@ target_link_libraries(agentxx_cli PRIVATE
   neograph_core
   yyjson
   # === neograph ^^^
-	agentxx
+	agentxx_static
 )
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   pkg_check_modules(uring REQUIRED IMPORTED_TARGET liburing)
@@ -73,7 +73,7 @@ if (AGENTXX_ENABLE_HYPERSCAN)
   )
 endif()
 
-if (IS_WIN_D)
+if (MSVC)
 	target_compile_options(agentxx_cli PRIVATE 
 		"/bigobj"
 	)

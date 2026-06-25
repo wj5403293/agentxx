@@ -16,7 +16,7 @@
 	url = https://github.com/VectorCamp/vectorscan
 [submodule "agent/third_party/uchardet"]
 	path = agent/third_party/uchardet
-	url = https://gitlab.freedesktop.org/uchardet/uchardet
+	url = https://github.com/coolight7/uchardet
 [submodule "agent/third_party/yaml-cpp"]
 	path = agent/third_party/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
