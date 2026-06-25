@@ -22,13 +22,6 @@ set_target_properties(agentxx_cli PROPERTIES
 
 target_include_directories(agentxx_cli PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (IS_DEBUG_D)
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(agentxx_cli PRIVATE "-fsanitize=address")
-    target_link_options(agentxx_cli PRIVATE "-fsanitize=address")
-  endif ()
-endif ()
-
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED CONFIG COMPONENTS process)
 if(Boost_FOUND)
@@ -40,7 +33,7 @@ if(Boost_FOUND)
 endif()
 find_package(iconv REQUIRED)
 find_package(uchardet REQUIRED)
-find_package(sqlite3 REQUIRED)
+find_package(SQLite3 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(html2md REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -80,19 +73,20 @@ if (AGENTXX_ENABLE_HYPERSCAN)
   )
 endif()
 
-if (IS_MACOS_D)
-  target_link_options(agentxx_cli PRIVATE 
-    "-Wl,-rpath,@executable_path"
-  )
-endif()
-
 if (IS_WIN_D)
-	target_compile_definitions(
-		agentxx_cli PRIVATE
+	target_compile_options(agentxx_cli PRIVATE 
+		"/bigobj"
+	)
+	target_compile_definitions(agentxx_cli PRIVATE
 		strdup=_strdup
 		strcasecmp=_stricmp
 		strncasecmp=_strnicmp
 	)
 endif ()
+if (IS_MACOS_D)
+  target_link_options(agentxx_cli PRIVATE 
+    "-Wl,-rpath,@executable_path"
+  )
+endif()
 
 install(TARGETS agentxx_cli DESTINATION "${AGENTXX_EXEC_INSTALL_PREFIX}")

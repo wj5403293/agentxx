@@ -2,7 +2,7 @@
 # installed. You should not increase this version, as doing so will cause
 # the plugin to fail to compile for some customers of the plugin.
 cmake_minimum_required(VERSION 3.30)
-cmake_policy(SET CMP0097 NEW)
+cmake_policy(SET CMP0091 NEW)
 
 project(agentxx_project VERSION 0.1.0 LANGUAGES C CXX)
 
@@ -69,9 +69,11 @@ message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
 
 set(_AGENTXX_COMMON_C_CXX_FLAGS)
 
+# /D_WIN32_WINNT=0x0A00 限制 win10 或更高:
+# - httplib 要求 >= win10
 if (MSVC) 
   set(_AGENTXX_COMMON_C_CXX_FLAGS 
-    "${_AGENTXX_COMMON_C_CXX_FLAGS} /D__STDC_CONSTANT_MACROS=1 /DCPPHTTPLIB_OPENSSL_SUPPORT=1 /DBOOST_ASIO_STANDALONE=1 /DASIO_STANDALONE=1 /DBOOST_PROCESS_USE_STD_FS=1"
+    "${_AGENTXX_COMMON_C_CXX_FLAGS} /D_WIN32_WINNT=0x0A00 /D__STDC_CONSTANT_MACROS=1 /DCPPHTTPLIB_OPENSSL_SUPPORT=1 /DBOOST_ASIO_STANDALONE=1 /DASIO_STANDALONE=1 /DBOOST_PROCESS_USE_STD_FS=1"
   )
   if (AGENTXX_WINDOWS_IOCP_SUPPORTED)
     set(_AGENTXX_COMMON_C_CXX_FLAGS 
@@ -86,6 +88,13 @@ if (MSVC)
     message("[agentxx] Enable asio/io_uring")
   endif()
 else ()
+  if (IS_WIN_D)
+    # 可能交叉编译
+    set(_AGENTXX_COMMON_C_CXX_FLAGS
+      ${_AGENTXX_COMMON_C_CXX_FLAGS}
+      -D_WIN32_WINNT=0x0A00
+    )
+  endif()
   set(_AGENTXX_COMMON_C_CXX_FLAGS
     ${_AGENTXX_COMMON_C_CXX_FLAGS}
     -D__STDC_CONSTANT_MACROS=1
@@ -120,48 +129,55 @@ endif()
 
 message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
 if (MSVC)
-		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
-		set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
-		set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
-		set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
-		set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
-		set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_COMMON_C_CXX_FLAGS} /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
+    set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
+    set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
+
+		set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_C_FLAGS}   /Gy")
+		set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_CXX_FLAGS} /Gy")
+		set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}   ${_AGENTXX_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_CXX_FLAGS}")
+		set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS}")
+
+    if (IS_RELEASE_D)
+      set(LDFLAGS "${LDFLAGS} /OPT:REF /OPT:ICF")
+    else ()
+      # windows/msvc 使用 /fsanitize=address 时可能导致链接错误 (uchatdet)
+      set(LDFLAGS "${LDFLAGS}")
+    endif()
 
     # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
     set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
-    set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
+    
+    set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_C_FLAGS}   -O3 -flto")
+    set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_CXX_FLAGS} -O3 -flto")
+    set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}   ${_AGENTXX_C_FLAGS}   ")
+    set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_CXX_FLAGS} ")
+    set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}   -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+    set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls")
 
-    if (DEFINED CMAKE_CONFIGURATION_TYPES)
-      set(CMAKE_C_FLAGS_RELEASE     "${CMAKE_C_FLAGS_RELEASE}   ${_AGENTXX_C_FLAGS}   -O3 -flto")
-      set(CMAKE_CXX_FLAGS_RELEASE   "${CMAKE_CXX_FLAGS_RELEASE} ${_AGENTXX_CXX_FLAGS} -O3 -flto")
-      set(CMAKE_C_FLAGS_PROFILE     "${CMAKE_C_FLAGS_PROFILE}   ${_AGENTXX_C_FLAGS}   ")
-      set(CMAKE_CXX_FLAGS_PROFILE   "${CMAKE_CXX_FLAGS_PROFILE} ${_AGENTXX_CXX_FLAGS} ")
-      set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-      set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
+    if (IS_RELEASE_D)
+      set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
     else ()
-      if (IS_DEBUG_D)
-        set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}   ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
-      else ()
-        set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}   ${_AGENTXX_C_FLAGS}     ")
-        set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS}   ")
-      endif ()
+      set(LDFLAGS "${LDFLAGS} -fsanitize=address")
     endif ()
 else ()
   message("[agentxx] 不支持的编译器")
   return()
 endif ()
 
+# exe install dir
 set(AGENTXX_EXEC_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/exec")
-message("[agentxx] CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message("[agentxx] AGENTXX_EXEC_INSTALL_PREFIX: ${AGENTXX_EXEC_INSTALL_PREFIX}")
+message("[agentxx] CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message("[agentxx] CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # deps
-set(agentxx_third_party_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
+set(AGENTXX_THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/")
 set(AGENTXX_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-project-install/")
 
 # boost 系统安装库 或 自行编译
@@ -205,8 +221,10 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DCMAKE_PREFIX_PATH=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_INSTALL_PREFIX=${AGENTXX_INSTALL_DIR}"
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
+    -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}
+    -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
 
     "-DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}"
     "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
@@ -230,7 +248,7 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     -DIS_IOS_D=${IS_IOS_D}
 
     "-DAGENTXX_EXEC_INSTALL_PREFIX=${AGENTXX_EXEC_INSTALL_PREFIX}"
-    "-Dagentxx_third_party_DIR=${agentxx_third_party_DIR}"
+    "-DAGENTXX_THIRD_PARTY_DIR=${AGENTXX_THIRD_PARTY_DIR}"
     -DAGENTXX_LINUX_IO_URING_SUPPORTED=${AGENTXX_LINUX_IO_URING_SUPPORTED}
     -DAGENTXX_WINDOWS_IOCP_SUPPORTED=${AGENTXX_WINDOWS_IOCP_SUPPORTED}
 )
@@ -257,7 +275,7 @@ if (NOT OpenSSL_FOUND)
 endif()
 
 # liburing
-set(LIBURING_SOURCE_DIR "${agentxx_third_party_DIR}/liburing/")
+set(LIBURING_SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/liburing/")
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   set(LIBURING_BINARY_DIR "${CMAKE_BINARY_DIR}/liburing-build")
   ExternalProject_Add(
@@ -283,7 +301,7 @@ endif()
 # iconv
 ExternalProject_Add(
   libiconv_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/libiconv-native/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/libiconv-native/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -299,11 +317,11 @@ ExternalProject_Add(
 # 复制版本和链接 sqlite-amalgamation-xxx.zip 
 ExternalProject_Add(
   sqlite3_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/sqlite3-cmake/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/sqlite3-cmake/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
-    "-DSQLITE3_SOURCE_DIR=${agentxx_third_party_DIR}/sqlite"
+    "-DSQLITE3_SOURCE_DIR=${AGENTXX_THIRD_PARTY_DIR}/sqlite"
     "-DSQLITE3_VERSION=3.53.2"
     "-DSQLITE3_URL=https://sqlite.org/2026/sqlite-amalgamation-3530200.zip"
     -Dsqlite3_ENABLE_THREADSAFE=ON
@@ -324,7 +342,7 @@ ExternalProject_Add(
 # fmt
 ExternalProject_Add(
   fmt_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/fmt/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/fmt/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -343,7 +361,7 @@ ExternalProject_Add(
 # uchardet
 ExternalProject_Add(
   uchardet_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/uchardet/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/uchardet/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -358,7 +376,7 @@ if (AGENTXX_ENABLE_CUSTOM_CURL)
   # curl
   ExternalProject_Add(
     curl_repo
-    SOURCE_DIR "${agentxx_third_party_DIR}/curl/"
+    SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/curl/"
     INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -399,7 +417,7 @@ if (AGENTXX_ENABLE_CODEGRAPH)
   ExternalProject_Add(
     codegraph_repo
     DEPENDS sqlite3_repo
-    SOURCE_DIR "${agentxx_third_party_DIR}/codegraph-cpp/"
+    SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/codegraph-cpp/"
     INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -413,7 +431,7 @@ if (AGENTXX_ENABLE_HYPERSCAN)
   # vectorscan
   ExternalProject_Add(
     vectorscan_repo
-    SOURCE_DIR "${agentxx_third_party_DIR}/vectorscan/"
+    SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/vectorscan/"
     INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
       ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -430,6 +448,7 @@ if (AGENTXX_ENABLE_HYPERSCAN)
       -DBUILD_AVX2=ON 
       -DBUILD_AVX512=ON 
       -DBUILD_AVX512VBMI=ON 
+      -DSANITIZE=""
       -DBUILD_SIMDE_BACKEND=OFF
       -DBUILD_SIMDE_NATIVE=OFF
     TEST_COMMAND ""
@@ -439,7 +458,7 @@ else()
 endif()
 
 # neograph
-set(neograph_SOURCE_DIR "${agentxx_third_party_DIR}/neograph/")
+set(neograph_SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/neograph/")
 ExternalProject_Add(
   neograph_repo
   DEPENDS sqlite3_repo
@@ -472,7 +491,7 @@ endif()
 # html2md
 ExternalProject_Add(
   html2md_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/html2md/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/html2md/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -488,7 +507,7 @@ ExternalProject_Add(
 # yaml-cpp
 ExternalProject_Add(
   yaml_cpp_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/yaml-cpp/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/yaml-cpp/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}
@@ -506,7 +525,7 @@ ExternalProject_Add(
 # glob
 ExternalProject_Add(
   glob_repo
-  SOURCE_DIR "${agentxx_third_party_DIR}/glob/"
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/glob/"
   INSTALL_DIR ${AGENTXX_INSTALL_DIR}
   CMAKE_ARGS
     ${_AGENTXX_COMMON_CMAKE_ARGS}

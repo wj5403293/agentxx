@@ -48,11 +48,13 @@ set "boost_install_dir=%CD%"
 cd "%boost_source_dir%"
 
 # 编译/安装
-.\b2 install --layout=system --prefix="%boost_install_dir%" link=static address-model=64
+.\b2.exe install --layout=system --prefix="%boost_install_dir%" link=static runtime-link=shared address-model=64
+# 如果想重新构建，可以先执行清理:
+# .\b2.exe --clean-all
 ```
 - PowerShell 使用:
 ```sh
-.\b2 install --layout=system --prefix="$PWD/../boost-build" link=static address-model=64
+.\b2.exe install --layout=system --prefix="$PWD/../boost-build" link=static runtime-link=shared address-model=64
 ```
 ### agentxx 编译
 - - 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client:

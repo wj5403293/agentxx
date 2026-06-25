@@ -289,7 +289,7 @@ Returns the most relevant documents with their content, source, and similarity s
 
           result.push_back(Document{
               .id = std::to_string(result.size()),
-              .title = filepath.filename(),
+              .title = filepath.filename().string(),
               .content = EmbeddingClient::splitStringByFixedLength(content),
               .source = path,
           });
@@ -309,7 +309,7 @@ Returns the most relevant documents with their content, source, and similarity s
         for (const auto &entity :
              std::filesystem::recursive_directory_iterator(itemPath)) {
           if (entity.is_regular_file()) {
-            if (onAppendItem(entity.path().c_str())) {
+            if (onAppendItem(entity.path().string())) {
               auto &doc = result.back();
               fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )",
                            doc.title, doc.content.size(), itemPath);

@@ -55,15 +55,7 @@ if (AGENTXX_ENABLE_CODEGRAPH)
   target_compile_definitions(agentxx PUBLIC AGENTXX_ENABLE_CODEGRAPH=1)
 endif()
 
-# ASan requires all linked libraries to be compiled with the same flag.
-# Disabled because dependencies (neograph, fmt, iconv, etc.) are not built with ASan.
-if (IS_DEBUG_D)
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(agentxx PRIVATE "-fsanitize=address")
-    target_link_options(agentxx PRIVATE "-fsanitize=address")
-  endif ()
-endif ()
-
+# 添加依赖库后应当同步更新 [packageProject:DEPENDENCIES]
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED CONFIG COMPONENTS process)
 if(Boost_FOUND)
@@ -75,7 +67,7 @@ if(Boost_FOUND)
 endif()
 find_package(iconv REQUIRED)
 find_package(uchardet REQUIRED)
-find_package(sqlite3 REQUIRED)
+find_package(SQLite3 REQUIRED)
 find_package(fmt REQUIRED)
 find_package(html2md REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -142,7 +134,7 @@ install(TARGETS agentxx DESTINATION "${AGENTXX_EXEC_INSTALL_PREFIX}")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake/CPM.cmake")
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.6.0")
-string(TOLOWER agentxx/version.h VERSION_HEADER_LOCATION)
+string(TOLOWER version.h VERSION_HEADER_LOCATION)
 packageProject(
   NAME ${PROJECT_NAME}
   VERSION ${PROJECT_VERSION}
@@ -150,5 +142,5 @@ packageProject(
   INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/agentxx
   INCLUDE_DESTINATION include/agentxx
   VERSION_HEADER "${VERSION_HEADER_LOCATION}"
-  DEPENDENCIES "Boost;Iconv;uchardet;sqlite3;fmt;html2md;yaml-cpp;Glob"
+  DEPENDENCIES "Boost;Iconv;uchardet;SQLite3;fmt;html2md;yaml-cpp;Glob;CURL;OpenSSL"
 )

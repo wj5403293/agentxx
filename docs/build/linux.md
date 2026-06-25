@@ -18,7 +18,9 @@ cd boost/
 
 boost_install_dir=$(cd "$(dirname "$0")" && pwd)
 
-./b2 install --layout=system --prefix=${boost_install_dir} link=static address-model=64
+./b2 install --layout=system --prefix=${boost_install_dir} link=static runtime-link=shared address-model=64
+# 如果想重新构建，可以先执行清理:
+# ./b2 --clean-all
 ```
 - 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client:
 ```sh

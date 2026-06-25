@@ -1,8 +1,7 @@
 # The Flutter tooling requires that developers have CMake 3.10 or later
 # installed. You should not increase this version, as doing so will cause
 # the plugin to fail to compile for some customers of the plugin.
-cmake_minimum_required(VERSION 3.28)
-cmake_policy(SET CMP0097 NEW)
+cmake_minimum_required(VERSION 3.30)
 
 project(test_temp VERSION 0.1.0 LANGUAGES C CXX)
 
@@ -114,11 +113,6 @@ include_directories(${third_party_DIR}/PaddleOCR/deploy/cpp_infer/)
 include_directories(${BOOST_ROOT}/include/)
 include_directories(${BOOST_ROOT}/include/boost/)
 include_directories(${third_party_DIR})
-
-if (IS_DEBUG_D)
-    add_compile_options("-fsanitize=address")
-    add_link_options("-fsanitize=address")
-endif ()
 
 file(GLOB_RECURSE test_temp_SOURCES "*.cpp" "*.cc" "*.cxx")
 add_executable(test_temp)
