@@ -142,22 +142,19 @@
 
 ## 编译 
 - C++ Standard: Requires C++23 or higher.
-
 - 编译器推荐
     - Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
-
+- 国内网络环境推荐先挂VPN代理，部分步骤需要手动或自动下载 Github 仓库
 - 拉取项目源码和依赖库
 ```sh
 git clone https://github.com/coolight7/agentxx
 cd agentxx
 git submodule update --init
 ```
-
 - 安装 codegraph-cpp 依赖
 ```sh
 cd {项目根目录}/agent/third_party/codegraph-cpp
 npm install --legacy-peer-deps
 ```
-
 - [Linux/WSL 可执行程序/动态库编译 .so](/docs/build/linux.md)
 - [Windows 可执行程序/动态库编译 .dll](/docs/build/windows.md)
