@@ -6,6 +6,12 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (XX_IS_MSVC)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;${CMAKE_FIND_LIBRARY_SUFFIXES}")
+else ()
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;${CMAKE_FIND_LIBRARY_SUFFIXES}")
+endif()
+
 add_executable(agentxx_cli)
 
 file(GLOB_RECURSE client_SOURCES 
@@ -73,7 +79,7 @@ if (AGENTXX_ENABLE_HYPERSCAN)
   )
 endif()
 
-if (MSVC)
+if (XX_IS_MSVC)
 	target_compile_options(agentxx_cli PRIVATE 
 		"/bigobj"
 	)
@@ -83,7 +89,7 @@ if (MSVC)
 		strncasecmp=_strnicmp
 	)
 endif ()
-if (IS_MACOS_D)
+if (XX_IS_MACOS_D)
   target_link_options(agentxx_cli PRIVATE 
     "-Wl,-rpath,@executable_path"
   )

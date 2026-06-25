@@ -257,7 +257,7 @@ public:
             case neograph::graph::GraphEvent::Type::LLM_TOKEN: {
               const auto token = event.data.get<std::string>();
               oss << token;
-#if IS_DEBUG_D
+#if XX_IS_DEBUG_D
               std::cout << token << std::flush;
 #endif
             } break;

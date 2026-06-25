@@ -25,34 +25,35 @@ if (CCACHE_PROGRAM)
 endif ()
 
 # 仅用于指示是否编译用于调试用途，不代表真实编译类型
-# - [IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
+# - [XX_IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
 # 性能的编译将视为 release
-set(IS_DEBUG_D    0)
-set(IS_RELEASE_D  1)
+set(XX_IS_DEBUG_D    0)
+set(XX_IS_RELEASE_D  1)
 
 if (XX_BUILD_TYPE MATCHES "DEBUG")
-  set(IS_DEBUG_D    1)
-  set(IS_RELEASE_D  0)
+  set(XX_IS_DEBUG_D    1)
+  set(XX_IS_RELEASE_D  0)
 endif()
 
-set(IS_LINUX_D    0)
-set(IS_WIN_D      0)
-set(IS_MACOS_D    0)
-set(IS_ANDROID_D  0)
-set(IS_IOS_D      0)
+# target system
+set(XX_IS_LINUX_D    0)
+set(XX_IS_WIN_D      0)
+set(XX_IS_MACOS_D    0)
+set(XX_IS_ANDROID_D  0)
+set(XX_IS_IOS_D      0)
 
 if (WIN32)
-  set(IS_WIN_D 1)
+  set(XX_IS_WIN_D 1)
 
   set(AGENTXX_WINDOWS_IOCP_SUPPORTED ON)
 elseif (ANDROID)
-  set(IS_ANDROID_D 1)
+  set(XX_IS_ANDROID_D 1)
 elseif (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(IS_MACOS_D 1)
+  set(XX_IS_MACOS_D 1)
 elseif (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "iOS")
-  set(IS_IOS_D 1)
+  set(XX_IS_IOS_D 1)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(IS_LINUX_D 1)
+  set(XX_IS_LINUX_D 1)
 
   # 检查是否支持 [AGENTXX_LINUX_IO_URING_SUPPORTED]
   file(READ "/usr/include/linux/version.h" _linux_version_h)
@@ -64,14 +65,31 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif()
 endif ()
 
+# compiler ID
+set(XX_IS_MSVC 0)
+set(XX_IS_GCC 0)
+set(XX_IS_CLANG 0)
+
+if (MSVC)
+  set(XX_IS_MSVC 1)
+elseif (CMAKE_C_COMPILER_ID MATCHES "GNU")
+  set(XX_IS_GCC 1)
+elseif (CMAKE_C_COMPILER_ID MATCHES "Clang")
+  set(XX_IS_CLANG 1)
+else ()
+  message("[agentxx] 不支持的编译器: ${CMAKE_C_COMPILER_ID}")
+  return()
+endif ()
+
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
+message("[agentxx] Current Compiler: ${CMAKE_C_COMPILER_ID}")
 
 set(_AGENTXX_COMMON_C_CXX_FLAGS)
 
 # /D_WIN32_WINNT=0x0A00 限制 win10 或更高:
 # - httplib 要求 >= win10
-if (MSVC) 
+if (XX_IS_MSVC) 
   set(_AGENTXX_COMMON_C_CXX_FLAGS 
     "${_AGENTXX_COMMON_C_CXX_FLAGS} /D_WIN32_WINNT=0x0A00 /D__STDC_CONSTANT_MACROS=1 /DCPPHTTPLIB_OPENSSL_SUPPORT=1 /DBOOST_ASIO_STANDALONE=1 /DASIO_STANDALONE=1 /DBOOST_PROCESS_USE_STD_FS=1"
   )
@@ -88,7 +106,7 @@ if (MSVC)
     message("[agentxx] Enable asio/io_uring")
   endif()
 else ()
-  if (IS_WIN_D)
+  if (XX_IS_WIN_D)
     # 可能交叉编译
     set(_AGENTXX_COMMON_C_CXX_FLAGS
       ${_AGENTXX_COMMON_C_CXX_FLAGS}
@@ -127,57 +145,62 @@ else ()
   endif()
 endif()
 
-message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+# msvc 时统一动态链接标准库 /MD /MDd
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+# 优先链接静态库
+if(XX_IS_MSVC)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+else()
+  set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+endif()
 
-if (MSVC)
-    set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
-    set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
+message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+if (XX_IS_MSVC)
+  set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
+  set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
 
-		set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE}          ${_AGENTXX_C_FLAGS}   /Gy")
-		set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE}        ${_AGENTXX_CXX_FLAGS} /Gy")
-		set(CMAKE_C_FLAGS_MINSIZEREL       "${CMAKE_C_FLAGS_MINSIZEREL}       ${_AGENTXX_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL}     ${_AGENTXX_CXX_FLAGS}")
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO}   ${_AGENTXX_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${_AGENTXX_CXX_FLAGS}")
-		set(CMAKE_C_FLAGS_DEBUG            "${CMAKE_C_FLAGS_DEBUG}            ${_AGENTXX_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG}          ${_AGENTXX_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE}          ${_AGENTXX_C_FLAGS}   /Gy")
+  set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE}        ${_AGENTXX_CXX_FLAGS} /Gy")
+  set(CMAKE_C_FLAGS_MINSIZEREL       "${CMAKE_C_FLAGS_MINSIZEREL}       ${_AGENTXX_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL}     ${_AGENTXX_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO}   ${_AGENTXX_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${_AGENTXX_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS_DEBUG            "${CMAKE_C_FLAGS_DEBUG}            ${_AGENTXX_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG}          ${_AGENTXX_CXX_FLAGS}")
 
-    if (IS_RELEASE_D)
-      set(LDFLAGS "${LDFLAGS} /OPT:REF /OPT:ICF")
-    else ()
-      # windows/msvc 使用 /fsanitize=address 时可能导致链接错误 (uchatdet)
-      set(LDFLAGS "${LDFLAGS}")
-    endif()
+  if (XX_IS_RELEASE_D)
+    set(LDFLAGS "${LDFLAGS} /OPT:REF /OPT:ICF")
+  else ()
+    # windows/msvc 使用 /fsanitize=address 时可能导致链接错误 (uchatdet)
+    set(LDFLAGS "${LDFLAGS}")
+  endif()
 
-    unset(_AGENTXX_C_FLAGS)
-    unset(_AGENTXX_CXX_FLAGS)
+  unset(_AGENTXX_C_FLAGS)
+  unset(_AGENTXX_CXX_FLAGS)
 
-    # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
-    set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
-    
-    set(CMAKE_C_FLAGS_RELEASE          "${_AGENTXX_C_FLAGS}   -O3 -flto ${CMAKE_C_FLAGS_RELEASE}")
-    set(CMAKE_CXX_FLAGS_RELEASE        "${_AGENTXX_CXX_FLAGS} -O3 -flto ${CMAKE_CXX_FLAGS_RELEASE}")
-		set(CMAKE_C_FLAGS_MINSIZEREL       "${_AGENTXX_C_FLAGS}   ${CMAKE_C_FLAGS_MINSIZEREL}")
-		set(CMAKE_CXX_FLAGS_MINSIZEREL     "${_AGENTXX_CXX_FLAGS} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${_AGENTXX_C_FLAGS}   ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${_AGENTXX_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-    set(CMAKE_C_FLAGS_DEBUG            "${_AGENTXX_C_FLAGS}   -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls ${CMAKE_C_FLAGS_DEBUG}")
-    set(CMAKE_CXX_FLAGS_DEBUG          "${_AGENTXX_CXX_FLAGS} -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls ${CMAKE_CXX_FLAGS_DEBUG}")
-
-    if (IS_RELEASE_D)
-      set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
-    else ()
-      set(LDFLAGS "${LDFLAGS} -fsanitize=address")
-    endif ()
-
-    unset(_AGENTXX_C_FLAGS)
-    unset(_AGENTXX_CXX_FLAGS)
+  # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 else ()
-  message("[agentxx] 不支持的编译器")
-  return()
+  # XX_IS_CLANG OR XX_IS_GCC
+  set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
+  set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
+  
+  set(CMAKE_C_FLAGS_RELEASE          "${_AGENTXX_C_FLAGS}   -O3 -flto ${CMAKE_C_FLAGS_RELEASE}")
+  set(CMAKE_CXX_FLAGS_RELEASE        "${_AGENTXX_CXX_FLAGS} -O3 -flto ${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS_MINSIZEREL       "${_AGENTXX_C_FLAGS}   ${CMAKE_C_FLAGS_MINSIZEREL}")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL     "${_AGENTXX_CXX_FLAGS} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${_AGENTXX_C_FLAGS}   ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${_AGENTXX_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+  set(CMAKE_C_FLAGS_DEBUG            "${_AGENTXX_C_FLAGS}   -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls ${CMAKE_C_FLAGS_DEBUG}")
+  set(CMAKE_CXX_FLAGS_DEBUG          "${_AGENTXX_CXX_FLAGS} -fsanitize=address -g -fno-omit-frame-pointer -fno-optimize-sibling-calls ${CMAKE_CXX_FLAGS_DEBUG}")
+
+  if (XX_IS_RELEASE_D)
+    set(LDFLAGS "${LDFLAGS} -Wl,--gc-sections")
+  else ()
+    set(LDFLAGS "${LDFLAGS} -fsanitize=address")
+  endif ()
+
+  unset(_AGENTXX_C_FLAGS)
+  unset(_AGENTXX_CXX_FLAGS)
 endif ()
 
 # exe install dir
@@ -196,36 +219,35 @@ set(AGENTXX_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-project-install/")
 # 自行按文档编译参考: /docs/build/linux.md 或 /docs/build/windows.md
 set (Boost_USE_STATIC_LIBS ON)
 set (Boost_USE_STATIC_RUNTIME OFF) # 静态链接标准库
-set (Boost_USE_DEBUG_LIBS ${IS_DEBUG_D})
-set (Boost_USE_RELEASE_LIBS ${IS_RELEASE_D})
-set (Boost_USE_DEBUG_RUNTIME ${IS_DEBUG_D})
-set (Boost_USE_RELEASE_RUNTIME ${IS_RELEASE_D})
+set (Boost_USE_DEBUG_LIBS ${XX_IS_DEBUG_D})
+set (Boost_USE_RELEASE_LIBS ${XX_IS_RELEASE_D})
+set (Boost_USE_DEBUG_RUNTIME ${XX_IS_DEBUG_D})
+set (Boost_USE_RELEASE_RUNTIME ${XX_IS_RELEASE_D})
 if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
-    # 尝试预编译目录，按顺序:
-    #   - ${BOOST_ROOT}
-    #   - boost-build-debug / boost-build-release
-    #   - boost-build
-    #   - find_package
-    if (IS_DEBUG_D)
-      set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build-debug/")
-    else ()
-      set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build-release/")
-    endif()
-    if (NOT EXISTS ${_BOOST_DIR})
-      set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
-    endif ()
+  # 尝试预编译目录，按顺序:
+  #   - ${BOOST_ROOT}
+  #   - boost-build-debug / boost-build-release
+  #   - boost-build
+  #   - find_package
+  if (XX_IS_DEBUG_D)
+    set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build-debug/")
+  else ()
+    set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build-release/")
+  endif()
+  if (NOT EXISTS ${_BOOST_DIR})
+    set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+  endif ()
 
-    if (EXISTS ${_BOOST_DIR})
-      set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
-    else ()
-      # 尝试系统 find_package
-      find_package(Boost REQUIRED)
-      if (NOT Boost_FOUND)
-        message(FATAL_ERROR "Boost not found. Please set BOOST_ROOT.")
-      endif()
-    endif()
+  if (EXISTS ${_BOOST_DIR})
+    set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
+  endif()
 
-    unset(_BOOST_DIR)
+  find_package(Boost REQUIRED)
+  if (NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost not found. Please set BOOST_ROOT.")
+  endif()
+
+  unset(_BOOST_DIR)
 endif()
 
 # openssl
@@ -236,24 +258,24 @@ if (NOT DEFINED OPENSSL_ROOT_DIR OR NOT EXISTS ${OPENSSL_ROOT_DIR})
 
   if (EXISTS ${_OPENSSL_ROOT_DIR})
     set(OPENSSL_ROOT_DIR ${_OPENSSL_ROOT_DIR} CACHE PATH "OpenSSL root directory" FORCE)
-    if (IS_WIN_D)
-      # 动态链接标准库
-      set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
-      if (IS_DEBUG_D)
-        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-        set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-        set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-      else ()
-        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-        set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-        set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-      endif()
-    endif()
-  else()
-    # 尝试系统 find_package
-    find_package(OpenSSL REQUIRED)
-    if (NOT OpenSSL_FOUND)
-      message(FATAL_ERROR "OpenSSL not found. Please set OPENSSL_ROOT.")
+  endif()
+
+  find_package(OpenSSL REQUIRED)
+  if (NOT OpenSSL_FOUND)
+    message(FATAL_ERROR "OpenSSL not found. Please set OPENSSL_ROOT.")
+  endif()
+
+  if (XX_IS_WIN_D)
+    # 动态链接标准库
+    set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+    if (XX_IS_DEBUG_D)
+      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+    else ()
+      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
     endif()
   endif()
 
@@ -276,7 +298,7 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DCMAKE_INSTALL_PREFIX=${AGENTXX_INSTALL_DIR}"
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 
-    -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}
+    "-DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}"
     -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
     -DCMAKE_POLICY_DEFAULT_CMP0144=NEW
 
@@ -310,19 +332,26 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     -DOPENSSL_USE_STATIC_LIBS=${OPENSSL_USE_STATIC_LIBS}
 
     -DXX_BUILD_TYPE=${XX_BUILD_TYPE}
-    -DIS_DEBUG_D=${IS_DEBUG_D}
-    -DIS_RELEASE_D=${IS_RELEASE_D}
-    -DIS_LINUX_D=${IS_LINUX_D}
-    -DIS_WIN_D=${IS_WIN_D}
-    -DIS_MACOS_D=${IS_MACOS_D}  
-    -DIS_ANDROID_D=${IS_ANDROID_D}
-    -DIS_IOS_D=${IS_IOS_D}
+    
+    -DXX_IS_DEBUG_D=${XX_IS_DEBUG_D}
+    -DXX_IS_RELEASE_D=${XX_IS_RELEASE_D}
+
+    -DXX_IS_LINUX_D=${XX_IS_LINUX_D}
+    -DXX_IS_WIN_D=${XX_IS_WIN_D}
+    -DXX_IS_MACOS_D=${XX_IS_MACOS_D}
+    -DXX_IS_ANDROID_D=${XX_IS_ANDROID_D}
+    -DXX_IS_IOS_D=${XX_IS_IOS_D}
+
+    -DXX_IS_MSVC=${XX_IS_MSVC}
+    -DXX_IS_GCC=${XX_IS_GCC}
+    -DXX_IS_CLANG=${XX_IS_CLANG}
 
     "-DAGENTXX_EXEC_INSTALL_PREFIX=${AGENTXX_EXEC_INSTALL_PREFIX}"
     "-DAGENTXX_THIRD_PARTY_DIR=${AGENTXX_THIRD_PARTY_DIR}"
     -DAGENTXX_LINUX_IO_URING_SUPPORTED=${AGENTXX_LINUX_IO_URING_SUPPORTED}
     -DAGENTXX_WINDOWS_IOCP_SUPPORTED=${AGENTXX_WINDOWS_IOCP_SUPPORTED}
 )
+message("[agentxx] _AGENTXX_COMMON_CMAKE_ARGS: ${_AGENTXX_COMMON_CMAKE_ARGS}")
 
 include(ExternalProject)
 include(FetchContent)

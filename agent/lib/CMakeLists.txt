@@ -6,6 +6,12 @@ set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (XX_IS_MSVC)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;${CMAKE_FIND_LIBRARY_SUFFIXES}")
+else ()
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;${CMAKE_FIND_LIBRARY_SUFFIXES}")
+endif()
+
 file(GLOB_RECURSE agentxx_SOURCES
   CONFIGURE_DEPENDS
  "src/*.cpp" "src/*.cc" "src/*.cxx"
@@ -18,7 +24,7 @@ add_library(agentxx_static STATIC ${agentxx_SOURCES})
 # 动态库控制导出符号
 target_compile_definitions(agentxx_shared PUBLIC AGENTXX_EXPORTS)
 
-if (MSVC)
+if (XX_IS_MSVC)
   target_compile_definitions(agentxx_shared PUBLIC
     strdup=_strdup
     strcasecmp=_stricmp
@@ -32,30 +38,30 @@ if (MSVC)
 endif()
 target_compile_definitions(agentxx_shared PUBLIC
   __STDC_CONSTANT_MACROS
-  IS_DEBUG_D=${IS_DEBUG_D}
-  IS_RELEASE_D=${IS_RELEASE_D}
+  XX_IS_DEBUG_D=${XX_IS_DEBUG_D}
+  XX_IS_RELEASE_D=${XX_IS_RELEASE_D}
   XX_BUILD_TYPE=${XX_BUILD_TYPE}
 
-  IS_LINUX_D=${IS_LINUX_D}
-  IS_WIN_D=${IS_WIN_D}
-  IS_MACOS_D=${IS_MACOS_D}
-  IS_ANDROID_D=${IS_ANDROID_D}
-  IS_IOS_D=${IS_IOS_D}
+  XX_IS_LINUX_D=${XX_IS_LINUX_D}
+  XX_IS_WIN_D=${XX_IS_WIN_D}
+  XX_IS_MACOS_D=${XX_IS_MACOS_D}
+  XX_IS_ANDROID_D=${XX_IS_ANDROID_D}
+  XX_IS_IOS_D=${XX_IS_IOS_D}
 
   NEOGRAPH_STATIC_BUILD
   NEOGRAPH_USE_BOODT_ASIO
 )
 target_compile_definitions(agentxx_static PUBLIC
   __STDC_CONSTANT_MACROS
-  IS_DEBUG_D=${IS_DEBUG_D}
-  IS_RELEASE_D=${IS_RELEASE_D}
+  XX_IS_DEBUG_D=${XX_IS_DEBUG_D}
+  XX_IS_RELEASE_D=${XX_IS_RELEASE_D}
   XX_BUILD_TYPE=${XX_BUILD_TYPE}
 
-  IS_LINUX_D=${IS_LINUX_D}
-  IS_WIN_D=${IS_WIN_D}
-  IS_MACOS_D=${IS_MACOS_D}
-  IS_ANDROID_D=${IS_ANDROID_D}
-  IS_IOS_D=${IS_IOS_D}
+  XX_IS_LINUX_D=${XX_IS_LINUX_D}
+  XX_IS_WIN_D=${XX_IS_WIN_D}
+  XX_IS_MACOS_D=${XX_IS_MACOS_D}
+  XX_IS_ANDROID_D=${XX_IS_ANDROID_D}
+  XX_IS_IOS_D=${XX_IS_IOS_D}
 
   NEOGRAPH_STATIC_BUILD
   NEOGRAPH_USE_BOODT_ASIO

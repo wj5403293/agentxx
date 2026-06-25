@@ -14,42 +14,42 @@ option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
 
 # 仅用于指示是否编译用于调试用途，不代表真实编译类型
-# - [IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
+# - [XX_IS_DEBUG_D] == 1 时，启用大部分调试日志等信息，因此 profile 之类注重
 # 性能的编译将视为 release
-set(IS_DEBUG_D    0)
-set(IS_RELEASE_D  1)
+set(XX_IS_DEBUG_D    0)
+set(XX_IS_RELEASE_D  1)
 
 if (XX_BUILD_TYPE MATCHES "DEBUG")
-  set(IS_DEBUG_D    1)
-  set(IS_RELEASE_D  0)
+  set(XX_IS_DEBUG_D    1)
+  set(XX_IS_RELEASE_D  0)
 endif()
-add_definitions(-DIS_DEBUG_D=${IS_DEBUG_D})
-add_definitions(-DIS_RELEASE_D=${IS_RELEASE_D})
+add_definitions(-DXX_IS_DEBUG_D=${XX_IS_DEBUG_D})
+add_definitions(-DXX_IS_RELEASE_D=${XX_IS_RELEASE_D})
 add_definitions(-DXX_BUILD_TYPE=${XX_BUILD_TYPE})
 
-set(IS_LINUX_D    0)
-set(IS_WIN_D      0)
-set(IS_MACOS_D    0)
-set(IS_ANDROID_D  0)
-set(IS_IOS_D      0)
+set(XX_IS_LINUX_D    0)
+set(XX_IS_WIN_D      0)
+set(XX_IS_MACOS_D    0)
+set(XX_IS_ANDROID_D  0)
+set(XX_IS_IOS_D      0)
 
 if (WIN32)
-  set(IS_WIN_D 1)
+  set(XX_IS_WIN_D 1)
 elseif (ANDROID)
-  set(IS_ANDROID_D 1)
+  set(XX_IS_ANDROID_D 1)
 elseif (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(IS_MACOS_D 1)
+  set(XX_IS_MACOS_D 1)
 elseif (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "iOS")
-  set(IS_IOS_D 1)
+  set(XX_IS_IOS_D 1)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(IS_LINUX_D 1)
+  set(XX_IS_LINUX_D 1)
 endif ()
 
-add_definitions(-DIS_LINUX_D=${IS_LINUX_D})
-add_definitions(-DIS_WIN_D=${IS_WIN_D})
-add_definitions(-DIS_MACOS_D=${IS_MACOS_D})
-add_definitions(-DIS_ANDROID_D=${IS_ANDROID_D})
-add_definitions(-DIS_IOS_D=${IS_IOS_D})
+add_definitions(-DXX_IS_LINUX_D=${XX_IS_LINUX_D})
+add_definitions(-DXX_IS_WIN_D=${XX_IS_WIN_D})
+add_definitions(-DXX_IS_MACOS_D=${XX_IS_MACOS_D})
+add_definitions(-DXX_IS_ANDROID_D=${XX_IS_ANDROID_D})
+add_definitions(-DXX_IS_IOS_D=${XX_IS_IOS_D})
 
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
@@ -77,7 +77,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
       set(CMAKE_C_FLAGS_DEBUG       "${CMAKE_C_FLAGS_DEBUG}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
       set(CMAKE_CXX_FLAGS_DEBUG     "${CMAKE_CXX_FLAGS_DEBUG}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
     else ()
-      if (IS_DEBUG_D)
+      if (XX_IS_DEBUG_D)
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS}     ${_AGENTXX_C_FLAGS}   -fno-omit-frame-pointer -fno-optimize-sibling-calls")
         set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}   ${_AGENTXX_CXX_FLAGS} -fno-omit-frame-pointer -fno-optimize-sibling-calls")
       else ()
@@ -126,12 +126,12 @@ target_link_libraries(test_temp
 	boost_process
 )
 
-if (IS_MACOS_D)
+if (XX_IS_MACOS_D)
   target_link_options(test_temp PRIVATE 
     "-Wl,-rpath,@executable_path"
   )
 endif()
-if (IS_WIN_D)
+if (XX_IS_WIN_D)
 	target_compile_definitions(
 		${NAME_test} PRIVATE
 		strdup=_strdup

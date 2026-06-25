@@ -235,10 +235,10 @@ public:
       tools.push_back(
           std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
 
-#if IS_WIN_D
+#if XX_IS_WIN_D
       tools.push_back(
           std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
-#elif IS_LINUX_D
+#elif XX_IS_LINUX_D
       tools.push_back(
           std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
       if (agentxx::util::isRunningInWSL()) {

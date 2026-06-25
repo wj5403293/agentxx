@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string_view>
 
-#if IS_DEBUG_D
+#if XX_IS_DEBUG_D
 
 #define XX_LOGD(str, ...)                                                      \
   (std::cerr << fmt::format(str, ##__VA_ARGS__) << std::endl);
@@ -32,7 +32,7 @@
 
 #endif
 
-#if IS_LINUX_D
+#if XX_IS_LINUX_D
 
 #include <csignal>
 #include <execinfo.h>

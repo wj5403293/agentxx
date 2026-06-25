@@ -7,16 +7,16 @@
 #include <map>
 #include <memory>
 
-#if IS_WIN_D
+#if XX_IS_WIN_D
 #include <Windows.h>
 #endif
 
 /// 运行可执行 ../script/client_run.sh
 int main(int argn, char **argv) {
-#if IS_WIN_D
+#if XX_IS_WIN_D
   SetConsoleOutputCP(CP_UTF8);
 #endif
-#if IS_DEBUG_D && IS_LINUX_D
+#if XX_IS_DEBUG_D && XX_IS_LINUX_D
   agentxx::util::signalError(argv[0]);
 #endif
   std::cout << "======= Agentxx Client =======" << std::endl;

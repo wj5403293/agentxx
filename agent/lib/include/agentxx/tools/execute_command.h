@@ -125,7 +125,7 @@ Current System is {}{}, please use linux shell/bash commands.)",
     }
 #endif
 
-#if IS_WIN_D
+#if XX_IS_WIN_D
     auto pipe = std::unique_ptr<FILE, decltype(&_pclose)>{
         _popen(command.c_str(), "r"), _pclose};
 #else
@@ -306,7 +306,7 @@ execute_async(const neograph::json &arguments) override {
   }
 #endif
 
-#if IS_WIN_D
+#if XX_IS_WIN_D
   auto pipe = std::unique_ptr<FILE, decltype(&_pclose)>{
       _popen(command.c_str(), "r"), _pclose};
 #else

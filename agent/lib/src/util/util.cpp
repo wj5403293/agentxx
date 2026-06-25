@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-#if IS_LINUX_D
+#if XX_IS_LINUX_D
 #include <sys/utsname.h>
 
 std::string agentxx::util::getSystemName() {
@@ -43,7 +43,7 @@ bool agentxx::util::isRunningInWSL() {
   return false;
 }
 
-#elif IS_WIN_D
+#elif XX_IS_WIN_D
 #include <windows.h>
 std::string agentxx::util::getSystemName() {
   OSVERSIONINFOEX info{};
