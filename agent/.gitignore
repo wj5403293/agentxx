@@ -1,7 +1,8 @@
 /build/
 /third_party/boost/
 /third_party/llvm-mingw-msvcrt-x86_64/
-/third_party/boost-build/
+/third_party/boost-build-debug/
+/third_party/boost-build-release/
 /third_party/OpenSSL/
 /third_party/sqlite/
 /third_party/paddle_inference/

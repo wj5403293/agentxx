@@ -183,17 +183,26 @@ set(AGENTXX_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-project-install/")
 # boost 系统安装库 或 自行编译
 # https://github.com/boostorg/boost
 # 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
-# 然后编译结果到 agent/third_party/boost-build/
-# cd boost/
-# ./bootstrap.sh
-# ./b2 --prefix=${PWD}/../boost-build
-# ./b2 install --prefix=${PWD}/../boost-build
+# 自行按文档编译参考: /docs/build/linux.md 或 /docs/build/windows.md
+set (Boost_USE_STATIC_LIBS ON)
 if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
-    # 尝试预编译目录
-    set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+    # 尝试预编译目录，按顺序:
+    #   - ${BOOST_ROOT}
+    #   - boost-build-debug / boost-build-release
+    #   - boost-build
+    #   - find_package
+    if (IS_DEBUG_D)
+      set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build-debug/")
+    else ()
+      set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build-release/")
+    endif()
+    if (NOT EXISTS ${_BOOST_DIR})
+      set(_BOOST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/boost-build/")
+    endif ()
+
     if (EXISTS ${_BOOST_DIR})
-        set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
-    else()
+      set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
+    else ()
         # 尝试系统 find_package
         find_package(Boost QUIET)
         if (Boost_FOUND)
@@ -256,6 +265,7 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DLDFLAGS=${LDFLAGS}"
 
     "-DBOOST_ROOT=${BOOST_ROOT}"
+    -DBOOST_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}
     -DOPENSSL_USE_STATIC_LIBS=${OPENSSL_USE_STATIC_LIBS}
 
     -DXX_BUILD_TYPE=${XX_BUILD_TYPE}
