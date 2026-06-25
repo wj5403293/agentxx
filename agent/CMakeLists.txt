@@ -206,6 +206,25 @@ if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
     endif()
 endif()
 
+# openssl
+set (OPENSSL_USE_STATIC_LIBS ON)
+find_package(OpenSSL QUIET)
+if (NOT OpenSSL_FOUND)
+  set(OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
+  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+  if (IS_WIN_D)
+    IF (IS_DEBUG_D)
+      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
+    else ()
+      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
+    endif()
+  endif ()
+endif()
+
 set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
     "-DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}"
@@ -237,6 +256,7 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     "-DLDFLAGS=${LDFLAGS}"
 
     "-DBOOST_ROOT=${BOOST_ROOT}"
+    -DOPENSSL_USE_STATIC_LIBS=${OPENSSL_USE_STATIC_LIBS}
 
     -DXX_BUILD_TYPE=${XX_BUILD_TYPE}
     -DIS_DEBUG_D=${IS_DEBUG_D}
@@ -255,24 +275,6 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
 
 include(ExternalProject)
 include(FetchContent)
-
-# openssl
-find_package(OpenSSL QUIET)
-if (NOT OpenSSL_FOUND)
-  set(OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
-  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
-  if (IS_WIN_D)
-    IF (IS_DEBUG_D)
-      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
-    else ()
-      set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-      set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-      set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
-    endif()
-  endif ()
-endif()
 
 # liburing
 set(LIBURING_SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/liburing/")

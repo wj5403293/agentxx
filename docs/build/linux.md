@@ -2,8 +2,7 @@
 
 - 系统环境: Linux
 - C++ 标准: Requires C++23 or higher.
-- 编译器推荐
-    - Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
+- 编译器推荐: Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
 
 ## 开始
 - 安装或编译 Boost 1.91
@@ -26,4 +25,9 @@ boost_install_dir=$(cd "$(dirname "$0")" && pwd)
 ```sh
 cd {项目根目录}/agent
 ./script/client_run.sh
+```
+- - release 编译可以运行:
+```sh
+cd {项目根目录}/agent
+./script/release_build.sh
 ```

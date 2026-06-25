@@ -1,9 +1,8 @@
 # Windows 可执行程序/动态库 编译
 
-- 系统环境: Linux，通过交叉编译得到 Windows exe/dll
+- 系统环境: Windows
 - C++ 标准: Requires C++23 or higher.
-- 编译器推荐
-    - Clang/llvm
+- 编译器: MSVC
 
 ## 开始
 ### 安装 VS-Studio-2026、cmake、pkg-config
@@ -19,17 +18,6 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 choco install pkgconfiglite
 
 pkg-config --version
-```
-### Clang/llvm 编译
-- 下载交叉编译工具链:
-    - https://github.com/mstorsjo/llvm-mingw/releases
-    - 下载并解压 llvm-mingw-xxx-msvcrt-x86_64.zip
-    - 示例: 
-```sh
-cd {项目根目录}/agent/third_party/
-wget https://github.com/mstorsjo/llvm-mingw/releases/download/20260616/llvm-mingw-20260616-msvcrt-x86_64.zip
-unzip llvm-mingw-20260616-msvcrt-x86_64.zip
-mv llvm-mingw-20260616-msvcrt-x86_64 llvm-mingw-msvcrt-x86_64
 ```
 ### Boost 编译
 - 安装或编译 Boost 1.91
@@ -61,4 +49,47 @@ cd "%boost_source_dir%"
 ```sh
 cd {项目根目录}/agent
 ./script/client_run.bat
+```
+- - release 编译可以运行:
+```sh
+cd {项目根目录}/agent
+./script/release_build.bat
+```
+
+## 常见错误
+
+### 链接错误 uchardet.lib(uchardet.obj) : error LNK2038
+- windows上 msvc 编译出来的库分为 debug 和 release 版本，且区分 静态链接c++标准库 和 动态链接c++标准库，因此一共分为 4种 情况
+- 这个报错是由于在构建 debug 库中链接了 release 版本的库，或者在构建 release 库中链接了 debug 版本的库
+- 对于 uchardet 需要修改其 CMakeLists.txt，删除或注释掉这段内容，然后删除编译缓存重新编译即可:
+```cmake
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    set(version_suffix .debug)
+    add_compile_options("-fsanitize=address")
+    add_link_options("-fsanitize=address")
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
+```
+- 有些库编译需要定义 `CMAKE_MSVC_RUNTIME_LIBRARY`，并开启 `CMAKE_POLICY_DEFAULT_CMP0091=NEW` 即可，这需要`cmake 3.16+`。这里举例声明固定为动态链接标准库；如果希望静态链接标准库，可以把 `MultiThreaded$<$<CONFIG:Debug>:Debug>DLL` 改为 `MultiThreaded$<$<CONFIG:Debug>:Debug>` 即可.
+```cmake
+# 如果可以修改项目的 CMakeLists.txt，则增加: 
+cmake_policy(SET CMP0091 NEW)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+
+# 如果是导入依赖库，可以添加`CMAKE_ARGS`变量:
+ExternalProject_Add(
+  glob_repo
+  SOURCE_DIR "path/to/glob/"
+  CMAKE_ARGS
+    "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+    "-DCMAKE_POLICY_DEFAULT_CMP0091=NEW"
+)
+```
+### 链接错误 error C1128
+- 编译参数添加 `/bigobj` 即可.
+```cmake
+if (MSVC)
+	target_compile_options(your_target PRIVATE 
+		"/bigobj"
+	)
+endif ()
 ```
