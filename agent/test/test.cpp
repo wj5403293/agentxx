@@ -20,13 +20,20 @@
 #include <iostream>
 #include <map>
 
+#if IS_WIN_D
+#include <Windows.h>
+#endif
+
 asio::io_context ioCtx;
 
 asio::awaitable<void> test(asio::io_context &ioCtx) { co_return; }
 
 /// 运行可执行 ../script/test_run.sh
 int main(int argn, char **argv) {
-#if IS_LINUX_D
+#if IS_WIN_D
+  SetConsoleOutputCP(CP_UTF8);
+#endif
+#if IS_DEBUG_D && IS_LINUX_D
   agentxx::util::signalError(argv[0]);
 #endif
   std::cout << "======= Test Start =======" << std::endl;
