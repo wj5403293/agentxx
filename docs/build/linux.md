@@ -15,9 +15,25 @@ cd boost/
 # 然后编译结果到 agent/third_party/boost-build/
 ./bootstrap.sh
 
-boost_install_dir=$(cd "$(dirname "$0")" && pwd)
+# 创建 third_party/boost-build-debug 和 third_party/boost-build-release 目录
+boost_source_dir=$PWD
 
-./b2 install --layout=system --prefix=${boost_install_dir} link=static runtime-link=shared address-model=64
+boost_install_debug_dir="${boost_source_dir}/../boost-build-debug/"
+mkdir -p "$boost_install_debug_dir"
+boost_install_debug_dir=$(cd "$boost_install_debug_dir" && pwd)
+
+boost_install_release_dir="${boost_source_dir}/../boost-build-release/"
+mkdir -p "$boost_install_release_dir"
+boost_install_release_dir=$(cd "$boost_install_release_dir" && pwd)
+
+cd "$boost_source_dir"
+
+./b2 install --layout=system --prefix="${boost_install_debug_dir}" link=static runtime-link=shared runtime-debugging=on address-model=64 variant=debug
+
+./b2 --clean-all
+
+./b2 install --layout=system --prefix="${boost_install_release_dir}" link=static runtime-link=shared runtime-debugging=off address-model=64 variant=release
+
 # 如果想重新构建，可以先执行清理:
 # ./b2 --clean-all
 ```

@@ -148,6 +148,9 @@ if (MSVC)
       set(LDFLAGS "${LDFLAGS}")
     endif()
 
+    unset(_AGENTXX_C_FLAGS)
+    unset(_AGENTXX_CXX_FLAGS)
+
     # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
@@ -165,6 +168,9 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "
     else ()
       set(LDFLAGS "${LDFLAGS} -fsanitize=address")
     endif ()
+
+    unset(_AGENTXX_C_FLAGS)
+    unset(_AGENTXX_CXX_FLAGS)
 else ()
   message("[agentxx] 不支持的编译器")
   return()
@@ -185,6 +191,11 @@ set(AGENTXX_INSTALL_DIR "${CMAKE_BINARY_DIR}/agentxx-project-install/")
 # 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
 # 自行按文档编译参考: /docs/build/linux.md 或 /docs/build/windows.md
 set (Boost_USE_STATIC_LIBS ON)
+set (Boost_USE_STATIC_RUNTIME OFF) # 静态链接标准库
+set (Boost_USE_DEBUG_LIBS ${IS_DEBUG_D})
+set (Boost_USE_RELEASE_LIBS ${IS_RELEASE_D})
+set (Boost_USE_DEBUG_RUNTIME ${IS_DEBUG_D})
+set (Boost_USE_RELEASE_RUNTIME ${IS_RELEASE_D})
 if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
     # 尝试预编译目录，按顺序:
     #   - ${BOOST_ROOT}
@@ -204,25 +215,25 @@ if (NOT DEFINED BOOST_ROOT OR NOT EXISTS ${BOOST_ROOT})
       set(BOOST_ROOT ${_BOOST_DIR} CACHE PATH "Boost root directory" FORCE)
     else ()
         # 尝试系统 find_package
-        find_package(Boost QUIET)
-        if (Boost_FOUND)
-            # 从 Boost_INCLUDE_DIRS 推导出根目录
-            get_filename_component(BOOST_ROOT "${Boost_INCLUDE_DIRS}/.." ABSOLUTE)
-            set(BOOST_ROOT ${BOOST_ROOT} CACHE PATH "Boost root directory" FORCE)
-        else()
+        find_package(Boost REQUIRED)
+        if (NOT Boost_FOUND)
             message(FATAL_ERROR "Boost not found. Please set BOOST_ROOT.")
         endif()
     endif()
+
+    unset(_BOOST_DIR)
 endif()
 
 # openssl
 set (OPENSSL_USE_STATIC_LIBS ON)
-find_package(OpenSSL QUIET)
-if (NOT OpenSSL_FOUND)
+if (NOT DEFINED OPENSSL_ROOT_DIR OR NOT EXISTS ${OPENSSL_ROOT_DIR})
+  # 预编译目录
   set(OPENSSL_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/OpenSSL/")
   set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include/")
+
   if (IS_WIN_D)
-    IF (IS_DEBUG_D)
+    # 动态链接标准库
+    if (IS_DEBUG_D)
       set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
       set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
       set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MDd")
@@ -231,7 +242,12 @@ if (NOT OpenSSL_FOUND)
       set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
       set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/MD")
     endif()
-  endif ()
+  else()
+    find_package(OpenSSL REQUIRED)
+    if (NOT OpenSSL_FOUND)
+        message(FATAL_ERROR "OpenSSL not found. Please set OPENSSL_ROOT.")
+    endif()
+  endif()
 endif()
 
 set(_AGENTXX_COMMON_CMAKE_ARGS
@@ -266,6 +282,16 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
 
     "-DBOOST_ROOT=${BOOST_ROOT}"
     -DBOOST_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}
+    -DBoost_USE_STATIC_RUNTIME=${Boost_USE_STATIC_RUNTIME}
+    -DBoost_USE_DEBUG_LIBS=${Boost_USE_DEBUG_LIBS}
+    -DBoost_USE_RELEASE_LIBS=${Boost_USE_RELEASE_LIBS}
+    -DBoost_USE_DEBUG_RUNTIME=${Boost_USE_DEBUG_RUNTIME}
+    -DBoost_USE_RELEASE_RUNTIME=${Boost_USE_RELEASE_RUNTIME}
+    "-DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}"
+    "-DOPENSSL_INCLUDE_DIR=${OPENSSL_INCLUDE_DIR}"
+    "-DOPENSSL_LIB_DIR=${OPENSSL_LIB_DIR}"
+    "-DOPENSSL_SSL_LIBRARY=${OPENSSL_SSL_LIBRARY}"
+    "-DOPENSSL_CRYPTO_LIBRARY=${OPENSSL_CRYPTO_LIBRARY}"
     -DOPENSSL_USE_STATIC_LIBS=${OPENSSL_USE_STATIC_LIBS}
 
     -DXX_BUILD_TYPE=${XX_BUILD_TYPE}
