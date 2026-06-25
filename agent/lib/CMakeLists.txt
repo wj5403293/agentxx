@@ -46,6 +46,7 @@ target_compile_definitions(agentxx PUBLIC IS_WIN_D=${IS_WIN_D})
 target_compile_definitions(agentxx PUBLIC IS_MACOS_D=${IS_MACOS_D})
 target_compile_definitions(agentxx PUBLIC IS_ANDROID_D=${IS_ANDROID_D})
 target_compile_definitions(agentxx PUBLIC IS_IOS_D=${IS_IOS_D})
+target_compile_definitions(agentxx PUBLIC NEOGRAPH_STATIC_BUILD)
 target_compile_definitions(agentxx PUBLIC NEOGRAPH_USE_BOODT_ASIO)
 if (AGENTXX_ENABLE_HYPERSCAN)
   target_compile_definitions(agentxx PUBLIC AGENTXX_ENABLE_HYPERSCAN=1)
@@ -54,11 +55,10 @@ if (AGENTXX_ENABLE_CODEGRAPH)
   target_compile_definitions(agentxx PUBLIC AGENTXX_ENABLE_CODEGRAPH=1)
 endif()
 
+# ASan requires all linked libraries to be compiled with the same flag.
+# Disabled because dependencies (neograph, fmt, iconv, etc.) are not built with ASan.
 if (IS_DEBUG_D)
-  if (MSVC)
-    target_compile_options(agentxx PRIVATE "/fsanitize=address")
-    target_link_options(agentxx PRIVATE "/fsanitize=address")
-  else()
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     target_compile_options(agentxx PRIVATE "-fsanitize=address")
     target_link_options(agentxx PRIVATE "-fsanitize=address")
   endif ()
@@ -98,6 +98,7 @@ target_link_directories(agentxx PUBLIC
 
 target_link_libraries(agentxx PUBLIC
   Iconv::Iconv
+  charset
   uchardet::libuchardet
   # === neograph vvv 链接顺序是必要的
   neograph_sqlite

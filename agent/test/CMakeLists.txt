@@ -23,12 +23,9 @@ set_target_properties(agentxx_test PROPERTIES
 target_include_directories(agentxx_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (IS_DEBUG_D)
-  if (MSVC)
-    target_compile_options(agentxx_cli PRIVATE "/fsanitize=address")
-    target_link_options(agentxx_cli PRIVATE "/fsanitize=address")
-  else()
-    target_compile_options(agentxx_cli PRIVATE "-fsanitize=address")
-    target_link_options(agentxx_cli PRIVATE "-fsanitize=address")
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    target_compile_options(agentxx_test PRIVATE "-fsanitize=address")
+    target_link_options(agentxx_test PRIVATE "-fsanitize=address")
   endif ()
 endif ()
 
