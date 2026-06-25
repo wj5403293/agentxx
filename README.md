@@ -7,6 +7,7 @@
 ### 基础模块
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
+    - ⬜兼容乱码、不合规字符处理
     - ✅filesystem (支持 `同步`/`asio 协程异步` 文件读写)
         - ls (file/dir/recursive-dir/limit)
         - read_text (full / offset-limit)
@@ -68,6 +69,7 @@
 - ✅中断恢复
     - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
     - 支持用户取消执行
+    - ⬜中断、异常时在上下文中补充提示
 - ✅Permission
     - ✅允许指定 tool 调用前拦截，决定 允许、拒绝 或中断提示询问
     - ⬜预设常见的权限限制
