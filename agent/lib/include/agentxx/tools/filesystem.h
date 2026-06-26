@@ -289,7 +289,14 @@ public:
                 offset, lineNum)};
           }
 
-          co_return result.str();
+          auto raw_str = result.str();
+          std::string encoding;
+          std::string converted;
+          if (agentxx::util::chardetConvertEncoding(raw_str, encoding,
+                                                    converted)) {
+            co_return converted;
+          }
+          co_return raw_str;
         }
 
         // 读取完整文件
@@ -301,6 +308,11 @@ public:
           throw std::system_error{errCode};
         }
         stream.close();
+        std::string encoding;
+        std::string converted;
+        if (agentxx::util::chardetConvertEncoding(data, encoding, converted)) {
+          co_return converted;
+        }
         co_return data;
       } catch (const std::exception &e) {
         stream.close();
@@ -350,13 +362,26 @@ public:
                 offset, lineNum)};
           }
 
-          co_return result.str();
+          auto raw_str = result.str();
+          std::string encoding;
+          std::string converted;
+          if (agentxx::util::chardetConvertEncoding(raw_str, encoding,
+                                                    converted)) {
+            co_return converted;
+          }
+          co_return raw_str;
         }
 
         // 读取完整文件
         auto result = std::string{std::istreambuf_iterator<char>(stream),
                                   std::istreambuf_iterator<char>()};
         stream.close();
+        std::string encoding;
+        std::string converted;
+        if (agentxx::util::chardetConvertEncoding(result, encoding,
+                                                  converted)) {
+          co_return converted;
+        }
         co_return result;
       } catch (const std::exception &e) {
         stream.close();

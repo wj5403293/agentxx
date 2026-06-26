@@ -27,8 +27,8 @@
 ### 基础模块
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
-    - ⬜兼容乱码、不合规字符处理
     - ✅filesystem (支持 `同步`/`asio io_uring/IOCP 协程异步` 文件读写)
+        - 读取文件内容时自动转换字符编码到 utf8
         - ls (file/dir/recursive-dir/limit)
         - read_text (full / offset-limit)
         - read_binary (full / byte-offset-limit)
@@ -98,7 +98,7 @@
     - 总结共享记忆
     - 自定义加载记忆消息
 - ✅权限限制`PermissionMiddleware`
-    - ✅允许指定 tool 调用前拦截，决定 允许、拒绝 或中断提示询问
+    - ✅允许指定 tool 调用前拦截，决定 允许、拒绝 或 中断提示询问
     - ⬜预设常见的权限限制
     - ⬜沙盒执行 Shell/File RW
 - ✅Skill支持`SkillMiddleware`
