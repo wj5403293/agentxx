@@ -13,6 +13,10 @@ enum class TextSource {
   TextPattern,
   TextChildPattern,
   ValuePattern,
+  EmGetSel,
+  AccessibleObject,
+  WmGetText,
+  DevTools,
 };
 
 struct TextSelectionEvent {

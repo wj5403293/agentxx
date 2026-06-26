@@ -214,6 +214,11 @@ target_link_libraries(agentxx_static PUBLIC
   charset
   uchardet::libuchardet
 )
+if (XX_IS_WIN_D)
+  target_link_libraries(agentxx_shared PUBLIC oleacc winhttp ws2_32)
+  target_link_libraries(agentxx_static PUBLIC oleacc winhttp ws2_32)
+endif()
+
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   pkg_check_modules(uring REQUIRED IMPORTED_TARGET liburing)
   # - pkg-config 找到的库用 PRIVATE，否则 install 时会被写入依赖中，名称却是当前项目自定义的 PkgConfig::uring,

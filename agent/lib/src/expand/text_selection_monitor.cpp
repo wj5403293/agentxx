@@ -4,8 +4,16 @@
 #include <thread>
 
 #if XX_IS_WIN_D
+// include 顺序是必要的
+#include <winsock2.h>
+// ---
 #include <UIAutomation.h>
+#include <oleacc.h>
 #include <windows.h>
+#include <winhttp.h>
+
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winhttp.lib")
 
 #endif
 
@@ -165,6 +173,560 @@ private:
     self->notifyListeners(evt);
   }
 
+  static std::string bstrToUtf8(BSTR bstr) {
+    if (!bstr) {
+      return {};
+    }
+    int len = SysStringLen(bstr);
+    if (len <= 0) {
+      return {};
+    }
+    int utf8Len = WideCharToMultiByte(CP_UTF8, 0, bstr, len, nullptr, 0,
+                                      nullptr, nullptr);
+    if (utf8Len <= 0) {
+      return {};
+    }
+    std::string result;
+    result.resize(utf8Len);
+    WideCharToMultiByte(CP_UTF8, 0, bstr, len, &result[0], utf8Len, nullptr,
+                        nullptr);
+    return result;
+  }
+
+  std::pair<std::string, TextSource> getSelectedTextByEmGetSel(HWND hwnd) {
+    HWND targetHwnd = hwnd;
+    wchar_t className[64] = {};
+    GetClassNameW(targetHwnd, className, 64);
+    bool isEdit = (wcscmp(className, L"Edit") == 0 ||
+                   wcsstr(className, L"RichEdit") != nullptr);
+
+    if (!isEdit) {
+      targetHwnd = FindWindowExW(hwnd, nullptr, L"Edit", nullptr);
+      if (!targetHwnd) {
+        return {};
+      }
+    }
+
+    DWORD_PTR msgResult = 0;
+    DWORD selStart = 0, selEnd = 0;
+    LRESULT lr = SendMessageTimeoutW(
+        targetHwnd, EM_GETSEL, reinterpret_cast<WPARAM>(&selStart),
+        reinterpret_cast<LPARAM>(&selEnd), SMTO_ABORTIFHUNG, 200, &msgResult);
+    if (!lr || selStart >= selEnd) {
+      return {};
+    }
+
+    int textLen = GetWindowTextLengthW(targetHwnd);
+    if (textLen <= 0) {
+      return {};
+    }
+
+    std::vector<wchar_t> buf(static_cast<size_t>(textLen) + 1);
+    GetWindowTextW(targetHwnd, buf.data(), textLen + 1);
+    std::wstring fullText(buf.data());
+
+    if (selStart >= fullText.size() || selEnd > fullText.size()) {
+      return {};
+    }
+
+    std::wstring selText = fullText.substr(selStart, selEnd - selStart);
+
+    int utf8Len = WideCharToMultiByte(CP_UTF8, 0, selText.data(),
+                                      static_cast<int>(selText.size()), nullptr,
+                                      0, nullptr, nullptr);
+    if (utf8Len <= 0) {
+      return {};
+    }
+
+    std::string result;
+    result.resize(utf8Len);
+    WideCharToMultiByte(CP_UTF8, 0, selText.data(),
+                        static_cast<int>(selText.size()), &result[0], utf8Len,
+                        nullptr, nullptr);
+
+    return {result, TextSource::EmGetSel};
+  }
+
+  std::pair<std::string, TextSource> getSelectedTextByAccessible(HWND hwnd) {
+    IAccessible *acc = nullptr;
+    HRESULT hr = AccessibleObjectFromWindow(hwnd, OBJID_CLIENT, IID_IAccessible,
+                                            reinterpret_cast<void **>(&acc));
+    if (FAILED(hr) || !acc) {
+      hr = AccessibleObjectFromWindow(hwnd, OBJID_WINDOW, IID_IAccessible,
+                                      reinterpret_cast<void **>(&acc));
+      if (FAILED(hr) || !acc) {
+        return {};
+      }
+    }
+
+    std::pair<std::string, TextSource> ret;
+
+    VARIANT varSel;
+    VariantInit(&varSel);
+    hr = acc->get_accSelection(&varSel);
+
+    if (SUCCEEDED(hr) && varSel.vt == VT_I4) {
+      BSTR value = nullptr;
+      hr = acc->get_accValue(varSel, &value);
+      if (SUCCEEDED(hr) && value) {
+        std::string text = bstrToUtf8(value);
+        if (!text.empty()) {
+          ret = {text, TextSource::AccessibleObject};
+        }
+        SysFreeString(value);
+      }
+    } else if (SUCCEEDED(hr) && varSel.vt == VT_DISPATCH && varSel.pdispVal) {
+      IEnumVARIANT *enumVar = nullptr;
+      hr = varSel.pdispVal->QueryInterface(IID_IEnumVARIANT,
+                                           reinterpret_cast<void **>(&enumVar));
+      if (SUCCEEDED(hr) && enumVar) {
+        VARIANT childVar;
+        VariantInit(&childVar);
+        ULONG fetched = 0;
+        std::string combined;
+        while (enumVar->Next(1, &childVar, &fetched) == S_OK && fetched == 1) {
+          if (childVar.vt == VT_DISPATCH && childVar.pdispVal) {
+            IAccessible *childAcc = nullptr;
+            hr = childVar.pdispVal->QueryInterface(
+                IID_IAccessible, reinterpret_cast<void **>(&childAcc));
+            if (SUCCEEDED(hr) && childAcc) {
+              VARIANT varChildId;
+              varChildId.vt = VT_I4;
+              varChildId.lVal = CHILDID_SELF;
+              BSTR name = nullptr;
+              hr = childAcc->get_accValue(varChildId, &name);
+              if (SUCCEEDED(hr) && name) {
+                std::string part = bstrToUtf8(name);
+                if (!part.empty()) {
+                  combined += part;
+                }
+                SysFreeString(name);
+              }
+              childAcc->Release();
+            }
+          }
+          VariantClear(&childVar);
+        }
+        if (!combined.empty()) {
+          ret = {combined, TextSource::AccessibleObject};
+        }
+        enumVar->Release();
+      }
+      varSel.pdispVal->Release();
+    }
+    VariantClear(&varSel);
+    acc->Release();
+    return ret;
+  }
+
+  std::pair<std::string, TextSource> getSelectedTextByWmGetText(HWND hwnd) {
+    int textLen = GetWindowTextLengthW(hwnd);
+    if (textLen <= 0) {
+      return {};
+    }
+
+    std::vector<wchar_t> buf(static_cast<size_t>(textLen) + 1);
+    GetWindowTextW(hwnd, buf.data(), textLen + 1);
+    std::wstring text(buf.data());
+
+    if (text.empty()) {
+      return {};
+    }
+
+    int utf8Len = WideCharToMultiByte(CP_UTF8, 0, text.data(),
+                                      static_cast<int>(text.size()), nullptr, 0,
+                                      nullptr, nullptr);
+    if (utf8Len <= 0) {
+      return {};
+    }
+
+    std::string result;
+    result.resize(utf8Len);
+    WideCharToMultiByte(CP_UTF8, 0, text.data(), static_cast<int>(text.size()),
+                        &result[0], utf8Len, nullptr, nullptr);
+
+    return {result, TextSource::WmGetText};
+  }
+
+  static bool isBrowserWindow(HWND hwnd) {
+    wchar_t className[64] = {};
+    GetClassNameW(hwnd, className, 64);
+    return (wcscmp(className, L"Chrome_WidgetWin_1") == 0 ||
+            wcscmp(className, L"MozillaWindowClass") == 0 ||
+            wcsstr(className, L"Chrome") != nullptr);
+  }
+
+  static bool ensureWSA() {
+    static bool initialized = false;
+    if (!initialized) {
+      WSADATA wsaData;
+      initialized = (WSAStartup(MAKEWORD(2, 2), &wsaData) == 0);
+    }
+    return initialized;
+  }
+
+  static int findCDPPort() {
+    static int cachedPort = 0;
+    if (cachedPort != 0) {
+      return (cachedPort > 0) ? cachedPort : 0;
+    }
+
+    for (int port : {9222, 9223, 9224, 9225}) {
+      SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+      if (sock == INVALID_SOCKET) {
+        continue;
+      }
+
+      sockaddr_in addr = {};
+      addr.sin_family = AF_INET;
+      addr.sin_port = htons(static_cast<u_short>(port));
+      addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+      if (connect(sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) ==
+          0) {
+        closesocket(sock);
+
+        HINTERNET hSession =
+            WinHttpOpen(L"AgentXX/CDP", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+                        WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+        if (!hSession) {
+          continue;
+        }
+
+        std::wstring server = L"127.0.0.1";
+        HINTERNET hConnect = WinHttpConnect(
+            hSession, server.c_str(), static_cast<INTERNET_PORT>(port), 0);
+        if (hConnect) {
+          HINTERNET hRequest = WinHttpOpenRequest(
+              hConnect, L"GET", L"/json/version", nullptr, WINHTTP_NO_REFERER,
+              WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
+          if (hRequest) {
+            if (WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+                                   WINHTTP_NO_REQUEST_DATA, 0, 0, 0) &&
+                WinHttpReceiveResponse(hRequest, nullptr)) {
+              cachedPort = port;
+              WinHttpCloseHandle(hRequest);
+              WinHttpCloseHandle(hConnect);
+              WinHttpCloseHandle(hSession);
+              return port;
+            }
+            WinHttpCloseHandle(hRequest);
+          }
+          WinHttpCloseHandle(hConnect);
+        }
+        WinHttpCloseHandle(hSession);
+      } else {
+        closesocket(sock);
+      }
+    }
+
+    cachedPort = -1;
+    return 0;
+  }
+
+  static std::string httpGet(int port, const std::wstring &path) {
+    HINTERNET hSession =
+        WinHttpOpen(L"AgentXX/CDP", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+                    WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+    if (!hSession) {
+      return {};
+    }
+
+    HINTERNET hConnect = WinHttpConnect(hSession, L"127.0.0.1",
+                                        static_cast<INTERNET_PORT>(port), 0);
+    if (!hConnect) {
+      WinHttpCloseHandle(hSession);
+      return {};
+    }
+
+    HINTERNET hRequest =
+        WinHttpOpenRequest(hConnect, L"GET", path.c_str(), nullptr,
+                           WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
+    if (!hRequest) {
+      WinHttpCloseHandle(hConnect);
+      WinHttpCloseHandle(hSession);
+      return {};
+    }
+
+    std::string result;
+    if (WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+                           WINHTTP_NO_REQUEST_DATA, 0, 0, 0) &&
+        WinHttpReceiveResponse(hRequest, nullptr)) {
+      DWORD bytesRead = 0;
+      char buffer[4096];
+      while (WinHttpReadData(hRequest, buffer, sizeof(buffer), &bytesRead) &&
+             bytesRead > 0) {
+        result.append(buffer, bytesRead);
+      }
+    }
+
+    WinHttpCloseHandle(hRequest);
+    WinHttpCloseHandle(hConnect);
+    WinHttpCloseHandle(hSession);
+    return result;
+  }
+
+  static SOCKET wsConnect(int port, const std::string &wsPath) {
+    if (!ensureWSA()) {
+      return INVALID_SOCKET;
+    }
+
+    SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (sock == INVALID_SOCKET) {
+      return INVALID_SOCKET;
+    }
+
+    sockaddr_in addr = {};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(static_cast<u_short>(port));
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    if (connect(sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) != 0) {
+      closesocket(sock);
+      return INVALID_SOCKET;
+    }
+
+    std::string key = "dGhlIHNhbXBsZSBub25jZQ==";
+    std::string upgradeReq = "GET " + wsPath +
+                             " HTTP/1.1\r\n"
+                             "Host: 127.0.0.1:" +
+                             std::to_string(port) +
+                             "\r\n"
+                             "Upgrade: websocket\r\n"
+                             "Connection: Upgrade\r\n"
+                             "Sec-WebSocket-Key: " +
+                             key +
+                             "\r\n"
+                             "Sec-WebSocket-Version: 13\r\n"
+                             "\r\n";
+
+    if (send(sock, upgradeReq.c_str(), static_cast<int>(upgradeReq.size()),
+             0) <= 0) {
+      closesocket(sock);
+      return INVALID_SOCKET;
+    }
+
+    char recvBuf[4096] = {};
+    int recvLen = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
+    if (recvLen <= 0) {
+      closesocket(sock);
+      return INVALID_SOCKET;
+    }
+    recvBuf[recvLen] = '\0';
+
+    if (!strstr(recvBuf, "101")) {
+      closesocket(sock);
+      return INVALID_SOCKET;
+    }
+
+    return sock;
+  }
+
+  static bool wsSend(SOCKET sock, const std::string &message) {
+    std::vector<unsigned char> frame;
+    frame.push_back(0x81);
+    size_t len = message.size();
+    if (len <= 125) {
+      frame.push_back(static_cast<unsigned char>(0x80 | len));
+    } else if (len <= 65535) {
+      frame.push_back(0xFE);
+      frame.push_back(static_cast<unsigned char>((len >> 8) & 0xFF));
+      frame.push_back(static_cast<unsigned char>(len & 0xFF));
+    } else {
+      frame.push_back(0xFF);
+      for (int i = 7; i >= 0; --i) {
+        frame.push_back(static_cast<unsigned char>((len >> (i * 8)) & 0xFF));
+      }
+    }
+
+    unsigned char mask[4] = {0x12, 0x34, 0x56, 0x78};
+    frame.insert(frame.end(), mask, mask + 4);
+
+    for (size_t i = 0; i < len; ++i) {
+      frame.push_back(static_cast<unsigned char>(message[i]) ^ mask[i % 4]);
+    }
+
+    return send(sock, reinterpret_cast<const char *>(frame.data()),
+                static_cast<int>(frame.size()), 0) > 0;
+  }
+
+  static std::string wsRecv(SOCKET sock) {
+    unsigned char header[2] = {};
+    if (recv(sock, reinterpret_cast<char *>(header), 2, 0) != 2) {
+      return {};
+    }
+
+    size_t payloadLen = header[1] & 0x7F;
+    if (payloadLen == 126) {
+      unsigned char ext[2] = {};
+      if (recv(sock, reinterpret_cast<char *>(ext), 2, 0) != 2) {
+        return {};
+      }
+      payloadLen = (static_cast<size_t>(ext[0]) << 8) | ext[1];
+    } else if (payloadLen == 127) {
+      unsigned char ext[8] = {};
+      if (recv(sock, reinterpret_cast<char *>(ext), 8, 0) != 8) {
+        return {};
+      }
+      payloadLen = 0;
+      for (int i = 0; i < 8; ++i) {
+        payloadLen = (payloadLen << 8) | ext[i];
+      }
+    }
+
+    if (payloadLen == 0 || payloadLen > 16 * 1024 * 1024) {
+      return {};
+    }
+
+    std::vector<char> payload(payloadLen);
+    size_t totalRecv = 0;
+    while (totalRecv < payloadLen) {
+      int n = recv(sock, payload.data() + totalRecv,
+                   static_cast<int>(payloadLen - totalRecv), 0);
+      if (n <= 0) {
+        return {};
+      }
+      totalRecv += n;
+    }
+
+    return std::string(payload.data(), payloadLen);
+  }
+
+  static void wsClose(SOCKET sock) {
+    if (sock != INVALID_SOCKET) {
+      closesocket(sock);
+    }
+  }
+
+  static std::string extractJsonString(const std::string &json,
+                                       const std::string &key) {
+    std::string search = "\"" + key + "\"";
+    size_t pos = json.find(search);
+    if (pos == std::string::npos) {
+      return {};
+    }
+    pos = json.find('"', pos + search.size());
+    if (pos == std::string::npos) {
+      return {};
+    }
+    size_t end = json.find('"', pos + 1);
+    if (end == std::string::npos) {
+      return {};
+    }
+    return json.substr(pos + 1, end - pos - 1);
+  }
+
+  std::pair<std::string, TextSource> getSelectedTextByCDP(HWND hwnd) {
+    int port = findCDPPort();
+    if (port <= 0) {
+      return {};
+    }
+
+    wchar_t windowTitle[512] = {};
+    GetWindowTextW(hwnd, windowTitle, 512);
+    std::wstring wTitle(windowTitle);
+
+    std::string targetsJson = httpGet(port, L"/json");
+    if (targetsJson.empty()) {
+      return {};
+    }
+
+    std::string targetId;
+    std::string targetTitle;
+    size_t pos = 0;
+    while (true) {
+      pos = targetsJson.find("\"id\"", pos);
+      if (pos == std::string::npos) {
+        break;
+      }
+      pos = targetsJson.find('"', pos + 4);
+      if (pos == std::string::npos) {
+        break;
+      }
+      size_t idEnd = targetsJson.find('"', pos + 1);
+      if (idEnd == std::string::npos) {
+        break;
+      }
+      std::string id = targetsJson.substr(pos + 1, idEnd - pos - 1);
+
+      size_t titlePos = targetsJson.find("\"title\"", idEnd);
+      if (titlePos == std::string::npos) {
+        break;
+      }
+      titlePos = targetsJson.find('"', titlePos + 7);
+      if (titlePos == std::string::npos) {
+        break;
+      }
+      size_t titleEnd = targetsJson.find('"', titlePos + 1);
+      if (titleEnd == std::string::npos) {
+        break;
+      }
+      std::string title =
+          targetsJson.substr(titlePos + 1, titleEnd - titlePos - 1);
+
+      int titleLen =
+          MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, nullptr, 0);
+      if (titleLen > 0) {
+        std::vector<wchar_t> wTitleBuf(titleLen);
+        MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, wTitleBuf.data(),
+                            titleLen);
+        if (wTitle.find(wTitleBuf.data()) != std::wstring::npos) {
+          targetId = id;
+          targetTitle = title;
+          break;
+        }
+      }
+
+      if (targetId.empty() && title.find("about:blank") == std::string::npos) {
+        targetId = id;
+        targetTitle = title;
+      }
+
+      pos = titleEnd;
+    }
+
+    if (targetId.empty()) {
+      return {};
+    }
+
+    std::string wsPath = "/devtools/page/" + targetId;
+    SOCKET sock = wsConnect(port, wsPath);
+    if (sock == INVALID_SOCKET) {
+      return {};
+    }
+
+    const char *cdpCmd =
+        R"_({"id":1,"method":"Runtime.evaluate","params":{"expression":"window.getSelection().toString()",
+       "returnByValue" : true
+  }})_";
+    if (!wsSend(sock, cdpCmd)) {
+      wsClose(sock);
+      return {};
+    }
+
+    std::string response = wsRecv(sock);
+    wsClose(sock);
+
+    if (response.empty()) {
+      return {};
+    }
+
+    std::string value = extractJsonString(response, "value");
+    if (value.empty()) {
+      return {};
+    }
+
+    return {value, TextSource::DevTools};
+  }
+
+  std::pair<std::string, TextSource> getSelectedTextByDevTools(HWND hwnd) {
+    if (!isBrowserWindow(hwnd)) {
+      return {};
+    }
+
+    return getSelectedTextByCDP(hwnd);
+  }
+
   std::pair<std::string, TextSource> getSelectedText(HWND hwnd) {
     if (!automation_) {
       return {};
@@ -231,16 +793,7 @@ private:
             BSTR text = nullptr;
             hr = range->GetText(-1, &text);
             if (SUCCEEDED(hr) && text) {
-              int len = SysStringLen(text);
-              if (len > 0) {
-                int utf8Len = WideCharToMultiByte(CP_UTF8, 0, text, len,
-                                                  nullptr, 0, nullptr, nullptr);
-                if (utf8Len > 0) {
-                  result.resize(utf8Len);
-                  WideCharToMultiByte(CP_UTF8, 0, text, len, &result[0],
-                                      utf8Len, nullptr, nullptr);
-                }
-              }
+              result = bstrToUtf8(text);
               SysFreeString(text);
             }
             range->Release();
@@ -265,17 +818,7 @@ private:
           BSTR value = nullptr;
           hr = valuePattern->get_CurrentValue(&value);
           if (SUCCEEDED(hr) && value) {
-            std::string result;
-            int len = SysStringLen(value);
-            if (len > 0) {
-              int utf8Len = WideCharToMultiByte(CP_UTF8, 0, value, len, nullptr,
-                                                0, nullptr, nullptr);
-              if (utf8Len > 0) {
-                result.resize(utf8Len);
-                WideCharToMultiByte(CP_UTF8, 0, value, len, &result[0], utf8Len,
-                                    nullptr, nullptr);
-              }
-            }
+            std::string result = bstrToUtf8(value);
             SysFreeString(value);
             valuePattern->Release();
             elemForValue->Release();
@@ -290,7 +833,22 @@ private:
       }
     }
 
-    return {};
+    auto legacyResult = getSelectedTextByEmGetSel(hwnd);
+    if (!legacyResult.first.empty()) {
+      return legacyResult;
+    }
+
+    legacyResult = getSelectedTextByAccessible(hwnd);
+    if (!legacyResult.first.empty()) {
+      return legacyResult;
+    }
+
+    legacyResult = getSelectedTextByDevTools(hwnd);
+    if (!legacyResult.first.empty()) {
+      return legacyResult;
+    }
+
+    return getSelectedTextByWmGetText(hwnd);
   }
 
   void notifyListeners(const TextSelectionEvent &event) {
