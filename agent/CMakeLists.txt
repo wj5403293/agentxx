@@ -389,6 +389,22 @@ if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   include_directories(${LIBURING_INSTALL_DIR}/include/)
 endif()
 
+# simdjson
+ExternalProject_Add(
+  simdjson_repo
+  SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/simdjson/"
+  INSTALL_DIR ${AGENTXX_INSTALL_DIR}
+  CMAKE_ARGS
+    ${_AGENTXX_COMMON_CMAKE_ARGS}
+    -DSIMDJSON_BUILD_STATIC_LIB=ON
+    -DSIMDJSON_INSTALL=ON
+    -DSIMDJSON_STATIC_REFLECTION=OFF
+    -DSIMDJSON_SINGLEHEADER=OFF
+    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_STATIC_LIBS=ON
+  TEST_COMMAND ""
+)
+
 # iconv
 ExternalProject_Add(
   libiconv_repo
@@ -667,6 +683,7 @@ ExternalProject_Add(
   agentxx_lib_repo
   DEPENDS 
     libiconv_repo
+    simdjson_repo
     sqlite3_repo
     fmt_repo
     uchardet_repo

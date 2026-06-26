@@ -81,17 +81,18 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 # 添加依赖库后应当同步更新 [packageProject:DEPENDENCIES]
-set (agentxx_DEPENDENCIES "Boost;Iconv;uchardet;SQLite3;fmt;html2md;yaml-cpp;Glob;OpenSSL;CURL")
-find_package(Boost REQUIRED CONFIG COMPONENTS process)
+set (agentxx_DEPENDENCIES "Iconv;uchardet;fmt;simdjson;OpenSSL;Boost;yaml-cpp;CURL;SQLite3;html2md;Glob")
 find_package(iconv REQUIRED)
 find_package(uchardet REQUIRED)
-find_package(SQLite3 REQUIRED)
 find_package(fmt REQUIRED)
-find_package(html2md REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(Glob REQUIRED)
+find_package(simdjson REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(Boost REQUIRED CONFIG COMPONENTS process)
+find_package(yaml-cpp REQUIRED)
 find_package(CURL REQUIRED)
+find_package(SQLite3 REQUIRED)
+find_package(html2md REQUIRED)
+find_package(Glob REQUIRED)
 
 target_include_directories(agentxx_shared PUBLIC 
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -182,6 +183,7 @@ target_link_libraries(agentxx_shared PUBLIC
   Boost::process
   OpenSSL::SSL
   OpenSSL::Crypto
+  simdjson::simdjson
   yyjson
   fmt::fmt
   Iconv::Iconv
@@ -205,6 +207,7 @@ target_link_libraries(agentxx_static PUBLIC
   Boost::process
   OpenSSL::SSL
   OpenSSL::Crypto
+  simdjson::simdjson
   yyjson
   fmt::fmt
   Iconv::Iconv

@@ -29,16 +29,18 @@ set_target_properties(agentxx_test PROPERTIES
 target_include_directories(agentxx_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(PkgConfig REQUIRED)
-find_package(Boost REQUIRED CONFIG COMPONENTS process)
+
 find_package(iconv REQUIRED)
 find_package(uchardet REQUIRED)
-find_package(SQLite3 REQUIRED)
 find_package(fmt REQUIRED)
-find_package(html2md REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(Glob REQUIRED)
+find_package(simdjson REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(Boost REQUIRED CONFIG COMPONENTS process)
+find_package(yaml-cpp REQUIRED)
 find_package(CURL REQUIRED)
+find_package(SQLite3 REQUIRED)
+find_package(html2md REQUIRED)
+find_package(Glob REQUIRED)
 
 find_package(agentxx_static REQUIRED)
 
