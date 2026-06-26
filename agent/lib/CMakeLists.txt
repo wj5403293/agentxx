@@ -157,11 +157,11 @@ if (AGENTXX_ENABLE_CODEGRAPH)
 endif()
 if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
   pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
-  target_link_libraries(agentxx_shared PUBLIC 
+  target_link_libraries(agentxx_shared PRIVATE 
     PkgConfig::hyperscan
     hs_runtime
   )
-  target_link_libraries(agentxx_static PUBLIC 
+  target_link_libraries(agentxx_static PRIVATE 
     PkgConfig::hyperscan 
     hs_runtime
   )

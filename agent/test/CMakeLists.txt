@@ -55,6 +55,9 @@ if(Boost_FOUND)
   )
 endif()
 
+target_link_libraries(agentxx_test PRIVATE
+	agentxx_static
+)
 if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
   pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
   target_link_libraries(agentxx_test PRIVATE 
@@ -62,18 +65,6 @@ if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
     hs_runtime
   )
 endif()
-target_link_libraries(agentxx_test PRIVATE
-  # === neograph vvv 链接顺序是必要的
-  neograph_sqlite
-  neograph_acp
-  neograph_mcp
-  neograph_async
-  neograph_llm
-  neograph_core
-  yyjson
-  # === neograph ^^^
-	agentxx_static
-)
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   pkg_check_modules(uring REQUIRED IMPORTED_TARGET liburing)
   target_link_libraries(agentxx_test PRIVATE 
