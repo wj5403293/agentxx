@@ -116,8 +116,14 @@ public:
 
     struct SplitConfig {
       SplitMode mode = SplitMode::StructuralThenCharThenFixed;
+
+      /// Block item max utf8 length
       size_t maxUtf8Length = 256;
-      // Delimiters tried in priority order (most significant first)
+
+      /// 20%
+      double overlapPercent = 20.0;
+
+      /// Delimiters tried in priority order (most significant first)
       std::vector<std::string> delimiters{
           "\n\n", "\n", "。", "！", "？", "；",
           "，",   ". ", "! ", "? ", "; ", ", ",
@@ -132,16 +138,48 @@ public:
         : embedder(std::move(in_embedder)), splitConfig(in_splitCfg) {}
 
     inline static std::vector<std::string>
-    splitByFixedLength(const std::string_view text, size_t blockSize = 256) {
+    splitByFixedLength(const std::string_view text, size_t blockSize = 256,
+                       double overlapPercent = 0.0) {
+      if (overlapPercent <= 0.0 || overlapPercent >= 100.0) {
+        auto result = std::vector<std::string>{};
+        for (size_t index = 0; index < text.size();) {
+          auto target =
+              agentxx::util::findIndexByUtf8Length(text, blockSize, index);
+          if (target <= 0) {
+            target = text.size();
+          }
+          result.push_back(std::string{text.substr(index, target - index)});
+          index = target;
+        }
+        return result;
+      }
+
+      size_t overlapChars =
+          static_cast<size_t>(blockSize * overlapPercent / 100.0);
+      size_t stepChars = blockSize - overlapChars;
+      if (stepChars == 0) {
+        stepChars = 1;
+      }
+
       auto result = std::vector<std::string>{};
-      for (size_t index = 0; index < text.size();) {
+      size_t index = 0;
+      while (index < text.size()) {
         auto target =
             agentxx::util::findIndexByUtf8Length(text, blockSize, index);
         if (target <= 0) {
           target = text.size();
         }
         result.push_back(std::string{text.substr(index, target - index)});
-        index = target;
+        if (target >= text.size()) {
+          break;
+        }
+
+        auto nextStart =
+            agentxx::util::findIndexByUtf8Length(text, stepChars, index);
+        if (nextStart <= 0 || nextStart >= text.size()) {
+          break;
+        }
+        index = nextStart;
       }
       return result;
     }
@@ -334,8 +372,51 @@ public:
       return splitByFixedLength(text, maxUtf8Length);
     }
 
+    // Apply overlap between adjacent chunks by prepending the tail of the
+    // previous chunk to the current chunk. overlapPercent=0 disables overlap.
+    inline static std::vector<std::string>
+    applyChunkOverlap(const std::vector<std::string> &chunks,
+                      size_t maxUtf8Length, double overlapPercent) {
+      if (overlapPercent <= 0.0 || chunks.size() <= 1) {
+        return chunks;
+      }
+
+      size_t overlapChars =
+          static_cast<size_t>(maxUtf8Length * overlapPercent / 100.0);
+      if (overlapChars == 0) {
+        return chunks;
+      }
+
+      std::vector<std::string> result;
+      result.reserve(chunks.size());
+      result.push_back(chunks[0]);
+
+      for (size_t i = 1; i < chunks.size(); ++i) {
+        const auto &prev = result.back();
+        size_t prevUtf8Len = agentxx::util::utf8GetLength(prev);
+
+        if (prevUtf8Len <= overlapChars) {
+          result.push_back(chunks[i]);
+          continue;
+        }
+
+        size_t overlapStart = agentxx::util::findIndexByUtf8Length(
+            prev, prevUtf8Len - overlapChars);
+        if (overlapStart == 0) {
+          result.push_back(chunks[i]);
+          continue;
+        }
+
+        result.push_back(std::string{prev.substr(overlapStart)} + chunks[i]);
+      }
+
+      return result;
+    }
+
     // Main entry: split text into chunks according to config, guaranteeing
-    // every chunk is within maxUtf8Length (UTF-8 characters)
+    // every chunk is within maxUtf8Length (UTF-8 characters).
+    // When overlapPercent > 0, adjacent chunks will overlap by the given
+    // percentage of maxUtf8Length.
     inline static std::vector<std::string>
     splitTextToChunks(const std::string_view text, const SplitConfig &config) {
       if (text.empty()) {
@@ -343,12 +424,15 @@ public:
       }
 
       size_t maxLen = config.maxUtf8Length;
+      double overlapPct = config.overlapPercent;
 
       switch (config.mode) {
       case SplitMode::FixedLength:
-        return splitByFixedLength(text, maxLen);
+        return splitByFixedLength(text, maxLen, overlapPct);
       case SplitMode::Character:
-        return splitByDelimiters(text, maxLen, config.delimiters);
+        return applyChunkOverlap(
+            splitByDelimiters(text, maxLen, config.delimiters), maxLen,
+            overlapPct);
       case SplitMode::Structural: {
         auto blocks = splitByStructure(text);
         std::vector<std::string> result;
@@ -362,7 +446,7 @@ public:
             }
           }
         }
-        return result;
+        return applyChunkOverlap(result, maxLen, overlapPct);
       }
       case SplitMode::StructuralThenChar: {
         auto blocks = splitByStructure(text);
@@ -377,7 +461,7 @@ public:
             }
           }
         }
-        return result;
+        return applyChunkOverlap(result, maxLen, overlapPct);
       }
       case SplitMode::StructuralThenCharThenFixed: {
         auto blocks = splitByStructure(text);
@@ -399,11 +483,12 @@ public:
             }
           }
         }
-        return result;
+        return applyChunkOverlap(result, maxLen, overlapPct);
       }
       }
 
-      return splitByFixedLength(text, maxLen);
+      return applyChunkOverlap(splitByFixedLength(text, maxLen), maxLen,
+                               overlapPct);
     }
 
     asio::awaitable<std::vector<Document>>

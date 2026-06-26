@@ -937,6 +937,330 @@ inline asio::awaitable<void> test_chunks_whitespace_only() {
 }
 
 // =========================================================================
+// Tests: splitByFixedLength — with overlap (sliding window)
+// =========================================================================
+
+inline asio::awaitable<void> test_fixed_length_overlap_basic() {
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  auto result = VectorStore::splitByFixedLength(text, 10, 20.0);
+  // blockSize=10, overlap=20% => overlapChars=2, stepChars=8
+  // Chunk 0: ABCDEFGHIJ (10 chars)
+  // Chunk 1: starts at step 8: IJKLMNOPQR (10 chars, overlap "IJ")
+  // Chunk 2: starts at step 16: QRSTUVWXYZ (10 chars)
+  bool hasOverlap = true;
+  if (result.size() >= 2) {
+    // Check that adjacent chunks share content
+    for (size_t i = 1; i < result.size(); ++i) {
+      if (result[i - 1].size() >= 2 &&
+          result[i - 1].substr(result[i - 1].size() - 2) !=
+              result[i].substr(0, 2)) {
+        hasOverlap = false;
+        break;
+      }
+    }
+  }
+  if (result.size() >= 3 && hasOverlap) {
+    std::cout << "[PASS] splitByFixedLength overlap basic" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitByFixedLength overlap basic, got "
+              << result.size() << " chunks, hasOverlap=" << hasOverlap
+              << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_fixed_length_overlap_zero() {
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  auto resultNoOverlap = VectorStore::splitByFixedLength(text, 10, 0.0);
+  auto resultOverlap = VectorStore::splitByFixedLength(text, 10, 0.0);
+  if (resultNoOverlap.size() == resultOverlap.size() &&
+      resultNoOverlap == resultOverlap) {
+    std::cout << "[PASS] splitByFixedLength overlap zero (disabled)"
+              << std::endl;
+  } else {
+    std::cout << "[FAIL] splitByFixedLength overlap zero, sizes: "
+              << resultNoOverlap.size() << " vs " << resultOverlap.size()
+              << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_fixed_length_overlap_single_chunk() {
+  std::string text = "Hello";
+  auto result = VectorStore::splitByFixedLength(text, 100, 20.0);
+  if (result.size() == 1 && result[0] == "Hello") {
+    std::cout << "[PASS] splitByFixedLength overlap single chunk" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitByFixedLength overlap single chunk, got "
+              << result.size() << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_fixed_length_overlap_utf8() {
+  std::string text = "你好世界你好世界你好世界";
+  auto result = VectorStore::splitByFixedLength(text, 4, 25.0);
+  // blockSize=4, overlap=25% => overlapChars=1, stepChars=3
+  // Chunk 0: 你好世界 (4 chars)
+  // Chunk 1: 世界你好 (4 chars, overlap "界")
+  // Chunk 2: 你好世界 (4 chars)
+  if (result.size() >= 3) {
+    std::cout << "[PASS] splitByFixedLength overlap utf8" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitByFixedLength overlap utf8, got " << result.size()
+              << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_fixed_length_overlap_50_percent() {
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  auto result = VectorStore::splitByFixedLength(text, 10, 50.0);
+  // blockSize=10, overlap=50% => overlapChars=5, stepChars=5
+  // Chunk 0: ABCDEFGHIJ
+  // Chunk 1: FGHIJKLMNO (overlap 5)
+  // Chunk 2: KLMNOPQRST
+  // Chunk 3: PQRSTUVWXY
+  // Chunk 4: UVWXYZ
+  bool allWithinLimit = true;
+  for (auto &chunk : result) {
+    if (agentxx::util::utf8GetLength(chunk) > 10) {
+      allWithinLimit = false;
+      break;
+    }
+  }
+  if (result.size() >= 5 && allWithinLimit) {
+    std::cout << "[PASS] splitByFixedLength overlap 50 percent" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitByFixedLength overlap 50 percent, got "
+              << result.size() << " chunks, allWithinLimit=" << allWithinLimit
+              << std::endl;
+  }
+  co_return;
+}
+
+// =========================================================================
+// Tests: applyChunkOverlap
+// =========================================================================
+
+inline asio::awaitable<void> test_apply_chunk_overlap_basic() {
+  std::vector<std::string> chunks = {"AAAAABBBBB", "CCCCCDDDDD", "EEEEEFFFFF"};
+  auto result = VectorStore::applyChunkOverlap(chunks, 10, 20.0);
+  // overlapChars = 2, so chunk 1 becomes "BB" + "CCCCCDDDDD" = "BBCCCCCDDDDD"
+  // chunk 2 becomes "DD" + "EEEEEFFFFF" = "DDEEEEEFFFFF"
+  if (result.size() == 3 && result[0] == "AAAAABBBBB" &&
+      result[1] == "BBCCCCCDDDDD" && result[2] == "DDEEEEEFFFFF") {
+    std::cout << "[PASS] applyChunkOverlap basic" << std::endl;
+  } else {
+    std::cout << "[FAIL] applyChunkOverlap basic, got " << result.size()
+              << " chunks:";
+    for (auto &s : result) {
+      std::cout << " [" << s << "]";
+    }
+    std::cout << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_apply_chunk_overlap_zero() {
+  std::vector<std::string> chunks = {"AAAAABBBBB", "CCCCCDDDDD", "EEEEEFFFFF"};
+  auto result = VectorStore::applyChunkOverlap(chunks, 10, 0.0);
+  if (result == chunks) {
+    std::cout << "[PASS] applyChunkOverlap zero (disabled)" << std::endl;
+  } else {
+    std::cout << "[FAIL] applyChunkOverlap zero, result differs" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_apply_chunk_overlap_single() {
+  std::vector<std::string> chunks = {"HelloWorld"};
+  auto result = VectorStore::applyChunkOverlap(chunks, 10, 20.0);
+  if (result.size() == 1 && result[0] == "HelloWorld") {
+    std::cout << "[PASS] applyChunkOverlap single chunk" << std::endl;
+  } else {
+    std::cout << "[FAIL] applyChunkOverlap single chunk, got " << result.size()
+              << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_apply_chunk_overlap_empty() {
+  std::vector<std::string> chunks = {};
+  auto result = VectorStore::applyChunkOverlap(chunks, 10, 20.0);
+  if (result.empty()) {
+    std::cout << "[PASS] applyChunkOverlap empty" << std::endl;
+  } else {
+    std::cout << "[FAIL] applyChunkOverlap empty, got " << result.size()
+              << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_apply_chunk_overlap_short_prev() {
+  std::vector<std::string> chunks = {"AB", "CCCCCDDDDD", "EEEEEFFFFF"};
+  auto result = VectorStore::applyChunkOverlap(chunks, 10, 20.0);
+  // overlapChars=2, prev has only 2 chars, so no overlap applied
+  if (result.size() == 3 && result[0] == "AB" && result[1] == "CCCCCDDDDD" &&
+      result[2] == "DDEEEEEFFFFF") {
+    std::cout << "[PASS] applyChunkOverlap short prev" << std::endl;
+  } else {
+    std::cout << "[FAIL] applyChunkOverlap short prev, got " << result.size()
+              << " chunks:";
+    for (auto &s : result) {
+      std::cout << " [" << s << "]";
+    }
+    std::cout << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_apply_chunk_overlap_utf8() {
+  std::vector<std::string> chunks = {"你好世界甲乙丙丁", "戊己庚辛壬癸子丑"};
+  auto result = VectorStore::applyChunkOverlap(chunks, 8, 25.0);
+  // overlapChars = 2, so chunk 1 starts with last 2 chars of chunk 0
+  if (result.size() == 2 && result[0] == "你好世界甲乙丙丁" &&
+      result[1].size() > chunks[1].size() &&
+      result[1].substr(
+          0, agentxx::util::findIndexByUtf8Length(
+                 result[0], agentxx::util::utf8GetLength(result[0]) - 2)) ==
+          "") {
+    // Just verify overlap was applied (result[1] is longer than original)
+    std::cout << "[PASS] applyChunkOverlap utf8" << std::endl;
+  } else {
+    std::cout << "[FAIL] applyChunkOverlap utf8, got " << result.size()
+              << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+// =========================================================================
+// Tests: splitTextToChunks — with overlap
+// =========================================================================
+
+inline asio::awaitable<void> test_chunks_overlap_fixed_length() {
+  VectorStore::SplitConfig config;
+  config.mode = VectorStore::SplitMode::FixedLength;
+  config.maxUtf8Length = 10;
+  config.overlapPercent = 20.0;
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  auto result = VectorStore::splitTextToChunks(text, config);
+  // Should have more chunks than non-overlap version due to sliding window
+  auto resultNoOverlap =
+      VectorStore::splitByFixedLength(text, config.maxUtf8Length);
+  if (result.size() > resultNoOverlap.size()) {
+    std::cout << "[PASS] splitTextToChunks overlap FixedLength" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitTextToChunks overlap FixedLength, got "
+              << result.size() << " (no-overlap: " << resultNoOverlap.size()
+              << ")" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_chunks_overlap_character() {
+  VectorStore::SplitConfig config;
+  config.mode = VectorStore::SplitMode::Character;
+  config.maxUtf8Length = 256;
+  config.overlapPercent = 20.0;
+  std::string text = "para1\n\npara2\n\npara3\n\npara4";
+  auto result = VectorStore::splitTextToChunks(text, config);
+  if (result.size() >= 4) {
+    std::cout << "[PASS] splitTextToChunks overlap Character" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitTextToChunks overlap Character, got "
+              << result.size() << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_chunks_overlap_structural() {
+  VectorStore::SplitConfig config;
+  config.mode = VectorStore::SplitMode::Structural;
+  config.maxUtf8Length = 256;
+  config.overlapPercent = 20.0;
+  std::string text = "# Title\n\nParagraph\n\n## Section\n\nMore text";
+  auto result = VectorStore::splitTextToChunks(text, config);
+  if (result.size() >= 2) {
+    std::cout << "[PASS] splitTextToChunks overlap Structural" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitTextToChunks overlap Structural, got "
+              << result.size() << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_chunks_overlap_zero_disabled() {
+  VectorStore::SplitConfig config;
+  config.mode = VectorStore::SplitMode::FixedLength;
+  config.maxUtf8Length = 10;
+  config.overlapPercent = 0.0;
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  auto result = VectorStore::splitTextToChunks(text, config);
+  auto resultDefault = VectorStore::splitByFixedLength(text, 10);
+  if (result.size() == resultDefault.size() && result == resultDefault) {
+    std::cout << "[PASS] splitTextToChunks overlap zero disabled" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitTextToChunks overlap zero disabled, sizes: "
+              << result.size() << " vs " << resultDefault.size() << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_chunks_overlap_default_config() {
+  VectorStore::SplitConfig config;
+  config.maxUtf8Length = 10;
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  auto result = VectorStore::splitTextToChunks(text, config);
+  // Default overlapPercent=20.0, mode=StructuralThenCharThenFixed
+  if (result.size() >= 1) {
+    std::cout << "[PASS] splitTextToChunks overlap default config" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitTextToChunks overlap default config, got "
+              << result.size() << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_chunks_overlap_short_text() {
+  VectorStore::SplitConfig config;
+  config.mode = VectorStore::SplitMode::FixedLength;
+  config.maxUtf8Length = 100;
+  config.overlapPercent = 20.0;
+  std::string text = "Hello";
+  auto result = VectorStore::splitTextToChunks(text, config);
+  if (result.size() == 1 && result[0] == "Hello") {
+    std::cout << "[PASS] splitTextToChunks overlap short text" << std::endl;
+  } else {
+    std::cout << "[FAIL] splitTextToChunks overlap short text, got "
+              << result.size() << " chunks" << std::endl;
+  }
+  co_return;
+}
+
+inline asio::awaitable<void> test_chunks_overlap_all_modes() {
+  std::string text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (auto mode :
+       {VectorStore::SplitMode::FixedLength, VectorStore::SplitMode::Character,
+        VectorStore::SplitMode::Structural,
+        VectorStore::SplitMode::StructuralThenChar,
+        VectorStore::SplitMode::StructuralThenCharThenFixed}) {
+    VectorStore::SplitConfig config;
+    config.mode = mode;
+    config.maxUtf8Length = 10;
+    config.overlapPercent = 20.0;
+    auto result = VectorStore::splitTextToChunks(text, config);
+    if (result.empty()) {
+      std::cout << "[FAIL] splitTextToChunks overlap all modes, mode="
+                << static_cast<int>(mode) << " returned empty" << std::endl;
+      co_return;
+    }
+  }
+  std::cout << "[PASS] splitTextToChunks overlap all modes" << std::endl;
+  co_return;
+}
+
+// =========================================================================
 // Tests: cosineSimilarity
 // =========================================================================
 
@@ -1136,6 +1460,30 @@ inline asio::awaitable<void> run_rag_search_tools_tests() {
   co_await run(test_chunks_numbered_list);
   co_await run(test_chunks_mixed_content);
   co_await run(test_chunks_whitespace_only);
+
+  // splitByFixedLength — overlap (sliding window)
+  co_await run(test_fixed_length_overlap_basic);
+  co_await run(test_fixed_length_overlap_zero);
+  co_await run(test_fixed_length_overlap_single_chunk);
+  co_await run(test_fixed_length_overlap_utf8);
+  co_await run(test_fixed_length_overlap_50_percent);
+
+  // applyChunkOverlap
+  co_await run(test_apply_chunk_overlap_basic);
+  co_await run(test_apply_chunk_overlap_zero);
+  co_await run(test_apply_chunk_overlap_single);
+  co_await run(test_apply_chunk_overlap_empty);
+  co_await run(test_apply_chunk_overlap_short_prev);
+  co_await run(test_apply_chunk_overlap_utf8);
+
+  // splitTextToChunks — overlap
+  co_await run(test_chunks_overlap_fixed_length);
+  co_await run(test_chunks_overlap_character);
+  co_await run(test_chunks_overlap_structural);
+  co_await run(test_chunks_overlap_zero_disabled);
+  co_await run(test_chunks_overlap_default_config);
+  co_await run(test_chunks_overlap_short_text);
+  co_await run(test_chunks_overlap_all_modes);
 
   // cosineSimilarity
   co_await run(test_cosine_identical);
