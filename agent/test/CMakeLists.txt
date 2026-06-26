@@ -56,6 +56,15 @@ if(Boost_FOUND)
 endif()
 
 target_link_libraries(agentxx_test PRIVATE
+  # === neograph vvv 链接顺序是必要的
+  neograph_sqlite
+  neograph_acp
+  neograph_mcp
+  neograph_async
+  neograph_llm
+  neograph_core
+  # === neograph ^^^
+  yyjson
 	agentxx_static
 )
 if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
