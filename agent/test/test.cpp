@@ -16,6 +16,7 @@
 #include "test_filesystem_tools.h"
 #include "test_rag_search_tools.h"
 #include "test_string_tools.h"
+#include "test_text_selection_monitor.h"
 #include "test_web_search_tools.h"
 #include <fstream>
 #include <iostream>
@@ -63,9 +64,15 @@ int main(int argn, char **argv) {
       asio::detached);
   ioCtx.run();
 
+  auto monitor = test_text_selection_monitor();
+
   std::cout << "======= Test Done =======" << std::endl;
   std::cout << ">>>";
   int num = 0;
   std::cin >> num;
+
+  if (nullptr != monitor) {
+    monitor->stop();
+  }
   return 0;
 }
