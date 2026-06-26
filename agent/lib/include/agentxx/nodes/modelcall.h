@@ -20,8 +20,6 @@ namespace nodes {
 class NEOGRAPH_API ModelCallWrapNode
     : public WrapHandleBaseNode<neograph::graph::LLMCallNode> {
 protected:
-  std::string baseSystemPrompt;
-
 public:
   inline static constexpr auto defNodeType =
       std::string_view{"xx_MiddlewareWrapModelCall"};
@@ -30,8 +28,7 @@ public:
                     const neograph::graph::NodeContext &ctx,
                     std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : WrapHandleBaseNode<neograph::graph::LLMCallNode>(name, in_agentContext,
-                                                         ctx),
-        baseSystemPrompt(ctx.instructions) {}
+                                                         ctx) {}
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -111,7 +108,7 @@ public:
       // 清空原本的 content
       newSystemMsg.content = "";
       std::ostringstream oss;
-      oss << baseSystemPrompt;
+      oss << agentCtxPtr->agentConfig->prompt.systemPrompt;
 
       if (false == appendSystemMsgList.empty()) {
         for (const auto &item : appendSystemMsgList) {

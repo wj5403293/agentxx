@@ -1,5 +1,6 @@
 #pragma once
 
+#include "prompt.h"
 #include <string>
 #include <vector>
 
@@ -18,7 +19,7 @@ public:
   std::string currentSystemName;
   bool isSystemWSL = false;
 
-  std::string systemPrompt = "You are a helpful assistant.";
+  agentxx::agent::AgentPrompt prompt;
   std::vector<std::string> skillDirPaths{};
   std::vector<std::string> mcpServerUrls{};
   std::vector<std::string> ragDocsPaths{};

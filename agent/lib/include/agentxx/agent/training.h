@@ -1,6 +1,7 @@
 #pragma once
 
 #include "agentxx/agent/config.h"
+#include "agentxx/agent/deepagent.h"
 #include "neograph/llm/openai_provider.h"
 #include "neograph/neograph.h"
 #include <agentxx/util/log.h>
@@ -110,13 +111,13 @@ Output ONLY a JSON object with the following schema:
 // ======================== 训练模式 ========================
 class TrainingAgent {
 protected:
-  std::shared_ptr<agentxx::agent::AgentConfig> config = nullptr;
+  std::shared_ptr<agentxx::agent::DeepAgent> scoreAgent;
+  std::shared_ptr<agentxx::agent::DeepAgent> trainAgent;
 
 public:
-  TrainingAgent(std::shared_ptr<agentxx::agent::AgentConfig> in_config)
-      : config(in_config) {
-    assert(nullptr != config);
-  }
+  TrainingAgent(std::shared_ptr<agentxx::agent::DeepAgent> in_scoreAgent,
+                std::shared_ptr<agentxx::agent::DeepAgent> in_trainAgent)
+      : scoreAgent(in_scoreAgent), trainAgent(in_trainAgent) {}
 
   /// 以单条用户输入运行 agent，返回完整输出文本（非流式）
   /// - threadId: 会话线程 ID
@@ -154,7 +155,7 @@ public:
     };
 
     std::ostringstream oss;
-    co_await engine->run_stream_async(
+    co_await trainAgent->run_stream_async(
         cfg, [&oss](const neograph::graph::GraphEvent &event) {
           switch (event.type) {
           case neograph::graph::GraphEvent::Type::LLM_TOKEN: {
@@ -174,21 +175,6 @@ public:
                              const TrainingConfig &trainCfg) {
     TrainingScore result;
     result.iteration = iteration;
-
-    neograph::llm::OpenAIProvider::Config scorerProviderCfg{
-        .api_key = trainCfg.scoringModelApiKey.empty()
-                       ? config->modelOpenAIApiKey
-                       : trainCfg.scoringModelApiKey,
-        .base_url = trainCfg.scoringModelBaseUrl.empty()
-                        ? config->modelOpenAIBaseUrl
-                        : trainCfg.scoringModelBaseUrl,
-        .default_model = trainCfg.scoringModelName.empty()
-                             ? config->modelOpenAIModelName
-                             : trainCfg.scoringModelName,
-    };
-
-    auto scorerProvider =
-        neograph::llm::OpenAIProvider::create_shared(scorerProviderCfg);
 
     std::ostringstream scoringMessage;
     scoringMessage << "Test Case: " << testCase.name << "\n";
@@ -213,7 +199,7 @@ public:
     try {
       std::vector<neograph::ChatMessage> messages = {systemMsg, scoringMsg};
       auto response =
-          co_await scorerProvider->chat_async(messages, neograph::json{});
+          co_await scoreAgent->run_stream_async(messages, neograph::json{});
 
       const auto &content = response.content;
 
