@@ -55,6 +55,7 @@
     - ✅Sub-Agent (支持协程并发执行，并保证返回顺序正确)
     - ✅RAGSearch
     - ⬜tool_skill_search (延迟加载 tool/skill)
+    - ✅ui_control (windows 系统上控制鼠标键盘)
     - ✅get_current_datetime 获取系统时间戳、本地时间、UTC时间
 - ✅Tree-Messages
     - share_store (允许存取变量，在 llm-messages、skill、tool 之间传递数据)
@@ -91,6 +92,7 @@
     - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
+- ⬜事件订阅通知/定时任务
 - ⬜Memory
     - 持久记忆
     - 总结共享记忆

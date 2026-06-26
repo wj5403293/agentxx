@@ -18,6 +18,7 @@
 #include "agentxx/tools/string.h"
 #include "agentxx/tools/sub_agent.h"
 #include "agentxx/tools/tool_skill_search.h"
+#include "agentxx/tools/ui_control.h"
 #include "agentxx/tools/web_search.h"
 #include "agentxx/util/log.h"
 #include "asio/co_spawn.hpp"
@@ -236,6 +237,8 @@ public:
           std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
 
 #if XX_IS_WIN_D
+      tools.push_back(
+          std::make_unique<agentxx::tools::UIControlKeyboardMouseTool>());
       tools.push_back(
           std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
 #elif XX_IS_LINUX_D
