@@ -150,73 +150,73 @@ set_target_properties(agentxx_static PROPERTIES
 target_link_directories(agentxx_shared PUBLIC ${CMAKE_PREFIX_PATH}/lib/)
 target_link_directories(agentxx_static PUBLIC ${CMAKE_PREFIX_PATH}/lib/)
 
-target_link_libraries(agentxx_shared PUBLIC
-  Iconv::Iconv
-  charset
-  uchardet::libuchardet
-  # === neograph vvv 链接顺序是必要的
-  neograph_sqlite
-  neograph_acp
-  neograph_mcp
-  neograph_async
-  neograph_llm
-  neograph_core
-  yyjson
-  # === neograph ^^^
-  SQLite::SQLite3
-  CURL::libcurl
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  fmt::fmt
-  html2md
-  yaml-cpp::yaml-cpp
-  Glob
-  Boost::process
-)
-target_link_libraries(agentxx_static PUBLIC
-  Iconv::Iconv
-  charset
-  uchardet::libuchardet
-  # === neograph vvv 链接顺序是必要的
-  neograph_sqlite
-  neograph_acp
-  neograph_mcp
-  neograph_async
-  neograph_llm
-  neograph_core
-  yyjson
-  # === neograph ^^^
-  SQLite::SQLite3
-  CURL::libcurl
-  OpenSSL::SSL
-  OpenSSL::Crypto
-  fmt::fmt
-  html2md
-  yaml-cpp::yaml-cpp
-  Glob
-  Boost::process
-)
 if (AGENTXX_ENABLE_CODEGRAPH)
   target_link_libraries(agentxx_shared PUBLIC codegraph_core)
   target_link_libraries(agentxx_static PUBLIC codegraph_core)
 endif()
+if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
+  pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
+  target_link_libraries(agentxx_shared PUBLIC 
+    PkgConfig::hyperscan
+    hs_runtime
+  )
+  target_link_libraries(agentxx_static PUBLIC 
+    PkgConfig::hyperscan 
+    hs_runtime
+  )
+endif()
+target_link_libraries(agentxx_shared PUBLIC
+  # === neograph vvv 链接顺序是必要的
+  neograph_sqlite
+  neograph_acp
+  neograph_mcp
+  neograph_async
+  neograph_llm
+  neograph_core
+  # === neograph ^^^
+  html2md
+  Glob
+  SQLite::SQLite3
+  CURL::libcurl
+  yaml-cpp::yaml-cpp
+  Boost::process
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  yyjson
+  fmt::fmt
+  Iconv::Iconv
+  charset
+  uchardet::libuchardet
+)
+target_link_libraries(agentxx_static PUBLIC
+  # === neograph vvv 链接顺序是必要的
+  neograph_sqlite
+  neograph_acp
+  neograph_mcp
+  neograph_async
+  neograph_llm
+  neograph_core
+  # === neograph ^^^
+  html2md
+  Glob
+  SQLite::SQLite3
+  CURL::libcurl
+  yaml-cpp::yaml-cpp
+  Boost::process
+  OpenSSL::SSL
+  OpenSSL::Crypto
+  yyjson
+  fmt::fmt
+  Iconv::Iconv
+  charset
+  uchardet::libuchardet
+)
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   pkg_check_modules(uring REQUIRED IMPORTED_TARGET liburing)
   # - pkg-config 找到的库用 PRIVATE，否则 install 时会被写入依赖中，名称却是当前项目自定义的 PkgConfig::uring,
   # 导致难以被找到，所以这里用 PRIVATE 链接，依赖当前项目的库重新 Find 再链接 liburing.a 即可
   target_link_libraries(agentxx_shared PRIVATE PkgConfig::uring)
   target_link_libraries(agentxx_static PRIVATE PkgConfig::uring)
-endif()
-if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
-  pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
-  target_link_libraries(agentxx_shared PRIVATE 
-    PkgConfig::hyperscan
-    hs_runtime
-  )
-  target_link_libraries(agentxx_static PRIVATE 
-    PkgConfig::hyperscan 
-    hs_runtime
-  )
 endif()
 
 install(TARGETS agentxx_shared agentxx_static 

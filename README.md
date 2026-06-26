@@ -1,28 +1,49 @@
 # Agentxx
 [Github agentxx](https://github.com/coolight7/agentxx)
 
-- C++ 实现 AI Agent，减少内存占用、程序包体积，为普通性能的手机、电脑等设备上运行而设计
+- C++ 实现的 AI Agent，减少内存占用、程序包体积、摆脱复杂依赖，为普通性能的手机、电脑等设备上运行设计
+
+## 兼容性
+- 跨系统支持:
+    - ✅可编译为独立可执行程序/动态库，摆脱额外的动态库依赖，仅依赖基本的系统库
+    - ✅Linux x86_64 + ✅WSL扩展功能
+    - ✅Windows 10+ x86_64
+    - ⬜支持Linux交叉编译 Windows/Android 可执行程序和库
+    - 未测试，理论上支持:
+        - ⬜Android Arm64 (计划验证兼容)
+        - Macos Arm64
+        - IOS Arm64
+    - ⬜编译优化，控制导出符号，裁剪体积
+- `libagentxx` Lang Binding:
+    - ✅C++ (自身开发语言)
+    - ⬜Flutter/Dart
+- 生成库链接方式:
+    - ✅动态链接库`libagentxx`; 统一多平台名称，仅后缀区别`.so/.dll/.dylib`.
+    - ✅静态链接库`libagentxx_static`; 统一多平台名称，仅后缀区别`.a/.lib`. 支持静态链接所有依赖库，合并生成独立可运行的 `agentxx_cli`, 已在 linux/win 验证. 同理可静态链接`libagentxx_static`及其静态依赖库，即可得到让自己的程序也摆脱动态库依赖
+    - ✅可修改[CMakeLists.txt](/agent/CMakeLists.txt)实现静态链接 `C++标准库 libstdc++`和`编译器运行时库 msvcrt/libgcc`, 但静态链接标准库和编译器运行时库有很大风险，谨慎考虑!
+        - 默认编译提供 动态库`libagentxx`、静态库`libagentxx_static`, 且统一动态链接 libstdc++/libgcc/msvcrt(/MD|/MDd)
 
 ## 计划实现
 ### 基础模块
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
     - ⬜兼容乱码、不合规字符处理
-    - ✅filesystem (支持 `同步`/`asio 协程异步` 文件读写)
+    - ✅filesystem (支持 `同步`/`asio io_uring/IOCP 协程异步` 文件读写)
         - ls (file/dir/recursive-dir/limit)
         - read_text (full / offset-limit)
         - read_binary (full / byte-offset-limit)
         - write (text/binary)
         - edit_text
         - glob
-        - grep (multi text/regex multi-filepath)
+        - grep (multi text/regex + multi-filepath)
     - ✅execute_command (支持 `同步`/`Boost.process 协程异步`执行)
-        - execute_linux_command
-        - execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
+        - ✅execute_linux_command
+        - ✅execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)
         - ⬜execute_python_command
         - ⬜execute_javascript_command
-        - ✅拦截输出，自动压缩、提取摘要存储到 share_store
-    - ✅web_search
+        - ✅拦截输出，超过限制长度时自动压缩、截取摘要存储到 share_store
+        - ✅自动转换输出字符编码到 Utf8
+    - ✅web_search (支持 asio 协程异步网络请求)
         - web_search (内置 HTML 转 markdown, 支持直接使用普通网页搜索api)
         - web_fetch_url_markdown (html to markdown)
         - web_fetch_url (raw resp body)
@@ -31,7 +52,7 @@
         - 分为两层规划
         - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
         - todo_list 描述近期需要实现的任务细节步骤
-    - ✅Sub-Agent
+    - ✅Sub-Agent (支持协程并发执行，并保证返回顺序正确)
     - ✅RAGSearch
     - ⬜tool_skill_search (延迟加载 tool/skill)
     - ✅get_current_datetime 获取系统时间戳、本地时间、UTC时间
@@ -43,6 +64,14 @@
     - ⬜消息摘要，支持存储原始消息到 `share_store` 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
+- ✅异常处理和自动重试
+    - Toolcall/LLM 节点自动重试
+    - Toolcall/LLM 节点异常时自动添加消息到上下文，保持消息顺序正确
+    - 保持 Middleware 拦截执行的顺序和异常处理正确
+- ✅中断恢复
+    - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
+    - 支持用户取消执行
+    - ⬜中断、异常时在上下文中补充提示
 - ✅Sub-Agent
     - 借由 Tool 实现, 允许 llm/代码 异步启动 SubAgent
     - Toolcall 支持并发，因此支持同时启动运行多个 Subagent
@@ -51,6 +80,10 @@
         - tool_skill_search
 - ✅Middleware
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
+- ✅PlanningMiddleware
+    - 分为两层规划
+    - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
+    - todo_list 描述近期需要实现的任务细节步骤
 - ✅压缩上下文`SummarizationMiddleware`
     - 自动估算 tokens，达到阈值时自动启动压缩
     - toolcall 各自实现压缩处理
@@ -62,19 +95,11 @@
     - 持久记忆
     - 总结共享记忆
     - 自定义加载记忆消息
-- ✅异常处理和自动重试
-    - Toolcall/LLM 节点自动重试
-    - Toolcall/LLM 节点异常时自动添加消息到上下文，保持消息顺序正确
-    - 保持 Middleware 拦截执行的顺序和异常处理正确
-- ✅中断恢复
-    - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
-    - 支持用户取消执行
-    - ⬜中断、异常时在上下文中补充提示
-- ✅Permission
+- ✅权限限制`PermissionMiddleware`
     - ✅允许指定 tool 调用前拦截，决定 允许、拒绝 或中断提示询问
     - ⬜预设常见的权限限制
-    - ⬜沙盒执行 shell/file RW
-- ✅Skill支持`SkillMiddlewareHandle`
+    - ⬜沙盒执行 Shell/File RW
+- ✅Skill支持`SkillMiddleware`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
 - ❌MCP支持 (Neograph已实现，但暂时使用有问题)
     - MCP client
@@ -85,12 +110,19 @@
     - 自动循环调整系统提示词、工具提示词等，评估效果
     - 自动测试
     - 空闲时自动优化 skill、prompt
+- ⬜LLM Api
+    - ✅Openai API
+    - Anthropic API
+- ✅自定义配置
+    - LLM Api (BaseUrl/ApiKey/ModelName/ExtraArgs)
+    - System Prompt
+    - ⬜分离 System/Tool Prompt 到独立配置，以便支持自定义和`Self-upgrade`自动调整适配
 - ⬜扩展
     - ✅CodeGraph
         - ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
     - ✅RAG
         - 文本分割方式:
-            - 分块 + 20%重叠
+            - 分块 + ⬜20%重叠
             - ✅定长分割
             - ⬜字符分割
             - ⬜结构分割 (较长的再进行字符分割)
@@ -100,9 +132,10 @@
     - FunASR 语音识别
     - Qwen3-TTS 文本转语音
 - ⬜Server:
-    - Openai api server
-    - ACP server
-    - A2A server
+    - Agent2App Api Server
+    - Openai Api Server
+    - ACP Server
+    - A2A Server
 
 ### 功能
 - ⬜翻译/划词翻译
@@ -116,13 +149,14 @@
 - ⬜操作live2d/3d模型动作
 
 ## 目录结构
-- `agent`:
-    - c++ 实现 Agent
-- `agent/lib`:
+- `agent`: 
+    - C++ 实现 Agent
+    - 大部分手写，非AI实现，计划基础框架实现差不多后由AI完善和检查，以及补充测试
+- `agent/lib`: libagentxx
     - 核心库，包含了内置实现的 toolcall、node、middleware 等，分离编译以便嵌入其他 app 开发使用
-- `agent/client`:
+- `agent/client`: agentxx_cli
     - 命令行可执行程序，计划用于启动服务、实现命令行用户交互
-- `agent/test`:
+- `agent/test`: agentxx_test
     - 测试
 - `agent/third_party`:
     - `neo-graph`: 图执行核心
@@ -140,12 +174,18 @@
     - `codegraph-cpp`: 分析代码/md文件关系. 
         - [原项目](https://github.com/plutoaac/codegraph-cpp)
         - [Fork 修改](https://github.com/coolight7/codegraph-cpp):
-            - 从支持 c++/python 解析，扩展到支持 js/ts/dart/rust/go/java/kotlin/bash/markdown 等 20+ 种编程语言和文件格式结构
+            - 从仅支持 c++/python 解析，扩展到支持 js/ts/dart/rust/go/java/kotlin/bash/markdown 等 20+ 种编程语言和文件格式结构
+            - 扩展 Windows 编译运行支持
+    - `正则表达式库支持`: 可根据编译选项自定义选择支持
+        - Vectorscan: 优先选择，但仅在 Linux 支持
+        - Hyperscan: 次选，兼容 Windows/Linux
+        - std::regex: 兜底
 
 ## 编译 
-- C++ Standard: Requires C++23 or higher.
+- C++ Standard: Requires C++23 +.
 - 编译器推荐
     - Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
+    - Windows/msvc/visual studio 2026. 也可尝试 vs2022 等旧版本, 未验证是否支持
 - 国内网络环境推荐先挂VPN代理，部分步骤需要手动或自动下载 Github 仓库
 - 拉取项目源码和依赖库
 ```sh
@@ -158,5 +198,10 @@ git submodule update --init
 cd {项目根目录}/agent/third_party/codegraph-cpp
 npm install --legacy-peer-deps
 ```
-- [Linux/WSL 可执行程序/动态库编译 .so](/docs/build/linux.md)
-- [Windows 可执行程序/动态库编译 .dll](/docs/build/windows.md)
+- 接下来按希望输出的目标系统选择:
+    - [Linux/WSL 可执行程序 / 动态库编译 .so / 静态库 .a](/docs/build/linux.md)
+    - [Windows 可执行程序 .exe / 动态库编译 .dll / 静态库 .lib](/docs/build/windows.md)
+
+## LICENSE
+- MIT License
+- 根据 动态链接、静态链接 库的不同，可能会携带他们的开源协议

@@ -1239,12 +1239,12 @@ Output format:
 
     if (text_patterns_is_regex) {
       // 正则匹配
-      auto regex = agentxx::util::XXRegex{text_patterns};
+      auto regex = agentxx::util::XXRegex::createRegex(text_patterns);
       for (const auto &item : refilelist) {
         auto filepath = item.generic_string();
         auto filetext = co_await readFileContent(filepath);
         auto matchs = std::vector<agentxx::util::XXRegexMatchResult>{};
-        if (regex.match(filetext, matchs)) {
+        if (regex->match(filetext, matchs)) {
           if (isContainsMode) {
             resultStr << filepath << ":" << matchs.size() << "\n";
           } else {

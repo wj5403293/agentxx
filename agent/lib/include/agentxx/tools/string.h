@@ -138,10 +138,10 @@ public:
       co_return R"({"error":"Arg `opt` is empty"})";
     }
 
-    auto regex = agentxx::util::XXRegex{match_exps};
+    auto regex = agentxx::util::XXRegex::createRegex(match_exps);
     if (match_opt == std::string_view{"search"}) {
       auto results = std::vector<agentxx::util::XXRegexMatchResult>{};
-      if (regex.match(content, results)) {
+      if (regex->match(content, results)) {
         auto relist = neograph::json::array();
         for (size_t i = 0; i < results.size(); ++i) {
           const auto &item = results[i];
@@ -155,14 +155,14 @@ public:
       }
     } else if (match_opt == std::string_view{"replace"}) {
       auto results = std::vector<agentxx::util::XXRegexMatchResult>{};
-      auto restr = regex.replace(
+      auto restr = regex->replace(
           content, arguments.value("replace_str", std::string{}), results);
       if (false == results.empty()) {
         co_return restr;
       }
     } else if (match_opt == std::string_view{"remove"}) {
       auto results = std::vector<agentxx::util::XXRegexMatchResult>{};
-      auto restr = regex.remove(content, results);
+      auto restr = regex->remove(content, results);
       if (false == results.empty()) {
         co_return restr;
       }

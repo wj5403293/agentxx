@@ -6,11 +6,11 @@
 
 ## 开始
 - 安装或编译 Boost 1.91
-- 安装可以通过系统包管理器直接安装，但需要注意版本
+- 安装可以通过系统包管理器直接安装，但需要注意版本，推荐和我们的开发版本一致 `1.91`
 - 自行编译:
 ```sh
-# https://github.com/boostorg/boost
-# 下载 release/boost-xxx.7z 解压到 agent/third_party/boost/
+# https://github.com/boostorg/boost/releases/
+# 下载 release/boost-xxx-cmake.tar.gz 解压到 agent/third_party/boost/
 cd boost/
 # 然后编译结果到 agent/third_party/boost-build/
 ./bootstrap.sh
@@ -67,3 +67,6 @@ cd {项目根目录}/agent
 cd {项目根目录}/agent
 ./script/release_build.sh
 ```
+
+## 常见错误
+- [FAQ 更多问题](FAQ.md)

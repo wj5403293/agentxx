@@ -3,6 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/agent/lib/include",
+                "${workspaceFolder}/agent/build/debug/agentxx-project-install/include/",
+                "${workspaceFolder}/agent/build/debug/agentxx-project-install/include/Glob-1.0/",
                 "${workspaceFolder}/agent/third_party/fmt/include/",
                 "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
                 "${workspaceFolder}/agent/third_party/html2md/include/",
@@ -15,8 +18,7 @@
                 "${workspaceFolder}/agent/third_party/neograph/include/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
-                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/lib/include"
+                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/"
             ],
             "defines": [
                 "XX_IS_LINUX_D",
@@ -37,6 +39,9 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}/agent/lib/include",
+                "${workspaceFolder}/agent/build/debug/agentxx-project-install/include/",
+                "${workspaceFolder}/agent/build/debug/agentxx-project-install/include/Glob-1.0/",
                 "${workspaceFolder}/agent/third_party/fmt/include/",
                 "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
                 "${workspaceFolder}/agent/third_party/html2md/include/",
@@ -48,8 +53,7 @@
                 "${workspaceFolder}/agent/third_party/neograph/include/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
-                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/lib/include"
+                "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/"
             ],
             "defines": [
                 "WIN32",
@@ -72,6 +76,9 @@
         {
             "name": "Android",
             "includePath": [
+                "${workspaceFolder}/agent/lib/include",
+                "${workspaceFolder}/agent/build/debug/agentxx-project-install/include/",
+                "${workspaceFolder}/agent/build/debug/agentxx-project-install/include/Glob-1.0/",
                 "${workspaceFolder}/agent/third_party/fmt/include/",
                 "${workspaceFolder}/agent/third_party/yaml-cpp/include/",
                 "${workspaceFolder}/agent/third_party/html2md/include/",
@@ -84,7 +91,6 @@
                 "${workspaceFolder}/agent/third_party/neograph/deps/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/cppdotenv/",
                 "${workspaceFolder}/agent/third_party/neograph/deps/yyjson/",
-                "${workspaceFolder}/agent/lib/include",
                 "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/",
                 "${ANDROID_HOME}/ndk/27.3.13750724/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/aarch64-linux-android/"
             ],

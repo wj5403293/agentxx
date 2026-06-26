@@ -30,13 +30,6 @@ target_include_directories(agentxx_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(PkgConfig REQUIRED)
 find_package(Boost REQUIRED CONFIG COMPONENTS process)
-if(Boost_FOUND)
-  target_include_directories(agentxx_test SYSTEM PRIVATE ${Boost_INCLUDE_DIRS}/)
-  target_include_directories(agentxx_test SYSTEM PRIVATE ${Boost_INCLUDE_DIRS}/boost/)
-  target_link_directories(agentxx_test PRIVATE 
-    ${BOOST_LIBRARY_DIR}
-  )
-endif()
 find_package(iconv REQUIRED)
 find_package(uchardet REQUIRED)
 find_package(SQLite3 REQUIRED)
@@ -52,7 +45,21 @@ find_package(agentxx_static REQUIRED)
 target_link_directories(agentxx_test PUBLIC
   ${CMAKE_PREFIX_PATH}/lib/
 )
+if(Boost_FOUND)
+  target_include_directories(agentxx_test SYSTEM PRIVATE ${Boost_INCLUDE_DIRS}/)
+  target_include_directories(agentxx_test SYSTEM PRIVATE ${Boost_INCLUDE_DIRS}/boost/)
+  target_link_directories(agentxx_test PRIVATE 
+    ${BOOST_LIBRARY_DIR}
+  )
+endif()
 
+if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
+  pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
+  target_link_libraries(agentxx_test PRIVATE 
+    PkgConfig::hyperscan
+    hs_runtime
+  )
+endif()
 target_link_libraries(agentxx_test PRIVATE
   # === neograph vvv 链接顺序是必要的
   neograph_sqlite
@@ -69,13 +76,6 @@ if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   pkg_check_modules(uring REQUIRED IMPORTED_TARGET liburing)
   target_link_libraries(agentxx_test PRIVATE 
     PkgConfig::uring
-  )
-endif()
-if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
-  pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
-  target_link_libraries(agentxx_test PRIVATE 
-    PkgConfig::hyperscan
-    hs_runtime
   )
 endif()
 

@@ -5,7 +5,9 @@
 - 编译器: MSVC
 
 ## 开始
-### 安装 VS-Studio-2026、cmake、pkg-config
+### 安装 VS-Studio-2026
+- 推荐 VS2026；也可以尝试 VS2022 未验证是否可以编译通过
+### cmake、pkg-config
 - 安装 cmake
     - https://cmake.org/download/
     - 选择win版本安装，如: cmake-x.x.x-windows-x86_64.msi
@@ -20,9 +22,11 @@ choco install pkgconfiglite
 pkg-config --version
 ```
 ### Boost 编译
-- 安装或编译 Boost 1.91
+- 安装或编译 Boost 1.91，推荐和我们的开发版本一致 `1.91`
 - 自行编译, windows CMD:
 ```sh
+# https://github.com/boostorg/boost/releases/
+# 下载 release/boost-xxx-cmake.7z 解压到 agent/third_party/boost/
 cd boost\
 # 然后编译结果到 agent/third_party/boost-build/
 .\bootstrap.bat
@@ -63,7 +67,7 @@ cd "%boost_source_dir%"
 ### 下载预编译的 openssl
 - 前往下载 `https://slproweb.com/products/Win32OpenSSL.html`, 进入网页后往下滑动，找到 `Win64 OpenSSL vx.x.x`，注意没有末尾 Light，下载其 `EXE` 或 `MSI` 都行，然后运行安装，安装目录选择到 `{项目根目录}/agent/third_party/OpenSSL/` 即可
 ### 安装 Ragel
-- 编译`vectorize`/`hyperscan`需要，不想安装也可以修改 [debug_build.bat](/agent/script/debug_build.bat)，更改 `-DAGENTXX_ENABLE_HYPERSCAN=OFF`关闭即可。
+- 编译高性能正则表达式库支持`vectorize`/`hyperscan`需要，不想安装也可以修改 [debug_build.bat](/agent/script/debug_build.bat)，更改 `-DAGENTXX_ENABLE_HYPERSCAN=OFF`关闭即可。
 - 打开 cmd，执行命令看看是否有 ragel:
 ```sh
 ragel -v
@@ -90,6 +94,7 @@ cd {项目根目录}/agent
 ```
 
 ## 常见错误
+- [FAQ 更多问题](FAQ.md)
 
 ### 链接错误 uchardet.lib(uchardet.obj) : error LNK2038
 - windows上 msvc 编译出来的库分为 debug 和 release 版本，且区分 静态链接c++标准库 和 动态链接c++标准库，因此一共分为 4种 情况

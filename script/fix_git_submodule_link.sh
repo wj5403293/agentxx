@@ -1,4 +1,4 @@
-# 解析 .gitmodules 文件，批量执行 git submodule add --force
+# 根据 .gitmodules 文件，批量执行 git submodule add --force
 git config -f .gitmodules --name-only --get-regexp 'submodule\..*\.path' | \
 sed 's/^submodule\.\(.*\)\.path$/\1/' | \
 while read name; do

@@ -2,6 +2,10 @@
 	path = agent/third_party/fmt
 	url = https://github.com/fmtlib/fmt
 	branch = 12.1.0
+[submodule "agent/third_party/simdjson"]
+	path = agent/third_party/simdjson
+	url = https://github.com/simdjson/simdjson/
+	branch = v4.6.4
 [submodule "agent/third_party/neograph"]
 	path = agent/third_party/neograph
 	url = https://github.com/coolight7/NeoGraph
