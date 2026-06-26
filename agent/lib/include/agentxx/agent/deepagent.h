@@ -340,7 +340,7 @@ public:
 
     /// Main Agent
     neograph::graph::NodeContext nodeContext{};
-    nodeContext.instructions = config->systemPrompt;
+    nodeContext.instructions = config->prompt.systemPrompt;
     nodeContext.provider =
         neograph::llm::OpenAIProvider::create_shared(provideConfig);
 
