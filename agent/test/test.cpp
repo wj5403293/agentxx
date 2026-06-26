@@ -14,6 +14,7 @@
 #include "test_command_tools.h"
 #include "test_datetime_tool.h"
 #include "test_filesystem_tools.h"
+#include "test_rag_search_tools.h"
 #include "test_string_tools.h"
 #include "test_web_search_tools.h"
 #include <fstream>
@@ -53,6 +54,7 @@ int main(int argn, char **argv) {
         };
 
         co_await run(agentxx::test::run_string_tools_tests);
+        co_await run(agentxx::test::run_rag_search_tools_tests);
         co_await run(agentxx::test::run_datetime_tool_tests);
         co_await run(agentxx::test::run_filesystem_tools_tests);
         co_await run(agentxx::test::run_command_tools_tests);

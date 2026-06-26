@@ -206,14 +206,13 @@ public:
       tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
 
       if (false == config->ragDocsPaths.empty()) {
-        auto docs = co_await agentxx::tools::RAGSearchTool::scanDocument(
-            config->ragDocsPaths);
         auto client = std::make_shared<agentxx::tools::EmbeddingClient>(
             config->modelOpenAIBaseUrl, config->modelOpenAIApiKey,
             config->modelOpenAIModelName);
         auto docsStore =
             std::make_shared<agentxx::tools::RAGSearchTool::VectorStore>(
                 client);
+        auto docs = co_await docsStore->scanDocument(config->ragDocsPaths);
         std::cout << "\n┏━━━━━━ RAG embedding ━━━━━━┓" << std::endl;
         if (co_await docsStore->addDocuments(std::move(docs))) {
           fmt::println("┣━ ✅ success: append {} docs", docs.size());

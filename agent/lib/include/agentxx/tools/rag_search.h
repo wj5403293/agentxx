@@ -24,22 +24,6 @@ public:
                   const std::string in_model)
       : baseUrl(in_baseUrl), apiKey(in_apiKey), model(in_model) {}
 
-  inline static std::vector<std::string>
-  splitStringByFixedLength(const std::string_view text,
-                           size_t blockSize = 256) {
-    auto result = std::vector<std::string>{};
-    for (size_t index = 0; index < text.size();) {
-      auto target =
-          agentxx::util::findIndexByUtf8Length(text, blockSize, index);
-      if (target <= 0) {
-        target = text.size();
-      }
-      result.push_back(std::string{text.substr(index, target - index)});
-      index = target;
-    }
-    return result;
-  }
-
   // Embed multiple texts in one API call
   asio::awaitable<std::expected<std::vector<std::vector<float>>, std::string>>
   embed_batch(const std::vector<std::string> &texts) const {
@@ -102,8 +86,8 @@ public:
     std::vector<std::vector<float>> embedding;
   };
 
-  static double cosine_similarity(const std::vector<float> &a,
-                                  const std::vector<float> &b) {
+  static double cosineSimilarity(const std::vector<float> &a,
+                                 const std::vector<float> &b) {
     if (a.size() != b.size() || a.empty())
       return 0.0;
     double dot = 0.0, norm_a = 0.0, norm_b = 0.0;
@@ -117,13 +101,371 @@ public:
   }
 
   class VectorStore {
-  protected:
-    std::shared_ptr<EmbeddingClient> embedder;
-    std::vector<Document> docs;
-
   public:
+    // =========================================================================
+    // Text Chunk Splitting — split modes & config
+    // =========================================================================
+
+    enum class SplitMode {
+      FixedLength,                 // Only fixed-length UTF-8 splitting
+      Character,                   // Only character delimiter splitting
+      Structural,                  // Only markdown-structure splitting
+      StructuralThenChar,          // Structural -> character fallback
+      StructuralThenCharThenFixed, // Structural -> character -> fixed-length
+    };
+
+    struct SplitConfig {
+      SplitMode mode = SplitMode::StructuralThenCharThenFixed;
+      size_t maxUtf8Length = 256;
+      // Delimiters tried in priority order (most significant first)
+      std::vector<std::string> delimiters{
+          "\n\n", "\n", "。", "！", "？", "；",
+          "，",   ". ", "! ", "? ", "; ", ", ",
+      };
+    };
+
     VectorStore(std::shared_ptr<EmbeddingClient> in_embedder)
         : embedder(std::move(in_embedder)) {}
+
+    VectorStore(std::shared_ptr<EmbeddingClient> in_embedder,
+                const SplitConfig &in_splitCfg)
+        : embedder(std::move(in_embedder)), splitConfig(in_splitCfg) {}
+
+    inline static std::vector<std::string>
+    splitByFixedLength(const std::string_view text, size_t blockSize = 256) {
+      auto result = std::vector<std::string>{};
+      for (size_t index = 0; index < text.size();) {
+        auto target =
+            agentxx::util::findIndexByUtf8Length(text, blockSize, index);
+        if (target <= 0) {
+          target = text.size();
+        }
+        result.push_back(std::string{text.substr(index, target - index)});
+        index = target;
+      }
+      return result;
+    }
+
+    // Split text by a single delimiter string
+    inline static std::vector<std::string>
+    splitByDelimiter(const std::string_view text,
+                     const std::string &delimiter) {
+      auto result = std::vector<std::string>{};
+      if (delimiter.empty()) {
+        if (!text.empty()) {
+          result.push_back(std::string{text});
+        }
+        return result;
+      }
+      size_t start = 0;
+      size_t end;
+      while ((end = text.find(delimiter, start)) != std::string_view::npos) {
+        auto part = text.substr(start, end - start);
+        if (!part.empty()) {
+          result.push_back(std::string{part});
+        }
+        start = end + delimiter.size();
+      }
+      auto last = text.substr(start);
+      if (!last.empty()) {
+        result.push_back(std::string{last});
+      }
+      return result;
+    }
+
+    // Split by markdown structure: headings, code blocks, lists, paragraphs
+    inline static std::vector<std::string>
+    splitByStructure(const std::string_view text) {
+      std::vector<std::string> blocks;
+      size_t len = text.size();
+      size_t lineStart = 0;
+      std::string currentBlock;
+      bool inCodeBlock = false;
+      bool currentIsHeading = false;
+      bool currentIsListItem = false;
+
+      auto flushBlock = [&]() {
+        if (!currentBlock.empty()) {
+          blocks.push_back(std::move(currentBlock));
+          currentBlock.clear();
+        }
+      };
+
+      auto isCodeFence = [](std::string_view line) -> bool {
+        return line.size() >= 3 && line.substr(0, 3) == "```";
+      };
+
+      auto isHeading = [](std::string_view line) -> bool {
+        return !line.empty() && line[0] == '#' && line.size() > 1 &&
+               line[1] == ' ';
+      };
+
+      auto isListItem = [](std::string_view line) -> bool {
+        if (line.empty()) {
+          return false;
+        }
+        if (line.size() >= 2 &&
+            (line.substr(0, 2) == "- " || line.substr(0, 2) == "* ")) {
+          return true;
+        }
+        if (line.size() >= 3 &&
+            std::isdigit(static_cast<unsigned char>(line[0])) &&
+            line[1] == '.' && line[2] == ' ') {
+          return true;
+        }
+        return false;
+      };
+
+      for (size_t i = 0; i <= len; ++i) {
+        if (i == len || text[i] == '\n') {
+          std::string_view line = text.substr(lineStart, i - lineStart);
+          lineStart = i + 1;
+
+          if (isCodeFence(line)) {
+            if (!inCodeBlock) {
+              flushBlock();
+              inCodeBlock = true;
+              currentBlock = std::string{line};
+            } else {
+              currentBlock += "\n" + std::string{line};
+              flushBlock();
+              inCodeBlock = false;
+            }
+            currentIsHeading = false;
+            currentIsListItem = false;
+            continue;
+          }
+
+          if (inCodeBlock) {
+            if (!currentBlock.empty()) {
+              currentBlock += "\n";
+            }
+            currentBlock += std::string{line};
+            continue;
+          }
+
+          if (line.empty()) {
+            flushBlock();
+            currentIsHeading = false;
+            currentIsListItem = false;
+          } else if (isHeading(line)) {
+            flushBlock();
+            currentBlock = std::string{line};
+            currentIsHeading = true;
+            currentIsListItem = false;
+          } else if (isListItem(line)) {
+            if (!currentIsListItem) {
+              flushBlock();
+            }
+            if (!currentBlock.empty()) {
+              currentBlock += "\n";
+            }
+            currentBlock += std::string{line};
+            currentIsListItem = true;
+            currentIsHeading = false;
+          } else {
+            if (!currentBlock.empty()) {
+              currentBlock += "\n";
+            }
+            currentBlock += std::string{line};
+            currentIsHeading = false;
+            currentIsListItem = false;
+          }
+        }
+      }
+      flushBlock();
+
+      // Merge heading with its following content block
+      std::vector<std::string> merged;
+      for (size_t i = 0; i < blocks.size();) {
+        bool blockIsHeading = !blocks[i].empty() && blocks[i][0] == '#' &&
+                              blocks[i].size() > 1 && blocks[i][1] == ' ';
+        if (blockIsHeading && i + 1 < blocks.size() && !blocks[i + 1].empty() &&
+            blocks[i + 1][0] != '#') {
+          std::string mergedBlock = blocks[i] + "\n\n" + blocks[i + 1];
+          merged.push_back(std::move(mergedBlock));
+          i += 2;
+        } else {
+          merged.push_back(std::move(blocks[i]));
+          i++;
+        }
+      }
+
+      return merged;
+    }
+
+    // Split by character delimiters with length limit, falling back to
+    // fixed-length if no delimiter produces small-enough chunks
+    inline static std::vector<std::string>
+    splitByDelimiters(const std::string_view text, size_t maxUtf8Length,
+                      const std::vector<std::string> &delimiters) {
+      if (agentxx::util::utf8GetLength(text) <= maxUtf8Length) {
+        return {std::string{text}};
+      }
+
+      for (const auto &delim : delimiters) {
+        auto parts = splitByDelimiter(text, delim);
+        if (parts.size() <= 1) {
+          continue;
+        }
+
+        std::vector<std::string> result;
+        bool allFit = true;
+        for (auto &part : parts) {
+          if (agentxx::util::utf8GetLength(part) > maxUtf8Length) {
+            allFit = false;
+            auto subParts = splitByDelimiters(part, maxUtf8Length, delimiters);
+            for (auto &sp : subParts) {
+              result.push_back(std::move(sp));
+            }
+          } else {
+            result.push_back(std::move(part));
+          }
+        }
+
+        if (allFit) {
+          return result;
+        }
+        if (!result.empty()) {
+          return result;
+        }
+      }
+
+      return splitByFixedLength(text, maxUtf8Length);
+    }
+
+    // Main entry: split text into chunks according to config, guaranteeing
+    // every chunk is within maxUtf8Length (UTF-8 characters)
+    inline static std::vector<std::string>
+    splitTextToChunks(const std::string_view text, const SplitConfig &config) {
+      if (text.empty()) {
+        return {};
+      }
+
+      size_t maxLen = config.maxUtf8Length;
+
+      switch (config.mode) {
+      case SplitMode::FixedLength:
+        return splitByFixedLength(text, maxLen);
+      case SplitMode::Character:
+        return splitByDelimiters(text, maxLen, config.delimiters);
+      case SplitMode::Structural: {
+        auto blocks = splitByStructure(text);
+        std::vector<std::string> result;
+        for (auto &block : blocks) {
+          if (agentxx::util::utf8GetLength(block) <= maxLen) {
+            result.push_back(std::move(block));
+          } else {
+            auto fixedParts = splitByFixedLength(block, maxLen);
+            for (auto &fp : fixedParts) {
+              result.push_back(std::move(fp));
+            }
+          }
+        }
+        return result;
+      }
+      case SplitMode::StructuralThenChar: {
+        auto blocks = splitByStructure(text);
+        std::vector<std::string> result;
+        for (auto &block : blocks) {
+          if (agentxx::util::utf8GetLength(block) <= maxLen) {
+            result.push_back(std::move(block));
+          } else {
+            auto subParts = splitByDelimiters(block, maxLen, config.delimiters);
+            for (auto &sp : subParts) {
+              result.push_back(std::move(sp));
+            }
+          }
+        }
+        return result;
+      }
+      case SplitMode::StructuralThenCharThenFixed: {
+        auto blocks = splitByStructure(text);
+        std::vector<std::string> result;
+        for (auto &block : blocks) {
+          if (agentxx::util::utf8GetLength(block) <= maxLen) {
+            result.push_back(std::move(block));
+          } else {
+            auto subParts = splitByDelimiters(block, maxLen, config.delimiters);
+            for (auto &sp : subParts) {
+              if (agentxx::util::utf8GetLength(sp) <= maxLen) {
+                result.push_back(std::move(sp));
+              } else {
+                auto fixedParts = splitByFixedLength(sp, maxLen);
+                for (auto &fp : fixedParts) {
+                  result.push_back(std::move(fp));
+                }
+              }
+            }
+          }
+        }
+        return result;
+      }
+      }
+
+      return splitByFixedLength(text, maxLen);
+    }
+
+    asio::awaitable<std::vector<Document>>
+    scanDocument(const std::vector<std::string> &pathlist) {
+      auto result = std::vector<Document>{};
+
+      auto onAppendItem = [&](const std::string &path) -> bool {
+        auto filepath = std::filesystem::path{path};
+        if (filepath.extension() == ".md") {
+          std::ifstream stream;
+          try {
+            stream.open(path);
+            if (!stream) {
+              auto ec = std::error_code{errno, std::system_category()};
+              throw std::runtime_error{
+                  fmt::format(R"(Can not open file. Error: {})", ec.message())};
+            }
+            auto content = std::string{std::istreambuf_iterator<char>(stream),
+                                       std::istreambuf_iterator<char>()};
+            stream.close();
+
+            result.push_back(Document{
+                .id = std::to_string(result.size()),
+                .title = filepath.filename().string(),
+                .content = VectorStore::splitTextToChunks(content, splitConfig),
+                .source = path,
+            });
+            return true;
+          } catch (const std::exception &e) {
+            stream.close();
+            XX_LOGD("RAG/scanDocument item exception: {} / {}", path, e.what());
+          }
+        }
+        return false;
+      };
+
+      std::cout << "\n┏━━━━━━ RAG Docs Load ━━━━━━┓" << std::endl;
+      for (const auto &itemPath : pathlist) {
+        std::cout << "try: " << itemPath << std::endl;
+        if (std::filesystem::is_directory(itemPath)) {
+          for (const auto &entity :
+               std::filesystem::recursive_directory_iterator(itemPath)) {
+            if (entity.is_regular_file()) {
+              if (onAppendItem(entity.path().generic_string())) {
+                auto &doc = result.back();
+                fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )",
+                             doc.title, doc.content.size(), itemPath);
+              }
+            }
+          }
+        } else if (std::filesystem::is_regular_file(itemPath)) {
+          if (onAppendItem(itemPath)) {
+            auto &doc = result.back();
+            fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )", doc.title,
+                         doc.content.size(), itemPath);
+          }
+        }
+      }
+      std::cout << "┗━━━━━━ RAG Docs Load ━━━━━━┛\n" << std::endl;
+
+      co_return result;
+    }
 
     // Add documents and compute their embeddings
     asio::awaitable<bool> addDocuments(std::vector<Document> &&appendDocs) {
@@ -153,26 +495,27 @@ public:
 
     // Search by cosine similarity
     asio::awaitable<std::expected<
-        std::vector<std::tuple<Document, size_t, double>>, std::string>>
+        std::vector<std::tuple<const Document &, size_t, double>>, std::string>>
     search(const std::string &query, size_t top_k = 3) const {
       auto queryVec = co_await embedder->embed_batch(
-          EmbeddingClient::splitStringByFixedLength(query));
+          VectorStore::splitTextToChunks(query, splitConfig));
       if (false == queryVec.has_value()) {
         co_return std::unexpected{queryVec.error()};
       }
       if (queryVec.value().empty()) {
         co_return std::expected<
-            std::vector<std::tuple<Document, size_t, double>>, std::string>{};
+            std::vector<std::tuple<const Document &, size_t, double>>,
+            std::string>{};
       }
 
       /// <docIndex, contentIndex, sim>
-      std::vector<std::tuple<size_t, size_t, double>> scores;
+      auto scores = std::vector<std::tuple<size_t, size_t, double>>{};
       for (size_t i = 0; i < docs.size(); ++i) {
         if (!docs[i].embedding.empty()) {
           for (size_t j = 0; j < docs[i].embedding.size(); ++j) {
             double sim = 0;
             for (const auto &queryVecItem : queryVec.value()) {
-              sim += cosine_similarity(queryVecItem, docs[i].embedding[j]);
+              sim += cosineSimilarity(queryVecItem, docs[i].embedding[j]);
             }
             scores.push_back({i, j, sim / queryVec->size()});
           }
@@ -187,14 +530,21 @@ public:
                   return aSim > bSim;
                 });
 
-      std::vector<std::tuple<Document, size_t, double>> results;
+      auto results =
+          std::vector<std::tuple<const Document &, size_t, double>>{};
       for (size_t i = 0; i < top_k && i < scores.size(); ++i) {
         const auto [docIndex, contentIndex, sim] = scores[i];
         results.push_back({docs[docIndex], contentIndex, sim});
       }
-      co_return std::expected<std::vector<std::tuple<Document, size_t, double>>,
-                              std::string>{results};
+      co_return std::expected<
+          std::vector<std::tuple<const Document &, size_t, double>>,
+          std::string>{std::move(results)};
     }
+
+  protected:
+    SplitConfig splitConfig;
+    std::shared_ptr<EmbeddingClient> embedder;
+    std::vector<Document> docs;
   };
 
   std::shared_ptr<VectorStore> store;
@@ -266,67 +616,6 @@ Returns the most relevant documents with their content, source, and similarity s
     }
 
     co_return output.dump(2);
-  }
-
-  inline static asio::awaitable<std::vector<Document>>
-  scanDocument(const std::vector<std::string> &pathlist) {
-    auto result = std::vector<Document>{};
-
-    auto onAppendItem = [&](const std::string &path) -> bool {
-      auto filepath = std::filesystem::path{path};
-      if (filepath.extension() == ".md") {
-        std::ifstream stream;
-        try {
-          stream.open(path);
-          if (!stream) {
-            auto ec = std::error_code{errno, std::system_category()};
-            throw std::runtime_error{
-                fmt::format(R"(Can not open file. Error: {})", ec.message())};
-          }
-          auto content = std::string{std::istreambuf_iterator<char>(stream),
-                                     std::istreambuf_iterator<char>()};
-          stream.close();
-
-          result.push_back(Document{
-              .id = std::to_string(result.size()),
-              .title = filepath.filename().string(),
-              .content = EmbeddingClient::splitStringByFixedLength(content),
-              .source = path,
-          });
-          return true;
-        } catch (const std::exception &e) {
-          stream.close();
-          XX_LOGD("RAG/scanDocument item exception: {} / {}", path, e.what());
-        }
-      }
-      return false;
-    };
-
-    std::cout << "\n┏━━━━━━ RAG Docs Load ━━━━━━┓" << std::endl;
-    for (const auto &itemPath : pathlist) {
-      std::cout << "try: " << itemPath << std::endl;
-      if (std::filesystem::is_directory(itemPath)) {
-        for (const auto &entity :
-             std::filesystem::recursive_directory_iterator(itemPath)) {
-          if (entity.is_regular_file()) {
-            if (onAppendItem(entity.path().string())) {
-              auto &doc = result.back();
-              fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )",
-                           doc.title, doc.content.size(), itemPath);
-            }
-          }
-        }
-      } else if (std::filesystem::is_regular_file(itemPath)) {
-        if (onAppendItem(itemPath)) {
-          auto &doc = result.back();
-          fmt::println("┣━ ✅ Load success: `{}`(Block {} | {} )", doc.title,
-                       doc.content.size(), itemPath);
-        }
-      }
-    }
-    std::cout << "┗━━━━━━ RAG Docs Load ━━━━━━┛\n" << std::endl;
-
-    co_return result;
   }
 };
 
