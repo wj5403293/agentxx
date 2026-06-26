@@ -66,6 +66,10 @@ target_compile_definitions(agentxx_static PUBLIC
   NEOGRAPH_STATIC_BUILD
   NEOGRAPH_USE_BOODT_ASIO
 )
+if (AGENTXX_ENABLE_VECTORSCAN)
+  target_compile_definitions(agentxx_shared PUBLIC AGENTXX_ENABLE_VECTORSCAN=1)
+  target_compile_definitions(agentxx_static PUBLIC AGENTXX_ENABLE_VECTORSCAN=1)
+endif()
 if (AGENTXX_ENABLE_HYPERSCAN)
   target_compile_definitions(agentxx_shared PUBLIC AGENTXX_ENABLE_HYPERSCAN=1)
   target_compile_definitions(agentxx_static PUBLIC AGENTXX_ENABLE_HYPERSCAN=1)
@@ -203,7 +207,7 @@ if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   target_link_libraries(agentxx_shared PRIVATE PkgConfig::uring)
   target_link_libraries(agentxx_static PRIVATE PkgConfig::uring)
 endif()
-if (AGENTXX_ENABLE_HYPERSCAN)
+if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
   pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
   target_link_libraries(agentxx_shared PRIVATE 
     PkgConfig::hyperscan

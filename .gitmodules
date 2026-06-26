@@ -37,3 +37,6 @@
 [submodule "agent/third_party/curl"]
 	path = agent/third_party/curl
 	url = https://github.com/curl/curl
+[submodule "agent/third_party/hyperscan"]
+	path = agent/third_party/hyperscan
+	url = https://github.com/coolight7/hyperscan/

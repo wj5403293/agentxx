@@ -62,6 +62,21 @@ cd "%boost_source_dir%"
 ```
 ### 下载预编译的 openssl
 - 前往下载 `https://slproweb.com/products/Win32OpenSSL.html`, 进入网页后往下滑动，找到 `Win64 OpenSSL vx.x.x`，注意没有末尾 Light，下载其 `EXE` 或 `MSI` 都行，然后运行安装，安装目录选择到 `{项目根目录}/agent/third_party/OpenSSL/` 即可
+### 安装 Ragel
+- 编译`vectorize`/`hyperscan`需要，不想安装也可以修改 [debug_build.bat](/agent/script/debug_build.bat)，更改 `-DAGENTXX_ENABLE_HYPERSCAN=OFF`关闭即可。
+- 打开 cmd，执行命令看看是否有 ragel:
+```sh
+ragel -v
+```
+- 报错`未找到可执行文件或脚本`就是没安装，可以用 winget 快速安装:
+```sh
+winget install --id=PolarGoose.Ragel -e
+
+# 查看安装目录，复制 Ragel.exe 所在路径
+dir %localappdata%\Microsoft\WinGet\Links\
+# 效果也等同于:
+%localappdata%\Microsoft\WinGet\Links\Ragel.exe -v
+```
 ### agentxx 编译
 - - 启动编译 agentxx，会自动下载其他依赖库，编译成功后自动运行 命令行 client:
 ```sh

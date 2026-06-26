@@ -12,7 +12,7 @@ struct XXRegexMatchResult {
   size_t end;
 };
 
-#if defined(AGENTXX_ENABLE_HYPERSCAN)
+#if defined(AGENTXX_ENABLE_VECTORSCAN) || defined(AGENTXX_ENABLE_HYPERSCAN)
 #include <hs_compile.h>
 #include <hs_runtime.h>
 

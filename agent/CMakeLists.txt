@@ -13,7 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
 option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
 option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
-option(AGENTXX_ENABLE_HYPERSCAN "Add HyperScan for regex support. Use std::regex if disable." ON)
+option(AGENTXX_ENABLE_VECTORSCAN "Add VectorScan for regex support. Use [AGENTXX_ENABLE_HYPERSCAN] or std::regex if disable." ON)
+option(AGENTXX_ENABLE_HYPERSCAN "Add HyperScan for regex support. Use [AGENTXX_ENABLE_VECTORSCAN] or std::regex if disable." OFF)
 option(AGENTXX_ENABLE_CODEGRAPH "Add CodeGraph-CPP for code analysis." ON)
 option(AGENTXX_ENABLE_CUSTOM_CURL "Use custom curl." ON)
 
@@ -84,6 +85,9 @@ endif ()
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
 message("[agentxx] Current Compiler: ${CMAKE_C_COMPILER_ID}")
+
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceRuns)
 
 set(_AGENTXX_COMMON_C_CXX_FLAGS)
 
@@ -346,6 +350,11 @@ set(_AGENTXX_COMMON_CMAKE_ARGS
     -DXX_IS_GCC=${XX_IS_GCC}
     -DXX_IS_CLANG=${XX_IS_CLANG}
 
+    -DAGENTXX_ENABLE_VECTORSCAN=${AGENTXX_ENABLE_VECTORSCAN}
+    -DAGENTXX_ENABLE_HYPERSCAN=${AGENTXX_ENABLE_HYPERSCAN}
+    -DAGENTXX_ENABLE_CODEGRAPH=${AGENTXX_ENABLE_CODEGRAPH}
+    -DAGENTXX_ENABLE_CUSTOM_CURL=${AGENTXX_ENABLE_CUSTOM_CURL}
+
     "-DAGENTXX_EXEC_INSTALL_PREFIX=${AGENTXX_EXEC_INSTALL_PREFIX}"
     "-DAGENTXX_THIRD_PARTY_DIR=${AGENTXX_THIRD_PARTY_DIR}"
     -DAGENTXX_LINUX_IO_URING_SUPPORTED=${AGENTXX_LINUX_IO_URING_SUPPORTED}
@@ -509,33 +518,73 @@ if (AGENTXX_ENABLE_CODEGRAPH)
   )
 endif()
 
-if (AGENTXX_ENABLE_HYPERSCAN)
+if (AGENTXX_ENABLE_VECTORSCAN)
   # vectorscan
+  if (XX_IS_MSVC)
+    check_cxx_compiler_flag("/arch:AVX512" COMPILER_SUPPORTS_AVX512F)
+    check_cxx_source_runs("
+      #include <immintrin.h>
+      int main() {
+          // 使用 VBMI 特有的 intrinsic：_mm512_vpermvar_epi8
+          __m512i a = _mm512_set1_epi8(42);
+          __m512i idx = _mm512_set1_epi8(0);
+          __m512i result = _mm512_vpermvar_epi8(a, idx);
+          
+          // 防止编译器优化掉
+          volatile __m512i dummy = result;
+          (void)dummy;
+          return 0;
+      }" 
+      COMPILER_SUPPORTS_AVX512VBMI
+    )
+  else ()
+    check_cxx_compiler_flag("-mavx512f" COMPILER_SUPPORTS_AVX512F)
+    check_cxx_compiler_flag("-mavx512vbmi" COMPILER_SUPPORTS_AVX512VBMI)
+  endif()
+
   ExternalProject_Add(
     vectorscan_repo
     SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/vectorscan/"
     INSTALL_DIR ${AGENTXX_INSTALL_DIR}
     CMAKE_ARGS
-      ${_AGENTXX_COMMON_CMAKE_ARGS}
       "-DBOOST_ROOT=${BOOST_ROOT}"
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
       -DBUILD_UNIT=OFF
       -DBUILD_TOOLS=OFF
       -DBUILD_EXAMPLES=OFF
       -DBUILD_BENCHMARKS=OFF
       -DBUILD_DOC=OFF
-      -DBUILD_SHARED_LIBS=OFF
-      -DBUILD_STATIC_LIBS=ON 
       -DFAT_RUNTIME=OFF
       -DUSE_CPU_NATIVE=ON 
       -DBUILD_AVX2=ON 
-      -DBUILD_AVX512=ON 
-      -DBUILD_AVX512VBMI=ON 
+      -DBUILD_AVX512=${COMPILER_SUPPORTS_AVX512VBMI}
+      -DBUILD_AVX512VBMI=${COMPILER_SUPPORTS_AVX512VBMI}
       -DBUILD_SIMDE_BACKEND=OFF
       -DBUILD_SIMDE_NATIVE=OFF
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON
+    TEST_COMMAND ""
+  )
+elseif (AGENTXX_ENABLE_HYPERSCAN)
+  ExternalProject_Add(
+    hyperscan_repo
+    SOURCE_DIR "${AGENTXX_THIRD_PARTY_DIR}/hyperscan/"
+    INSTALL_DIR ${AGENTXX_INSTALL_DIR}
+    CMAKE_ARGS
+      "-DCMAKE_POLICY_VERSION_MINIMUM=3.15"
+      "-DBOOST_ROOT=${BOOST_ROOT}"
+      ${_AGENTXX_COMMON_CMAKE_ARGS}
+      -DBUILD_STATIC_AND_SHARED=OFF
+      -DBUILD_EXAMPLES=OFF
+      -DBUILD_TOOLS=OFF
+      -DDEBUG_OUTPUT=OFF
+      # -DFAT_RUNTIME=OFF # auto
+      -DBUILD_SHARED_LIBS=OFF
+      -DBUILD_STATIC_LIBS=ON
     TEST_COMMAND ""
   )
 else()
-  message("[agentxx] Disable Hyperscan")
+  message("[agentxx] Disable VectorScan and HyperScan")
 endif()
 
 # neograph
@@ -634,8 +683,10 @@ ExternalProject_Add(
 if (AGENTXX_LINUX_IO_URING_SUPPORTED)
   add_dependencies(agentxx_lib_repo liburing_repo)
 endif()
-if (AGENTXX_ENABLE_HYPERSCAN)
+if (AGENTXX_ENABLE_VECTORSCAN)
   add_dependencies(agentxx_lib_repo vectorscan_repo)
+elseif (AGENTXX_ENABLE_HYPERSCAN)
+  add_dependencies(agentxx_lib_repo hyperscan_repo)
 endif()
 if (AGENTXX_ENABLE_CODEGRAPH)
   add_dependencies(agentxx_lib_repo codegraph_repo)

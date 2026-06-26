@@ -71,7 +71,7 @@ if (AGENTXX_LINUX_IO_URING_SUPPORTED)
     PkgConfig::uring
   )
 endif()
-if (AGENTXX_ENABLE_HYPERSCAN)
+if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
   pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
   target_link_libraries(agentxx_test PRIVATE 
     PkgConfig::hyperscan
