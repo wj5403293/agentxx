@@ -75,8 +75,10 @@ public:
   baseRun(neograph::graph::NodeInput &in) {
     try {
       co_return co_await T::run(in);
+    } catch (const neograph::graph::CancelledException &e) {
+      throw;
     } catch (const neograph::graph::NodeInterrupt &e) {
-      throw e;
+      throw;
     } catch (const std::exception &e) {
       neograph::graph::NodeOutput out;
       out.writes.push_back(neograph::graph::ChannelWrite{
@@ -163,6 +165,11 @@ public:
       auto &item = agentCtxPtr->middlewareHandleContext->handles[i];
       try {
         co_await onHandleStart(*item, in);
+      } catch (const neograph::graph::CancelledException &e) {
+        errorRethrow = true;
+        onHandleStartError(errorRethrow, &e, *item, in, out);
+        errorPtr = std::current_exception();
+        break;
       } catch (const neograph::graph::NodeInterrupt &e) {
         errorRethrow = true;
         onHandleStartError(errorRethrow, &e, *item, in, out);
@@ -181,6 +188,10 @@ public:
     if (i >= len) {
       try {
         co_await baseRun(in, out);
+      } catch (const neograph::graph::CancelledException &e) {
+        errorRethrow = true;
+        onHandleBaseRunError(errorRethrow, &e, in, out);
+        errorPtr = std::current_exception();
       } catch (const neograph::graph::NodeInterrupt &e) {
         errorRethrow = true;
         onHandleBaseRunError(errorRethrow, &e, in, out);
@@ -202,6 +213,10 @@ public:
       } else {
         try {
           co_await onHandleEnd(*item, in, out);
+        } catch (const neograph::graph::CancelledException &e) {
+          errorRethrow = true;
+          onHandleEndError(errorRethrow, &e, *item, in, out);
+          errorPtr = std::current_exception();
         } catch (const neograph::graph::NodeInterrupt &e) {
           errorRethrow = true;
           onHandleEndError(errorRethrow, &e, *item, in, out);
