@@ -28,7 +28,6 @@
 - Toolcall:
     - ✅返回值自动转换字符编码到 utf8
     - ✅filesystem (支持 `同步`/`asio io_uring/IOCP 协程异步` 文件读写)
-        - 读取文件内容时自动转换字符编码到 utf8
         - ls (file/dir/recursive-dir/limit)
         - read_text (full / offset-limit)
         - read_binary (full / byte-offset-limit)
@@ -36,6 +35,8 @@
         - edit_text
         - glob
         - grep (multi text/regex + multi-filepath)
+        - 读取文件内容时自动转换字符编码到 utf8
+        - ⬜写入文件内容时保持文件原有字符编码
     - ✅execute_command (支持 `同步`/`Boost.process 协程异步`执行)
         - ✅execute_linux_command
         - ✅execute_windows_command (检测到 WSL 环境时，允许在 linux/wsl 直接执行 windows 命令)

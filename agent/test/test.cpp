@@ -16,6 +16,7 @@
 #include "test_filesystem_tools.h"
 #include "test_rag_search_tools.h"
 #include "test_string_tools.h"
+#include "test_string_util.h"
 #include "test_text_selection_monitor.h"
 #include "test_web_search_tools.h"
 #include <fstream>
@@ -53,6 +54,8 @@ int main(int argn, char **argv) {
                       << std::endl;
           }
         };
+
+        { agentxx::test::testStringUtil(); }
 
         co_await run(agentxx::test::run_string_tools_tests);
         co_await run(agentxx::test::run_rag_search_tools_tests);

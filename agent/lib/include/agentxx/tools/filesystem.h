@@ -505,8 +505,8 @@ Returns binary content as base64 string.)",
               {"bytes_read_len", bytesReadLen},
               {
                   "base64_data",
-                  agentxx::util::base64_encode(readRange.data(),
-                                               readRange.size()),
+                  agentxx::util::base64Encode(readRange.data(),
+                                              readRange.size()),
               },
           }
               .dump();
@@ -541,8 +541,7 @@ Returns binary content as base64 string.)",
             {"bytes_read_len", bytesReadLen},
             {
                 "base64_data",
-                agentxx::util::base64_encode(readRange.data(),
-                                             readRange.size()),
+                agentxx::util::base64Encode(readRange.data(), readRange.size()),
             },
         }
             .dump();
@@ -605,7 +604,7 @@ Returns binary content as base64 string.)",
           co_return neograph::json{
               {"bytes_read_len", realBytesRead},
               {"base64_data",
-               agentxx::util::base64_encode(result.data(), result.size())},
+               agentxx::util::base64Encode(result.data(), result.size())},
           }
               .dump();
         }
@@ -618,7 +617,7 @@ Returns binary content as base64 string.)",
         co_return neograph::json{
             {"bytes_read_len", bytesReadLen},
             {"base64_data",
-             agentxx::util::base64_encode(result.data(), result.size())},
+             agentxx::util::base64Encode(result.data(), result.size())},
         }
             .dump();
       } catch (const std::exception &e) {
@@ -737,7 +736,7 @@ public:
         if (false == content.empty()) {
           // 写入文件内容
           if (is_binary) {
-            auto result = agentxx::util::base64_decode(content);
+            auto result = agentxx::util::base64Decode(content);
             if (result.empty()) {
               throw std::runtime_error{"base64 decode failed"};
             }
@@ -792,7 +791,7 @@ public:
         if (false == content.empty()) {
           // 写入文件内容
           if (is_binary) {
-            auto result = agentxx::util::base64_decode(content);
+            auto result = agentxx::util::base64Decode(content);
             if (result.empty()) {
               throw std::runtime_error{"base64 decode failed"};
             }

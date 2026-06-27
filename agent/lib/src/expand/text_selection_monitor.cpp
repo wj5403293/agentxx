@@ -24,7 +24,11 @@ namespace expand {
 
 class TextSelectionMonitor::Impl {
 public:
-  Impl() : running_(false), debounceMs_(300), lastEventTime_({}) {}
+  static constexpr UINT WM_SELECTION_COMPLETE = WM_APP + 1;
+
+  Impl()
+      : running_(false), debounceMs_(300), lastSelectionChangeTime_({}),
+        selectionPending_(false), lastSelectionHwnd_(nullptr) {}
 
   ~Impl() { stop(); }
 
@@ -83,6 +87,11 @@ public:
       hook_ = nullptr;
     }
 
+    if (mouseHook_) {
+      UnhookWindowsHookEx(mouseHook_);
+      mouseHook_ = nullptr;
+    }
+
     if (workerThread_.joinable()) {
       PostThreadMessageW(GetThreadId(workerThread_.native_handle()), WM_QUIT, 0,
                          0);
@@ -114,15 +123,30 @@ private:
       return;
     }
 
+    mouseHook_ = SetWindowsHookExW(WH_MOUSE_LL, MouseProc, nullptr, 0);
+    if (!mouseHook_) {
+      XX_LOGE("TextSelectionMonitor: SetWindowsHookEx(WH_MOUSE_LL) failed");
+      UnhookWinEvent(hook_);
+      hook_ = nullptr;
+      running_.store(false);
+      return;
+    }
+
     MSG msg;
     while (running_.load()) {
       while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
         if (msg.message == WM_QUIT) {
           return;
         }
+        if (msg.message == WM_SELECTION_COMPLETE) {
+          processPendingSelection();
+          continue;
+        }
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
       }
+
+      checkDebounce();
 
       if (running_.load() &&
           MsgWaitForMultipleObjects(0, nullptr, FALSE, 100, QS_ALLINPUT) ==
@@ -130,6 +154,60 @@ private:
         continue;
       }
     }
+  }
+
+  static LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0) {
+      Impl *self = instancePtr();
+      if (!self)
+        return CallNextHookEx(nullptr, nCode, wParam, lParam);
+
+      MSLLHOOKSTRUCT *pMouseStruct = (MSLLHOOKSTRUCT *)lParam;
+
+      switch (wParam) {
+      case WM_LBUTTONDOWN:
+        self->mouseDownPos_ = pMouseStruct->pt;
+        break;
+
+      case WM_LBUTTONUP: {
+        if (self->selectionPending_.load(std::memory_order_acquire)) {
+          PostThreadMessageW(GetCurrentThreadId(), WM_SELECTION_COMPLETE, 0, 0);
+        } else {
+          int dx = abs(pMouseStruct->pt.x - self->mouseDownPos_.x);
+          int dy = abs(pMouseStruct->pt.y - self->mouseDownPos_.y);
+          bool wasDrag = (dx > 3 || dy > 3);
+
+          auto now = std::chrono::steady_clock::now();
+          auto clickElapsed =
+              std::chrono::duration_cast<std::chrono::milliseconds>(
+                  now - self->lastClickTime_);
+          int cdx = abs(pMouseStruct->pt.x - self->lastClickPos_.x);
+          int cdy = abs(pMouseStruct->pt.y - self->lastClickPos_.y);
+          bool wasDoubleClick = (clickElapsed.count() < GetDoubleClickTime() &&
+                                 cdx < 5 && cdy < 5);
+
+          if (wasDrag || wasDoubleClick) {
+            HWND hwnd = WindowFromPoint(pMouseStruct->pt);
+            if (hwnd) {
+              HWND rootHwnd = GetAncestor(hwnd, GA_ROOT);
+              if (isBrowserWindow(rootHwnd)) {
+                std::lock_guard<std::mutex> lock(self->debounceMutex_);
+                self->lastSelectionHwnd_ = rootHwnd;
+                self->lastSelectionChangeTime_ = now;
+                self->selectionPending_.store(true, std::memory_order_release);
+                PostThreadMessageW(GetCurrentThreadId(), WM_SELECTION_COMPLETE,
+                                   0, 0);
+              }
+            }
+          }
+          self->lastClickTime_ = now;
+          self->lastClickPos_ = pMouseStruct->pt;
+        }
+        break;
+      }
+      }
+    }
+    return CallNextHookEx(nullptr, nCode, wParam, lParam);
   }
 
   static void CALLBACK WinEventProc(HWINEVENTHOOK /*hWinEventHook*/,
@@ -152,25 +230,10 @@ private:
     auto now = std::chrono::steady_clock::now();
     {
       std::lock_guard<std::mutex> lock(self->debounceMutex_);
-      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-          now - self->lastEventTime_);
-      if (elapsed.count() < self->debounceMs_) {
-        return;
-      }
-      self->lastEventTime_ = now;
+      self->lastSelectionHwnd_ = hwnd;
+      self->lastSelectionChangeTime_ = now;
     }
-
-    auto [selectedText, source] = self->getSelectedText(hwnd);
-    if (selectedText.empty()) {
-      return;
-    }
-
-    TextSelectionEvent evt;
-    evt.text = std::move(selectedText);
-    evt.timestamp = now;
-    evt.source = source;
-
-    self->notifyListeners(evt);
+    self->selectionPending_.store(true, std::memory_order_release);
   }
 
   static std::string bstrToUtf8(BSTR bstr) {
@@ -351,9 +414,49 @@ private:
   static bool isBrowserWindow(HWND hwnd) {
     wchar_t className[64] = {};
     GetClassNameW(hwnd, className, 64);
-    return (wcscmp(className, L"Chrome_WidgetWin_1") == 0 ||
-            wcscmp(className, L"MozillaWindowClass") == 0 ||
-            wcsstr(className, L"Chrome") != nullptr);
+    if (wcscmp(className, L"Chrome_WidgetWin_1") == 0 ||
+        wcscmp(className, L"MozillaWindowClass") == 0 ||
+        wcsstr(className, L"Chrome") != nullptr) {
+      return true;
+    }
+
+    DWORD processId = 0;
+    GetWindowThreadProcessId(hwnd, &processId);
+    if (processId == 0) {
+      return false;
+    }
+
+    HANDLE hProcess =
+        OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+    if (!hProcess) {
+      return false;
+    }
+
+    wchar_t exePath[MAX_PATH] = {};
+    DWORD size = MAX_PATH;
+    bool isBrowser = false;
+    if (QueryFullProcessImageNameW(hProcess, 0, exePath, &size)) {
+      wchar_t *fileName = wcsrchr(exePath, L'\\');
+      if (!fileName) {
+        fileName = exePath;
+      } else {
+        ++fileName;
+      }
+      _wcslwr_s(fileName, wcslen(fileName) + 1);
+      isBrowser = (wcsstr(fileName, L"chrome") != nullptr ||
+                   wcsstr(fileName, L"firefox") != nullptr ||
+                   wcsstr(fileName, L"edge") != nullptr ||
+                   wcsstr(fileName, L"opera") != nullptr ||
+                   wcsstr(fileName, L"brave") != nullptr ||
+                   wcsstr(fileName, L"browser") != nullptr ||
+                   wcsstr(fileName, L"360") != nullptr ||
+                   wcsstr(fileName, L"sogou") != nullptr ||
+                   wcsstr(fileName, L"qqbrowser") != nullptr ||
+                   wcsstr(fileName, L"maxthon") != nullptr ||
+                   wcsstr(fileName, L"liebao") != nullptr);
+    }
+    CloseHandle(hProcess);
+    return isBrowser;
   }
 
   static bool ensureWSA() {
@@ -719,12 +822,111 @@ private:
     return {value, TextSource::DevTools};
   }
 
+  std::pair<std::string, TextSource> getSelectedTextByClipboard(HWND hwnd) {
+    HWND foregroundHwnd = GetForegroundWindow();
+    bool needRestoreFocus =
+        (foregroundHwnd != hwnd && foregroundHwnd != nullptr);
+
+    if (needRestoreFocus) {
+      DWORD targetThreadId = GetWindowThreadProcessId(hwnd, nullptr);
+      DWORD currentThreadId = GetCurrentThreadId();
+      AttachThreadInput(currentThreadId, targetThreadId, TRUE);
+      SetForegroundWindow(hwnd);
+      AttachThreadInput(currentThreadId, targetThreadId, FALSE);
+      Sleep(50);
+    }
+
+    if (!OpenClipboard(nullptr)) {
+      if (needRestoreFocus) {
+        SetForegroundWindow(foregroundHwnd);
+      }
+      return {};
+    }
+
+    std::string savedText;
+    {
+      HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+      if (hData) {
+        wchar_t *pwsz = static_cast<wchar_t *>(GlobalLock(hData));
+        if (pwsz) {
+          int utf8Len = WideCharToMultiByte(CP_UTF8, 0, pwsz, -1, nullptr, 0,
+                                            nullptr, nullptr);
+          if (utf8Len > 1) {
+            savedText.resize(utf8Len - 1);
+            WideCharToMultiByte(CP_UTF8, 0, pwsz, -1, &savedText[0], utf8Len,
+                                nullptr, nullptr);
+          }
+          GlobalUnlock(hData);
+        }
+      }
+    }
+    EmptyClipboard();
+    CloseClipboard();
+
+    keybd_event(VK_CONTROL, 0, 0, 0);
+    keybd_event('C', 0, 0, 0);
+    keybd_event('C', 0, KEYEVENTF_KEYUP, 0);
+    keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+    Sleep(30);
+
+    std::string result;
+    if (OpenClipboard(nullptr)) {
+      HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+      if (hData) {
+        wchar_t *pwsz = static_cast<wchar_t *>(GlobalLock(hData));
+        if (pwsz) {
+          int utf8Len = WideCharToMultiByte(CP_UTF8, 0, pwsz, -1, nullptr, 0,
+                                            nullptr, nullptr);
+          if (utf8Len > 1) {
+            result.resize(utf8Len - 1);
+            WideCharToMultiByte(CP_UTF8, 0, pwsz, -1, &result[0], utf8Len,
+                                nullptr, nullptr);
+          }
+          GlobalUnlock(hData);
+        }
+      }
+
+      if (!savedText.empty()) {
+        size_t wLen =
+            MultiByteToWideChar(CP_UTF8, 0, savedText.c_str(), -1, nullptr, 0);
+        if (wLen > 0) {
+          HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, wLen * sizeof(wchar_t));
+          if (hMem) {
+            wchar_t *pwszDst = static_cast<wchar_t *>(GlobalLock(hMem));
+            if (pwszDst) {
+              MultiByteToWideChar(CP_UTF8, 0, savedText.c_str(), -1, pwszDst,
+                                  wLen);
+              GlobalUnlock(hMem);
+            }
+            SetClipboardData(CF_UNICODETEXT, hMem);
+          }
+        }
+      }
+      CloseClipboard();
+    }
+
+    if (needRestoreFocus) {
+      SetForegroundWindow(foregroundHwnd);
+    }
+
+    if (result.empty()) {
+      return {};
+    }
+
+    return {result, TextSource::Clipboard};
+  }
+
   std::pair<std::string, TextSource> getSelectedTextByDevTools(HWND hwnd) {
     if (!isBrowserWindow(hwnd)) {
       return {};
     }
 
-    return getSelectedTextByCDP(hwnd);
+    auto cdpResult = getSelectedTextByCDP(hwnd);
+    if (!cdpResult.first.empty()) {
+      return cdpResult;
+    }
+
+    return getSelectedTextByClipboard(hwnd);
   }
 
   std::pair<std::string, TextSource> getSelectedText(HWND hwnd) {
@@ -848,7 +1050,61 @@ private:
       return legacyResult;
     }
 
+    if (isBrowserWindow(hwnd)) {
+      return {};
+    }
+
     return getSelectedTextByWmGetText(hwnd);
+  }
+
+  void processPendingSelection() {
+    if (!selectionPending_.load(std::memory_order_acquire)) {
+      return;
+    }
+
+    HWND hwnd = nullptr;
+    {
+      std::lock_guard<std::mutex> lock(debounceMutex_);
+      hwnd = lastSelectionHwnd_;
+    }
+
+    if (!hwnd) {
+      selectionPending_.store(false, std::memory_order_release);
+      return;
+    }
+
+    auto [selectedText, source] = getSelectedText(hwnd);
+    if (selectedText.empty()) {
+      selectionPending_.store(false, std::memory_order_release);
+      return;
+    }
+
+    selectionPending_.store(false, std::memory_order_release);
+
+    TextSelectionEvent evt;
+    evt.text = std::move(selectedText);
+    evt.timestamp = std::chrono::steady_clock::now();
+    evt.source = source;
+
+    notifyListeners(evt);
+  }
+
+  void checkDebounce() {
+    if (!selectionPending_.load(std::memory_order_acquire)) {
+      return;
+    }
+
+    std::chrono::steady_clock::time_point lastTime;
+    {
+      std::lock_guard<std::mutex> lock(debounceMutex_);
+      lastTime = lastSelectionChangeTime_;
+    }
+
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - lastTime);
+    if (elapsed.count() >= debounceMs_) {
+      processPendingSelection();
+    }
   }
 
   void notifyListeners(const TextSelectionEvent &event) {
@@ -868,9 +1124,15 @@ private:
   std::atomic<bool> running_;
   std::thread workerThread_;
   HWINEVENTHOOK hook_ = nullptr;
+  HHOOK mouseHook_ = nullptr;
   IUIAutomation *automation_ = nullptr;
   int debounceMs_;
-  std::chrono::steady_clock::time_point lastEventTime_;
+  std::chrono::steady_clock::time_point lastSelectionChangeTime_;
+  std::atomic<bool> selectionPending_;
+  HWND lastSelectionHwnd_ = nullptr;
+  POINT mouseDownPos_ = {};
+  std::chrono::steady_clock::time_point lastClickTime_ = {};
+  POINT lastClickPos_ = {};
   std::mutex debounceMutex_;
   std::mutex listenersMutex_;
   std::vector<TextSelectionListener> listeners_;
