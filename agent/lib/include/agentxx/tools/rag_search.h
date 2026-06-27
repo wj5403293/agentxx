@@ -494,7 +494,7 @@ public:
     scanDocument(const std::vector<std::string> &pathlist) {
       auto result = std::vector<Document>{};
 
-      auto onAppendItem = [&](std::string_view path) -> bool {
+      auto onAppendItem = [&](const std::string &path) -> bool {
         auto filepath = std::filesystem::path{path};
         if (filepath.extension() == ".md") {
           std::ifstream stream;
