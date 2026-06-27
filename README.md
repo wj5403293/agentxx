@@ -24,10 +24,11 @@
     - 默认编译提供 动态库`libagentxx`、静态库`libagentxx_static`, 且统一动态链接 libstdc++/libgcc/msvcrt(/MD|/MDd)
 ### 编译后的体积和依赖库
 - Agentxx 编译后输出的 可执行程序`agentxx_cli`、动态库`libagentxx` 都会尽量静态链接依赖库，保持编译结果对动态库的依赖尽量少
+- 以下是编译添加了所有支持的功能，如果需要进一步裁剪体积，可以移除 VectorScan/Hyperscan 等可选库、采用 -Os 体积编译优化，可以大幅缩减体积
 - Windows: 
     - Release 编译体积 MSVC (Visual Studio 18 2026 / MSVC 19.51.36247.0) x86_64 -O2:
-        - agentxx_cli.exe: 
-        - libagentxx.dll
+        - agentxx_cli.exe: 11.9 MB
+        - libagentxx.dll:  5.14 MB
     - 依赖的动态库都只有 系统库+msvc运行时, 打包时建议带上msvc运行时。`dumpbin /dependents agentxx_cli.exe` 或 `dumpbin /dependents libagentxx.dll`结果一致: 
         - OLEACC.dll
         - WINHTTP.dll
@@ -45,8 +46,8 @@
         - ucrtbased.dll
 - Ubuntu/Linux: 
     - Release 编译 GCC 16.1.0 x86_64 -O3:
-        - agentxx_cli: 
-        - libagentxx.so: 
+        - agentxx_cli:   28 MB
+        - libagentxx.so: 11 MB
     - `ldd agentxx_cli` 、`ldd libagentxx.so` 结果一致:
         - linux-vdso.so.1
         - libgcc_s.so.1 => /usr/local/lib64/libgcc_s.so.1
