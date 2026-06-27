@@ -138,7 +138,7 @@ public:
         : embedder(std::move(in_embedder)), splitConfig(in_splitCfg) {}
 
     inline static std::vector<std::string>
-    splitByFixedLength(const std::string_view text, size_t blockSize = 256,
+    splitByFixedLength(std::string_view text, size_t blockSize = 256,
                        double overlapPercent = 0.0) {
       if (overlapPercent <= 0.0 || overlapPercent >= 100.0) {
         auto result = std::vector<std::string>{};
@@ -212,7 +212,7 @@ public:
 
     // Split by markdown structure: headings, code blocks, lists, paragraphs
     inline static std::vector<std::string>
-    splitByStructure(const std::string_view text) {
+    splitByStructure(std::string_view text) {
       std::vector<std::string> blocks;
       size_t len = text.size();
       size_t lineStart = 0;
@@ -334,7 +334,7 @@ public:
     // Split by character delimiters with length limit, falling back to
     // fixed-length if no delimiter produces small-enough chunks
     inline static std::vector<std::string>
-    splitByDelimiters(const std::string_view text, size_t maxUtf8Length,
+    splitByDelimiters(std::string_view text, size_t maxUtf8Length,
                       const std::vector<std::string> &delimiters) {
       if (text.empty()) {
         return {};
@@ -417,7 +417,7 @@ public:
     // When overlapPercent > 0, adjacent chunks will overlap by the given
     // percentage of maxUtf8Length.
     inline static std::vector<std::string>
-    splitTextToChunks(const std::string_view text, const SplitConfig &config) {
+    splitTextToChunks(std::string_view text, const SplitConfig &config) {
       if (text.empty()) {
         return {};
       }

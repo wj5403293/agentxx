@@ -134,7 +134,7 @@ static bool uiControlNeedsShift(char ch) {
   }
 }
 
-static WORD uiControlKeyNameToVk(const std::string_view key) {
+static WORD uiControlKeyNameToVk(std::string_view key) {
   if (key.size() == 1) {
     return uiControlCharToVk(key[0]);
   }
@@ -323,8 +323,8 @@ static UICmdResult uiControlMouseMove(int x, int y) {
   return {true, fmt::format("mouse_move -> ({}, {})", x, y)};
 }
 
-static UICmdResult uiControlMouseClick(const std::string_view button, int x,
-                                       int y, bool at, int click_count) {
+static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
+                                       bool at, int click_count) {
   if (at) {
     SetCursorPos(x, y);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -409,7 +409,7 @@ static UICmdResult uiControlMouseScroll(int delta, int x, int y, bool at) {
 }
 
 static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
-                                      const std::string_view button,
+                                      std::string_view button,
                                       int duration_ms) {
   SetCursorPos(x1, y1);
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -541,7 +541,7 @@ static UICmdResult uiControlKeyCombo(const std::vector<WORD> &vks) {
   return {true, fmt::format("key_combo [{}]", comboStr)};
 }
 
-static UICmdResult uiControlKeyType(const std::string_view text) {
+static UICmdResult uiControlKeyType(std::string_view text) {
   for (char ch : text) {
     WORD vk = uiControlCharToVk(ch);
     if (vk == 0)

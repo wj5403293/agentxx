@@ -34,7 +34,7 @@ AUTO_DESTROY void chardetDestroyHandle() {
 }
 
 // BOM 判断UTF16编码
-static std::string detectUtfBom(const std::string_view str) {
+static std::string detectUtfBom(std::string_view str) {
   if (str.size() < 2) {
     // UTF16 BOM至少2字节，长度不足直接返回
     return "";
@@ -76,7 +76,7 @@ getIconvCandidateEncodings(const char *src_encoding) {
 }
 
 // 转UTF8
-std::string agentxx::util::convertToUtf8(const std::string_view src,
+std::string agentxx::util::convertToUtf8(std::string_view src,
                                          const char *src_encoding) {
   // 已是UTF8/空字符串，直接返回
   if (std::strcmp(src_encoding, "UTF-8") == 0 ||
@@ -133,7 +133,7 @@ std::string agentxx::util::convertToUtf8(const std::string_view src,
   return utf8_str;
 }
 
-bool agentxx::util::autoConvertToUtf8(const std::string_view str,
+bool agentxx::util::autoConvertToUtf8(std::string_view str,
                                       std::string &encoding,
                                       std::string &result) {
   const auto handle = cChardetHandle;

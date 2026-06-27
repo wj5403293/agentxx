@@ -625,7 +625,7 @@ private:
     return sock;
   }
 
-  static bool wsSend(SOCKET sock, const std::string_view message) {
+  static bool wsSend(SOCKET sock, std::string_view message) {
     std::vector<unsigned char> frame;
     frame.push_back(0x81);
     size_t len = message.size();
@@ -701,8 +701,8 @@ private:
     }
   }
 
-  static std::string_view extractJsonString(const std::string_view json,
-                                            const std::string_view key) {
+  static std::string_view extractJsonString(std::string_view json,
+                                            std::string_view key) {
     std::string search = fmt::format("\"{}\"", key);
     size_t pos = json.find(search);
     if (pos == std::string::npos) {
