@@ -1,13 +1,15 @@
 #include "agentxx/tools/ui_control.h"
 #include "agentxx/util/log.h"
 #include "agentxx/util/string_util.h"
+#include "asio/awaitable.hpp"
+#include "asio/steady_timer.hpp"
+#include "asio/use_awaitable.hpp"
 #include "fmt/format.h"
-#include <asio/awaitable.hpp>
-#include <asio/steady_timer.hpp>
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
+
 
 #if XX_IS_WIN_D
 #include <windows.h>
@@ -37,25 +39,25 @@ static WORD uiControlCharToVk(char ch) {
   case '\x1b':
     return VK_ESCAPE;
   case '!':
-    return VK_NUMPAD1;
+    return '1';
   case '@':
-    return VK_NUMPAD2;
+    return '2';
   case '#':
-    return VK_NUMPAD3;
+    return '3';
   case '$':
-    return VK_NUMPAD4;
+    return '4';
   case '%':
-    return VK_NUMPAD5;
+    return '5';
   case '^':
-    return VK_NUMPAD6;
+    return '6';
   case '&':
-    return VK_NUMPAD7;
+    return '7';
   case '*':
-    return VK_NUMPAD8;
+    return '8';
   case '(':
-    return VK_NUMPAD9;
+    return '9';
   case ')':
-    return VK_NUMPAD0;
+    return '0';
   case '-':
     return VK_OEM_MINUS;
   case '=':
@@ -318,16 +320,93 @@ struct UICmdResult {
   std::string msg;
 };
 
+static UINT uiControlSendInput(UINT cInputs, LPINPUT pInputs, int cbSize) {
+  UINT sent = SendInput(cInputs, pInputs, cbSize);
+  if (sent < cInputs) {
+    HWND fgWnd = GetForegroundWindow();
+    if (fgWnd) {
+      DWORD fgThreadId = GetWindowThreadProcessId(fgWnd, nullptr);
+      DWORD curThreadId = GetCurrentThreadId();
+      AttachThreadInput(curThreadId, fgThreadId, TRUE);
+      sent = SendInput(cInputs - sent, pInputs + sent, cbSize);
+      AttachThreadInput(curThreadId, fgThreadId, FALSE);
+    }
+    if (sent < cInputs) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      sent = SendInput(cInputs - sent, pInputs + sent, cbSize);
+    }
+  }
+  return sent;
+}
+
+static bool uiControlIsExtendedKey(WORD vk) {
+  switch (vk) {
+  case VK_INSERT:
+  case VK_DELETE:
+  case VK_HOME:
+  case VK_END:
+  case VK_PRIOR:
+  case VK_NEXT:
+  case VK_LEFT:
+  case VK_RIGHT:
+  case VK_UP:
+  case VK_DOWN:
+  case VK_LWIN:
+  case VK_RWIN:
+  case VK_APPS:
+  case VK_RCONTROL:
+  case VK_RMENU:
+  case VK_DIVIDE:
+  case VK_NUMLOCK:
+  case VK_SNAPSHOT:
+    return true;
+  default:
+    return false;
+  }
+}
+
+static void uiControlPrepareKeyInput(INPUT &input, WORD vk, DWORD flags) {
+  input.type = INPUT_KEYBOARD;
+  input.ki.wVk = vk;
+  input.ki.wScan = static_cast<WORD>(MapVirtualKey(vk, MAPVK_VK_TO_VSC));
+  input.ki.dwFlags = flags | KEYEVENTF_SCANCODE;
+  input.ki.time = 0;
+  input.ki.dwExtraInfo = 0;
+  if (uiControlIsExtendedKey(vk)) {
+    input.ki.dwFlags |= KEYEVENTF_EXTENDEDKEY;
+  }
+}
+
+static void uiControlMouseMoveTo(int x, int y) {
+  int screenW = GetSystemMetrics(SM_CXSCREEN);
+  int screenH = GetSystemMetrics(SM_CYSCREEN);
+  INPUT input = {};
+  input.type = INPUT_MOUSE;
+  input.mi.dx = static_cast<LONG>((static_cast<LONGLONG>(x) * 65535) / screenW);
+  input.mi.dy = static_cast<LONG>((static_cast<LONGLONG>(y) * 65535) / screenH);
+  input.mi.mouseData = 0;
+  input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+  input.mi.time = 0;
+  input.mi.dwExtraInfo = 0;
+  uiControlSendInput(1, &input, sizeof(INPUT));
+}
+
+static std::pair<int, int> uiControlGetCursorPosPair() {
+  POINT pt;
+  GetCursorPos(&pt);
+  return {pt.x, pt.y};
+}
+
 static UICmdResult uiControlMouseMove(int x, int y) {
-  SetCursorPos(x, y);
+  uiControlMouseMoveTo(x, y);
   return {true, fmt::format("mouse_move -> ({}, {})", x, y)};
 }
 
 static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
                                        bool at, int click_count) {
   if (at) {
-    SetCursorPos(x, y);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    uiControlMouseMoveTo(x, y);
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
   }
 
   DWORD downFlag = 0, upFlag = 0;
@@ -348,28 +427,30 @@ static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
     btnName = "left";
   }
 
-  POINT pt;
-  GetCursorPos(&pt);
+  auto [ptX, ptY] = uiControlGetCursorPosPair();
 
   for (int i = 0; i < click_count; i++) {
-    INPUT inputs[2] = {};
-    inputs[0].type = INPUT_MOUSE;
-    inputs[0].mi.dx = 0;
-    inputs[0].mi.dy = 0;
-    inputs[0].mi.mouseData = dataVal;
-    inputs[0].mi.dwFlags = downFlag;
-    inputs[0].mi.time = 0;
-    inputs[0].mi.dwExtraInfo = 0;
+    INPUT inputDown = {};
+    inputDown.type = INPUT_MOUSE;
+    inputDown.mi.dx = 0;
+    inputDown.mi.dy = 0;
+    inputDown.mi.mouseData = dataVal;
+    inputDown.mi.dwFlags = downFlag;
+    inputDown.mi.time = 0;
+    inputDown.mi.dwExtraInfo = 0;
+    uiControlSendInput(1, &inputDown, sizeof(INPUT));
 
-    inputs[1].type = INPUT_MOUSE;
-    inputs[1].mi.dx = 0;
-    inputs[1].mi.dy = 0;
-    inputs[1].mi.mouseData = dataVal;
-    inputs[1].mi.dwFlags = upFlag;
-    inputs[1].mi.time = 0;
-    inputs[1].mi.dwExtraInfo = 0;
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-    SendInput(2, inputs, sizeof(INPUT));
+    INPUT inputUp = {};
+    inputUp.type = INPUT_MOUSE;
+    inputUp.mi.dx = 0;
+    inputUp.mi.dy = 0;
+    inputUp.mi.mouseData = dataVal;
+    inputUp.mi.dwFlags = upFlag;
+    inputUp.mi.time = 0;
+    inputUp.mi.dwExtraInfo = 0;
+    uiControlSendInput(1, &inputUp, sizeof(INPUT));
 
     if (i < click_count - 1) {
       std::this_thread::sleep_for(std::chrono::milliseconds(80));
@@ -382,13 +463,13 @@ static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
             fmt::format("mouse_{} @ ({}, {}) [{}]", action, x, y, btnName)};
   }
   return {true,
-          fmt::format("mouse_{} @ ({}, {}) [{}]", action, pt.x, pt.y, btnName)};
+          fmt::format("mouse_{} @ ({}, {}) [{}]", action, ptX, ptY, btnName)};
 }
 
 static UICmdResult uiControlMouseScroll(int delta, int x, int y, bool at) {
   if (at) {
-    SetCursorPos(x, y);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    uiControlMouseMoveTo(x, y);
+    std::this_thread::sleep_for(std::chrono::milliseconds(30));
   }
 
   INPUT input = {};
@@ -400,19 +481,18 @@ static UICmdResult uiControlMouseScroll(int delta, int x, int y, bool at) {
   input.mi.time = 0;
   input.mi.dwExtraInfo = 0;
 
-  SendInput(1, &input, sizeof(INPUT));
+  uiControlSendInput(1, &input, sizeof(INPUT));
 
-  POINT pt;
-  GetCursorPos(&pt);
+  auto [ptX, ptY] = uiControlGetCursorPosPair();
   return {true,
-          fmt::format("mouse_scroll delta={} @ ({}, {})", delta, pt.x, pt.y)};
+          fmt::format("mouse_scroll delta={} @ ({}, {})", delta, ptX, ptY)};
 }
 
 static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
                                       std::string_view button,
                                       int duration_ms) {
-  SetCursorPos(x1, y1);
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  uiControlMouseMoveTo(x1, y1);
+  std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
   DWORD downFlag = 0, upFlag = 0;
   if (button == "right") {
@@ -433,7 +513,7 @@ static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
   inputDown.mi.dwFlags = downFlag;
   inputDown.mi.time = 0;
   inputDown.mi.dwExtraInfo = 0;
-  SendInput(1, &inputDown, sizeof(INPUT));
+  uiControlSendInput(1, &inputDown, sizeof(INPUT));
 
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
@@ -441,12 +521,12 @@ static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
   for (int i = 1; i <= steps; i++) {
     int cx = x1 + (x2 - x1) * i / steps;
     int cy = y1 + (y2 - y1) * i / steps;
-    SetCursorPos(cx, cy);
+    uiControlMouseMoveTo(cx, cy);
     std::this_thread::sleep_for(std::chrono::milliseconds(duration_ms / steps));
   }
 
-  SetCursorPos(x2, y2);
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  uiControlMouseMoveTo(x2, y2);
+  std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
   INPUT inputUp = {};
   inputUp.type = INPUT_MOUSE;
@@ -455,7 +535,7 @@ static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
   inputUp.mi.dwFlags = upFlag;
   inputUp.mi.time = 0;
   inputUp.mi.dwExtraInfo = 0;
-  SendInput(1, &inputUp, sizeof(INPUT));
+  uiControlSendInput(1, &inputUp, sizeof(INPUT));
 
   return {true, fmt::format("mouse_drag ({}, {}) -> ({}, {}) [{}]", x1, y1, x2,
                             y2, button)};
@@ -463,142 +543,176 @@ static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
 
 static UICmdResult uiControlKeyDown(WORD vk) {
   INPUT input = {};
-  input.type = INPUT_KEYBOARD;
-  input.ki.wVk = vk;
-  input.ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-  input.ki.dwFlags = 0;
-  input.ki.time = 0;
-  input.ki.dwExtraInfo = 0;
-  SendInput(1, &input, sizeof(INPUT));
+  uiControlPrepareKeyInput(input, vk, 0);
+  uiControlSendInput(1, &input, sizeof(INPUT));
   return {true, fmt::format("key_down [{}]", uiControlVkToKeyName(vk))};
 }
 
 static UICmdResult uiControlKeyUp(WORD vk) {
   INPUT input = {};
-  input.type = INPUT_KEYBOARD;
-  input.ki.wVk = vk;
-  input.ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-  input.ki.dwFlags = KEYEVENTF_KEYUP;
-  input.ki.time = 0;
-  input.ki.dwExtraInfo = 0;
-  SendInput(1, &input, sizeof(INPUT));
+  uiControlPrepareKeyInput(input, vk, KEYEVENTF_KEYUP);
+  uiControlSendInput(1, &input, sizeof(INPUT));
   return {true, fmt::format("key_up [{}]", uiControlVkToKeyName(vk))};
 }
 
 static UICmdResult uiControlKeyPress(WORD vk) {
-  INPUT inputs[2] = {};
-  inputs[0].type = INPUT_KEYBOARD;
-  inputs[0].ki.wVk = vk;
-  inputs[0].ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-  inputs[0].ki.dwFlags = 0;
-  inputs[0].ki.time = 0;
-  inputs[0].ki.dwExtraInfo = 0;
+  INPUT keyDown = {};
+  uiControlPrepareKeyInput(keyDown, vk, 0);
+  uiControlSendInput(1, &keyDown, sizeof(INPUT));
 
-  inputs[1].type = INPUT_KEYBOARD;
-  inputs[1].ki.wVk = vk;
-  inputs[1].ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-  inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
-  inputs[1].ki.time = 0;
-  inputs[1].ki.dwExtraInfo = 0;
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-  SendInput(2, inputs, sizeof(INPUT));
+  INPUT keyUp = {};
+  uiControlPrepareKeyInput(keyUp, vk, KEYEVENTF_KEYUP);
+  uiControlSendInput(1, &keyUp, sizeof(INPUT));
+
   return {true, fmt::format("key_press [{}]", uiControlVkToKeyName(vk))};
 }
 
 static UICmdResult uiControlKeyCombo(const std::vector<WORD> &vks) {
-  std::vector<INPUT> inputs;
-  inputs.reserve(vks.size() * 2);
+  if (vks.empty())
+    return {false, "key_combo: empty keys"};
 
   std::string comboStr;
   for (auto vk : vks) {
-    INPUT down = {};
-    down.type = INPUT_KEYBOARD;
-    down.ki.wVk = vk;
-    down.ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-    down.ki.dwFlags = 0;
-    down.ki.time = 0;
-    down.ki.dwExtraInfo = 0;
-    inputs.push_back(down);
-
-    if (!comboStr.empty()) {
+    if (!comboStr.empty())
       comboStr += "+";
-    }
     comboStr += uiControlVkToKeyName(vk);
   }
 
-  for (auto it = vks.rbegin(); it != vks.rend(); ++it) {
-    INPUT up = {};
-    up.type = INPUT_KEYBOARD;
-    up.ki.wVk = *it;
-    up.ki.wScan = MapVirtualKey(*it, MAPVK_VK_TO_VSC);
-    up.ki.dwFlags = KEYEVENTF_KEYUP;
-    up.ki.time = 0;
-    up.ki.dwExtraInfo = 0;
-    inputs.push_back(up);
+  for (auto vk : vks) {
+    INPUT down = {};
+    uiControlPrepareKeyInput(down, vk, 0);
+    uiControlSendInput(1, &down, sizeof(INPUT));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
-  SendInput(static_cast<UINT>(inputs.size()), inputs.data(), sizeof(INPUT));
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+  for (auto it = vks.rbegin(); it != vks.rend(); ++it) {
+    INPUT up = {};
+    uiControlPrepareKeyInput(up, *it, KEYEVENTF_KEYUP);
+    uiControlSendInput(1, &up, sizeof(INPUT));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  }
+
   return {true, fmt::format("key_combo [{}]", comboStr)};
 }
 
 static UICmdResult uiControlKeyType(std::string_view text) {
+  if (text.empty())
+    return {true, "key_type [0 chars]"};
+
+  std::vector<INPUT> inputs;
+  inputs.reserve(text.size() * 2);
+
   for (char ch : text) {
-    WORD vk = uiControlCharToVk(ch);
-    if (vk == 0)
+    if (ch == '\n' || ch == '\r') {
+      if (!inputs.empty()) {
+        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
+                           sizeof(INPUT));
+        inputs.clear();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
+      INPUT down = {};
+      uiControlPrepareKeyInput(down, VK_RETURN, 0);
+      uiControlSendInput(1, &down, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      INPUT up = {};
+      uiControlPrepareKeyInput(up, VK_RETURN, KEYEVENTF_KEYUP);
+      uiControlSendInput(1, &up, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      continue;
+    }
+
+    if (ch == '\t') {
+      if (!inputs.empty()) {
+        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
+                           sizeof(INPUT));
+        inputs.clear();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
+      INPUT down = {};
+      uiControlPrepareKeyInput(down, VK_TAB, 0);
+      uiControlSendInput(1, &down, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      INPUT up = {};
+      uiControlPrepareKeyInput(up, VK_TAB, KEYEVENTF_KEYUP);
+      uiControlSendInput(1, &up, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      continue;
+    }
+
+    if (ch == '\b') {
+      if (!inputs.empty()) {
+        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
+                           sizeof(INPUT));
+        inputs.clear();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
+      INPUT down = {};
+      uiControlPrepareKeyInput(down, VK_BACK, 0);
+      uiControlSendInput(1, &down, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      INPUT up = {};
+      uiControlPrepareKeyInput(up, VK_BACK, KEYEVENTF_KEYUP);
+      uiControlSendInput(1, &up, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      continue;
+    }
+
+    if (ch == '\x1b') {
+      if (!inputs.empty()) {
+        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
+                           sizeof(INPUT));
+        inputs.clear();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
+      INPUT down = {};
+      uiControlPrepareKeyInput(down, VK_ESCAPE, 0);
+      uiControlSendInput(1, &down, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      INPUT up = {};
+      uiControlPrepareKeyInput(up, VK_ESCAPE, KEYEVENTF_KEYUP);
+      uiControlSendInput(1, &up, sizeof(INPUT));
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      continue;
+    }
+
+    unsigned char uch = static_cast<unsigned char>(ch);
+    if (uch < 32)
       continue;
 
-    bool needsShift = uiControlNeedsShift(ch) || (ch >= 'A' && ch <= 'Z');
+    INPUT keyDown = {};
+    keyDown.type = INPUT_KEYBOARD;
+    keyDown.ki.wVk = 0;
+    keyDown.ki.wScan = uch;
+    keyDown.ki.dwFlags = KEYEVENTF_UNICODE;
+    keyDown.ki.time = 0;
+    keyDown.ki.dwExtraInfo = 0;
+    inputs.push_back(keyDown);
 
-    if (needsShift) {
-      INPUT shiftDown = {};
-      shiftDown.type = INPUT_KEYBOARD;
-      shiftDown.ki.wVk = VK_LSHIFT;
-      shiftDown.ki.wScan = MapVirtualKey(VK_LSHIFT, MAPVK_VK_TO_VSC);
-      shiftDown.ki.dwFlags = 0;
-      shiftDown.ki.time = 0;
-      shiftDown.ki.dwExtraInfo = 0;
-      SendInput(1, &shiftDown, sizeof(INPUT));
-
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-
-    INPUT inputs[2] = {};
-    inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wVk = vk;
-    inputs[0].ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-    inputs[0].ki.dwFlags = 0;
-    inputs[0].ki.time = 0;
-    inputs[0].ki.dwExtraInfo = 0;
-
-    inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wVk = vk;
-    inputs[1].ki.wScan = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
-    inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
-    inputs[1].ki.time = 0;
-    inputs[1].ki.dwExtraInfo = 0;
-
-    SendInput(2, inputs, sizeof(INPUT));
-
-    if (needsShift) {
-      INPUT shiftUp = {};
-      shiftUp.type = INPUT_KEYBOARD;
-      shiftUp.ki.wVk = VK_LSHIFT;
-      shiftUp.ki.wScan = MapVirtualKey(VK_LSHIFT, MAPVK_VK_TO_VSC);
-      shiftUp.ki.dwFlags = KEYEVENTF_KEYUP;
-      shiftUp.ki.time = 0;
-      shiftUp.ki.dwExtraInfo = 0;
-      SendInput(1, &shiftUp, sizeof(INPUT));
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    INPUT keyUp = {};
+    keyUp.type = INPUT_KEYBOARD;
+    keyUp.ki.wVk = 0;
+    keyUp.ki.wScan = uch;
+    keyUp.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+    keyUp.ki.time = 0;
+    keyUp.ki.dwExtraInfo = 0;
+    inputs.push_back(keyUp);
   }
+
+  if (!inputs.empty()) {
+    uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
+                       sizeof(INPUT));
+  }
+
   return {true, fmt::format("key_type [{} chars]", text.size())};
 }
 
 static UICmdResult uiControlGetCursorPos() {
-  POINT pt;
-  GetCursorPos(&pt);
-  return {true, fmt::format("cursor_pos: ({}, {})", pt.x, pt.y)};
+  auto [x, y] = uiControlGetCursorPosPair();
+  return {true, fmt::format("cursor_pos: ({}, {})", x, y)};
 }
 
 static UICmdResult uiControlGetScreenSize() {
@@ -925,7 +1039,6 @@ UIControlKeyboardMouseTool::execute_async(const neograph::json &arguments) {
 
     if (interval_ms > 0 && i < cmds.size() - 1) {
       co_await timer.async_wait();
-      std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
     }
   }
 
