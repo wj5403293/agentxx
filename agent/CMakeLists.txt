@@ -4,19 +4,10 @@
 cmake_minimum_required(VERSION 3.30)
 cmake_policy(SET CMP0091 NEW)
 
-project(agentxx_project VERSION 0.1.0 LANGUAGES C CXX)
-
-set(CMAKE_C_STANDARD 23)
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
-option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
-option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
-option(AGENTXX_ENABLE_VECTORSCAN "Add VectorScan for regex support. Use [AGENTXX_ENABLE_HYPERSCAN] or std::regex if disable." ON)
-option(AGENTXX_ENABLE_HYPERSCAN "Add HyperScan for regex support. Use [AGENTXX_ENABLE_VECTORSCAN] or std::regex if disable." OFF)
-option(AGENTXX_ENABLE_CODEGRAPH "Add CodeGraph-CPP for code analysis." ON)
-option(AGENTXX_ENABLE_CUSTOM_CURL "Use custom curl." ON)
+project(agentxx_project 
+  VERSION 0.1.0 
+  LANGUAGES C CXX
+)
 
 # ccache
 find_program(CCACHE_PROGRAM ccache)
@@ -86,10 +77,42 @@ message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
 message("[agentxx] Current Compiler: ${CMAKE_C_COMPILER_ID}")
 
-include(CheckCXXCompilerFlag)
-include(CheckCXXSourceRuns)
+# option ==========
+option(XX_BUILD_TYPE "Generate the client target." "RELEASE")
+option(AGENTXX_BUILD_CLIENT "Generate the client target." OFF)
+option(AGENTXX_BUILD_TEST "Generate the test target." OFF)
+option(AGENTXX_ENABLE_VECTORSCAN "Add VectorScan for regex support. Use [AGENTXX_ENABLE_HYPERSCAN] or std::regex if disable." ON)
+option(AGENTXX_ENABLE_HYPERSCAN "Add HyperScan for regex support. Use [AGENTXX_ENABLE_VECTORSCAN] or std::regex if disable." OFF)
+option(AGENTXX_ENABLE_CODEGRAPH "Add CodeGraph-CPP for code analysis." ON)
+option(AGENTXX_ENABLE_CUSTOM_CURL "Use custom curl." ON)
 
 set(_AGENTXX_COMMON_C_CXX_FLAGS)
+set(_AGENTXX_C_FLAGS)
+set(_AGENTXX_CXX_FLAGS)
+
+# 开发默认标准，建议 c17 + c++26
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if (XX_IS_MSVC)
+  set(_AGENTXX_C_FLAGS "/std:c17")
+  set(_AGENTXX_CXX_FLAGS "/std:c++latest")
+else ()
+  set(_AGENTXX_C_FLAGS "-std=c17")
+  set(_AGENTXX_CXX_FLAGS "-std=c++26")
+endif ()
+# msvc 时统一动态链接标准库 /MD /MDd
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+# 优先链接静态库，不影响链接标准库
+if(XX_IS_MSVC)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+else()
+  set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+endif()
+
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceRuns)
 
 # /D_WIN32_WINNT=0x0A00 限制 win10 或更高:
 # - httplib 要求 >= win10
@@ -149,19 +172,10 @@ else ()
   endif()
 endif()
 
-# msvc 时统一动态链接标准库 /MD /MDd
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-# 优先链接静态库
-if(XX_IS_MSVC)
-  set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-else()
-  set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-endif()
-
 message("[agentxx] CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 if (XX_IS_MSVC)
-  set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /std:c17 /D_GNU_SOURCE")
-  set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} /bigobj /utf-8 /wd4200 /Zc:__cplusplus /std:c++latest")
+  set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} ${_AGENTXX_C_FLAGS} /bigobj /utf-8 /wd4200 /D_GNU_SOURCE")
+  set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS} /bigobj /utf-8 /wd4200 /Zc:__cplusplus")
 
   set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE}          ${_AGENTXX_C_FLAGS}   /Gy")
   set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE}        ${_AGENTXX_CXX_FLAGS} /Gy")
@@ -179,14 +193,11 @@ if (XX_IS_MSVC)
     set(LDFLAGS "${LDFLAGS}")
   endif()
 
-  unset(_AGENTXX_C_FLAGS)
-  unset(_AGENTXX_CXX_FLAGS)
-
   # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 else ()
   # XX_IS_CLANG OR XX_IS_GCC
-  set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c17 -D_GNU_SOURCE")
-  set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -std=c++23")
+  set(_AGENTXX_C_FLAGS   "${_AGENTXX_COMMON_C_CXX_FLAGS} ${_AGENTXX_C_FLAGS}   -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe -D_GNU_SOURCE")
+  set(_AGENTXX_CXX_FLAGS "${_AGENTXX_COMMON_C_CXX_FLAGS} ${_AGENTXX_CXX_FLAGS} -fvisibility=default -ffunction-sections -fdata-sections -Wall -fPIC -pipe")
   
   set(CMAKE_C_FLAGS_RELEASE          "${_AGENTXX_C_FLAGS}   -O3 -flto ${CMAKE_C_FLAGS_RELEASE}")
   set(CMAKE_CXX_FLAGS_RELEASE        "${_AGENTXX_CXX_FLAGS} -O3 -flto ${CMAKE_CXX_FLAGS_RELEASE}")
@@ -202,10 +213,11 @@ else ()
   else ()
     set(LDFLAGS "${LDFLAGS} -fsanitize=address")
   endif ()
-
-  unset(_AGENTXX_C_FLAGS)
-  unset(_AGENTXX_CXX_FLAGS)
 endif ()
+
+unset(_AGENTXX_COMMON_C_CXX_FLAGS)
+unset(_AGENTXX_C_FLAGS)
+unset(_AGENTXX_CXX_FLAGS)
 
 # exe install dir
 set(AGENTXX_EXEC_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/exec")
