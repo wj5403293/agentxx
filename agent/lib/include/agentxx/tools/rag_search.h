@@ -337,8 +337,8 @@ public:
     inline static std::vector<std::string>
     splitByDelimiters(const std::string_view text, size_t maxUtf8Length,
                       const std::vector<std::string> &delimiters) {
-      if (agentxx::util::utf8GetLength(text) <= maxUtf8Length) {
-        return {std::string{text}};
+      if (text.empty()) {
+        return {};
       }
 
       for (const auto &delim : delimiters) {

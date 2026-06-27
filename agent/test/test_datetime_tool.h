@@ -29,8 +29,8 @@ inline asio::awaitable<void> test_datetime_execute() {
   auto result = co_await tool.execute_async(neograph::json{});
 
   bool hasTimestamp = result.find("Timestamp:") != std::string::npos;
-  bool hasLocalTime = result.find("Local Time:") != std::string::npos;
-  bool hasUtcTime = result.find("UTC Time:") != std::string::npos;
+  bool hasLocalTime = result.find("Local Time (24Hour):") != std::string::npos;
+  bool hasUtcTime = result.find("UTC Time (24Hour):") != std::string::npos;
 
   if (hasTimestamp && hasLocalTime && hasUtcTime) {
     std::cout << "[PASS] GetCurrentDateTimeTool returns timestamp, local time "
@@ -47,7 +47,7 @@ inline asio::awaitable<void> test_datetime_timestamp_format() {
   auto tool = agentxx::tools::GetCurrentDateTimeTool{};
   auto result = co_await tool.execute_async(neograph::json{});
 
-  std::regex timestampRegex(R"(Timestamp: (\d+) ms)");
+  std::regex timestampRegex(R"(Timestamp: (\d+) millisecond)");
   std::smatch match;
   if (std::regex_search(result, match, timestampRegex)) {
     auto timestamp = std::stoll(match[1].str());

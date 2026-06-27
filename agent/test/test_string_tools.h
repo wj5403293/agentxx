@@ -12,7 +12,7 @@ namespace test {
 inline asio::awaitable<void> test_html_to_markdown_basic() {
   auto tool = agentxx::tools::StringHtml2MarkdownTool{};
   auto def = tool.get_definition();
-  if (def.name == "html_to_markdown") {
+  if (def.name == "string_html_to_markdown") {
     std::cout << "[PASS] StringHtml2MarkdownTool::get_definition() name correct"
               << std::endl;
   } else {

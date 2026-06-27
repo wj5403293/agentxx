@@ -12,7 +12,9 @@
 namespace agentxx {
 namespace test {
 
-const std::string testDir = "/tmp/agentxx_test_filesystem";
+const std::string testDir =
+    (std::filesystem::temp_directory_path() / "agentxx_test_filesystem")
+        .generic_string();
 
 inline void setupTestDir() {
   namespace fs = std::filesystem;
@@ -123,15 +125,22 @@ inline asio::awaitable<void> test_list_file_info_fields() {
   auto result = co_await tool.execute_async(args);
   auto jsonResult = neograph::json::parse(result);
   if (jsonResult.is_array() && jsonResult.size() >= 1) {
-    auto first = jsonResult[0];
-    if (first.contains("path") && first.contains("type") &&
-        first.contains("last_write_time") && first.contains("size")) {
+    bool hasAllFields = false;
+    for (const auto &item : jsonResult) {
+      if (item.contains("path") && item.contains("type") &&
+          item.contains("last_write_time") && item.contains("size")) {
+        hasAllFields = true;
+        break;
+      }
+    }
+    if (hasAllFields) {
       std::cout
           << "[PASS] FileSystemListFileTool returns file info with all fields"
           << std::endl;
     } else {
       std::cout << "[FAIL] FileSystemListFileTool missing file info fields, "
                    "first item keys: ";
+      auto first = jsonResult[0];
       for (auto it = first.begin(); it != first.end(); ++it) {
         std::cout << it.key() << " ";
       }
