@@ -33,7 +33,9 @@
 - Ubuntu/Linux: 
     - Release 编译 GCC 16.1.0 x86_64 -O3:
         - agentxx_cli:   28 MB
+            - 移除 VectorScan/Hyperscan: 21MB
         - libagentxx.so: 11 MB
+            - 移除 VectorScan/Hyperscan: 4.4MB
     - `ldd agentxx_cli` 、`ldd libagentxx.so` 依赖的动态库都只有 系统库/libstdc++/libgcc_s，打包时建议带上 libstdc++.so.6/libgcc_s.so.1
         - linux-vdso.so.1
         - libgcc_s.so.1 => /usr/local/lib64/libgcc_s.so.1

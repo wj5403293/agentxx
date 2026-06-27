@@ -13,6 +13,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -20,26 +21,47 @@
 namespace agentxx {
 namespace util {
 
-static constexpr int CODE_0 = 48;
-static constexpr int CODE_9 = 57;
-static constexpr int CODE_A = 65;
-static constexpr int CODE_Z = 90;
-static constexpr int CODE_a = 97;
-static constexpr int CODE_z = 122;
+inline static constexpr int CODE_0 = 48;
+inline static constexpr int CODE_9 = 57;
+inline static constexpr int CODE_A = 65;
+inline static constexpr int CODE_Z = 90;
+inline static constexpr int CODE_a = 97;
+inline static constexpr int CODE_z = 122;
 
 using PinyinCallback = std::function<std::string(std::string_view)>;
 
-inline bool isCode_num(int code) { return (code >= CODE_0 && code <= CODE_9); }
+// constexpr 字符操作辅助函数，替代非 constexpr 的
+// std::tolower/std::toupper/std::isspace
+constexpr char c_toLower(char c) noexcept {
+  return (c >= 'A' && c <= 'Z') ? static_cast<char>(c + ('a' - 'A')) : c;
+}
 
-inline bool isCode_AZ(int code) { return (code >= CODE_A && code <= CODE_Z); }
+constexpr char c_toUpper(char c) noexcept {
+  return (c >= 'a' && c <= 'z') ? static_cast<char>(c - ('a' - 'A')) : c;
+}
 
-inline bool isCode_az(int code) { return (code >= CODE_a && code <= CODE_z); }
+constexpr bool c_isspace(char c) noexcept {
+  return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' ||
+         c == '\f';
+}
 
-inline bool isCode_AZaz(int code) {
+inline constexpr bool isCode_num(int code) {
+  return (code >= CODE_0 && code <= CODE_9);
+}
+
+inline constexpr bool isCode_AZ(int code) {
+  return (code >= CODE_A && code <= CODE_Z);
+}
+
+inline constexpr bool isCode_az(int code) {
+  return (code >= CODE_a && code <= CODE_z);
+}
+
+inline constexpr bool isCode_AZaz(int code) {
   return (isCode_AZ(code) || isCode_az(code));
 }
 
-inline std::optional<int> toCode_tryAZ(int code) {
+inline constexpr std::optional<int> toCode_tryAZ(int code) {
   if (isCode_az(code)) {
     return code - (CODE_a - CODE_A);
   } else if (isCode_AZ(code)) {
@@ -48,7 +70,7 @@ inline std::optional<int> toCode_tryAZ(int code) {
   return std::nullopt;
 }
 
-inline std::optional<int> toCode_tryaz(int code) {
+inline constexpr std::optional<int> toCode_tryaz(int code) {
   if (isCode_az(code)) {
     return code;
   } else if (isCode_AZ(code)) {
@@ -57,49 +79,55 @@ inline std::optional<int> toCode_tryaz(int code) {
   return std::nullopt;
 }
 
-inline int toCode_mayAZ(int code) {
+inline constexpr int toCode_mayAZ(int code) {
   auto result = toCode_tryAZ(code);
   return result.has_value() ? result.value() : code;
 }
 
-inline int toCode_mayaz(int code) {
+inline constexpr int toCode_mayaz(int code) {
   auto result = toCode_tryaz(code);
   return result.has_value() ? result.value() : code;
 }
 
-inline int toCode_AZ(int code) {
+inline constexpr int toCode_AZ(int code) {
   if (isCode_az(code)) {
     return code - (CODE_a - CODE_A);
   }
-  assert(isCode_AZ(code));
+  if (!std::is_constant_evaluated()) {
+    assert(isCode_AZ(code));
+  }
   return code;
 }
 
-inline int toCode_az(int code) {
+inline constexpr int toCode_az(int code) {
   if (isCode_AZ(code)) {
     return code + (CODE_a - CODE_A);
   }
-  assert(isCode_az(code));
+  if (!std::is_constant_evaluated()) {
+    assert(isCode_az(code));
+  }
   return code;
 }
 
-inline void toUpperSelf(std::string &str) {
-  std::transform(str.begin(), str.end(), str.begin(),
-                 [](unsigned char c) { return std::toupper(c); });
+inline constexpr void toUpperSelf(std::string &str) {
+  std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+    return c_toUpper(static_cast<char>(c));
+  });
 }
 
-inline std::string toUpper(std::string_view str) {
+inline constexpr std::string toUpper(std::string_view str) {
   auto result = std::string{str};
   toUpperSelf(result);
   return result;
 }
 
-inline void toLowerSelf(std::string &str) {
-  std::transform(str.begin(), str.end(), str.begin(),
-                 [](unsigned char c) { return std::tolower(c); });
+inline constexpr void toLowerSelf(std::string &str) {
+  std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+    return c_toLower(static_cast<char>(c));
+  });
 }
 
-inline std::string toLower(std::string_view str) {
+inline constexpr std::string toLower(std::string_view str) {
   auto result = std::string{str};
   toLowerSelf(result);
   return result;
@@ -118,26 +146,26 @@ struct IgnoreCaseHash {
 
 // 不区分大小写相等判断（用于无序容器）
 struct IgnoreCaseEqual {
-  bool operator()(const std::string &a, const std::string &b) const {
+  constexpr bool operator()(const std::string &a, const std::string &b) const {
     if (a.size() != b.size()) {
       return false;
     }
     for (size_t i = 0; i < a.size(); ++i) {
-      if (tolower(static_cast<unsigned char>(a[i])) !=
-          tolower(static_cast<unsigned char>(b[i]))) {
+      if (c_toLower(static_cast<char>(static_cast<unsigned char>(a[i]))) !=
+          c_toLower(static_cast<char>(static_cast<unsigned char>(b[i])))) {
         return false;
       }
     }
     return true;
   }
 
-  bool operator()(std::string_view a, std::string_view b) const {
+  constexpr bool operator()(std::string_view a, std::string_view b) const {
     if (a.size() != b.size()) {
       return false;
     }
     for (size_t i = 0; i < a.size(); ++i) {
-      if (tolower(static_cast<unsigned char>(a[i])) !=
-          tolower(static_cast<unsigned char>(b[i]))) {
+      if (c_toLower(static_cast<char>(static_cast<unsigned char>(a[i]))) !=
+          c_toLower(static_cast<char>(static_cast<unsigned char>(b[i])))) {
         return false;
       }
     }
@@ -152,7 +180,7 @@ using IgnoreCaseMap =
 using IgnoreCaseSet =
     std::unordered_set<std::string, IgnoreCaseHash, IgnoreCaseEqual>;
 
-inline size_t utf8GetLength(std::string_view in_str) {
+inline constexpr size_t utf8GetLength(std::string_view in_str) {
   size_t length = 0;
   for (size_t i = 0, step = 0; i < in_str.size(); i += step) {
     unsigned char byte = in_str[i];
@@ -175,8 +203,9 @@ inline size_t utf8GetLength(std::string_view in_str) {
   return length;
 }
 
-inline size_t findIndexByUtf8Length(std::string_view in_str, size_t targetLen,
-                                    size_t start = 0) {
+inline constexpr size_t findIndexByUtf8Length(std::string_view in_str,
+                                              size_t targetLen,
+                                              size_t start = 0) {
   size_t count = 0;
   size_t i = start, step = 0;
   for (; i < in_str.size();) {
@@ -207,7 +236,7 @@ inline size_t findIndexByUtf8Length(std::string_view in_str, size_t targetLen,
 }
 
 /// return <index, lineCount, lastLineIndex>
-inline std::tuple<size_t, size_t, size_t>
+inline constexpr std::tuple<size_t, size_t, size_t>
 findIndexAndLastLineIndexByUtf8Length(std::string_view in_str,
                                       size_t targetLen) {
   if (in_str.size() >= targetLen) {
@@ -245,11 +274,11 @@ findIndexAndLastLineIndexByUtf8Length(std::string_view in_str,
   return std::tuple<size_t, size_t, size_t>{0, 0, 0};
 }
 
-inline bool utf8IsContinuationChar(unsigned char ch) {
+inline constexpr bool utf8IsContinuationChar(unsigned char ch) {
   return (ch & 0xC0) == 0x80; // 10xxxxxx 的二进制特征：前两位是 10
 }
 
-inline size_t utf8GetLengthCheckAvail(std::string_view str) {
+inline constexpr size_t utf8GetLengthCheckAvail(std::string_view str) {
   size_t length = 0;
   const auto strLen = str.length();
   for (size_t i = 0, step = 0; i < strLen; i += step) {
@@ -308,7 +337,7 @@ inline size_t utf8GetLengthCheckAvail(std::string_view str) {
   return length;
 }
 
-inline bool utf8IsAvail(std::string_view str) {
+inline constexpr bool utf8IsAvail(std::string_view str) {
   if (str.empty() || str[0] == '\0' || (utf8GetLengthCheckAvail(str) == 0)) {
     return false;
   }
@@ -329,8 +358,8 @@ inline std::string stringVectorJoin(const std::vector<T> &list,
   return oss.str();
 }
 
-inline std::vector<std::string_view> strSplit(std::string_view in_str,
-                                              char delim) {
+inline constexpr std::vector<std::string_view> strSplit(std::string_view in_str,
+                                                        char delim) {
   auto split = in_str | std::views::split(delim);
   std::vector<std::string_view> result;
   result.reserve(std::ranges::distance(split));
@@ -340,8 +369,8 @@ inline std::vector<std::string_view> strSplit(std::string_view in_str,
   return result;
 }
 
-inline std::vector<std::string> strSplitCopid(std::string_view in_str,
-                                              char delim) {
+inline constexpr std::vector<std::string> strSplitCopid(std::string_view in_str,
+                                                        char delim) {
   auto split_view = in_str | std::views::split(delim);
   std::vector<std::string> result;
   result.reserve(std::ranges::distance(split_view));
@@ -351,11 +380,11 @@ inline std::vector<std::string> strSplitCopid(std::string_view in_str,
   return result;
 }
 
-inline std::string_view strTrim(std::string_view sv) {
-  while (!sv.empty() && std::isspace(sv.front())) {
+inline constexpr std::string_view strTrim(std::string_view sv) {
+  while (!sv.empty() && c_isspace(sv.front())) {
     sv.remove_prefix(1);
   }
-  while (!sv.empty() && std::isspace(sv.back())) {
+  while (!sv.empty() && c_isspace(sv.back())) {
     sv.remove_suffix(1);
   }
   return sv;
@@ -379,7 +408,7 @@ inline void printStringToIntList(const char *str) {
   std::cout << "]" << std::endl;
 }
 
-inline std::string_view toStringNotNull(const char *str) {
+inline constexpr std::string_view toStringNotNull(const char *str) {
   if (nullptr == str) {
     return std::string_view{""};
   }
@@ -416,7 +445,7 @@ bool autoConvertToUtf8(std::string_view str, std::string &encoding,
 
 inline PinyinCallback s_pinyinCallback = nullptr;
 
-inline std::string removeAllSpace(std::string_view str) {
+inline constexpr std::string removeAllSpace(std::string_view str) {
   std::string result;
   result.reserve(str.size());
   for (char c : str) {
@@ -427,7 +456,8 @@ inline std::string removeAllSpace(std::string_view str) {
   return result;
 }
 
-inline std::optional<std::string> removeAllSpaceMayNull(std::string_view str) {
+inline constexpr std::optional<std::string>
+removeAllSpaceMayNull(std::string_view str) {
   if (str.empty()) {
     return std::nullopt;
   }
@@ -438,12 +468,14 @@ inline std::optional<std::string> removeAllSpaceMayNull(std::string_view str) {
   return result;
 }
 
-inline std::string removeBetweenSpace(std::string_view str,
-                                      bool removeLine = true,
-                                      bool subLeft = true,
-                                      bool subRight = true) {
+inline constexpr std::string removeBetweenSpace(std::string_view str,
+                                                bool removeLine = true,
+                                                bool subLeft = true,
+                                                bool subRight = true) {
 
-  assert(subLeft || subRight);
+  if (!std::is_constant_evaluated()) {
+    assert(subLeft || subRight);
+  }
 
   if (str.empty()) {
     return std::string{str};
@@ -477,7 +509,7 @@ inline std::string removeBetweenSpace(std::string_view str,
   }
 }
 
-inline std::optional<std::string>
+inline constexpr std::optional<std::string>
 removeBetweenSpaceMayNull(std::string_view str, bool removeLine = true,
                           bool subLeft = true, bool subRight = true) {
 
@@ -672,7 +704,7 @@ inline int compareExtend(std::string_view left, std::string_view right) {
   return 0;
 }
 
-inline std::string collapseSlashes(std::string_view path) {
+inline constexpr std::string collapseSlashes(std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevSlash = false;
@@ -690,7 +722,7 @@ inline std::string collapseSlashes(std::string_view path) {
   return result;
 }
 
-inline std::string collapseBackslashes(std::string_view path) {
+inline constexpr std::string collapseBackslashes(std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevBackslash = false;
@@ -708,7 +740,7 @@ inline std::string collapseBackslashes(std::string_view path) {
   return result;
 }
 
-inline std::string collapseMixedSlashes(std::string_view path) {
+inline constexpr std::string collapseMixedSlashes(std::string_view path) {
   std::string result;
   result.reserve(path.size());
   size_t i = 0;
@@ -732,14 +764,14 @@ inline std::string collapseMixedSlashes(std::string_view path) {
   return result;
 }
 
-inline std::string toStandardPath(std::string_view path) {
+inline constexpr std::string toStandardPath(std::string_view path) {
   std::string result = collapseSlashes(path);
   result = collapseBackslashes(result);
   result = collapseMixedSlashes(result);
   return result;
 }
 
-inline std::string toWindowsStandardPath(std::string_view path) {
+inline constexpr std::string toWindowsStandardPath(std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevSlash = false;
@@ -757,7 +789,7 @@ inline std::string toWindowsStandardPath(std::string_view path) {
   return result;
 }
 
-inline std::string toUnixStandardPath(std::string_view path) {
+inline constexpr std::string toUnixStandardPath(std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevSlash = false;
@@ -775,7 +807,7 @@ inline std::string toUnixStandardPath(std::string_view path) {
   return result;
 }
 
-inline std::string toUnixStandardDirPath(std::string_view path) {
+inline constexpr std::string toUnixStandardDirPath(std::string_view path) {
   if (path.empty()) {
     return std::string{path};
   }
@@ -786,9 +818,9 @@ inline std::string toUnixStandardDirPath(std::string_view path) {
   return normalized + "/";
 }
 
-inline std::string_view getFileName(std::string_view in_path,
-                                    bool removeEXT = false,
-                                    bool useRigthDot = true) {
+inline constexpr std::string_view getFileName(std::string_view in_path,
+                                              bool removeEXT = false,
+                                              bool useRigthDot = true) {
 
   if (in_path.empty()) {
     return "";
@@ -870,7 +902,7 @@ inline std::string_view getFileName(std::string_view in_path,
   return in_path.substr(start, end - start);
 }
 
-inline std::optional<std::string_view>
+inline constexpr std::optional<std::string_view>
 getFileNameEXT(std::string_view in_path) {
   if (in_path.empty() || in_path.back() == '.' || in_path.back() == '/' ||
       in_path.back() == '\\') {
@@ -899,7 +931,7 @@ inline std::string replaceOrAppendExt(std::string_view inpath,
   return fmt::format("{}.{}", inpath, newExt);
 }
 
-inline std::optional<std::string_view>
+inline constexpr std::optional<std::string_view>
 getParentDirPath(std::string_view in_path) {
   if (in_path.empty()) {
     return std::nullopt;
@@ -930,36 +962,38 @@ getParentDirPath(std::string_view in_path) {
   return std::nullopt;
 }
 
-inline bool isIgnoreCaseEqual(std::string_view left, std::string_view right) {
+inline constexpr bool isIgnoreCaseEqual(std::string_view left,
+                                        std::string_view right) {
   if (left.size() == right.size()) {
     return toLower(left) == toLower(right);
   }
   return false;
 }
 
-inline bool isIgnoreCaseContains(std::string_view longStr,
-                                 std::string_view shortStr) {
+inline constexpr bool isIgnoreCaseContains(std::string_view longStr,
+                                           std::string_view shortStr) {
   std::string lowerLong = toLower(longStr);
   std::string lowerShort = toLower(shortStr);
   return lowerLong.find(lowerShort) != std::string::npos;
 }
 
-inline bool isIgnoreCaseContainsAny(std::string_view str1,
-                                    std::string_view str2) {
+inline constexpr bool isIgnoreCaseContainsAny(std::string_view str1,
+                                              std::string_view str2) {
   return (str1.size() >= str2.size()) ? isIgnoreCaseContains(str1, str2)
                                       : isIgnoreCaseContains(str2, str1);
 }
 
-inline bool isNotEmptyAndIgnoreCaseContains(std::string_view str1,
-                                            std::string_view str2) {
+inline constexpr bool isNotEmptyAndIgnoreCaseContains(std::string_view str1,
+                                                      std::string_view str2) {
   if (str1.empty() || str2.empty()) {
     return false;
   }
   return isIgnoreCaseContains(str1, str2);
 }
 
-inline bool isNotEmptyAndIgnoreCaseContainsAny(std::string_view str1,
-                                               std::string_view str2) {
+inline constexpr bool
+isNotEmptyAndIgnoreCaseContainsAny(std::string_view str1,
+                                   std::string_view str2) {
   if (str1.empty() || str2.empty()) {
     return false;
   }

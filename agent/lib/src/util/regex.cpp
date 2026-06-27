@@ -293,10 +293,11 @@ public:
       return false;
 
     std::vector<std::pair<size_t, size_t>> raw_matches;
+    auto inputStr = std::string{input};
 
     // 收集所有原始匹配区间
     auto collect = [&](const std::regex &re) {
-      std::sregex_iterator begin(input.data(), input.length(), re);
+      std::sregex_iterator begin(inputStr.begin(), inputStr.end(), re);
       std::sregex_iterator end;
       for (auto it = begin; it != end; ++it) {
         const std::smatch &m = *it;
