@@ -20,8 +20,8 @@
 - 生成库链接方式:
     - ✅动态链接库`libagentxx`; 统一多平台名称，仅后缀区别`.so/.dll/.dylib`.
     - ✅静态链接库`libagentxx_static`; 统一多平台名称，仅后缀区别`.a/.lib`. 支持静态链接所有依赖库，合并生成独立可运行的 `agentxx_cli`, 已在 linux/win 验证. 同理可静态链接`libagentxx_static`及其静态依赖库，即可得到让自己的程序也摆脱动态库依赖
-    - ✅可修改[CMakeLists.txt](/agent/CMakeLists.txt)实现静态链接 `C++标准库 libstdc++`和`编译器运行时库 msvcrt/libgcc`, 但静态链接标准库和编译器运行时库有很大风险，谨慎考虑!
-        - 默认编译提供 动态库`libagentxx`、静态库`libagentxx_static`, 且统一动态链接 libstdc++/libgcc/msvcrt(/MD|/MDd)
+    - 可修改[CMakeLists.txt](/agent/CMakeLists.txt)实现静态链接 `C++标准库 libstdc++`和`编译器运行时库 msvcrt/libgcc`, 但静态链接标准库和编译器运行时库有很大风险，谨慎考虑!
+    - 默认编译提供 动态库`libagentxx`、静态库`libagentxx_static`, 且统一动态链接 libstdc++/libgcc/msvcrt(/MD|/MDd)
 ### 编译后的体积和依赖库
 - Agentxx 编译后输出的 可执行程序`agentxx_cli`、动态库`libagentxx` 都会尽量静态链接依赖库，保持编译结果对动态库的依赖尽量少
 - Windows: 
@@ -57,7 +57,7 @@
 
 ## 计划实现
 ### 基础模块
-- Toolcall:
+- **Toolcall**
     - ✅返回值自动转换字符编码到 utf8
     - ✅filesystem (支持 `同步`/`asio io_uring/IOCP 协程异步` 文件读写)
         - ls (file/dir/recursive-dir/limit)
@@ -90,7 +90,7 @@
     - ⬜tool_skill_search (延迟加载 tool/skill)
     - ✅ui_control (windows 系统上控制鼠标键盘)
     - ✅get_current_datetime 获取系统时间戳、本地时间、UTC时间
-- ✅Tree-Messages
+- ✅**Tree-Messages**
     - share_store (允许存取变量，在 llm-messages、skill、tool 之间传递数据)
         - 支持 `line_offset`/`line_limit` 文本分页读取
         - 压缩上下文时会将部分内容存储到 `share_store`
@@ -98,61 +98,61 @@
     - ⬜消息摘要，支持存储原始消息到 `share_store` 后，能识别出 message content 是消息摘要
     - 消息分支，支持修改历史消息/模型重新生成消息
     - 多会话和历史会话
-- ✅异常处理和自动重试
+- ✅**异常处理和自动重试**
     - Toolcall/LLM 节点自动重试
     - Toolcall/LLM 节点异常时自动添加消息到上下文，保持消息顺序正确
     - 保持 Middleware 拦截执行的顺序和异常处理正确
-- ✅中断恢复
+- ✅**中断恢复**
     - HITL支持，在 Node 暂停，等待用户响应，然后恢复执行
     - 支持用户取消执行
     - ⬜中断、异常时在上下文中补充提示
-- ✅Sub-Agent
+- ✅**Sub-Agent**
     - 借由 Tool 实现, 允许 llm/代码 异步启动 SubAgent
     - Toolcall 支持并发，因此支持同时启动运行多个 Subagent
     - 内置实现:
         - subagent_task (仅隔离上下文)
         - tool_skill_search
-- ✅Middleware
+- ✅**Middleware**
     - 支持层次化栈式拦截 (层层执行 start，压栈对应的 end，再逐层向外退栈执行 end) `agentCallStart`、`agentCallEnd`、`modelCallStart`、`modelCallEnd`、`toolCallStart`、`toolCallEnd`
-- ✅PlanningMiddleware
+- ✅**PlanningMiddleware**
     - 分为两层规划
     - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
     - todo_list 描述近期需要实现的任务细节步骤
-- ✅压缩上下文`SummarizationMiddleware`
+- ✅**压缩上下文** `SummarizationMiddleware`
     - 自动估算 tokens，达到阈值时自动启动压缩
     - toolcall 各自实现压缩处理
         - 裁剪历史消息中过时的 (filesystem)文件读写、(planning)任务规划、(share_store)变量读写消息
     - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取
     - LLM 总结压缩
     - 保留最近消息
-- ⬜事件订阅通知/定时任务
-- ⬜Memory
+- ⬜**事件订阅通知/定时任务**
+- ⬜**Memory**
     - 持久记忆
     - 总结共享记忆
     - 自定义加载记忆消息
-- ✅权限限制`PermissionMiddleware`
+- ✅**权限限制** `PermissionMiddleware`
     - ✅允许指定 tool 调用前拦截，决定 允许、拒绝 或 中断提示询问
     - ⬜预设常见的权限限制
     - ⬜沙盒执行 Shell/File RW
-- ✅Skill支持`SkillMiddleware`
+- ✅**Skill支持** `SkillMiddleware`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
-- ❌MCP支持 (Neograph已实现，但暂时使用有问题)
+- ❌**MCP支持** (Neograph已实现，但暂时使用有问题)
     - MCP client
     - Mcp Server
         - CodeGraph
         - Websearch
-- ⬜Self-upgrade
+- ⬜**Self-upgrade**
     - 自动循环调整系统提示词、工具提示词等，评估效果
     - 自动测试
     - 空闲时自动优化 skill、prompt
-- ⬜LLM Api
+- ⬜**LLM Api**
     - ✅Openai API
     - Anthropic API
-- ✅自定义配置
+- ✅**自定义配置**
     - LLM Api (BaseUrl/ApiKey/ModelName/ExtraArgs)
     - System Prompt
     - ⬜分离 System/Tool Prompt 到独立配置，以便支持自定义和`Self-upgrade`自动调整适配
-- ⬜扩展
+- ⬜**扩展**
     - ✅CodeGraph
         - ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
     - ✅RAG
@@ -166,23 +166,25 @@
     - SD.cpp 图片视频生成
     - FunASR 语音识别
     - Qwen3-TTS 文本转语音
-- ⬜Server:
+- ⬜**Server**
     - Agent2App Api Server
     - Openai Api Server
     - ACP Server
     - A2A Server
 
 ### 功能
-- ⬜翻译/划词翻译
-- ⬜根据文本/音视频，生成评论/弹幕
-- ⬜根据图片内容，提取文本和提示并指定文本在图片上的位置
+- ⬜**翻译/划词翻译**
+    - ✅接收选择文本事件
+- ⬜**操作键鼠**
+    - ✅Tool/ui_control
+- ⬜**根据文本/音视频，生成评论/弹幕**
+- ⬜**根据图片内容，提取文本和提示并指定文本在图片上的位置**
     - 实现类似游戏中图片内容中的多个提示点，点击扩展到文本内容或提示信息
-- ⬜图片/视频生成，通过 llm 优化提示词后生成返回，可自动检查生成结果，调整提示词重新生成
-- ⬜ASR/TTS
-- ⬜匹配歌词
-- ✅操作键鼠
-    - Tool/ui_control
-- ⬜操作live2d/3d模型动作
+- ⬜**图片/视频生成**
+    - 通过 llm 优化提示词后生成返回，可自动检查生成结果，调整提示词重新生成
+- ⬜**ASR/TTS**
+- ⬜**匹配歌词**
+- ⬜**操作live2d/3d模型动作**
 
 ## 目录结构
 - `agent`: 
