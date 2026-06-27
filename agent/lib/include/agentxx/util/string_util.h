@@ -32,15 +32,15 @@ using PinyinCallback = std::function<std::string(std::string_view)>;
 
 // constexpr 字符操作辅助函数，替代非 constexpr 的
 // std::tolower/std::toupper/std::isspace
-constexpr char c_toLower(char c) noexcept {
+constexpr char charToLower(char c) noexcept {
   return (c >= 'A' && c <= 'Z') ? static_cast<char>(c + ('a' - 'A')) : c;
 }
 
-constexpr char c_toUpper(char c) noexcept {
+constexpr char charToUpper(char c) noexcept {
   return (c >= 'a' && c <= 'z') ? static_cast<char>(c - ('a' - 'A')) : c;
 }
 
-constexpr bool c_isspace(char c) noexcept {
+constexpr bool charIsSpace(char c) noexcept {
   return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v' ||
          c == '\f';
 }
@@ -111,7 +111,7 @@ inline constexpr int toCode_az(int code) {
 
 inline constexpr void toUpperSelf(std::string &str) {
   std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
-    return c_toUpper(static_cast<char>(c));
+    return charToUpper(static_cast<char>(c));
   });
 }
 
@@ -123,7 +123,7 @@ inline constexpr std::string toUpper(std::string_view str) {
 
 inline constexpr void toLowerSelf(std::string &str) {
   std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
-    return c_toLower(static_cast<char>(c));
+    return charToLower(static_cast<char>(c));
   });
 }
 
@@ -151,8 +151,8 @@ struct IgnoreCaseEqual {
       return false;
     }
     for (size_t i = 0; i < a.size(); ++i) {
-      if (c_toLower(static_cast<char>(static_cast<unsigned char>(a[i]))) !=
-          c_toLower(static_cast<char>(static_cast<unsigned char>(b[i])))) {
+      if (charToLower(static_cast<char>(static_cast<unsigned char>(a[i]))) !=
+          charToLower(static_cast<char>(static_cast<unsigned char>(b[i])))) {
         return false;
       }
     }
@@ -164,8 +164,8 @@ struct IgnoreCaseEqual {
       return false;
     }
     for (size_t i = 0; i < a.size(); ++i) {
-      if (c_toLower(static_cast<char>(static_cast<unsigned char>(a[i]))) !=
-          c_toLower(static_cast<char>(static_cast<unsigned char>(b[i])))) {
+      if (charToLower(static_cast<char>(static_cast<unsigned char>(a[i]))) !=
+          charToLower(static_cast<char>(static_cast<unsigned char>(b[i])))) {
         return false;
       }
     }
@@ -381,10 +381,10 @@ inline constexpr std::vector<std::string> strSplitCopid(std::string_view in_str,
 }
 
 inline constexpr std::string_view strTrim(std::string_view sv) {
-  while (!sv.empty() && c_isspace(sv.front())) {
+  while (!sv.empty() && charIsSpace(sv.front())) {
     sv.remove_prefix(1);
   }
-  while (!sv.empty() && c_isspace(sv.back())) {
+  while (!sv.empty() && charIsSpace(sv.back())) {
     sv.remove_suffix(1);
   }
   return sv;

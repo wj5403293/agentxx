@@ -105,7 +105,7 @@ public:
     const size_t new_start = std::min(curr_start, curr_end);
     const size_t new_end = std::max(curr_start, curr_end);
 
-    // 处理区间合并
+    // 处理区间合并（仅合并重叠区间，不合并相邻区间）
     if (!results->empty()) {
       size_t merge_start = new_start;
       size_t merge_end = new_end;
@@ -113,21 +113,13 @@ public:
           typename std::vector<agentxx::util::XXRegexMatchResult>::iterator>
           to_erase;
 
-      // 找出所有重叠/相邻的区间
+      // 找出所有重叠的区间
       for (auto it = results->begin(); it != results->end(); ++it) {
         const auto &exist = *it;
-        // 判断是否重叠或相邻：
-        // - 重叠条件：exist.start <= merge_end 且 merge_start
-        // <= exist.end
-        // - 相邻条件：merge_end + 1 == exist.start 或 exist.end
-        // + 1
-        // == merge_start
         bool is_overlap =
-            (exist.start <= merge_end) && (merge_start <= exist.end);
-        bool is_adjacent =
-            (merge_end + 1 == exist.start) || (exist.end + 1 == merge_start);
+            (exist.start < merge_end) && (merge_start < exist.end);
 
-        if (is_overlap || is_adjacent) {
+        if (is_overlap) {
           // 更新合并区间：取所有相关区间的最小start和最大end
           merge_start = std::min(merge_start, exist.start);
           merge_end = std::max(merge_end, exist.end);
@@ -320,13 +312,13 @@ public:
     // 按起始位置排序
     std::sort(raw_matches.begin(), raw_matches.end());
 
-    // 合并重叠与相邻区间（相邻定义：end + 1 == next.start）
+    // 合并重叠区间（不合并相邻区间）
     agentxx::util::XXRegexMatchResult current{raw_matches[0].first,
                                               raw_matches[0].second};
     results.push_back(current);
     for (size_t i = 1; i < raw_matches.size(); ++i) {
       auto &last = results.back();
-      if (raw_matches[i].first <= last.end + 1) { // 重叠或相邻
+      if (raw_matches[i].first < last.end) { // 仅重叠合并
         last.end = std::max(last.end, raw_matches[i].second);
       } else {
         results.push_back({raw_matches[i].first, raw_matches[i].second});
