@@ -133,9 +133,9 @@ std::string agentxx::util::convertToUtf8(const std::string_view src,
   return utf8_str;
 }
 
-bool agentxx::util::chardetConvertEncoding(const std::string_view str,
-                                           std::string &encoding,
-                                           std::string &result) {
+bool agentxx::util::autoConvertToUtf8(const std::string_view str,
+                                      std::string &encoding,
+                                      std::string &result) {
   const auto handle = cChardetHandle;
   if (handle == nullptr) {
     return false;

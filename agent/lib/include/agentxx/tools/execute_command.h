@@ -118,8 +118,19 @@ Current System is {}{}, please use linux shell/bash commands.)",
       result << "## ExitCode: " << exitCode << std::endl;
       if (all_output || 0 != exitCode) {
         // failed
-        result << "## StdOut:\n" << strout << std::endl;
-        result << "## StdErr:\n" << strerr << std::endl;
+        std::string encoding, str;
+        if (strout.empty() ||
+            agentxx::util::autoConvertToUtf8(strout, encoding, str)) {
+          result << "## StdOut:\n" << str << std::endl;
+        } else {
+          result << "## StdOut convert to utf8 faild, truncated" << std::endl;
+        }
+        if (strerr.empty() ||
+            agentxx::util::autoConvertToUtf8(strerr, encoding, str)) {
+          result << "## StdErr:\n" << str << std::endl;
+        } else {
+          result << "## StdErr convert to utf8 faild, truncated" << std::endl;
+        }
       }
       co_return result.str();
     }
@@ -290,13 +301,13 @@ execute_async(const neograph::json &arguments) override {
       // failed
       std::string encoding, str;
       if (strout.empty() ||
-          agentxx::util::chardetConvertEncoding(strout, encoding, str)) {
+          agentxx::util::autoConvertToUtf8(strout, encoding, str)) {
         result << "## StdOut:\n" << str << std::endl;
       } else {
         result << "## StdOut convert to utf8 faild, truncated" << std::endl;
       }
       if (strerr.empty() ||
-          agentxx::util::chardetConvertEncoding(strerr, encoding, str)) {
+          agentxx::util::autoConvertToUtf8(strerr, encoding, str)) {
         result << "## StdErr:\n" << str << std::endl;
       } else {
         result << "## StdErr convert to utf8 faild, truncated" << std::endl;
@@ -326,7 +337,7 @@ execute_async(const neograph::json &arguments) override {
   }
   std::string result = out.str();
   std::string encoding, utf8result;
-  if (agentxx::util::chardetConvertEncoding(result, encoding, utf8result)) {
+  if (agentxx::util::autoConvertToUtf8(result, encoding, utf8result)) {
     // 转 utf8
     co_return utf8result;
   }
