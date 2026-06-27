@@ -6,10 +6,10 @@
 #include "asio/use_awaitable.hpp"
 #include "fmt/format.h"
 #include <chrono>
+#include <future>
 #include <string>
 #include <thread>
 #include <vector>
-
 
 #if XX_IS_WIN_D
 #include <windows.h>
@@ -320,6 +320,12 @@ struct UICmdResult {
   std::string msg;
 };
 
+static asio::awaitable<void> uiControlDelay(int ms) {
+  asio::steady_timer timer(co_await asio::this_coro::executor);
+  timer.expires_after(std::chrono::milliseconds(ms));
+  co_await timer.async_wait(asio::use_awaitable);
+}
+
 static UINT uiControlSendInput(UINT cInputs, LPINPUT pInputs, int cbSize) {
   UINT sent = SendInput(cInputs, pInputs, cbSize);
   if (sent < cInputs) {
@@ -332,11 +338,17 @@ static UINT uiControlSendInput(UINT cInputs, LPINPUT pInputs, int cbSize) {
       AttachThreadInput(curThreadId, fgThreadId, FALSE);
     }
     if (sent < cInputs) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(2));
-      sent = SendInput(cInputs - sent, pInputs + sent, cbSize);
+      sent += SendInput(cInputs - sent, pInputs + sent, cbSize);
     }
   }
   return sent;
+}
+
+static asio::awaitable<UINT>
+uiControlSendInputAsync(UINT cInputs, LPINPUT pInputs, int cbSize) {
+  // TODO: 异步
+  UINT sent = uiControlSendInput(cInputs, pInputs, cbSize);
+  co_return sent;
 }
 
 static bool uiControlIsExtendedKey(WORD vk) {
@@ -377,7 +389,7 @@ static void uiControlPrepareKeyInput(INPUT &input, WORD vk, DWORD flags) {
   }
 }
 
-static void uiControlMouseMoveTo(int x, int y) {
+static asio::awaitable<void> uiControlMouseMoveTo(int x, int y) {
   int screenW = GetSystemMetrics(SM_CXSCREEN);
   int screenH = GetSystemMetrics(SM_CYSCREEN);
   INPUT input = {};
@@ -388,7 +400,7 @@ static void uiControlMouseMoveTo(int x, int y) {
   input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
   input.mi.time = 0;
   input.mi.dwExtraInfo = 0;
-  uiControlSendInput(1, &input, sizeof(INPUT));
+  co_await uiControlSendInputAsync(1, &input, sizeof(INPUT));
 }
 
 static std::pair<int, int> uiControlGetCursorPosPair() {
@@ -397,16 +409,17 @@ static std::pair<int, int> uiControlGetCursorPosPair() {
   return {pt.x, pt.y};
 }
 
-static UICmdResult uiControlMouseMove(int x, int y) {
-  uiControlMouseMoveTo(x, y);
-  return {true, fmt::format("mouse_move -> ({}, {})", x, y)};
+static asio::awaitable<UICmdResult> uiControlMouseMove(int x, int y) {
+  co_await uiControlMouseMoveTo(x, y);
+  co_return UICmdResult{true, fmt::format("mouse_move -> ({}, {})", x, y)};
 }
 
-static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
-                                       bool at, int click_count) {
+static asio::awaitable<UICmdResult> uiControlMouseClick(std::string_view button,
+                                                        int x, int y, bool at,
+                                                        int click_count) {
   if (at) {
-    uiControlMouseMoveTo(x, y);
-    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    co_await uiControlMouseMoveTo(x, y);
+    co_await uiControlDelay(30);
   }
 
   DWORD downFlag = 0, upFlag = 0;
@@ -438,9 +451,9 @@ static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
     inputDown.mi.dwFlags = downFlag;
     inputDown.mi.time = 0;
     inputDown.mi.dwExtraInfo = 0;
-    uiControlSendInput(1, &inputDown, sizeof(INPUT));
+    co_await uiControlSendInputAsync(1, &inputDown, sizeof(INPUT));
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    co_await uiControlDelay(20);
 
     INPUT inputUp = {};
     inputUp.type = INPUT_MOUSE;
@@ -450,26 +463,27 @@ static UICmdResult uiControlMouseClick(std::string_view button, int x, int y,
     inputUp.mi.dwFlags = upFlag;
     inputUp.mi.time = 0;
     inputUp.mi.dwExtraInfo = 0;
-    uiControlSendInput(1, &inputUp, sizeof(INPUT));
+    co_await uiControlSendInputAsync(1, &inputUp, sizeof(INPUT));
 
     if (i < click_count - 1) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(80));
+      co_await uiControlDelay(80);
     }
   }
 
   std::string action = click_count > 1 ? "double_click" : "click";
   if (at) {
-    return {true,
-            fmt::format("mouse_{} @ ({}, {}) [{}]", action, x, y, btnName)};
+    co_return UICmdResult{
+        true, fmt::format("mouse_{} @ ({}, {}) [{}]", action, x, y, btnName)};
   }
-  return {true,
-          fmt::format("mouse_{} @ ({}, {}) [{}]", action, ptX, ptY, btnName)};
+  co_return UICmdResult{
+      true, fmt::format("mouse_{} @ ({}, {}) [{}]", action, ptX, ptY, btnName)};
 }
 
-static UICmdResult uiControlMouseScroll(int delta, int x, int y, bool at) {
+static asio::awaitable<UICmdResult> uiControlMouseScroll(int delta, int x,
+                                                         int y, bool at) {
   if (at) {
-    uiControlMouseMoveTo(x, y);
-    std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    co_await uiControlMouseMoveTo(x, y);
+    co_await uiControlDelay(30);
   }
 
   INPUT input = {};
@@ -481,18 +495,19 @@ static UICmdResult uiControlMouseScroll(int delta, int x, int y, bool at) {
   input.mi.time = 0;
   input.mi.dwExtraInfo = 0;
 
-  uiControlSendInput(1, &input, sizeof(INPUT));
+  co_await uiControlSendInputAsync(1, &input, sizeof(INPUT));
 
   auto [ptX, ptY] = uiControlGetCursorPosPair();
-  return {true,
-          fmt::format("mouse_scroll delta={} @ ({}, {})", delta, ptX, ptY)};
+  co_return UICmdResult{
+      true, fmt::format("mouse_scroll delta={} @ ({}, {})", delta, ptX, ptY)};
 }
 
-static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
-                                      std::string_view button,
-                                      int duration_ms) {
-  uiControlMouseMoveTo(x1, y1);
-  std::this_thread::sleep_for(std::chrono::milliseconds(30));
+static asio::awaitable<UICmdResult> uiControlMouseDrag(int x1, int y1, int x2,
+                                                       int y2,
+                                                       std::string_view button,
+                                                       int duration_ms) {
+  co_await uiControlMouseMoveTo(x1, y1);
+  co_await uiControlDelay(30);
 
   DWORD downFlag = 0, upFlag = 0;
   if (button == "right") {
@@ -513,20 +528,20 @@ static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
   inputDown.mi.dwFlags = downFlag;
   inputDown.mi.time = 0;
   inputDown.mi.dwExtraInfo = 0;
-  uiControlSendInput(1, &inputDown, sizeof(INPUT));
+  co_await uiControlSendInputAsync(1, &inputDown, sizeof(INPUT));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  co_await uiControlDelay(50);
 
   int steps = std::max(duration_ms / 10, 1);
   for (int i = 1; i <= steps; i++) {
     int cx = x1 + (x2 - x1) * i / steps;
     int cy = y1 + (y2 - y1) * i / steps;
-    uiControlMouseMoveTo(cx, cy);
-    std::this_thread::sleep_for(std::chrono::milliseconds(duration_ms / steps));
+    co_await uiControlMouseMoveTo(cx, cy);
+    co_await uiControlDelay(duration_ms / steps);
   }
 
-  uiControlMouseMoveTo(x2, y2);
-  std::this_thread::sleep_for(std::chrono::milliseconds(30));
+  co_await uiControlMouseMoveTo(x2, y2);
+  co_await uiControlDelay(30);
 
   INPUT inputUp = {};
   inputUp.type = INPUT_MOUSE;
@@ -535,43 +550,48 @@ static UICmdResult uiControlMouseDrag(int x1, int y1, int x2, int y2,
   inputUp.mi.dwFlags = upFlag;
   inputUp.mi.time = 0;
   inputUp.mi.dwExtraInfo = 0;
-  uiControlSendInput(1, &inputUp, sizeof(INPUT));
+  co_await uiControlSendInputAsync(1, &inputUp, sizeof(INPUT));
 
-  return {true, fmt::format("mouse_drag ({}, {}) -> ({}, {}) [{}]", x1, y1, x2,
-                            y2, button)};
+  co_return UICmdResult{true,
+                        fmt::format("mouse_drag ({}, {}) -> ({}, {}) [{}]", x1,
+                                    y1, x2, y2, button)};
 }
 
-static UICmdResult uiControlKeyDown(WORD vk) {
+static asio::awaitable<UICmdResult> uiControlKeyDown(WORD vk) {
   INPUT input = {};
   uiControlPrepareKeyInput(input, vk, 0);
-  uiControlSendInput(1, &input, sizeof(INPUT));
-  return {true, fmt::format("key_down [{}]", uiControlVkToKeyName(vk))};
+  co_await uiControlSendInputAsync(1, &input, sizeof(INPUT));
+  co_return UICmdResult{true,
+                        fmt::format("key_down [{}]", uiControlVkToKeyName(vk))};
 }
 
-static UICmdResult uiControlKeyUp(WORD vk) {
+static asio::awaitable<UICmdResult> uiControlKeyUp(WORD vk) {
   INPUT input = {};
   uiControlPrepareKeyInput(input, vk, KEYEVENTF_KEYUP);
-  uiControlSendInput(1, &input, sizeof(INPUT));
-  return {true, fmt::format("key_up [{}]", uiControlVkToKeyName(vk))};
+  co_await uiControlSendInputAsync(1, &input, sizeof(INPUT));
+  co_return UICmdResult{true,
+                        fmt::format("key_up [{}]", uiControlVkToKeyName(vk))};
 }
 
-static UICmdResult uiControlKeyPress(WORD vk) {
+static asio::awaitable<UICmdResult> uiControlKeyPress(WORD vk) {
   INPUT keyDown = {};
   uiControlPrepareKeyInput(keyDown, vk, 0);
-  uiControlSendInput(1, &keyDown, sizeof(INPUT));
+  co_await uiControlSendInputAsync(1, &keyDown, sizeof(INPUT));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  co_await uiControlDelay(20);
 
   INPUT keyUp = {};
   uiControlPrepareKeyInput(keyUp, vk, KEYEVENTF_KEYUP);
-  uiControlSendInput(1, &keyUp, sizeof(INPUT));
+  co_await uiControlSendInputAsync(1, &keyUp, sizeof(INPUT));
 
-  return {true, fmt::format("key_press [{}]", uiControlVkToKeyName(vk))};
+  co_return UICmdResult{
+      true, fmt::format("key_press [{}]", uiControlVkToKeyName(vk))};
 }
 
-static UICmdResult uiControlKeyCombo(const std::vector<WORD> &vks) {
+static asio::awaitable<UICmdResult>
+uiControlKeyCombo(const std::vector<WORD> &vks) {
   if (vks.empty())
-    return {false, "key_combo: empty keys"};
+    co_return UICmdResult{false, "key_combo: empty keys"};
 
   std::string comboStr;
   for (auto vk : vks) {
@@ -583,25 +603,25 @@ static UICmdResult uiControlKeyCombo(const std::vector<WORD> &vks) {
   for (auto vk : vks) {
     INPUT down = {};
     uiControlPrepareKeyInput(down, vk, 0);
-    uiControlSendInput(1, &down, sizeof(INPUT));
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    co_await uiControlSendInputAsync(1, &down, sizeof(INPUT));
+    co_await uiControlDelay(10);
   }
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  co_await uiControlDelay(20);
 
   for (auto it = vks.rbegin(); it != vks.rend(); ++it) {
     INPUT up = {};
     uiControlPrepareKeyInput(up, *it, KEYEVENTF_KEYUP);
-    uiControlSendInput(1, &up, sizeof(INPUT));
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    co_await uiControlSendInputAsync(1, &up, sizeof(INPUT));
+    co_await uiControlDelay(5);
   }
 
-  return {true, fmt::format("key_combo [{}]", comboStr)};
+  co_return UICmdResult{true, fmt::format("key_combo [{}]", comboStr)};
 }
 
-static UICmdResult uiControlKeyType(std::string_view text) {
+static asio::awaitable<UICmdResult> uiControlKeyType(std::string_view text) {
   if (text.empty())
-    return {true, "key_type [0 chars]"};
+    co_return UICmdResult{true, "key_type [0 chars]"};
 
   std::vector<INPUT> inputs;
   inputs.reserve(text.size() * 2);
@@ -609,73 +629,73 @@ static UICmdResult uiControlKeyType(std::string_view text) {
   for (char ch : text) {
     if (ch == '\n' || ch == '\r') {
       if (!inputs.empty()) {
-        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
-                           sizeof(INPUT));
+        co_await uiControlSendInputAsync(static_cast<UINT>(inputs.size()),
+                                         inputs.data(), sizeof(INPUT));
         inputs.clear();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        co_await uiControlDelay(5);
       }
       INPUT down = {};
       uiControlPrepareKeyInput(down, VK_RETURN, 0);
-      uiControlSendInput(1, &down, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &down, sizeof(INPUT));
+      co_await uiControlDelay(5);
       INPUT up = {};
       uiControlPrepareKeyInput(up, VK_RETURN, KEYEVENTF_KEYUP);
-      uiControlSendInput(1, &up, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &up, sizeof(INPUT));
+      co_await uiControlDelay(5);
       continue;
     }
 
     if (ch == '\t') {
       if (!inputs.empty()) {
-        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
-                           sizeof(INPUT));
+        co_await uiControlSendInputAsync(static_cast<UINT>(inputs.size()),
+                                         inputs.data(), sizeof(INPUT));
         inputs.clear();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        co_await uiControlDelay(5);
       }
       INPUT down = {};
       uiControlPrepareKeyInput(down, VK_TAB, 0);
-      uiControlSendInput(1, &down, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &down, sizeof(INPUT));
+      co_await uiControlDelay(5);
       INPUT up = {};
       uiControlPrepareKeyInput(up, VK_TAB, KEYEVENTF_KEYUP);
-      uiControlSendInput(1, &up, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &up, sizeof(INPUT));
+      co_await uiControlDelay(5);
       continue;
     }
 
     if (ch == '\b') {
       if (!inputs.empty()) {
-        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
-                           sizeof(INPUT));
+        co_await uiControlSendInputAsync(static_cast<UINT>(inputs.size()),
+                                         inputs.data(), sizeof(INPUT));
         inputs.clear();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        co_await uiControlDelay(5);
       }
       INPUT down = {};
       uiControlPrepareKeyInput(down, VK_BACK, 0);
-      uiControlSendInput(1, &down, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &down, sizeof(INPUT));
+      co_await uiControlDelay(5);
       INPUT up = {};
       uiControlPrepareKeyInput(up, VK_BACK, KEYEVENTF_KEYUP);
-      uiControlSendInput(1, &up, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &up, sizeof(INPUT));
+      co_await uiControlDelay(5);
       continue;
     }
 
     if (ch == '\x1b') {
       if (!inputs.empty()) {
-        uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
-                           sizeof(INPUT));
+        co_await uiControlSendInputAsync(static_cast<UINT>(inputs.size()),
+                                         inputs.data(), sizeof(INPUT));
         inputs.clear();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        co_await uiControlDelay(5);
       }
       INPUT down = {};
       uiControlPrepareKeyInput(down, VK_ESCAPE, 0);
-      uiControlSendInput(1, &down, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &down, sizeof(INPUT));
+      co_await uiControlDelay(5);
       INPUT up = {};
       uiControlPrepareKeyInput(up, VK_ESCAPE, KEYEVENTF_KEYUP);
-      uiControlSendInput(1, &up, sizeof(INPUT));
-      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      co_await uiControlSendInputAsync(1, &up, sizeof(INPUT));
+      co_await uiControlDelay(5);
       continue;
     }
 
@@ -703,11 +723,11 @@ static UICmdResult uiControlKeyType(std::string_view text) {
   }
 
   if (!inputs.empty()) {
-    uiControlSendInput(static_cast<UINT>(inputs.size()), inputs.data(),
-                       sizeof(INPUT));
+    co_await uiControlSendInputAsync(static_cast<UINT>(inputs.size()),
+                                     inputs.data(), sizeof(INPUT));
   }
 
-  return {true, fmt::format("key_type [{} chars]", text.size())};
+  co_return UICmdResult{true, fmt::format("key_type [{} chars]", text.size())};
 }
 
 static UICmdResult uiControlGetCursorPos() {
@@ -721,21 +741,23 @@ static UICmdResult uiControlGetScreenSize() {
   return {true, fmt::format("screen_size: {}x{}", w, h)};
 }
 
-static UICmdResult uiControlExecuteOne(const neograph::json &cmd) {
+static asio::awaitable<UICmdResult>
+uiControlExecuteOne(const neograph::json &cmd) {
   if (!cmd.is_object() || !cmd.contains("action")) {
-    return {false, "missing `action` field"};
+    co_return UICmdResult{false, "missing `action` field"};
   }
 
   auto action = cmd.value("action", std::string{});
   if (action.empty()) {
-    return {false, "`action` is empty"};
+    co_return UICmdResult{false, "`action` is empty"};
   }
 
   if (action == "mouse_move") {
     if (!cmd.contains("x") || !cmd.contains("y")) {
-      return {false, "mouse_move requires `x` and `y`"};
+      co_return UICmdResult{false, "mouse_move requires `x` and `y`"};
     }
-    return uiControlMouseMove(cmd.value<int>("x", 0), cmd.value<int>("y", 0));
+    co_return co_await uiControlMouseMove(cmd.value<int>("x", 0),
+                                          cmd.value<int>("y", 0));
   }
 
   if (action == "mouse_click" || action == "mouse_double_click") {
@@ -744,107 +766,109 @@ static UICmdResult uiControlExecuteOne(const neograph::json &cmd) {
     int y = cmd.value<int>("y", 0);
     bool at = cmd.contains("x") && cmd.contains("y");
     int count = (action == "mouse_double_click") ? 2 : 1;
-    return uiControlMouseClick(button, x, y, at, count);
+    co_return co_await uiControlMouseClick(button, x, y, at, count);
   }
 
   if (action == "mouse_scroll") {
     if (!cmd.contains("delta")) {
-      return {false, "mouse_scroll requires `delta`"};
+      co_return UICmdResult{false, "mouse_scroll requires `delta`"};
     }
     int delta = cmd.value<int>("delta", 0);
     int x = cmd.value<int>("x", 0);
     int y = cmd.value<int>("y", 0);
     bool at = cmd.contains("x") && cmd.contains("y");
-    return uiControlMouseScroll(delta, x, y, at);
+    co_return co_await uiControlMouseScroll(delta, x, y, at);
   }
 
   if (action == "mouse_drag") {
     if (!cmd.contains("x1") || !cmd.contains("y1") || !cmd.contains("x2") ||
         !cmd.contains("y2")) {
-      return {false, "mouse_drag requires `x1`, `y1`, `x2`, `y2`"};
+      co_return UICmdResult{false,
+                            "mouse_drag requires `x1`, `y1`, `x2`, `y2`"};
     }
     auto button = cmd.value("button", std::string{"left"});
     int duration = cmd.value<int>("duration_ms", 200);
-    return uiControlMouseDrag(cmd.value<int>("x1", 0), cmd.value<int>("y1", 0),
-                              cmd.value<int>("x2", 0), cmd.value<int>("y2", 0),
-                              button, duration);
+    co_return co_await uiControlMouseDrag(
+        cmd.value<int>("x1", 0), cmd.value<int>("y1", 0),
+        cmd.value<int>("x2", 0), cmd.value<int>("y2", 0), button, duration);
   }
 
   if (action == "key_press") {
     if (!cmd.contains("key")) {
-      return {false, "key_press requires `key`"};
+      co_return UICmdResult{false, "key_press requires `key`"};
     }
     auto key = cmd.value("key", std::string{});
     WORD vk = uiControlKeyNameToVk(key);
     if (vk == 0) {
-      return {false, fmt::format("unknown key: {}", key)};
+      co_return UICmdResult{false, fmt::format("unknown key: {}", key)};
     }
-    return uiControlKeyPress(vk);
+    co_return co_await uiControlKeyPress(vk);
   }
 
   if (action == "key_down") {
     if (!cmd.contains("key")) {
-      return {false, "key_down requires `key`"};
+      co_return UICmdResult{false, "key_down requires `key`"};
     }
     auto key = cmd.value("key", std::string{});
     WORD vk = uiControlKeyNameToVk(key);
     if (vk == 0) {
-      return {false, fmt::format("unknown key: {}", key)};
+      co_return UICmdResult{false, fmt::format("unknown key: {}", key)};
     }
-    return uiControlKeyDown(vk);
+    co_return co_await uiControlKeyDown(vk);
   }
 
   if (action == "key_up") {
     if (!cmd.contains("key")) {
-      return {false, "key_up requires `key`"};
+      co_return UICmdResult{false, "key_up requires `key`"};
     }
     auto key = cmd.value("key", std::string{});
     WORD vk = uiControlKeyNameToVk(key);
     if (vk == 0) {
-      return {false, fmt::format("unknown key: {}", key)};
+      co_return UICmdResult{false, fmt::format("unknown key: {}", key)};
     }
-    return uiControlKeyUp(vk);
+    co_return co_await uiControlKeyUp(vk);
   }
 
   if (action == "key_combo") {
     if (!cmd.contains("keys") || !cmd["keys"].is_array()) {
-      return {false, "key_combo requires `keys` array"};
+      co_return UICmdResult{false, "key_combo requires `keys` array"};
     }
     std::vector<WORD> vks;
     for (const auto &k : cmd["keys"]) {
       auto keyStr = k.get<std::string>();
       WORD vk = uiControlKeyNameToVk(keyStr);
       if (vk == 0) {
-        return {false, fmt::format("unknown key in combo: {}", keyStr)};
+        co_return UICmdResult{false,
+                              fmt::format("unknown key in combo: {}", keyStr)};
       }
       vks.push_back(vk);
     }
-    return uiControlKeyCombo(vks);
+    co_return co_await uiControlKeyCombo(vks);
   }
 
   if (action == "key_type") {
     if (!cmd.contains("text")) {
-      return {false, "key_type requires `text`"};
+      co_return UICmdResult{false, "key_type requires `text`"};
     }
-    return uiControlKeyType(cmd.value("text", std::string{}));
+    co_return co_await uiControlKeyType(cmd.value("text", std::string{}));
   }
 
   if (action == "wait") {
     int ms = cmd.value<int>("ms", 100);
     ms = std::clamp(ms, 0, 30000);
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-    return {true, fmt::format("wait {}ms", ms)};
+    co_await uiControlDelay(ms);
+    co_return UICmdResult{true, fmt::format("wait {}ms", ms)};
   }
 
   if (action == "get_cursor_pos") {
-    return uiControlGetCursorPos();
+    co_return uiControlGetCursorPos();
   }
 
   if (action == "get_screen_size") {
-    return uiControlGetScreenSize();
+    co_return uiControlGetScreenSize();
   }
 
-  return {false, fmt::format("unknown action: {}", action)};
+  co_return UICmdResult{false, fmt::format("unknown action: {}", action)};
 }
 
 #endif // XX_IS_WIN_D
@@ -1012,15 +1036,13 @@ UIControlKeyboardMouseTool::execute_async(const neograph::json &arguments) {
 
 #if XX_IS_WIN_D
   int interval_ms = arguments.value<int>("interval_ms", 50);
-  auto timer = asio::steady_timer{co_await asio::this_coro::executor};
-  timer.expires_after(std::chrono::milliseconds(interval_ms));
 
   neograph::json results = neograph::json::array();
   int ok_count = 0;
   int fail_count = 0;
 
   for (size_t i = 0; i < cmds.size(); i++) {
-    auto r = uiControlExecuteOne(cmds[i]);
+    auto r = co_await uiControlExecuteOne(cmds[i]);
     if (r.ok) {
       ok_count++;
     } else {
@@ -1038,7 +1060,9 @@ UIControlKeyboardMouseTool::execute_async(const neograph::json &arguments) {
     }
 
     if (interval_ms > 0 && i < cmds.size() - 1) {
-      co_await timer.async_wait();
+      asio::steady_timer timer{co_await asio::this_coro::executor};
+      timer.expires_after(std::chrono::milliseconds(interval_ms));
+      co_await timer.async_wait(asio::use_awaitable);
     }
   }
 
