@@ -22,6 +22,38 @@
     - ✅静态链接库`libagentxx_static`; 统一多平台名称，仅后缀区别`.a/.lib`. 支持静态链接所有依赖库，合并生成独立可运行的 `agentxx_cli`, 已在 linux/win 验证. 同理可静态链接`libagentxx_static`及其静态依赖库，即可得到让自己的程序也摆脱动态库依赖
     - ✅可修改[CMakeLists.txt](/agent/CMakeLists.txt)实现静态链接 `C++标准库 libstdc++`和`编译器运行时库 msvcrt/libgcc`, 但静态链接标准库和编译器运行时库有很大风险，谨慎考虑!
         - 默认编译提供 动态库`libagentxx`、静态库`libagentxx_static`, 且统一动态链接 libstdc++/libgcc/msvcrt(/MD|/MDd)
+### 编译后的体积和依赖库
+- Agentxx 编译后输出的 可执行程序`agentxx_cli`、动态库`libagentxx` 都会尽量静态链接依赖库，保持编译结果对动态库的依赖尽量少
+- Windows: 
+    - Release 编译体积 MSVC (Visual Studio 18 2026 / MSVC 19.51.36247.0) x86_64 -O2:
+        - agentxx_cli.exe: 
+        - libagentxx.dll
+    - 依赖的动态库都只有 系统库+msvc运行时, 打包时建议带上msvc运行时。`dumpbin /dependents agentxx_cli.exe` 或 `dumpbin /dependents libagentxx.dll`结果一致: 
+        - OLEACC.dll
+        - WINHTTP.dll
+        - WS2_32.dll
+        - CRYPT32.dll
+        - ADVAPI32.dll
+        - ntdll.dll
+        - USER32.dll
+        - KERNEL32.dll
+        - ole32.dll
+        - OLEAUT32.dll
+        - MSVCP140D.dll
+        - VCRUNTIME140D.dll
+        - VCRUNTIME140_1D.dll
+        - ucrtbased.dll
+- Ubuntu/Linux: 
+    - Release 编译 GCC 16.1.0 x86_64 -O3:
+        - agentxx_cli: 
+        - libagentxx.so: 
+    - `ldd agentxx_cli` 、`ldd libagentxx.so` 结果一致:
+        - linux-vdso.so.1
+        - libgcc_s.so.1 => /usr/local/lib64/libgcc_s.so.1
+        - libstdc++.so.6 => /usr/local/lib64/libstdc++.so.6
+        - libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
+        - libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
+        - /lib64/ld-linux-x86-64.so.2
 
 ## 计划实现
 ### 基础模块
@@ -125,7 +157,7 @@
         - ⬜根据 .gitignore/.gitmodules 等排序分析优先级，把 third_party/test 等目录排后
     - ✅RAG
         - 文本分割方式:
-            - ✅分块 + 20%重叠
+            - ✅分块 + 默认20%相邻分块重叠
             - ✅定长分割
             - ✅字符分割
             - ✅结构分割 (较长的再进行 字符分割/定长分割)
@@ -148,7 +180,8 @@
 - ⬜图片/视频生成，通过 llm 优化提示词后生成返回，可自动检查生成结果，调整提示词重新生成
 - ⬜ASR/TTS
 - ⬜匹配歌词
-- ⬜操作键鼠
+- ✅操作键鼠
+    - Tool/ui_control
 - ⬜操作live2d/3d模型动作
 
 ## 目录结构
