@@ -292,8 +292,7 @@ public:
           auto raw_str = result.str();
           std::string encoding;
           std::string converted;
-          if (agentxx::util::chardetConvertEncoding(raw_str, encoding,
-                                                    converted)) {
+          if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
             co_return converted;
           }
           co_return raw_str;
@@ -310,7 +309,7 @@ public:
         stream.close();
         std::string encoding;
         std::string converted;
-        if (agentxx::util::chardetConvertEncoding(data, encoding, converted)) {
+        if (agentxx::util::autoConvertToUtf8(data, encoding, converted)) {
           co_return converted;
         }
         co_return data;
@@ -365,8 +364,7 @@ public:
           auto raw_str = result.str();
           std::string encoding;
           std::string converted;
-          if (agentxx::util::chardetConvertEncoding(raw_str, encoding,
-                                                    converted)) {
+          if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
             co_return converted;
           }
           co_return raw_str;
@@ -378,8 +376,7 @@ public:
         stream.close();
         std::string encoding;
         std::string converted;
-        if (agentxx::util::chardetConvertEncoding(result, encoding,
-                                                  converted)) {
+        if (agentxx::util::autoConvertToUtf8(result, encoding, converted)) {
           co_return converted;
         }
         co_return result;
