@@ -6,7 +6,6 @@
 #include "asio/use_awaitable.hpp"
 #include "fmt/format.h"
 #include <chrono>
-#include <future>
 #include <string>
 #include <thread>
 #include <vector>
@@ -329,6 +328,7 @@ static asio::awaitable<void> uiControlDelay(int ms) {
 static UINT uiControlSendInput(UINT cInputs, LPINPUT pInputs, int cbSize) {
   UINT sent = SendInput(cInputs, pInputs, cbSize);
   if (sent < cInputs) {
+    // TODO: 支持选择指定窗口
     HWND fgWnd = GetForegroundWindow();
     if (fgWnd) {
       DWORD fgThreadId = GetWindowThreadProcessId(fgWnd, nullptr);
@@ -1036,6 +1036,8 @@ UIControlKeyboardMouseTool::execute_async(const neograph::json &arguments) {
 
 #if XX_IS_WIN_D
   int interval_ms = arguments.value<int>("interval_ms", 50);
+  asio::steady_timer timer{co_await asio::this_coro::executor};
+  timer.expires_after(std::chrono::milliseconds(interval_ms));
 
   neograph::json results = neograph::json::array();
   int ok_count = 0;
@@ -1060,8 +1062,6 @@ UIControlKeyboardMouseTool::execute_async(const neograph::json &arguments) {
     }
 
     if (interval_ms > 0 && i < cmds.size() - 1) {
-      asio::steady_timer timer{co_await asio::this_coro::executor};
-      timer.expires_after(std::chrono::milliseconds(interval_ms));
       co_await timer.async_wait(asio::use_awaitable);
     }
   }

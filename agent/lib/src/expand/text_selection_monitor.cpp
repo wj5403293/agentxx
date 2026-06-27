@@ -98,6 +98,10 @@ public:
       workerThread_.join();
     }
 
+    if (processingThread_.joinable()) {
+      processingThread_.join();
+    }
+
     if (automation_) {
       automation_->Release();
       automation_ = nullptr;
@@ -468,6 +472,41 @@ private:
     return initialized;
   }
 
+  static bool tcpConnectWithTimeout(SOCKET sock, sockaddr_in &addr,
+                                    int timeoutMs) {
+    u_long nonBlocking = 1;
+    ioctlsocket(sock, FIONBIO, &nonBlocking);
+
+    int result =
+        connect(sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr));
+    if (result == SOCKET_ERROR) {
+      int err = WSAGetLastError();
+      if (err != WSAEWOULDBLOCK) {
+        u_long blocking = 0;
+        ioctlsocket(sock, FIONBIO, &blocking);
+        return false;
+      }
+
+      fd_set writeSet;
+      FD_ZERO(&writeSet);
+      FD_SET(sock, &writeSet);
+      timeval tv = {};
+      tv.tv_sec = timeoutMs / 1000;
+      tv.tv_usec = (timeoutMs % 1000) * 1000;
+
+      result = select(0, nullptr, &writeSet, nullptr, &tv);
+      if (result <= 0) {
+        u_long blocking = 0;
+        ioctlsocket(sock, FIONBIO, &blocking);
+        return false;
+      }
+    }
+
+    u_long blocking = 0;
+    ioctlsocket(sock, FIONBIO, &blocking);
+    return true;
+  }
+
   static int findCDPPort() {
     static int cachedPort = 0;
     if (cachedPort != 0) {
@@ -485,8 +524,7 @@ private:
       addr.sin_port = htons(static_cast<u_short>(port));
       addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-      if (connect(sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) ==
-          0) {
+      if (tcpConnectWithTimeout(sock, addr, 200)) {
         closesocket(sock);
 
         HINTERNET hSession =
@@ -1073,20 +1111,28 @@ private:
       return;
     }
 
-    auto [selectedText, source] = getSelectedText(hwnd);
-    if (selectedText.empty()) {
-      selectionPending_.store(false, std::memory_order_release);
-      return;
-    }
-
     selectionPending_.store(false, std::memory_order_release);
 
-    TextSelectionEvent evt;
-    evt.text = std::move(selectedText);
-    evt.timestamp = std::chrono::steady_clock::now();
-    evt.source = source;
+    if (processingThread_.joinable()) {
+      processingThread_.join();
+    }
+    processingThread_ = std::thread([this, hwnd]() {
+      CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-    notifyListeners(evt);
+      auto [selectedText, source] = getSelectedText(hwnd);
+      if (selectedText.empty()) {
+        CoUninitialize();
+        return;
+      }
+
+      TextSelectionEvent evt;
+      evt.text = std::move(selectedText);
+      evt.timestamp = std::chrono::steady_clock::now();
+      evt.source = source;
+
+      notifyListeners(evt);
+      CoUninitialize();
+    });
   }
 
   void checkDebounce() {
@@ -1123,6 +1169,7 @@ private:
 
   std::atomic<bool> running_;
   std::thread workerThread_;
+  std::thread processingThread_;
   HWINEVENTHOOK hook_ = nullptr;
   HHOOK mouseHook_ = nullptr;
   IUIAutomation *automation_ = nullptr;
