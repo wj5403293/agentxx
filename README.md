@@ -29,26 +29,12 @@
     - Release 编译体积 MSVC (Visual Studio 18 2026 / MSVC 19.51.36247.0) x86_64 -O2:
         - agentxx_cli.exe: 11.9 MB
         - libagentxx.dll:  5.14 MB
-    - 依赖的动态库都只有 系统库+msvc运行时, 打包时建议带上msvc运行时。`dumpbin /dependents agentxx_cli.exe` 或 `dumpbin /dependents libagentxx.dll`结果一致: 
-        - OLEACC.dll
-        - WINHTTP.dll
-        - WS2_32.dll
-        - CRYPT32.dll
-        - ADVAPI32.dll
-        - ntdll.dll
-        - USER32.dll
-        - KERNEL32.dll
-        - ole32.dll
-        - OLEAUT32.dll
-        - MSVCP140D.dll
-        - VCRUNTIME140D.dll
-        - VCRUNTIME140_1D.dll
-        - ucrtbased.dll
+    - `dumpbin /dependents agentxx_cli.exe` 或 `dumpbin /dependents libagentxx.dll` 依赖的动态库都只有 系统库+msvc运行时, 打包时建议带上msvc运行时
 - Ubuntu/Linux: 
     - Release 编译 GCC 16.1.0 x86_64 -O3:
         - agentxx_cli:   28 MB
         - libagentxx.so: 11 MB
-    - `ldd agentxx_cli` 、`ldd libagentxx.so` 结果一致:
+    - `ldd agentxx_cli` 、`ldd libagentxx.so` 系统库/libstdc++/libgcc_s
         - linux-vdso.so.1
         - libgcc_s.so.1 => /usr/local/lib64/libgcc_s.so.1
         - libstdc++.so.6 => /usr/local/lib64/libstdc++.so.6
