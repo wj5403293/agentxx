@@ -207,7 +207,7 @@
         - std::regex: 兜底
 
 ## 编译 
-- C++ Standard: Requires C++23 +.
+- C++ Standard: Requires C++26 +.
 - 编译器推荐
     - Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
     - Windows/msvc/visual studio 2026. 也可尝试 vs2022 等旧版本, 未验证是否支持

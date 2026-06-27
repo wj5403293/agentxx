@@ -3,7 +3,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.30)
 project(agentxx_cli VERSION 0.1.0 LANGUAGES C CXX)
 
 # 建议使用 c++ 26 
-target_compile_features(agentxx_cli PUBLIC cxx_std_26)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 
 if (XX_IS_MSVC)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;${CMAKE_FIND_LIBRARY_SUFFIXES}")

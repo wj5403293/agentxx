@@ -1,7 +1,7 @@
 # Windows 可执行程序/动态库 编译
 
 - 系统环境: Windows
-- C++ 标准: Requires C++23 or higher.
+- C++ 标准: Requires C++26+.
 - 编译器: MSVC
 
 ## 开始

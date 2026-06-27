@@ -1,7 +1,7 @@
 # Linux 可执行程序/动态库 编译
 
 - 系统环境: Linux
-- C++ 标准: Requires C++23 or higher.
+- C++ 标准: Requires C++26+.
 - 编译器推荐: Linux/gcc 16.1. 此前使用 gcc 13.2 编译时，部分协程函数会导致编译器自身崩溃
 
 ## 开始
