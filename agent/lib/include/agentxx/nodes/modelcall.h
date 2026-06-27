@@ -2,6 +2,8 @@
 
 #include "agentxx/nodes/warp_handle.h"
 #include "asio/io_context.hpp"
+#include "asio/steady_timer.hpp"
+#include "asio/use_awaitable.hpp"
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -141,14 +143,19 @@ public:
     }
 
     size_t retry = 0;
+    auto timer = asio::steady_timer(co_await asio::this_coro::executor);
     do {
       try {
         co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(
             in, result);
         co_return;
+      } catch (const neograph::graph::CancelledException &e) {
+        throw;
+      } catch (const neograph::graph::NodeInterrupt &e) {
+        throw;
       } catch (const std::exception &e) {
         if (retry < agentCtxPtr->agentConfig->llmMaxRetry) {
-          // TODO: 延时等待
+          // TODO: 附加已有的 llm 消息，而不是覆盖
           retry++;
           XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
                   agentCtxPtr->agentConfig->llmMaxRetry, e.what());
@@ -156,6 +163,8 @@ public:
           throw;
         }
       }
+      timer.expires_after(std::chrono::microseconds(retry * 1000));
+      co_await timer.async_wait(asio::use_awaitable);
     } while (true);
   }
 };
