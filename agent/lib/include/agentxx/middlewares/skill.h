@@ -208,7 +208,7 @@ public:
           data.compatibility = metadata["compatibility"].as<std::string>();
         }
         if (metadata["allowed-tools"].IsScalar()) {
-          data.allowed_tools = agentxx::util::strSplit(
+          data.allowed_tools = agentxx::util::strSplitCopid(
               metadata["allowed-tools"].as<std::string>(), ' ');
         }
         if (metadata["metadata"].IsMap()) {

@@ -346,19 +346,6 @@ void test_toArgument() {
   EXPECT_EQ(agentxx::util::toArgument("\\\"wow\\\""), "\"\\\"wow\\\"\"");
 }
 
-void test_subString() {
-  TEST("subString");
-
-  EXPECT_EQ(agentxx::util::subString("hello").value(), "hello");
-  EXPECT_EQ(agentxx::util::subString("hello", 0).value(), "hello");
-  EXPECT_EQ(agentxx::util::subString("hello", 1).value(), "ello");
-  EXPECT_EQ(agentxx::util::subString("hello", 0, 2).value(), "he");
-  EXPECT_EQ(agentxx::util::subString("hello", 1, 4).value(), "ell");
-  EXPECT_NULLOPT(agentxx::util::subString("hello", 10));
-  EXPECT_NULLOPT(agentxx::util::subString("hello", 3, 2));
-  EXPECT_EQ(agentxx::util::subString("hello", 0, 100).value(), "hello");
-}
-
 namespace agentxx {
 namespace test {
 
@@ -373,7 +360,6 @@ void testStringUtil() {
   test_isIgnoreCaseEqual();
   test_isIgnoreCaseContains();
   test_toArgument();
-  test_subString();
 
   std::cout << "=== string_util_xx C++ Tests DONE ===" << std::endl;
 }

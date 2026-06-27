@@ -408,7 +408,8 @@ public:
   }
 
   template <typename T>
-  T &getGraphDataItemValue(const std::string &thread_id, std::string_view key) {
+  T &getGraphDataItemValue(const std::string &thread_id,
+                           const std::string &key) {
     auto &itemGraphData = graphData[thread_id];
     auto sysMsgIt = itemGraphData.find(key);
     if (sysMsgIt == itemGraphData.end()) {
