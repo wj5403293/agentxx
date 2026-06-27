@@ -7,6 +7,7 @@
 #include <functional>
 #include <iostream>
 #include <queue>
+#include <ranges>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -26,7 +27,7 @@ static constexpr int CODE_Z = 90;
 static constexpr int CODE_a = 97;
 static constexpr int CODE_z = 122;
 
-using PinyinCallback = std::function<std::string(const std::string &)>;
+using PinyinCallback = std::function<std::string(std::string_view)>;
 
 inline bool isCode_num(int code) { return (code >= CODE_0 && code <= CODE_9); }
 
@@ -82,13 +83,24 @@ inline int toCode_az(int code) {
   return code;
 }
 
+inline void toUpperSelf(std::string &str) {
+  std::transform(str.begin(), str.end(), str.begin(),
+                 [](unsigned char c) { return std::toupper(c); });
+}
+
+inline std::string toUpper(std::string_view str) {
+  auto result = std::string{str};
+  toUpperSelf(result);
+  return result;
+}
+
 inline void toLowerSelf(std::string &str) {
   std::transform(str.begin(), str.end(), str.begin(),
                  [](unsigned char c) { return std::tolower(c); });
 }
 
-inline std::string toLower(const std::string &str) {
-  std::string result = str;
+inline std::string toLower(std::string_view str) {
+  auto result = std::string{str};
   toLowerSelf(result);
   return result;
 }
@@ -98,11 +110,28 @@ struct IgnoreCaseHash {
   size_t operator()(const std::string &s) const {
     return std::hash<std::string>()(toLower(s));
   }
+
+  size_t operator()(std::string_view s) const {
+    return std::hash<std::string>()(toLower(s));
+  }
 };
 
 // 不区分大小写相等判断（用于无序容器）
 struct IgnoreCaseEqual {
   bool operator()(const std::string &a, const std::string &b) const {
+    if (a.size() != b.size()) {
+      return false;
+    }
+    for (size_t i = 0; i < a.size(); ++i) {
+      if (tolower(static_cast<unsigned char>(a[i])) !=
+          tolower(static_cast<unsigned char>(b[i]))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool operator()(std::string_view a, std::string_view b) const {
     if (a.size() != b.size()) {
       return false;
     }
@@ -300,15 +329,26 @@ inline std::string stringVectorJoin(const std::vector<T> &list,
   return oss.str();
 }
 
-inline std::vector<std::string> strSplit(const std::string &in_str,
-                                         char in_char) {
-  std::vector<std::string> re_strlist{};
-  std::istringstream iss{in_str}; // 输入流
-  for (std::string item{};
-       std::getline(iss, item, in_char);) { // 以split为分隔符
-    re_strlist.push_back(item);
+inline std::vector<std::string_view> strSplit(std::string_view in_str,
+                                              char delim) {
+  auto split = in_str | std::views::split(delim);
+  std::vector<std::string_view> result;
+  result.reserve(std::ranges::distance(split));
+  for (auto &&sub : split) {
+    result.emplace_back(&*sub.begin(), std::ranges::distance(sub));
   }
-  return re_strlist;
+  return result;
+}
+
+inline std::vector<std::string> strSplitCopid(std::string_view in_str,
+                                              char delim) {
+  auto split_view = in_str | std::views::split(delim);
+  std::vector<std::string> result;
+  result.reserve(std::ranges::distance(split_view));
+  for (auto sub : split_view) {
+    result.emplace_back(sub.begin(), sub.end());
+  }
+  return result;
 }
 
 inline std::string_view strTrim(std::string_view sv) {
@@ -376,7 +416,7 @@ bool autoConvertToUtf8(const std::string_view str, std::string &encoding,
 
 inline PinyinCallback s_pinyinCallback = nullptr;
 
-inline std::string removeAllSpace(const std::string &str) {
+inline std::string removeAllSpace(const std::string_view str) {
   std::string result;
   result.reserve(str.size());
   for (char c : str) {
@@ -388,7 +428,7 @@ inline std::string removeAllSpace(const std::string &str) {
 }
 
 inline std::optional<std::string>
-removeAllSpaceMayNull(const std::string &str) {
+removeAllSpaceMayNull(const std::string_view str) {
   if (str.empty()) {
     return std::nullopt;
   }
@@ -399,7 +439,7 @@ removeAllSpaceMayNull(const std::string &str) {
   return result;
 }
 
-inline std::string removeBetweenSpace(const std::string &str,
+inline std::string removeBetweenSpace(const std::string_view str,
                                       bool removeLine = true,
                                       bool subLeft = true,
                                       bool subRight = true) {
@@ -407,7 +447,7 @@ inline std::string removeBetweenSpace(const std::string &str,
   assert(subLeft || subRight);
 
   if (str.empty()) {
-    return str;
+    return std::string{str};
   }
 
   int left = 0;
@@ -432,14 +472,14 @@ inline std::string removeBetweenSpace(const std::string &str,
   }
 
   if (left <= right) {
-    return str.substr(left, right - left + 1);
+    return std::string{str.substr(left, right - left + 1)};
   } else {
     return "";
   }
 }
 
 inline std::optional<std::string>
-removeBetweenSpaceMayNull(const std::string &str, bool removeLine = true,
+removeBetweenSpaceMayNull(const std::string_view str, bool removeLine = true,
                           bool subLeft = true, bool subRight = true) {
 
   if (str.empty()) {
@@ -453,14 +493,14 @@ removeBetweenSpaceMayNull(const std::string &str, bool removeLine = true,
   return result;
 }
 
-inline std::string getFirstWordPinyin(const std::string &str) {
+inline std::string getFirstWordPinyin(const std::string_view str) {
   if (s_pinyinCallback) {
     return s_pinyinCallback(str);
   }
   return "";
 }
 
-inline std::string getFirstCharPinyinFast(const std::string &str) {
+inline std::string getFirstCharPinyinFast(const std::string_view str) {
   if (str.empty())
     return "";
 
@@ -483,7 +523,7 @@ inline std::string getFirstCharPinyinFast(const std::string &str) {
   return "";
 }
 
-inline std::optional<int> getComparableCode(const std::string &str,
+inline std::optional<int> getComparableCode(const std::string_view str,
                                             size_t index) {
   int code = static_cast<unsigned char>(str[index]);
 
@@ -495,7 +535,7 @@ inline std::optional<int> getComparableCode(const std::string &str,
   if (code < 128)
     return std::nullopt;
 
-  std::string target = (index == 0) ? str : str.substr(index);
+  auto target = (index == 0) ? str : str.substr(index);
   std::string pinyin = getFirstCharPinyinFast(target);
   if (!pinyin.empty()) {
     int pinyinCode = static_cast<unsigned char>(pinyin[0]);
@@ -507,7 +547,7 @@ inline std::optional<int> getComparableCode(const std::string &str,
   return std::nullopt;
 }
 
-inline std::optional<std::string> getFirstCharPinyin(const std::string &str,
+inline std::optional<std::string> getFirstCharPinyin(const std::string_view str,
                                                      bool enableAZ = true,
                                                      bool enableNum = true) {
   if (str.empty()) {
@@ -553,7 +593,7 @@ inline std::optional<std::string> getFirstCharPinyin(const std::string &str,
 }
 
 inline std::optional<std::string>
-getFirstCharPinyinFirstChar(const std::string &str) {
+getFirstCharPinyinFirstChar(const std::string_view str) {
   auto restr = getFirstCharPinyin(str);
   if (restr.has_value() && !restr->empty()) {
     return std::string(1, (*restr)[0]);
@@ -561,7 +601,8 @@ getFirstCharPinyinFirstChar(const std::string &str) {
   return std::nullopt;
 }
 
-inline int compareExtend(const std::string &left, const std::string &right) {
+inline int compareExtend(const std::string_view left,
+                         const std::string_view right) {
   if (left.empty()) {
     if (right.empty()) {
       return 0;
@@ -633,7 +674,7 @@ inline int compareExtend(const std::string &left, const std::string &right) {
   return 0;
 }
 
-inline std::string collapseSlashes(const std::string &path) {
+inline std::string collapseSlashes(const std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevSlash = false;
@@ -651,7 +692,7 @@ inline std::string collapseSlashes(const std::string &path) {
   return result;
 }
 
-inline std::string collapseBackslashes(const std::string &path) {
+inline std::string collapseBackslashes(const std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevBackslash = false;
@@ -669,7 +710,7 @@ inline std::string collapseBackslashes(const std::string &path) {
   return result;
 }
 
-inline std::string collapseMixedSlashes(const std::string &path) {
+inline std::string collapseMixedSlashes(const std::string_view path) {
   std::string result;
   result.reserve(path.size());
   size_t i = 0;
@@ -693,14 +734,14 @@ inline std::string collapseMixedSlashes(const std::string &path) {
   return result;
 }
 
-inline std::string toStandardPath(const std::string &path) {
+inline std::string toStandardPath(const std::string_view path) {
   std::string result = collapseSlashes(path);
   result = collapseBackslashes(result);
   result = collapseMixedSlashes(result);
   return result;
 }
 
-inline std::string toWindowsStandardPath(const std::string &path) {
+inline std::string toWindowsStandardPath(const std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevSlash = false;
@@ -718,7 +759,7 @@ inline std::string toWindowsStandardPath(const std::string &path) {
   return result;
 }
 
-inline std::string toUnixStandardPath(const std::string &path) {
+inline std::string toUnixStandardPath(const std::string_view path) {
   std::string result;
   result.reserve(path.size());
   bool prevSlash = false;
@@ -736,9 +777,9 @@ inline std::string toUnixStandardPath(const std::string &path) {
   return result;
 }
 
-inline std::string toUnixStandardDirPath(const std::string &path) {
+inline std::string toUnixStandardDirPath(const std::string_view path) {
   if (path.empty()) {
-    return path;
+    return std::string{path};
   }
   std::string normalized = toUnixStandardPath(path);
   if (normalized.back() == '/') {
@@ -747,9 +788,9 @@ inline std::string toUnixStandardDirPath(const std::string &path) {
   return normalized + "/";
 }
 
-inline std::string getFileName(const std::string &in_path,
-                               bool removeEXT = false,
-                               bool useRigthDot = true) {
+inline std::string_view getFileName(const std::string_view in_path,
+                                    bool removeEXT = false,
+                                    bool useRigthDot = true) {
 
   if (in_path.empty()) {
     return "";
@@ -831,7 +872,8 @@ inline std::string getFileName(const std::string &in_path,
   return in_path.substr(start, end - start);
 }
 
-inline std::optional<std::string> getFileNameEXT(const std::string &in_path) {
+inline std::optional<std::string_view>
+getFileNameEXT(const std::string_view in_path) {
   if (in_path.empty() || in_path.back() == '.' || in_path.back() == '/' ||
       in_path.back() == '\\') {
     return std::nullopt;
@@ -845,21 +887,22 @@ inline std::optional<std::string> getFileNameEXT(const std::string &in_path) {
   return std::nullopt;
 }
 
-inline std::string replaceOrAppendExt(const std::string &inpath,
-                                      const std::string &newExt) {
+inline std::string replaceOrAppendExt(const std::string_view inpath,
+                                      const std::string_view newExt) {
   auto ext = getFileNameEXT(inpath);
   if (ext.has_value()) {
-    std::string result = inpath;
+    auto result = std::string{inpath};
     result.replace(inpath.size() - ext->size(), ext->size(), newExt);
     return result;
   }
   if (!inpath.empty() && inpath.back() == '.') {
-    return inpath + newExt;
+    return fmt::format("{}{}", inpath, newExt);
   }
-  return inpath + "." + newExt;
+  return fmt::format("{}.{}", inpath, newExt);
 }
 
-inline std::optional<std::string> getParentDirPath(const std::string &in_path) {
+inline std::optional<std::string_view>
+getParentDirPath(const std::string_view in_path) {
   if (in_path.empty()) {
     return std::nullopt;
   }
@@ -889,67 +932,44 @@ inline std::optional<std::string> getParentDirPath(const std::string &in_path) {
   return std::nullopt;
 }
 
-inline bool isIgnoreCaseEqual(const std::string &left,
-                              const std::string &right) {
+inline bool isIgnoreCaseEqual(const std::string_view left,
+                              const std::string_view right) {
   if (left.size() == right.size()) {
     return toLower(left) == toLower(right);
   }
   return false;
 }
 
-inline bool isIgnoreCaseContains(const std::string &longStr,
-                                 const std::string &shortStr) {
+inline bool isIgnoreCaseContains(const std::string_view longStr,
+                                 const std::string_view shortStr) {
   std::string lowerLong = toLower(longStr);
   std::string lowerShort = toLower(shortStr);
   return lowerLong.find(lowerShort) != std::string::npos;
 }
 
-inline bool isIgnoreCaseContainsAny(const std::string &str1,
-                                    const std::string &str2) {
+inline bool isIgnoreCaseContainsAny(const std::string_view str1,
+                                    const std::string_view str2) {
   return (str1.size() >= str2.size()) ? isIgnoreCaseContains(str1, str2)
                                       : isIgnoreCaseContains(str2, str1);
 }
 
-inline bool isNotEmptyAndIgnoreCaseContains(const std::string &str1,
-                                            const std::string &str2) {
+inline bool isNotEmptyAndIgnoreCaseContains(const std::string_view str1,
+                                            const std::string_view str2) {
   if (str1.empty() || str2.empty()) {
     return false;
   }
   return isIgnoreCaseContains(str1, str2);
 }
 
-inline bool isNotEmptyAndIgnoreCaseContainsAny(const std::string &str1,
-                                               const std::string &str2) {
+inline bool isNotEmptyAndIgnoreCaseContainsAny(const std::string_view str1,
+                                               const std::string_view str2) {
   if (str1.empty() || str2.empty()) {
     return false;
   }
   return isIgnoreCaseContainsAny(str1, str2);
 }
 
-inline std::optional<std::string>
-subString(const std::string &str, size_t start = 0,
-          std::optional<size_t> end = std::nullopt) {
-
-  if (start > str.size()) {
-    return std::nullopt;
-  }
-
-  size_t actualEnd = str.size();
-  if (end.has_value()) {
-    if (end.value() < start) {
-      return std::nullopt;
-    }
-    if (end.value() > str.size()) {
-      actualEnd = str.size();
-    } else {
-      actualEnd = end.value();
-    }
-  }
-
-  return str.substr(start, actualEnd - start);
-}
-
-inline std::string toArgument(const std::string &str, char mark = '"') {
+inline std::string toArgument(const std::string_view str, char mark = '"') {
   std::string result;
   result.reserve(str.size() * 2);
   size_t len = str.size();
@@ -976,7 +996,7 @@ inline std::string toArgument(const std::string &str, char mark = '"') {
     }
   }
 
-  return std::string(1, mark) + result + std::string(1, mark);
+  return fmt::format("{}{}{}", mark, result, mark);
 }
 
 }; // namespace util

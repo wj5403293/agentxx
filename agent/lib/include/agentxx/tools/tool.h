@@ -36,7 +36,7 @@ public:
   /// - 最多执行 1 + maxRetry(retry) 次
   const size_t maxRetry;
 
-  explicit XXToolBase(const std::string &in_name,
+  explicit XXToolBase(std::string_view in_name,
                       bool in_autoSummaryOutput = false,
                       bool in_canDelayLoad = true, size_t in_maxRetry = 0)
       : name(in_name), autoSummaryOutput(in_autoSummaryOutput),

@@ -19,21 +19,22 @@ namespace util {
 class HttpClient {
 public:
   static inline std::pair<std::string, std::string>
-  splitUrl(const std::string &url) {
+  splitUrl(std::string_view url) {
     auto scheme_end = url.find("://");
     if (scheme_end == std::string::npos) {
-      return {url, "/"};
+      return std::pair<std::string, std::string>{url, "/"};
     }
     auto path_start = url.find('/', scheme_end + 3);
     if (path_start == std::string::npos) {
-      return {url, "/"};
+      return std::pair<std::string, std::string>{url, "/"};
     }
-    return {url.substr(0, path_start), url.substr(path_start)};
+    return std::pair<std::string, std::string>{url.substr(0, path_start),
+                                               url.substr(path_start)};
   }
 
   // URL-encode for query strings (small subset: letters/digits untouched,
   // space→+, everything else percent-encoded).
-  static inline std::string urlEncode(const std::string &s) {
+  static inline std::string urlEncode(std::string_view s) {
     std::ostringstream out;
     out << std::hex;
     for (unsigned char c : s) {

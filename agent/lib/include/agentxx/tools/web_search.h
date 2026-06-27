@@ -23,7 +23,7 @@ protected:
   const bool convertHtml2markdown;
 
 public:
-  explicit WebSearchTool(const std::string &in_searchApiUrl,
+  explicit WebSearchTool(std::string_view in_searchApiUrl,
                          bool in_convertHtml2markdown)
       : XXToolBase("web_search", true, true), searchApiUrl(in_searchApiUrl),
         convertHtml2markdown(in_convertHtml2markdown) {}
@@ -150,6 +150,11 @@ public:
       auto &data = resp.value().body;
       if (data.empty()) {
         co_return R"({"error": "Http GET request Success, but got empty body."})";
+      }
+      std::string encoding;
+      std::string converted;
+      if (agentxx::util::autoConvertToUtf8(data, encoding, converted)) {
+        co_return converted;
       }
       co_return data;
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "agentxx/agent/context.h"
+#include "agentxx/util/log.h"
 #include "asio/io_context.hpp"
 #include "fmt/format.h"
 #include <any>
@@ -72,7 +73,7 @@ public:
   std::map<std::string, std::shared_ptr<BaseMiddlewareState>> states{};
 
   BaseMiddlewareHandleInterface(
-      const std::string &in_name,
+      std::string_view in_name,
       std::weak_ptr<agentxx::agent::AgentContext> in_agentContext);
 
   /// ================ warp call ================
@@ -157,7 +158,7 @@ class BaseMiddlewareHandle : public BaseMiddlewareHandleInterface {
 protected:
 public:
   BaseMiddlewareHandle(
-      const std::string &in_name,
+      std::string_view in_name,
       std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : BaseMiddlewareHandleInterface(in_name, in_agentContext) {}
 
@@ -272,7 +273,7 @@ public:
   onGraphNodeAfterCallFunc onToolcallEnd;
 
   MiddlewareWarpHandle(
-      const std::string &in_name,
+      std::string_view in_name,
       std::weak_ptr<agentxx::agent::AgentContext> in_agentContext,
       const onGraphNodeBeforeCallFunc &in_onAgentcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onAgentcallEnd = nullptr,
@@ -384,12 +385,12 @@ public:
   }
 
   void setShareStoreItemValue(const std::string &thread_id, const int id,
-                              const std::string &value) {
+                              std::string_view value) {
     shareStore[thread_id].store[id] = value;
   }
 
   size_t addShareStoreItemValue(const std::string &thread_id,
-                                const std::string &value) {
+                                std::string_view value) {
     auto store = shareStore[thread_id];
     auto id = store.getNextId();
     store.store[id] = value;
@@ -407,8 +408,7 @@ public:
   }
 
   template <typename T>
-  T &getGraphDataItemValue(const std::string &thread_id,
-                           const std::string &key) {
+  T &getGraphDataItemValue(const std::string &thread_id, std::string_view key) {
     auto &itemGraphData = graphData[thread_id];
     auto sysMsgIt = itemGraphData.find(key);
     if (sysMsgIt == itemGraphData.end()) {
@@ -418,7 +418,7 @@ public:
   }
 
   asio::awaitable<std::optional<neograph::json>>
-  execInterruptHandle(const std::string &name,
+  execInterruptHandle(std::string_view name,
                       agentxx::middleware::InterruptHandleArg &arg);
 };
 

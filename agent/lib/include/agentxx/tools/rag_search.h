@@ -20,8 +20,8 @@ namespace tools {
 
 class EmbeddingClient {
 public:
-  EmbeddingClient(const std::string &in_baseUrl, const std::string &in_apiKey,
-                  const std::string in_model)
+  EmbeddingClient(std::string_view in_baseUrl, std::string_view in_apiKey,
+                  std::string_view in_model)
       : baseUrl(in_baseUrl), apiKey(in_apiKey), model(in_model) {}
 
   // Embed multiple texts in one API call
@@ -186,8 +186,7 @@ public:
 
     // Split text by a single delimiter string
     inline static std::vector<std::string>
-    splitByDelimiter(const std::string_view text,
-                     const std::string &delimiter) {
+    splitByDelimiter(std::string_view text, std::string_view delimiter) {
       auto result = std::vector<std::string>{};
       if (delimiter.empty()) {
         if (!text.empty()) {
@@ -495,7 +494,7 @@ public:
     scanDocument(const std::vector<std::string> &pathlist) {
       auto result = std::vector<Document>{};
 
-      auto onAppendItem = [&](const std::string &path) -> bool {
+      auto onAppendItem = [&](std::string_view path) -> bool {
         auto filepath = std::filesystem::path{path};
         if (filepath.extension() == ".md") {
           std::ifstream stream;
@@ -514,7 +513,7 @@ public:
                 .id = std::to_string(result.size()),
                 .title = filepath.filename().string(),
                 .content = VectorStore::splitTextToChunks(content, splitConfig),
-                .source = path,
+                .source = std::string{path},
             });
             return true;
           } catch (const std::exception &e) {
@@ -581,7 +580,7 @@ public:
     // Search by cosine similarity
     asio::awaitable<std::expected<
         std::vector<std::tuple<const Document &, size_t, double>>, std::string>>
-    search(const std::string &query, size_t top_k = 3) const {
+    search(std::string_view query, size_t top_k = 3) const {
       auto queryVec = co_await embedder->embed_batch(
           VectorStore::splitTextToChunks(query, splitConfig));
       if (false == queryVec.has_value()) {

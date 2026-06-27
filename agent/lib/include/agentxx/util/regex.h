@@ -33,17 +33,17 @@ public:
   virtual ~XXRegex() {}
 
   // 匹配
-  virtual bool match(const std::string &input,
+  virtual bool match(std::string_view input,
                      std::vector<XXRegexMatchResult> &results) const = 0;
 
   // 移除匹配的子串
   virtual std::string
-  remove(const std::string &input,
+  remove(std::string_view input,
          std::vector<XXRegexMatchResult> &results) const = 0;
 
   // 替换匹配的子串
   virtual std::string
-  replace(const std::string &input, const std::string &target,
+  replace(std::string_view input, std::string_view target,
           std::vector<XXRegexMatchResult> &results) const = 0;
   XXRegex &operator=(XXRegex &&other) = delete;
 };

@@ -170,7 +170,7 @@ public:
 
   // 默认评分器：使用 subagent 进行评分
   asio::awaitable<TrainingScore>
-  defaultScoringWithSubAgent(const std::string &agentOutput,
+  defaultScoringWithSubAgent(std::string_view agentOutput,
                              const TrainingTestCase &testCase, int iteration,
                              const TrainingConfig &trainCfg) {
     TrainingScore result;

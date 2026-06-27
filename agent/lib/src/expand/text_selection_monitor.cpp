@@ -625,7 +625,7 @@ private:
     return sock;
   }
 
-  static bool wsSend(SOCKET sock, const std::string &message) {
+  static bool wsSend(SOCKET sock, const std::string_view message) {
     std::vector<unsigned char> frame;
     frame.push_back(0x81);
     size_t len = message.size();
@@ -701,9 +701,9 @@ private:
     }
   }
 
-  static std::string extractJsonString(const std::string &json,
-                                       const std::string &key) {
-    std::string search = "\"" + key + "\"";
+  static std::string_view extractJsonString(const std::string_view json,
+                                            const std::string_view key) {
+    std::string search = fmt::format("\"{}\"", key);
     size_t pos = json.find(search);
     if (pos == std::string::npos) {
       return {};
@@ -814,12 +814,12 @@ private:
       return {};
     }
 
-    std::string value = extractJsonString(response, "value");
+    auto value = extractJsonString(response, "value");
     if (value.empty()) {
       return {};
     }
 
-    return {value, TextSource::DevTools};
+    return std::pair<std::string, TextSource>{value, TextSource::DevTools};
   }
 
   std::pair<std::string, TextSource> getSelectedTextByClipboard(HWND hwnd) {

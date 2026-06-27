@@ -26,9 +26,9 @@ public:
   const std::string depict;
   std::string systemPrompt;
 
-  SubAgentTaskBase(const std::string &in_subAgentName,
-                   const std::string &in_subAgentDepict,
-                   const std::string &in_systemPrompt)
+  SubAgentTaskBase(std::string_view in_subAgentName,
+                   std::string_view in_subAgentDepict,
+                   std::string_view in_systemPrompt)
       : name(in_subAgentName), depict(in_subAgentDepict),
         systemPrompt(in_systemPrompt) {}
 
@@ -46,8 +46,8 @@ public:
 
 class SubAgentNormalTask : public SubAgentTaskBase {
 public:
-  SubAgentNormalTask(const std::string &in_subAgentName,
-                     const std::string &in_subAgentDepict,
+  SubAgentNormalTask(std::string_view in_subAgentName,
+                     std::string_view in_subAgentDepict,
                      const neograph::graph::NodeContext &in_context)
       : SubAgentTaskBase(in_subAgentName, in_subAgentDepict, "") {
     createSubgraph(in_context);
@@ -130,7 +130,7 @@ class SubAgentManagerTool : public XXToolBase {
 public:
   std::map<std::string, std::shared_ptr<SubAgentTaskBase>> subAgentList{};
 
-  explicit SubAgentManagerTool(const std::string &in_nodeName)
+  explicit SubAgentManagerTool(std::string_view in_nodeName)
       : XXToolBase(in_nodeName, true, false) {}
 
   std::string get_name() const override { return "subagent_switch"; }

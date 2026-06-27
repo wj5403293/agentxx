@@ -154,7 +154,7 @@ public:
 
   // 匹配
   bool match(
-      const std::string &input,
+      std::string_view input,
       std::vector<agentxx::util::XXRegexMatchResult> &results) const override {
     results.clear();
     if (hs_db == nullptr || hs_scratch == nullptr) {
@@ -162,8 +162,8 @@ public:
     }
 
     // block模式、适合短文本
-    hs_error_t err = hs_scan(hs_db, input.c_str(), input.length(), 0,
-                             hs_scratch, xxregexMatchCallback, &results);
+    hs_error_t err = hs_scan(hs_db, input.data(), input.length(), 0, hs_scratch,
+                             xxregexMatchCallback, &results);
     if (err != HS_SUCCESS && err != HS_SCAN_TERMINATED) {
       XX_LOGE("Hyperscan扫描失败");
       return false;
@@ -174,7 +174,7 @@ public:
 
   // 移除匹配的子串
   std::string remove(
-      const std::string &input,
+      std::string_view input,
       std::vector<agentxx::util::XXRegexMatchResult> &results) const override {
     std::string result;
     if (match(input, results)) {
@@ -194,7 +194,7 @@ public:
 
   // 替换匹配的子串
   std::string replace(
-      const std::string &input, const std::string &target,
+      std::string_view input, std::string_view target,
       std::vector<agentxx::util::XXRegexMatchResult> &results) const override {
     std::string result;
     if (match(input, results)) {
@@ -286,7 +286,7 @@ public:
 
   // 匹配：返回所有合并后的非重叠区间
   bool match(
-      const std::string &input,
+      std::string_view input,
       std::vector<agentxx::util::XXRegexMatchResult> &results) const override {
     results.clear();
     if (!valid_)
@@ -296,7 +296,7 @@ public:
 
     // 收集所有原始匹配区间
     auto collect = [&](const std::regex &re) {
-      std::sregex_iterator begin(input.begin(), input.end(), re);
+      std::sregex_iterator begin(input.data(), input.length(), re);
       std::sregex_iterator end;
       for (auto it = begin; it != end; ++it) {
         const std::smatch &m = *it;
@@ -337,7 +337,7 @@ public:
 
   // 移除匹配子串
   std::string remove(
-      const std::string &input,
+      std::string_view input,
       std::vector<agentxx::util::XXRegexMatchResult> &results) const override {
     std::string result;
     if (match(input, results)) {
@@ -356,7 +356,7 @@ public:
 
   // 替换匹配子串
   std::string replace(
-      const std::string &input, const std::string &target,
+      std::string_view input, std::string_view target,
       std::vector<agentxx::util::XXRegexMatchResult> &results) const override {
     std::string result;
     if (match(input, results)) {
