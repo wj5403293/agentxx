@@ -29,7 +29,7 @@ struct TextSelectionEvent {
 using TextSelectionListener =
     std::function<void(const TextSelectionEvent &event)>;
 
-/// 支持 [IUIAutomationTextPattern]
+/// 系统级 文本选择事件流
 class TextSelectionMonitor {
 public:
   TextSelectionMonitor();

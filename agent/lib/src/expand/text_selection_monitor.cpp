@@ -22,6 +22,9 @@ namespace expand {
 
 #if XX_IS_WIN_D
 
+/// 系统级 文本选择事件流
+/// - 当选择 程序窗口、浏览器 中的文本时，收到事件，分析文本内容并发起通知
+/// - 启动独立线程处理接收事件
 class TextSelectionMonitor::Impl {
 public:
   static constexpr UINT WM_SELECTION_COMPLETE = WM_APP + 1;
