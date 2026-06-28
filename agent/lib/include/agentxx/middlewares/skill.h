@@ -293,12 +293,20 @@ public:
     auto skillState = co_await getStateItem(in.ctx.thread_id);
 
     {
+      auto agentCtxPtr = agentContext.lock();
+
       if (skillState->cacheFormatSkillPrompt.empty()) {
-        skillState->cacheFormatSkillPrompt =
-            fmt::format(defSkillPromptTemplate, formatSkillsMetadataList());
+        // 生成 skill 系统提示词
+        const auto &templateKey = agentCtxPtr->agentConfig->prompt
+                                      .systemSkillPromptSkillMetasInsertKey;
+        const auto &promptTemplate =
+            agentCtxPtr->agentConfig->prompt.systemSkillPrompt;
+        skillState->cacheFormatSkillPrompt = promptTemplate;
+        skillState->cacheFormatSkillPrompt.replace(
+            promptTemplate.find(templateKey), templateKey.size(),
+            formatSkillsMetadataList());
       }
 
-      auto agentCtxPtr = agentContext.lock();
       auto &appendSystemMsgList =
           agentCtxPtr->middlewareHandleContext
               ->getGraphDataItemValue<std::vector<std::string>>(

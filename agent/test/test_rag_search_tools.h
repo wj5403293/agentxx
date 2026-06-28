@@ -1384,7 +1384,8 @@ inline asio::awaitable<void> test_cosine_zero_vector() {
 // Test runner
 // =========================================================================
 
-inline asio::awaitable<void> run_rag_search_tools_tests() {
+inline asio::awaitable<void> run_rag_search_tools_tests(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   std::cout << "======= Test: RAG Search Tools =======" << std::endl;
 
   auto run = [](auto testFn) -> asio::awaitable<void> {

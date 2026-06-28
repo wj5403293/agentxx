@@ -70,7 +70,7 @@ Remember: Output ONLY valid JSON, nothing else before or after.
       std::string_view{"toolSkillSearch_loadedSkills"};
 
 public:
-  explicit ToolSkillSearchSubAgentTask(
+  ToolSkillSearchSubAgentTask(
       const neograph::graph::NodeContext &in_context,
       const std::vector<DelayToolInfo> &in_delayToolInfos,
       const std::vector<std::string> &in_skillDirPaths,

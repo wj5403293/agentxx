@@ -11,8 +11,9 @@ namespace tools {
 
 class UIControlKeyboardMouseTool : public XXToolBase {
 public:
-  explicit UIControlKeyboardMouseTool()
-      : XXToolBase("ui_control_keyboard_mouse", false, true) {}
+  UIControlKeyboardMouseTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("ui_control_keyboard_mouse", in_agentContext, false, true) {}
 
   neograph::ChatTool get_definition() const override;
 

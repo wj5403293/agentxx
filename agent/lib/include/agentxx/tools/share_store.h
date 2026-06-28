@@ -21,14 +21,10 @@ namespace tools {
 /// 之间方便传递数据
 /// TODO: 支持重启恢复
 class ThreadShareStoreTool : public XXToolBase {
-protected:
-  std::weak_ptr<agentxx::agent::AgentContext> agentContext;
-
 public:
-  explicit ThreadShareStoreTool(
+  ThreadShareStoreTool(
       std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
-      : XXToolBase("share_store", false, false), agentContext(in_agentContext) {
-  }
+      : XXToolBase("share_store", in_agentContext, false, false) {}
 
   std::optional<agentxx::middleware::SummarizationToolHandle>
   createSummarizationToolHandle() const override {

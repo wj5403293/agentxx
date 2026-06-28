@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agentxx/agent/context.h"
 #include "agentxx/tools/filesystem.h"
 #include "neograph/neograph.h"
 #include <asio/awaitable.hpp>
@@ -39,8 +40,9 @@ inline void setupTestDir() {
 
 inline void cleanupTestDir() { std::filesystem::remove_all(testDir); }
 
-inline asio::awaitable<void> test_list_file_get_definition() {
-  auto tool = agentxx::tools::FileSystemListFileTool{};
+inline asio::awaitable<void> test_list_file_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FileSystemListFileTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_list_file") {
     std::cout << "[PASS] FileSystemListFileTool::get_definition() name correct"
@@ -53,8 +55,9 @@ inline asio::awaitable<void> test_list_file_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_list_file_empty_path() {
-  auto tool = agentxx::tools::FileSystemListFileTool{};
+inline asio::awaitable<void> test_list_file_empty_path(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FileSystemListFileTool{agentContext};
   auto args = neograph::json{{"path", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -68,8 +71,9 @@ inline asio::awaitable<void> test_list_file_empty_path() {
   co_return;
 }
 
-inline asio::awaitable<void> test_list_file_basic() {
-  auto tool = agentxx::tools::FileSystemListFileTool{};
+inline asio::awaitable<void>
+test_list_file_basic(std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FileSystemListFileTool{agentContext};
   auto args = neograph::json{{"path", testDir}};
   auto result = co_await tool.execute_async(args);
   if (result.find("test1.txt") != std::string::npos &&
@@ -84,8 +88,9 @@ inline asio::awaitable<void> test_list_file_basic() {
   co_return;
 }
 
-inline asio::awaitable<void> test_list_file_recursive() {
-  auto tool = agentxx::tools::FileSystemListFileTool{};
+inline asio::awaitable<void> test_list_file_recursive(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FileSystemListFileTool{agentContext};
   auto args = neograph::json{
       {"path", testDir},
       {"recursive", true},
@@ -101,8 +106,9 @@ inline asio::awaitable<void> test_list_file_recursive() {
   co_return;
 }
 
-inline asio::awaitable<void> test_list_file_limit() {
-  auto tool = agentxx::tools::FileSystemListFileTool{};
+inline asio::awaitable<void>
+test_list_file_limit(std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FileSystemListFileTool{agentContext};
   auto args = neograph::json{
       {"path", testDir},
       {"limit", 1},
@@ -119,8 +125,9 @@ inline asio::awaitable<void> test_list_file_limit() {
   co_return;
 }
 
-inline asio::awaitable<void> test_list_file_info_fields() {
-  auto tool = agentxx::tools::FileSystemListFileTool{};
+inline asio::awaitable<void> test_list_file_info_fields(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FileSystemListFileTool{agentContext};
   auto args = neograph::json{{"path", testDir}};
   auto result = co_await tool.execute_async(args);
   auto jsonResult = neograph::json::parse(result);
@@ -153,8 +160,9 @@ inline asio::awaitable<void> test_list_file_info_fields() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_get_definition() {
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+inline asio::awaitable<void> test_read_text_file_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_read_text_file") {
     std::cout
@@ -168,8 +176,9 @@ inline asio::awaitable<void> test_read_text_file_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_empty_path() {
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+inline asio::awaitable<void> test_read_text_file_empty_path(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto args = neograph::json{{"path", ""}};
   try {
     auto result = co_await tool.execute_async(args);
@@ -189,8 +198,9 @@ inline asio::awaitable<void> test_read_text_file_empty_path() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_not_exist() {
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+inline asio::awaitable<void> test_read_text_file_not_exist(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto args = neograph::json{{"path", testDir + "/nonexistent.txt"}};
   try {
     auto result = co_await tool.execute_async(args);
@@ -204,8 +214,9 @@ inline asio::awaitable<void> test_read_text_file_not_exist() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_full() {
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+inline asio::awaitable<void> test_read_text_file_full(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto args = neograph::json{{"path", testDir + "/test1.txt"}};
   auto result = co_await tool.execute_async(args);
   if (result.find("line1") != std::string::npos &&
@@ -219,13 +230,14 @@ inline asio::awaitable<void> test_read_text_file_full() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_offset() {
+inline asio::awaitable<void> test_read_text_file_offset(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   auto offsetFile = testDir + "/offset_test.txt";
   {
     std::ofstream f(offsetFile);
     f << "aaaa\nbbbb\ncccc\ndddd\n";
   }
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", offsetFile},
       {"line_offset", 0},
@@ -241,8 +253,9 @@ inline asio::awaitable<void> test_read_text_file_offset() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_limit() {
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+inline asio::awaitable<void> test_read_text_file_limit(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", testDir + "/offset_test.txt"},
       {"line_limit", 3},
@@ -263,8 +276,9 @@ inline asio::awaitable<void> test_read_text_file_limit() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_text_file_offset_and_limit() {
-  auto tool = agentxx::tools::FilesystemReadTextFileTool{};
+inline asio::awaitable<void> test_read_text_file_offset_and_limit(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", testDir + "/offset_test.txt"},
       {"line_offset", 0},
@@ -284,8 +298,9 @@ inline asio::awaitable<void> test_read_text_file_offset_and_limit() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_binary_file_get_definition() {
-  auto tool = agentxx::tools::FilesystemReadBinaryFileTool{};
+inline asio::awaitable<void> test_read_binary_file_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadBinaryFileTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_read_binary_file") {
     std::cout
@@ -299,8 +314,9 @@ inline asio::awaitable<void> test_read_binary_file_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_read_binary_file_full() {
-  auto tool = agentxx::tools::FilesystemReadBinaryFileTool{};
+inline asio::awaitable<void> test_read_binary_file_full(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemReadBinaryFileTool{agentContext};
   auto args = neograph::json{{"path", testDir + "/test1.txt"}};
   auto result = co_await tool.execute_async(args);
   if (result.find("base64_data") != std::string::npos &&
@@ -315,8 +331,9 @@ inline asio::awaitable<void> test_read_binary_file_full() {
   co_return;
 }
 
-inline asio::awaitable<void> test_write_file_get_definition() {
-  auto tool = agentxx::tools::FilesystemWriteFileTool{};
+inline asio::awaitable<void> test_write_file_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemWriteFileTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_write_file") {
     std::cout << "[PASS] FilesystemWriteFileTool::get_definition() name correct"
@@ -329,8 +346,9 @@ inline asio::awaitable<void> test_write_file_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_write_file_empty_path() {
-  auto tool = agentxx::tools::FilesystemWriteFileTool{};
+inline asio::awaitable<void> test_write_file_empty_path(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemWriteFileTool{agentContext};
   auto args = neograph::json{{"path", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -344,8 +362,9 @@ inline asio::awaitable<void> test_write_file_empty_path() {
   co_return;
 }
 
-inline asio::awaitable<void> test_write_file_create() {
-  auto tool = agentxx::tools::FilesystemWriteFileTool{};
+inline asio::awaitable<void> test_write_file_create(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemWriteFileTool{agentContext};
   auto filePath = testDir + "/write_test.txt";
   auto args = neograph::json{
       {"path", filePath},
@@ -375,8 +394,9 @@ inline asio::awaitable<void> test_write_file_create() {
   co_return;
 }
 
-inline asio::awaitable<void> test_write_file_no_overwrite_existing() {
-  auto tool = agentxx::tools::FilesystemWriteFileTool{};
+inline asio::awaitable<void> test_write_file_no_overwrite_existing(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemWriteFileTool{agentContext};
   auto filePath = testDir + "/test1.txt";
   auto args = neograph::json{
       {"path", filePath},
@@ -395,8 +415,9 @@ inline asio::awaitable<void> test_write_file_no_overwrite_existing() {
   co_return;
 }
 
-inline asio::awaitable<void> test_write_file_overwrite() {
-  auto tool = agentxx::tools::FilesystemWriteFileTool{};
+inline asio::awaitable<void> test_write_file_overwrite(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemWriteFileTool{agentContext};
   auto filePath = testDir + "/overwrite_test.txt";
   {
     std::ofstream f(filePath);
@@ -427,8 +448,9 @@ inline asio::awaitable<void> test_write_file_overwrite() {
   co_return;
 }
 
-inline asio::awaitable<void> test_edit_text_file_get_definition() {
-  auto tool = agentxx::tools::FilesystemEditTextFileTool{};
+inline asio::awaitable<void> test_edit_text_file_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemEditTextFileTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_edit_text_file") {
     std::cout
@@ -442,8 +464,9 @@ inline asio::awaitable<void> test_edit_text_file_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_edit_text_file_empty_path() {
-  auto tool = agentxx::tools::FilesystemEditTextFileTool{};
+inline asio::awaitable<void> test_edit_text_file_empty_path(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemEditTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", ""},
       {"old_str", "a"},
@@ -462,8 +485,9 @@ inline asio::awaitable<void> test_edit_text_file_empty_path() {
   co_return;
 }
 
-inline asio::awaitable<void> test_edit_text_file_empty_old_str() {
-  auto tool = agentxx::tools::FilesystemEditTextFileTool{};
+inline asio::awaitable<void> test_edit_text_file_empty_old_str(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemEditTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", testDir + "/test1.txt"},
       {"old_str", ""},
@@ -482,14 +506,15 @@ inline asio::awaitable<void> test_edit_text_file_empty_old_str() {
   co_return;
 }
 
-inline asio::awaitable<void> test_edit_text_file_single_replace() {
+inline asio::awaitable<void> test_edit_text_file_single_replace(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   auto filePath = testDir + "/edit_test.txt";
   {
     std::ofstream f(filePath);
     f << "hello world\nfoo bar\n";
   }
 
-  auto tool = agentxx::tools::FilesystemEditTextFileTool{};
+  auto tool = agentxx::tools::FilesystemEditTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", filePath},
       {"old_str", "hello world"},
@@ -516,14 +541,15 @@ inline asio::awaitable<void> test_edit_text_file_single_replace() {
   co_return;
 }
 
-inline asio::awaitable<void> test_edit_text_file_multi_replace() {
+inline asio::awaitable<void> test_edit_text_file_multi_replace(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   auto filePath = testDir + "/edit_multi_test.txt";
   {
     std::ofstream f(filePath);
     f << "foo foo foo bar\n";
   }
 
-  auto tool = agentxx::tools::FilesystemEditTextFileTool{};
+  auto tool = agentxx::tools::FilesystemEditTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", filePath},
       {"old_str", "foo"},
@@ -551,9 +577,10 @@ inline asio::awaitable<void> test_edit_text_file_multi_replace() {
   co_return;
 }
 
-inline asio::awaitable<void> test_edit_text_file_no_match() {
+inline asio::awaitable<void> test_edit_text_file_no_match(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   auto filePath = testDir + "/edit_test.txt";
-  auto tool = agentxx::tools::FilesystemEditTextFileTool{};
+  auto tool = agentxx::tools::FilesystemEditTextFileTool{agentContext};
   auto args = neograph::json{
       {"path", filePath},
       {"old_str", "nonexistent_string_xyz"},
@@ -571,8 +598,9 @@ inline asio::awaitable<void> test_edit_text_file_no_match() {
   co_return;
 }
 
-inline asio::awaitable<void> test_glob_get_definition() {
-  auto tool = agentxx::tools::FilesystemGlobTool{};
+inline asio::awaitable<void> test_glob_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGlobTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_glob") {
     std::cout << "[PASS] FilesystemGlobTool::get_definition() name correct"
@@ -584,8 +612,9 @@ inline asio::awaitable<void> test_glob_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_glob_empty_patterns() {
-  auto tool = agentxx::tools::FilesystemGlobTool{};
+inline asio::awaitable<void> test_glob_empty_patterns(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGlobTool{agentContext};
   auto args = neograph::json{
       {"file_patterns", neograph::json::array()},
   };
@@ -602,8 +631,9 @@ inline asio::awaitable<void> test_glob_empty_patterns() {
   co_return;
 }
 
-inline asio::awaitable<void> test_glob_find_files() {
-  auto tool = agentxx::tools::FilesystemGlobTool{};
+inline asio::awaitable<void>
+test_glob_find_files(std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGlobTool{agentContext};
   auto args = neograph::json{
       {"file_patterns", neograph::json::array({testDir + "/*.txt"})},
   };
@@ -619,8 +649,9 @@ inline asio::awaitable<void> test_glob_find_files() {
   co_return;
 }
 
-inline asio::awaitable<void> test_glob_recursive() {
-  auto tool = agentxx::tools::FilesystemGlobTool{};
+inline asio::awaitable<void>
+test_glob_recursive(std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGlobTool{agentContext};
   auto args = neograph::json{
       {"file_patterns", neograph::json::array({testDir + "/**/*.txt"})},
   };
@@ -636,8 +667,9 @@ inline asio::awaitable<void> test_glob_recursive() {
   co_return;
 }
 
-inline asio::awaitable<void> test_grep_get_definition() {
-  auto tool = agentxx::tools::FilesystemGrepTool{};
+inline asio::awaitable<void> test_grep_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGrepTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "filesystem_grep") {
     std::cout << "[PASS] FilesystemGrepTool::get_definition() name correct"
@@ -649,8 +681,9 @@ inline asio::awaitable<void> test_grep_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_grep_empty_text_patterns() {
-  auto tool = agentxx::tools::FilesystemGrepTool{};
+inline asio::awaitable<void> test_grep_empty_text_patterns(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGrepTool{agentContext};
   auto args = neograph::json{
       {"text_patterns_is_regex", false},
       {"text_patterns", neograph::json::array()},
@@ -669,8 +702,9 @@ inline asio::awaitable<void> test_grep_empty_text_patterns() {
   co_return;
 }
 
-inline asio::awaitable<void> test_grep_empty_file_patterns() {
-  auto tool = agentxx::tools::FilesystemGrepTool{};
+inline asio::awaitable<void> test_grep_empty_file_patterns(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGrepTool{agentContext};
   auto args = neograph::json{
       {"text_patterns_is_regex", false},
       {"text_patterns", neograph::json::array({"hello"})},
@@ -689,8 +723,9 @@ inline asio::awaitable<void> test_grep_empty_file_patterns() {
   co_return;
 }
 
-inline asio::awaitable<void> test_grep_text_search() {
-  auto tool = agentxx::tools::FilesystemGrepTool{};
+inline asio::awaitable<void> test_grep_text_search(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGrepTool{agentContext};
   auto args = neograph::json{
       {"text_patterns_is_regex", false},
       {"text_patterns", neograph::json::array({"hello"})},
@@ -708,8 +743,9 @@ inline asio::awaitable<void> test_grep_text_search() {
   co_return;
 }
 
-inline asio::awaitable<void> test_grep_regex_search() {
-  auto tool = agentxx::tools::FilesystemGrepTool{};
+inline asio::awaitable<void> test_grep_regex_search(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGrepTool{agentContext};
   auto args = neograph::json{
       {"text_patterns_is_regex", true},
       {"text_patterns", neograph::json::array({"line[0-9]"})},
@@ -727,8 +763,9 @@ inline asio::awaitable<void> test_grep_regex_search() {
   co_return;
 }
 
-inline asio::awaitable<void> test_grep_content_mode() {
-  auto tool = agentxx::tools::FilesystemGrepTool{};
+inline asio::awaitable<void> test_grep_content_mode(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::FilesystemGrepTool{agentContext};
   auto args = neograph::json{
       {"text_patterns_is_regex", false},
       {"text_patterns", neograph::json::array({"hello"})},
@@ -748,13 +785,14 @@ inline asio::awaitable<void> test_grep_content_mode() {
   co_return;
 }
 
-inline asio::awaitable<void> run_filesystem_tools_tests() {
+inline asio::awaitable<void> run_filesystem_tools_tests(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   setupTestDir();
   std::cout << "======= Test: Filesystem Tools =======" << std::endl;
 
-  auto run = [](auto testFn) -> asio::awaitable<void> {
+  auto run = [agentContext](auto testFn) -> asio::awaitable<void> {
     try {
-      co_await testFn();
+      co_await testFn(agentContext);
     } catch (const std::exception &e) {
       std::cout << "[FAIL] Exception in test: " << e.what() << std::endl;
     }

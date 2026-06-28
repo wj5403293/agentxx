@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agentxx/agent/context.h"
 #include "agentxx/tools/execute_command.h"
 #include "boost/asio/dispatch.hpp"
 #include <iostream>
@@ -8,8 +9,9 @@
 namespace agentxx {
 namespace test {
 
-inline asio::awaitable<void> test_linux_command_get_definition() {
-  auto tool = agentxx::tools::ExecuteLinuxCommandTool{};
+inline asio::awaitable<void> test_linux_command_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteLinuxCommandTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "execute_linux_command") {
     std::cout << "[PASS] ExecuteLinuxCommandTool::get_definition() name correct"
@@ -22,8 +24,9 @@ inline asio::awaitable<void> test_linux_command_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_linux_command_empty_command() {
-  auto tool = agentxx::tools::ExecuteLinuxCommandTool{};
+inline asio::awaitable<void> test_linux_command_empty_command(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteLinuxCommandTool{agentContext};
   auto args = neograph::json{{"command", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -38,8 +41,9 @@ inline asio::awaitable<void> test_linux_command_empty_command() {
   co_return;
 }
 
-inline asio::awaitable<void> test_linux_command_echo() {
-  auto tool = agentxx::tools::ExecuteLinuxCommandTool{};
+inline asio::awaitable<void> test_linux_command_echo(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteLinuxCommandTool{agentContext};
   auto args = neograph::json{{"command", "echo hello_test"}};
   auto result = co_await tool.execute_async(args);
   if (result.find("hello_test") != std::string::npos) {
@@ -52,8 +56,9 @@ inline asio::awaitable<void> test_linux_command_echo() {
   co_return;
 }
 
-inline asio::awaitable<void> test_linux_command_ls() {
-  auto tool = agentxx::tools::ExecuteLinuxCommandTool{};
+inline asio::awaitable<void> test_linux_command_ls(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteLinuxCommandTool{agentContext};
   auto args = neograph::json{{"command", "ls /tmp"}};
   auto result = co_await tool.execute_async(args);
   if (false == result.empty()) {
@@ -66,8 +71,9 @@ inline asio::awaitable<void> test_linux_command_ls() {
   co_return;
 }
 
-inline asio::awaitable<void> test_linux_command_pwd() {
-  auto tool = agentxx::tools::ExecuteLinuxCommandTool{};
+inline asio::awaitable<void> test_linux_command_pwd(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteLinuxCommandTool{agentContext};
   auto args = neograph::json{{"command", "pwd"}};
   auto result = co_await tool.execute_async(args);
   if (result.find("/") != std::string::npos) {
@@ -80,8 +86,9 @@ inline asio::awaitable<void> test_linux_command_pwd() {
   co_return;
 }
 
-inline asio::awaitable<void> test_linux_command_whoami() {
-  auto tool = agentxx::tools::ExecuteLinuxCommandTool{};
+inline asio::awaitable<void> test_linux_command_whoami(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteLinuxCommandTool{agentContext};
   auto args = neograph::json{{"command", "whoami"}};
   auto result = co_await tool.execute_async(args);
   if (false == result.empty()) {
@@ -94,8 +101,9 @@ inline asio::awaitable<void> test_linux_command_whoami() {
   co_return;
 }
 
-inline asio::awaitable<void> test_windows_command_get_definition() {
-  auto tool = agentxx::tools::ExecuteWindowsCommandTool{};
+inline asio::awaitable<void> test_windows_command_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteWindowsCommandTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "execute_windows_command") {
     std::cout
@@ -109,8 +117,9 @@ inline asio::awaitable<void> test_windows_command_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_windows_command_empty_command() {
-  auto tool = agentxx::tools::ExecuteWindowsCommandTool{};
+inline asio::awaitable<void> test_windows_command_empty_command(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteWindowsCommandTool{agentContext};
   auto args = neograph::json{{"command", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -126,8 +135,9 @@ inline asio::awaitable<void> test_windows_command_empty_command() {
   co_return;
 }
 
-inline asio::awaitable<void> test_python_command_get_definition() {
-  auto tool = agentxx::tools::ExecutePythonTool{};
+inline asio::awaitable<void> test_python_command_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecutePythonTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "execute_python") {
     std::cout << "[PASS] ExecutePythonTool::get_definition() name correct"
@@ -139,8 +149,9 @@ inline asio::awaitable<void> test_python_command_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_python_command_empty_command() {
-  auto tool = agentxx::tools::ExecutePythonTool{};
+inline asio::awaitable<void> test_python_command_empty_command(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecutePythonTool{agentContext};
   auto args = neograph::json{{"command", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -155,8 +166,9 @@ inline asio::awaitable<void> test_python_command_empty_command() {
   co_return;
 }
 
-inline asio::awaitable<void> test_javascript_command_get_definition() {
-  auto tool = agentxx::tools::ExecuteJavaScriptTool{};
+inline asio::awaitable<void> test_javascript_command_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteJavaScriptTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "execute_javascript") {
     std::cout << "[PASS] ExecuteJavaScriptTool::get_definition() name correct"
@@ -168,8 +180,9 @@ inline asio::awaitable<void> test_javascript_command_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_javascript_command_empty_command() {
-  auto tool = agentxx::tools::ExecuteJavaScriptTool{};
+inline asio::awaitable<void> test_javascript_command_empty_command(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::ExecuteJavaScriptTool{agentContext};
   auto args = neograph::json{{"command", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -183,12 +196,13 @@ inline asio::awaitable<void> test_javascript_command_empty_command() {
   co_return;
 }
 
-inline asio::awaitable<void> run_command_tools_tests() {
+inline asio::awaitable<void> run_command_tools_tests(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   std::cout << "======= Test: Command Tools =======" << std::endl;
 
-  auto run = [](auto testFn) -> asio::awaitable<void> {
+  auto run = [agentContext](auto testFn) -> asio::awaitable<void> {
     try {
-      co_await testFn();
+      co_await testFn(agentContext);
     } catch (const std::exception &e) {
       std::cout << "[FAIL] Exception in test: " << e.what() << std::endl;
     }

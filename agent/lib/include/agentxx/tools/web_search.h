@@ -23,9 +23,10 @@ protected:
   const bool convertHtml2markdown;
 
 public:
-  explicit WebSearchTool(std::string_view in_searchApiUrl,
-                         bool in_convertHtml2markdown)
-      : XXToolBase("web_search", true, true), searchApiUrl(in_searchApiUrl),
+  WebSearchTool(std::string_view in_searchApiUrl, bool in_convertHtml2markdown,
+                std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("web_search", in_agentContext, true, true),
+        searchApiUrl(in_searchApiUrl),
         convertHtml2markdown(in_convertHtml2markdown) {}
 
   neograph::ChatTool get_definition() const override {
@@ -99,7 +100,8 @@ public:
 
 class WebFetchUrlTool : public XXToolBase {
 public:
-  explicit WebFetchUrlTool() : XXToolBase("web_fetch_url", true, true) {}
+  WebFetchUrlTool(std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("web_fetch_url", in_agentContext, true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -164,8 +166,9 @@ public:
 
 class WebFetchUrlMarkdownTool : public XXToolBase {
 public:
-  explicit WebFetchUrlMarkdownTool()
-      : XXToolBase("web_fetch_url_markdown", true, true) {}
+  WebFetchUrlMarkdownTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("web_fetch_url_markdown", in_agentContext, true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

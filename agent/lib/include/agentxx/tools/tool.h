@@ -21,6 +21,7 @@ namespace tools {
 class XXToolBase : public neograph::AsyncTool {
 protected:
   const std::string name;
+  std::weak_ptr<agentxx::agent::AgentContext> agentContext;
 
 public:
   /// - 自动压缩 tool 输出，当长度超过限制值
@@ -36,11 +37,13 @@ public:
   /// - 最多执行 1 + maxRetry(retry) 次
   const size_t maxRetry;
 
-  explicit XXToolBase(std::string_view in_name,
-                      bool in_autoSummaryOutput = false,
-                      bool in_canDelayLoad = true, size_t in_maxRetry = 0)
-      : name(in_name), autoSummaryOutput(in_autoSummaryOutput),
-        canDelayLoad(in_canDelayLoad), maxRetry(in_maxRetry) {
+  XXToolBase(std::string_view in_name,
+             std::weak_ptr<agentxx::agent::AgentContext> in_agentContext,
+             bool in_autoSummaryOutput = false, bool in_canDelayLoad = true,
+             size_t in_maxRetry = 0)
+      : name(in_name), agentContext(in_agentContext),
+        autoSummaryOutput(in_autoSummaryOutput), canDelayLoad(in_canDelayLoad),
+        maxRetry(in_maxRetry) {
     extra["autoSummaryOutput"] = autoSummaryOutput ? "true" : "false";
     extra["canDelayLoad"] = canDelayLoad ? "true" : "false";
     extra["maxRetry"] = std::to_string(maxRetry);
@@ -76,13 +79,14 @@ protected:
       summarizationHandle;
 
 public:
-  explicit XXToolWarp(
-      std::unique_ptr<neograph::Tool> &&in_inner,
-      bool in_autoSummaryOutput = false, bool in_canDelayLoad = false,
-      size_t in_maxRetry = 0,
-      std::optional<agentxx::middleware::SummarizationToolHandle>
-          in_summarizationHandle = std::nullopt)
-      : XXToolBase("", in_autoSummaryOutput, in_canDelayLoad, in_maxRetry),
+  XXToolWarp(std::unique_ptr<neograph::Tool> &&in_inner,
+             std::weak_ptr<agentxx::agent::AgentContext> in_agentContext,
+             bool in_autoSummaryOutput = false, bool in_canDelayLoad = false,
+             size_t in_maxRetry = 0,
+             std::optional<agentxx::middleware::SummarizationToolHandle>
+                 in_summarizationHandle = std::nullopt)
+      : XXToolBase(in_inner->get_name(), in_agentContext, in_autoSummaryOutput,
+                   in_canDelayLoad, in_maxRetry),
         inner(std::move(in_inner)),
         summarizationHandle(in_summarizationHandle) {}
 

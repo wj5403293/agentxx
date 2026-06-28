@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agentxx/agent/context.h"
 #include "agentxx/tools/string.h"
 #include "neograph/neograph.h"
 #include <asio/awaitable.hpp>
@@ -9,8 +10,9 @@
 namespace agentxx {
 namespace test {
 
-inline asio::awaitable<void> test_html_to_markdown_basic() {
-  auto tool = agentxx::tools::StringHtml2MarkdownTool{};
+inline asio::awaitable<void> test_html_to_markdown_basic(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringHtml2MarkdownTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "string_html_to_markdown") {
     std::cout << "[PASS] StringHtml2MarkdownTool::get_definition() name correct"
@@ -23,8 +25,9 @@ inline asio::awaitable<void> test_html_to_markdown_basic() {
   co_return;
 }
 
-inline asio::awaitable<void> test_html_to_markdown_empty_content() {
-  auto tool = agentxx::tools::StringHtml2MarkdownTool{};
+inline asio::awaitable<void> test_html_to_markdown_empty_content(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringHtml2MarkdownTool{agentContext};
   auto args = neograph::json{{"content", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -39,8 +42,9 @@ inline asio::awaitable<void> test_html_to_markdown_empty_content() {
   co_return;
 }
 
-inline asio::awaitable<void> test_html_to_markdown_convert() {
-  auto tool = agentxx::tools::StringHtml2MarkdownTool{};
+inline asio::awaitable<void> test_html_to_markdown_convert(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringHtml2MarkdownTool{agentContext};
   auto args = neograph::json{{"content", "<h1>Hello</h1><p>World</p>"}};
   auto result = co_await tool.execute_async(args);
   if (result.find("# Hello") != std::string::npos &&
@@ -54,8 +58,9 @@ inline asio::awaitable<void> test_html_to_markdown_convert() {
   co_return;
 }
 
-inline asio::awaitable<void> test_html_to_markdown_simple_text() {
-  auto tool = agentxx::tools::StringHtml2MarkdownTool{};
+inline asio::awaitable<void> test_html_to_markdown_simple_text(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringHtml2MarkdownTool{agentContext};
   auto args = neograph::json{{"content", "<b>bold</b> <i>italic</i>"}};
   auto result = co_await tool.execute_async(args);
   if (result.find("**bold**") != std::string::npos &&
@@ -70,8 +75,9 @@ inline asio::awaitable<void> test_html_to_markdown_simple_text() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_get_definition() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "string_regexp") {
     std::cout << "[PASS] StringRegexpTool::get_definition() name correct"
@@ -83,8 +89,9 @@ inline asio::awaitable<void> test_regexp_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_empty_content() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_empty_content(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", ""},
       {"exps", neograph::json::array({"test"})},
@@ -102,8 +109,9 @@ inline asio::awaitable<void> test_regexp_empty_content() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_empty_exps() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_empty_exps(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "some text"},
       {"exps", neograph::json::array()},
@@ -121,8 +129,9 @@ inline asio::awaitable<void> test_regexp_empty_exps() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_empty_opt() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_empty_opt(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "some text"},
       {"exps", neograph::json::array({"test"})},
@@ -140,8 +149,9 @@ inline asio::awaitable<void> test_regexp_empty_opt() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_invalid_opt() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_invalid_opt(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "some text"},
       {"exps", neograph::json::array({"test"})},
@@ -160,8 +170,9 @@ inline asio::awaitable<void> test_regexp_invalid_opt() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_search_match() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_search_match(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "hello world, hello everyone"},
       {"exps", neograph::json::array({"hello"})},
@@ -178,8 +189,9 @@ inline asio::awaitable<void> test_regexp_search_match() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_search_no_match() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_search_no_match(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "hello world"},
       {"exps", neograph::json::array({"xyz_not_found"})},
@@ -198,8 +210,9 @@ inline asio::awaitable<void> test_regexp_search_no_match() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_replace() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void>
+test_regexp_replace(std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "hello world"},
       {"exps", neograph::json::array({"world"})},
@@ -216,8 +229,9 @@ inline asio::awaitable<void> test_regexp_replace() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_replace_no_match() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_replace_no_match(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "hello world"},
       {"exps", neograph::json::array({"xyz_not_found"})},
@@ -237,8 +251,9 @@ inline asio::awaitable<void> test_regexp_replace_no_match() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_remove() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void>
+test_regexp_remove(std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "hello world, hello everyone"},
       {"exps", neograph::json::array({"hello "})},
@@ -255,8 +270,9 @@ inline asio::awaitable<void> test_regexp_remove() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_remove_no_match() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_remove_no_match(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "hello world"},
       {"exps", neograph::json::array({"xyz_not_found"})},
@@ -275,8 +291,9 @@ inline asio::awaitable<void> test_regexp_remove_no_match() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_search_multi_patterns() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_search_multi_patterns(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "apple banana cherry"},
       {"exps", neograph::json::array({"apple", "cherry"})},
@@ -294,8 +311,9 @@ inline asio::awaitable<void> test_regexp_search_multi_patterns() {
   co_return;
 }
 
-inline asio::awaitable<void> test_regexp_replace_multi_patterns() {
-  auto tool = agentxx::tools::StringRegexpTool{};
+inline asio::awaitable<void> test_regexp_replace_multi_patterns(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::StringRegexpTool{agentContext};
   auto args = neograph::json{
       {"content", "apple banana apple"},
       {"exps", neograph::json::array({"apple"})},
@@ -319,12 +337,13 @@ inline asio::awaitable<void> test_regexp_replace_multi_patterns() {
   co_return;
 }
 
-inline asio::awaitable<void> run_string_tools_tests() {
+inline asio::awaitable<void> run_string_tools_tests(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   std::cout << "======= Test: String Tools =======" << std::endl;
 
-  auto run = [](auto testFn) -> asio::awaitable<void> {
+  auto run = [agentContext](auto testFn) -> asio::awaitable<void> {
     try {
-      co_await testFn();
+      co_await testFn(agentContext);
     } catch (const std::exception &e) {
       std::cout << "[FAIL] Exception in test: " << e.what() << std::endl;
     }

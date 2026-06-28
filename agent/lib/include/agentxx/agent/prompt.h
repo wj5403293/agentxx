@@ -1,11 +1,22 @@
 #pragma once
 
+#include "agentxx/util/util.h"
+#include "fmt/format.h"
+#include <map>
 #include <string>
 #include <vector>
 
 namespace agentxx {
 namespace agent {
 
+class ToolPrompt {
+public:
+  std::string depict;
+  std::map<std::string, std::string> args;
+};
+
+/// 提示词汇总
+/// - 将大部分 system prompt,tool prompt 汇集，方便自定义配置、自循环更新等功能
 class AgentPrompt {
 public:
   std::string systemPrompt = "You are a helpful assistant.";
@@ -31,6 +42,9 @@ Writing roadmap and todos takes time and tokens, use it when it is helpful for m
 When you finish all work, write your final answer in the message AFTER your last `planning_write` call — not in the same turn as that call. Start the final message with the substantive content the user asked for — the data, computation, summary, or analysis. The user wants the result, not confirmation that the work is done.
 )_";
 
+  inline static constexpr std::string_view systemSkillPromptSkillMetasInsertKey{
+      "{Skill-Meta-Lists-Insert-Key}"};
+
   std::string systemSkillPrompt = R"_(
 ## Skills System
 
@@ -38,7 +52,7 @@ You have access to a skills library that provides specialized capabilities and d
 
 **Available Skills:**
 
-{}
+{Skill-Meta-Lists-Insert-Key}
 
 **How to Use Skills (Progressive Disclosure):**
 
@@ -69,6 +83,27 @@ User: "Can you analyse the latest developments in quantum computing?"
 
 Remember: Skills make you more capable and consistent. When in doubt, check if a skill exists for the task!
 )_";
+
+  /// toolcall
+  std::map<std::string, const ToolPrompt> toolPrompt{
+      {
+          "execute_linux_command",
+          ToolPrompt{
+              .args =
+                  {
+                      {"command",
+                       fmt::format(R"(Command to execute.
+Current System is {}{}, please use linux shell/bash commands.)",
+                                   agentxx::util::getSystemName(),
+                                   agentxx::util::isRunningInWSL() ? "/(WSL)"
+                                                                   : "")},
+                      {"all_output", R"(Default `true`. 
+`true`: Return all output.
+`false`: Truncate Output. Only return the stdout and stderr output when the command faild.)"},
+                  },
+          },
+      },
+  };
 };
 
 } // namespace agent

@@ -1,3 +1,5 @@
+#include "agentxx/agent/config.h"
+#include "agentxx/agent/context.h"
 #include "agentxx/util/log.h"
 #include "asio/awaitable.hpp"
 #include "asio/co_spawn.hpp"
@@ -47,9 +49,13 @@ int main(int argn, char **argv) {
       []() -> asio::awaitable<void> {
         co_await test(ioCtx);
 
-        auto run = [](auto testFn) -> asio::awaitable<void> {
+        auto agentConfig = std::make_shared<agentxx::agent::AgentConfig>();
+        auto agentContext = std::make_shared<agentxx::agent::AgentContext>();
+        agentContext->agentConfig = agentConfig;
+
+        auto run = [](auto testFn, auto... args) -> asio::awaitable<void> {
           try {
-            co_await testFn();
+            co_await testFn(args...);
           } catch (const std::exception &e) {
             std::cout << "[FAIL] Test suite exception: " << e.what()
                       << std::endl;
@@ -59,12 +65,12 @@ int main(int argn, char **argv) {
         { agentxx::test::testStringUtil(); }
         { agentxx::test::testRegex(); }
 
-        co_await run(agentxx::test::run_string_tools_tests);
-        co_await run(agentxx::test::run_rag_search_tools_tests);
-        co_await run(agentxx::test::run_datetime_tool_tests);
-        co_await run(agentxx::test::run_filesystem_tools_tests);
-        co_await run(agentxx::test::run_command_tools_tests);
-        co_await run(agentxx::test::run_web_search_tools_tests);
+        co_await run(agentxx::test::run_string_tools_tests, agentContext);
+        co_await run(agentxx::test::run_rag_search_tools_tests, agentContext);
+        co_await run(agentxx::test::run_datetime_tool_tests, agentContext);
+        co_await run(agentxx::test::run_filesystem_tools_tests, agentContext);
+        co_await run(agentxx::test::run_command_tools_tests, agentContext);
+        co_await run(agentxx::test::run_web_search_tools_tests, agentContext);
       },
       asio::detached);
   ioCtx.run();
