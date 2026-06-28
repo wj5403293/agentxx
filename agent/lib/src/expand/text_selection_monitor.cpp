@@ -197,7 +197,7 @@ private:
             HWND hwnd = WindowFromPoint(pMouseStruct->pt);
             if (hwnd) {
               HWND rootHwnd = GetAncestor(hwnd, GA_ROOT);
-              if (isBrowserWindow(rootHwnd)) {
+              if (needsClipboardFallback(rootHwnd)) {
                 std::lock_guard<std::mutex> lock(self->debounceMutex_);
                 self->lastSelectionHwnd_ = rootHwnd;
                 self->lastSelectionChangeTime_ = now;
@@ -464,6 +464,47 @@ private:
     }
     CloseHandle(hProcess);
     return isBrowser;
+  }
+
+  static bool isElectronAppWindow(HWND hwnd) {
+    DWORD processId = 0;
+    GetWindowThreadProcessId(hwnd, &processId);
+    if (processId == 0) {
+      return false;
+    }
+
+    HANDLE hProcess =
+        OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+    if (!hProcess) {
+      return false;
+    }
+
+    wchar_t exePath[MAX_PATH] = {};
+    DWORD size = MAX_PATH;
+    bool isElectron = false;
+    if (QueryFullProcessImageNameW(hProcess, 0, exePath, &size)) {
+      wchar_t *fileName = wcsrchr(exePath, L'\\');
+      if (!fileName) {
+        fileName = exePath;
+      } else {
+        ++fileName;
+      }
+      _wcslwr_s(fileName, wcslen(fileName) + 1);
+      isElectron = (wcscmp(fileName, L"code.exe") == 0 ||
+                    wcscmp(fileName, L"code") == 0 ||
+                    wcscmp(fileName, L"code-insiders.exe") == 0 ||
+                    wcscmp(fileName, L"code-insiders") == 0 ||
+                    wcscmp(fileName, L"codium.exe") == 0 ||
+                    wcscmp(fileName, L"codium") == 0 ||
+                    wcscmp(fileName, L"cursor.exe") == 0 ||
+                    wcscmp(fileName, L"cursor") == 0);
+    }
+    CloseHandle(hProcess);
+    return isElectron;
+  }
+
+  static bool needsClipboardFallback(HWND hwnd) {
+    return isBrowserWindow(hwnd) || isElectronAppWindow(hwnd);
   }
 
   static bool ensureWSA() {
@@ -864,15 +905,20 @@ private:
   }
 
   std::pair<std::string, TextSource> getSelectedTextByClipboard(HWND hwnd) {
+    HWND rootHwnd = GetAncestor(hwnd, GA_ROOT);
+    if (!rootHwnd) {
+      rootHwnd = hwnd;
+    }
+
     HWND foregroundHwnd = GetForegroundWindow();
     bool needRestoreFocus =
-        (foregroundHwnd != hwnd && foregroundHwnd != nullptr);
+        (foregroundHwnd != rootHwnd && foregroundHwnd != nullptr);
 
     if (needRestoreFocus) {
-      DWORD targetThreadId = GetWindowThreadProcessId(hwnd, nullptr);
+      DWORD targetThreadId = GetWindowThreadProcessId(rootHwnd, nullptr);
       DWORD currentThreadId = GetCurrentThreadId();
       AttachThreadInput(currentThreadId, targetThreadId, TRUE);
-      SetForegroundWindow(hwnd);
+      SetForegroundWindow(rootHwnd);
       AttachThreadInput(currentThreadId, targetThreadId, FALSE);
       Sleep(50);
     }
@@ -958,7 +1004,7 @@ private:
   }
 
   std::pair<std::string, TextSource> getSelectedTextByDevTools(HWND hwnd) {
-    if (!isBrowserWindow(hwnd)) {
+    if (!needsClipboardFallback(hwnd)) {
       return {};
     }
 
@@ -971,6 +1017,11 @@ private:
   }
 
   std::pair<std::string, TextSource> getSelectedText(HWND hwnd) {
+    auto legacyResult = getSelectedTextByEmGetSel(hwnd);
+    if (!legacyResult.first.empty()) {
+      return legacyResult;
+    }
+
     if (!automation_) {
       return {};
     }
@@ -1076,11 +1127,6 @@ private:
       }
     }
 
-    auto legacyResult = getSelectedTextByEmGetSel(hwnd);
-    if (!legacyResult.first.empty()) {
-      return legacyResult;
-    }
-
     legacyResult = getSelectedTextByAccessible(hwnd);
     if (!legacyResult.first.empty()) {
       return legacyResult;
@@ -1091,7 +1137,7 @@ private:
       return legacyResult;
     }
 
-    if (isBrowserWindow(hwnd)) {
+    if (needsClipboardFallback(hwnd)) {
       return {};
     }
 
