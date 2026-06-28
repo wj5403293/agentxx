@@ -25,24 +25,12 @@
 ### 编译后的体积和依赖库
 - Agentxx 编译后输出的 可执行程序`agentxx_cli`、动态库`libagentxx` 都会尽量静态链接依赖库，保持编译结果对动态库的依赖尽量少
 - 以下是编译添加了所有支持的功能，如果需要进一步裁剪体积，可以移除 VectorScan/Hyperscan 等可选库、采用 -Os 体积编译优化，可以大幅缩减体积
-- Windows: 
-    - Release 编译体积 MSVC (Visual Studio 18 2026 / MSVC 19.51.36247.0) x86_64 -O2:
-        - agentxx_cli.exe: 11.9 MB
-        - libagentxx.dll:  5.14 MB
-    - `dumpbin /dependents agentxx_cli.exe` 或 `dumpbin /dependents libagentxx.dll` 依赖的动态库都只有 系统库+msvc运行时, 打包时建议带上msvc运行时
-- Ubuntu/Linux: 
-    - Release 编译 GCC 16.1.0 x86_64 -O3:
-        - agentxx_cli:   28 MB
-            - 移除 VectorScan/Hyperscan: 21MB
-        - libagentxx.so: 11 MB
-            - 移除 VectorScan/Hyperscan: 4.4MB
-    - `ldd agentxx_cli` 、`ldd libagentxx.so` 依赖的动态库都只有 系统库/libstdc++/libgcc_s，打包时建议带上 libstdc++.so.6/libgcc_s.so.1
-        - linux-vdso.so.1
-        - libgcc_s.so.1 => /usr/local/lib64/libgcc_s.so.1
-        - libstdc++.so.6 => /usr/local/lib64/libstdc++.so.6
-        - libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6
-        - libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
-        - /lib64/ld-linux-x86-64.so.2
+
+| System | agentxx_cli | libagentxx | compiler | TIP |
+|---|---|---|---|---|
+| **Windows** | 11.9 MB | 5.14 MB | MSVC (Visual Studio 18 2026 MSVC 19.51.36247.0) x86_64 -O2 | 打包时建议带上msvc运行时 |
+| **Linux** | 28 MB | 11 MB | GCC 16.1.0 x86_64 -O3 | 打包时建议带上 libstdc++.so.6,libgcc_s.so.1 |
+| **Linux (-deps)** | 21 MB | 4.4 MB | - | 移除依赖 vectorScan/hyperscan |
 
 ## 计划实现
 ### 基础模块
@@ -163,7 +151,7 @@
 
 ### 功能
 - ⬜**翻译/划词翻译**
-    - ✅接收选择文本事件
+    - ✅接收其他程序、浏览器选择文本事件
 - ⬜**操作键鼠**
     - ✅Tool/ui_control
 - ⬜**根据文本/音视频，生成评论/弹幕**
