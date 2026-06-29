@@ -13,6 +13,7 @@
 #include "asio/registered_buffer.hpp"
 #include "asio/stream_file.hpp"
 #include "asio/use_awaitable.hpp"
+#include "test_codegraph_tools.h"
 #include "test_command_tools.h"
 #include "test_datetime_tool.h"
 #include "test_filesystem_tools.h"
@@ -72,6 +73,7 @@ int main(int argn, char **argv) {
         co_await run(agentxx::test::run_filesystem_tools_tests, agentContext);
         co_await run(agentxx::test::run_command_tools_tests, agentContext);
         co_await run(agentxx::test::run_web_search_tools_tests, agentContext);
+        co_await run(agentxx::test::run_codegraph_tools_tests, agentContext);
       },
       asio::detached);
   ioCtx.run();

@@ -1,4 +1,5 @@
 #include "agentxx/expand/codegraph_manager.h"
+#include "agentxx/agent/config_static.h"
 #include "agentxx/util/log.h"
 #include "codegraph/context/context_builder.h"
 #include "codegraph/core/types.h"
@@ -24,6 +25,8 @@ namespace expand {
 
 namespace fs = std::filesystem;
 
+static constexpr std::string_view kCodeGraphDbPath = ".codegraph";
+
 static bool should_skip(const std::string &file_path) {
   fs::path p(file_path);
   std::string path_str = p.generic_string();
@@ -33,7 +36,11 @@ static bool should_skip(const std::string &file_path) {
          path_str.find("/build-") != std::string::npos ||
          path_str.find("/__pycache__/") != std::string::npos ||
          path_str.find("/.git/") != std::string::npos ||
-         path_str.find("/.codegraph/") != std::string::npos;
+         path_str.find(fmt::format(
+             "/{}/", agentxx::agent::AgentConfigStatic::agentxxDataDirPath)) !=
+             std::string::npos ||
+         path_str.find(fmt::format("/{}/", kCodeGraphDbPath)) !=
+             std::string::npos;
 }
 
 static std::vector<std::string>
@@ -135,7 +142,9 @@ public:
     shutdown();
 
     project_root_ = project_root;
-    fs::path cg_dir = fs::path(project_root) / ".codegraph";
+    fs::path cg_dir = fs::path(project_root) /
+                      agentxx::agent::AgentConfigStatic::agentxxDataDirPath /
+                      kCodeGraphDbPath;
     std::string index_path = (cg_dir / "index").string();
 
     try {
@@ -167,12 +176,17 @@ public:
       return true;
     }
 
+    XX_LOGI("CodeGraphManager: found {} source files to index", files.size());
+
     int processed = 0;
     int total = static_cast<int>(files.size());
 
     for (const auto &file_path : files) {
       if (!running_.load())
         break;
+
+      XX_LOGI("CodeGraphManager: processing file [{}]: {}", processed,
+              file_path);
 
       if (incremental) {
         try {
@@ -189,20 +203,30 @@ public:
       }
 
       std::string lang = codegraph::detect_language(file_path);
-      if (lang.empty())
+      if (lang.empty()) {
+        XX_LOGW("CodeGraphManager: no language detected for {}", file_path);
         continue;
+      }
 
       auto extractor = codegraph::create_extractor(lang);
-      if (!extractor)
+      if (!extractor) {
+        XX_LOGW("CodeGraphManager: no extractor for lang={} file={}", lang,
+                file_path);
         continue;
+      }
 
       std::ifstream ifs(file_path);
-      if (!ifs.is_open())
+      if (!ifs.is_open()) {
+        XX_LOGW("CodeGraphManager: cannot open file {}", file_path);
         continue;
+      }
       std::string source((std::istreambuf_iterator<char>(ifs)),
                          std::istreambuf_iterator<char>());
 
       auto result = extractor->extract(file_path, source);
+      XX_LOGI(
+          "CodeGraphManager: extracted {} nodes, {} unresolved refs from {}",
+          result.nodes.size(), result.unresolved.size(), file_path);
 
       db_->begin_transaction();
       try {
@@ -249,6 +273,13 @@ public:
     }
 
     resolveReferences();
+
+    try {
+      db_->rebuild_fts();
+    } catch (const std::exception &e) {
+      XX_LOGW("CodeGraphManager: FTS rebuild failed: {}", e.what());
+    }
+
     return true;
   }
 
@@ -439,14 +470,30 @@ public:
     }
     try {
       result.total_nodes = db_->count_nodes();
+    } catch (const std::exception &e) {
+      result.error = std::string("count_nodes: ") + e.what();
+      return result;
+    }
+    try {
       result.total_edges = db_->count_edges();
+    } catch (const std::exception &e) {
+      result.error = std::string("count_edges: ") + e.what();
+      return result;
+    }
+    try {
       result.total_files = static_cast<int64_t>(db_->get_all_files().size());
+    } catch (const std::exception &e) {
+      result.error = std::string("get_all_files: ") + e.what();
+      return result;
+    }
+    try {
       auto cycles = traverser_->find_circular_dependencies();
       result.circular_deps = static_cast<int>(cycles.size());
-      result.success = true;
     } catch (const std::exception &e) {
-      result.error = e.what();
+      result.error = std::string("find_circular_dependencies: ") + e.what();
+      return result;
     }
+    result.success = true;
     return result;
   }
 
