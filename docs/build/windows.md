@@ -5,7 +5,7 @@
 - 编译器: MSVC
 
 ## 开始
-### 安装 VS-Studio-2026
+### 安装 Visual-Studio-2026
 - 推荐 VS2026；也可以尝试 VS2022 未验证是否可以编译通过
 ### cmake、pkg-config
 - 安装 cmake
