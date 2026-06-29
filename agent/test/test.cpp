@@ -16,6 +16,7 @@
 #include "test_filesystem_tools.h"
 #include "test_rag_search_tools.h"
 #include "test_regex.h"
+#include "test_screen_capture.h"
 #include "test_string_tools.h"
 #include "test_string_util.h"
 #include "test_text_selection_monitor.h"
@@ -68,6 +69,8 @@ int main(int argn, char **argv) {
       },
       asio::detached);
   ioCtx.run();
+
+  test_screen_capture();
 
   auto monitor = test_text_selection_monitor();
 
