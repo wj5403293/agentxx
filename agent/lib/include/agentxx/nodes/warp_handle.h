@@ -1,6 +1,7 @@
 #pragma once
 
 #include "agentxx/middlewares/middleware.h"
+#include "agentxx/util/exception.h"
 #include "asio/io_context.hpp"
 #include "fmt/format.h"
 #include <cstdlib>
@@ -12,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
 namespace asio = ::boost::asio;
@@ -73,6 +75,7 @@ public:
 
   virtual asio::awaitable<neograph::graph::NodeOutput>
   baseRun(neograph::graph::NodeInput &in) {
+    std::string errInfo;
     try {
       co_return co_await T::run(in);
     } catch (const neograph::graph::CancelledException &e) {
@@ -80,14 +83,20 @@ public:
     } catch (const neograph::graph::NodeInterrupt &e) {
       throw;
     } catch (const std::exception &e) {
-      neograph::graph::NodeOutput out;
-      out.writes.push_back(neograph::graph::ChannelWrite{
-          "messages",
-          fmt::format(R"({{"error": "Middleware Wrap `{}` exception: {}"}})",
-                      name, e.what()),
-      });
-      co_return out;
+      errInfo = e.what();
+    } catch (const boost::exception &e) {
+      errInfo = boost::diagnostic_information(e);
+    } catch (...) {
+      errInfo = "Unknown error";
     }
+
+    neograph::graph::NodeOutput out;
+    out.writes.push_back(neograph::graph::ChannelWrite{
+        "messages",
+        fmt::format(R"({{"error": "Middleware Wrap `{}` exception: {}"}})",
+                    name, errInfo),
+    });
+    co_return out;
   }
 
   asio::awaitable<neograph::graph::NodeOutput>
@@ -125,19 +134,23 @@ public:
 
   // 如果是消息节点，应当添加消息，后续不执行 BaseRun
   virtual void
-  onHandleStartError(bool errorRethrow, const std::exception *e,
+  onHandleStartError(bool errorRethrow, bool isCurrentError,
+                     std::string_view exceptionStr,
                      agentxx::middleware::BaseMiddlewareHandleInterface &item,
                      neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) {}
-  virtual void onHandleBaseRunError(bool errorRethrow, const std::exception *e,
-                                    neograph::graph::NodeInput &in,
-                                    neograph::graph::NodeOutput &result) {}
+                     neograph::graph::NodeOutput &result) noexcept {}
+  virtual void
+  onHandleBaseRunError(bool errorRethrow, bool isCurrentError,
+                       std::string_view exceptionStr,
+                       neograph::graph::NodeInput &in,
+                       neograph::graph::NodeOutput &result) noexcept {}
   // 一般不修改 [result]，消息已经由前面的 start/baseRun 添加
   virtual void
-  onHandleEndError(bool errorRethrow, const std::exception *e,
+  onHandleEndError(bool errorRethrow, bool isCurrentError,
+                   std::string_view exceptionStr,
                    agentxx::middleware::BaseMiddlewareHandleInterface &item,
                    const neograph::graph::NodeInput &in,
-                   neograph::graph::NodeOutput &result) {}
+                   neograph::graph::NodeOutput &result) noexcept {}
 
   virtual asio::awaitable<void> baseRun(neograph::graph::NodeInput &in,
                                         neograph::graph::NodeOutput &result) {
@@ -163,70 +176,112 @@ public:
     size_t i = 0;
     for (; i < len; ++i) {
       auto &item = agentCtxPtr->middlewareHandleContext->handles[i];
+      std::string errInfo;
       try {
         co_await onHandleStart(*item, in);
+        continue;
       } catch (const neograph::graph::CancelledException &e) {
         errorRethrow = true;
-        onHandleStartError(errorRethrow, &e, *item, in, out);
+        onHandleStartError(errorRethrow, true, "", *item, in, out);
         errorPtr = std::current_exception();
-        break;
       } catch (const neograph::graph::NodeInterrupt &e) {
         errorRethrow = true;
-        onHandleStartError(errorRethrow, &e, *item, in, out);
+        onHandleStartError(errorRethrow, true, "", *item, in, out);
         errorPtr = std::current_exception();
-        break;
       } catch (const std::exception &e) {
-        XX_LOGE("{}/Start call `{}` exception: {}", nodeName, item->name,
-                e.what());
+        errInfo = e.what();
         // 替代 baseRun
-        onHandleStartError(errorRethrow, &e, *item, in, out);
+        onHandleStartError(errorRethrow, true, errInfo, *item, in, out);
         errorPtr = std::current_exception();
-        break;
+      } catch (const boost::exception &e) {
+        errInfo = boost::diagnostic_information(e);
+        onHandleStartError(errorRethrow, true, errInfo, *item, in, out);
+        errorPtr = std::current_exception();
+      } catch (...) {
+        errInfo = "Unknown error";
+        onHandleStartError(errorRethrow, true, errInfo, *item, in, out);
+        errorPtr = std::current_exception();
       }
+      XX_LOGE("{}/Start call `{}` exception: {}", nodeName, item->name,
+              errInfo);
+      // 触发异常，不再执行后面的 start / baseRun
+      break;
     }
 
     if (i >= len) {
+      std::string errInfo;
       try {
         co_await baseRun(in, out);
       } catch (const neograph::graph::CancelledException &e) {
         errorRethrow = true;
-        onHandleBaseRunError(errorRethrow, &e, in, out);
+        onHandleBaseRunError(errorRethrow, true, "", in, out);
         errorPtr = std::current_exception();
       } catch (const neograph::graph::NodeInterrupt &e) {
         errorRethrow = true;
-        onHandleBaseRunError(errorRethrow, &e, in, out);
+        onHandleBaseRunError(errorRethrow, true, "", in, out);
         errorPtr = std::current_exception();
       } catch (const std::exception &e) {
-        XX_LOGE("{}/run exception: {})", nodeName, e.what());
-        onHandleBaseRunError(errorRethrow, &e, in, out);
+        errInfo = e.what();
+        onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+        errorPtr = std::current_exception();
+      } catch (const boost::exception &e) {
+        errInfo = boost::diagnostic_information(e);
+        onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+        errorPtr = std::current_exception();
+      } catch (...) {
+        errInfo = "Unknown error";
+        onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
         errorPtr = std::current_exception();
       }
+      XX_LOGE("{}/run exception: {})", nodeName, errInfo);
       i = len;
     } else if (nullptr != errorPtr) {
-      onHandleBaseRunError(errorRethrow, nullptr, in, out);
+      onHandleBaseRunError(errorRethrow, false, "", in, out);
+    } else {
+      XX_LOGE(
+          R"_({}/run, Before `baseRun` should exec all `onStart` or catch exception)_",
+          nodeName);
+      assert(false);
     }
 
     for (; i-- > 0;) {
       auto &item = agentCtxPtr->middlewareHandleContext->handles[i];
       if (nullptr != errorPtr) {
-        onHandleEndError(errorRethrow, nullptr, *item, in, out);
+        onHandleEndError(errorRethrow, false, "", *item, in, out);
       } else {
+        std::string errInfo;
         try {
           co_await onHandleEnd(*item, in, out);
         } catch (const neograph::graph::CancelledException &e) {
           errorRethrow = true;
-          onHandleEndError(errorRethrow, &e, *item, in, out);
+          onHandleEndError(errorRethrow, true, "", *item, in, out);
           errorPtr = std::current_exception();
         } catch (const neograph::graph::NodeInterrupt &e) {
           errorRethrow = true;
-          onHandleEndError(errorRethrow, &e, *item, in, out);
+          onHandleEndError(errorRethrow, true, "", *item, in, out);
           errorPtr = std::current_exception();
         } catch (const std::exception &e) {
-          XX_LOGE("{}/End call `{}` exception: {}", nodeName, item->name,
-                  e.what());
-          onHandleEndError(errorRethrow, &e, *item, in, out);
-          errorPtr = std::current_exception();
+          errInfo = e.what();
+          onHandleEndError(errorRethrow, true, errInfo, *item, in, out);
+          if (false == errorRethrow) {
+            // 避免覆盖之前的错误，导致未重新抛出异常
+            errorPtr = std::current_exception();
+          }
+        } catch (const boost::exception &e) {
+          errInfo = boost::diagnostic_information(e);
+          onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+          if (false == errorRethrow) {
+            errorPtr = std::current_exception();
+          }
+        } catch (...) {
+          errInfo = "Unknown error";
+          onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+          if (false == errorRethrow) {
+            errorPtr = std::current_exception();
+          }
         }
+        XX_LOGE("{}/End call `{}` exception: {}", nodeName, item->name,
+                errInfo);
       }
     }
 
