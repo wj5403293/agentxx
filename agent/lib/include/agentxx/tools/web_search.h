@@ -30,10 +30,12 @@ public:
         convertHtml2markdown(in_convertHtml2markdown) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt = agentPtr->agentConfig->prompt.toolPrompt["web_search"];
+
     return {
         "web_search",
-        "进行网络搜索. 返回一个 markdown 列表结果. "
-        "然后可以使用 fetch_url_markdown 工具拉取网页具体内容.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -42,7 +44,7 @@ public:
                     "query",
                     {
                         {"type", "string"},
-                        {"description", "Search query."},
+                        {"description", prompt.getArg("query")},
                     },
                 }},
             },
@@ -104,9 +106,13 @@ public:
       : XXToolBase("web_fetch_url", in_agentContext, true, true) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["web_fetch_url"];
+
     return {
         "web_fetch_url",
-        "(Http GET) 发起网络请求,返回响应体原文.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -115,15 +121,14 @@ public:
                      "url",
                      {
                          {"type", "string"},
-                         {"description", "Absolute http/https URL."},
+                         {"description", prompt.getArg("url")},
                      },
                  },
                  {
                      "timeout",
                      {
                          {"type", "number"},
-                         {"description",
-                          "GET requiest timeout, default 60 seconds."},
+                         {"description", prompt.getArg("timeout")},
                      },
                  }},
             },
@@ -171,10 +176,13 @@ public:
       : XXToolBase("web_fetch_url_markdown", in_agentContext, true, true) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["web_fetch_url_markdown"];
+
     return {
         "web_fetch_url_markdown",
-        R"((Http GET) 拉取一个网页,返回其Markdown格式的页面内容. 
-常用于在 web_search 之后获取具体页面内容.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -183,16 +191,7 @@ public:
                     "url",
                     {
                         {"type", "string"},
-                        {"description", R"(Absolute http/https URL.
-如果需要获取MD中的相对路径链接网页,应当结合本次传入的`url`. 例如:
-- 网页`http://example.com/help/`内:
-    - 包含相对路径`model/delete/`(非/开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/delete/`
-    - 包含相对路径`./model/create/`(以.开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/create/`
-    - 包含相对路径`../model/create/`(以..开头为相对路径，上一级目录),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/model/create/`
-    - 包含绝对路径`/model/view/`(以/开头为绝对路径),则替换网页路径得到`http://example.com/model/view/`
-- 网页`http://example.com/help/what.html`内:
-    - 包含相对路径`model/delete/`(非/开头为相对路径),则移除末尾文件名，顺着当前网页末尾拼接，得到的完整链接为`http://example.com/help/model/delete/`
-)"},
+                        {"description", prompt.getArg("url")},
                     },
                 }},
             },

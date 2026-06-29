@@ -139,7 +139,7 @@ inline asio::awaitable<void> test_python_command_get_definition(
     std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   auto tool = agentxx::tools::ExecutePythonTool{agentContext};
   auto def = tool.get_definition();
-  if (def.name == "execute_python") {
+  if (def.name == "execute_python_command") {
     std::cout << "[PASS] ExecutePythonTool::get_definition() name correct"
               << std::endl;
   } else {
@@ -170,7 +170,7 @@ inline asio::awaitable<void> test_javascript_command_get_definition(
     std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   auto tool = agentxx::tools::ExecuteJavaScriptTool{agentContext};
   auto def = tool.get_definition();
-  if (def.name == "execute_javascript") {
+  if (def.name == "execute_javascript_command") {
     std::cout << "[PASS] ExecuteJavaScriptTool::get_definition() name correct"
               << std::endl;
   } else {

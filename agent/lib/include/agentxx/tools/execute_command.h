@@ -32,7 +32,7 @@ public:
 
   neograph::ChatTool get_definition() const override {
     auto agentPtr = agentContext.lock();
-    auto prompt =
+    const auto &prompt =
         agentPtr->agentConfig->prompt.toolPrompt["execute_linux_command"];
 
     return {
@@ -167,12 +167,12 @@ public:
 
   neograph::ChatTool get_definition() const override {
     auto agentPtr = agentContext.lock();
-    auto prompt =
+    const auto &prompt =
         agentPtr->agentConfig->prompt.toolPrompt["execute_windows_command"];
 
     return {
         "execute_windows_command",
-        R"(Run windows commands in the terminal.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -308,7 +308,7 @@ public:
 
   neograph::ChatTool get_definition() const override {
     auto agentPtr = agentContext.lock();
-    auto prompt =
+    const auto &prompt =
         agentPtr->agentConfig->prompt.toolPrompt["execute_python_command"];
 
     return {
@@ -353,7 +353,7 @@ public:
 
   neograph::ChatTool get_definition() const override {
     auto agentPtr = agentContext.lock();
-    auto prompt =
+    const auto &prompt =
         agentPtr->agentConfig->prompt.toolPrompt["execute_javascript_command"];
 
     return {

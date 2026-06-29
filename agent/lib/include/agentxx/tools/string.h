@@ -28,9 +28,13 @@ public:
       : XXToolBase("string_html_to_markdown", in_agentContext, true, true) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["string_html_to_markdown"];
+
     return {
         "string_html_to_markdown",
-        R"(HTML to markdown)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -39,7 +43,7 @@ public:
                     "content",
                     {
                         {"type", "string"},
-                        {"description", "HTML content."},
+                        {"description", prompt.getArg("content")},
                     },
                 }},
             },
@@ -69,9 +73,13 @@ public:
       : XXToolBase("string_regexp", in_agentContext, true) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["string_regexp"];
+
     return {
         "string_regexp",
-        "text search,replace or remove by regexp(Regular Expression)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -81,7 +89,7 @@ public:
                         "content",
                         {
                             {"type", "string"},
-                            {"description", "text content."},
+                            {"description", prompt.getArg("content")},
                         },
                     },
                     {
@@ -89,8 +97,7 @@ public:
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
-                            {"description",
-                             R"(grep regexp array. Search succeeds if any of the provided array match.)"},
+                            {"description", prompt.getArg("exps")},
                         },
                     },
                     {
@@ -99,20 +106,14 @@ public:
                             {"type", "string"},
                             {"enum", neograph::json::array(
                                          {"search", "replace", "remove"})},
-                            {"description", R"(match operator.
-`search` return match result(s).
-`replace` replace match result(s) with `replace_str`. return result text content.
-`remove` remove match result(s) from content. return result text content.
-)"},
+                            {"description", prompt.getArg("opt")},
                         },
                     },
                     {
                         "replace_str",
                         {
                             {"type", "string"},
-                            {"description", "Default empty string. When opt is "
-                                            "`replace`, replace "
-                                            "string for match result(s)."},
+                            {"description", prompt.getArg("replace_str")},
                         },
                     },
                 },

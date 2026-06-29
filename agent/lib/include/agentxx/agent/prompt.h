@@ -16,7 +16,7 @@ public:
   const std::string depict;
   const std::map<std::string, std::string, std::less<>> args;
 
-  const std::string &getArg(std::string_view name) {
+  const std::string &getArg(std::string_view name) const {
     const auto it = args.find(name);
     assert(it != args.end());
     return it->second;
@@ -198,6 +198,498 @@ Windows Command must be executed through `cmd.exe`. Write arg command: `cmd.exe 
               .args =
                   {
                       {"command", "Command to execute"},
+                  },
+          },
+      },
+      {
+          "filesystem_list_file",
+          ToolPrompt{
+              .depict =
+                  R"(列出文件夹内的文件和文件夹信息，包含文件大小/Bytes, 类型, 最后写入时间(时间戳/nanoseconds)
+指定文件路径可以得到文件信息.
+也可用于检查文件/文件夹是否存在.)",
+              .args =
+                  {
+                      {"path", "文件或文件夹的绝对路径"},
+                      {"recursive", "默认 `false`. 是否递归子目录"},
+                      {"limit",
+                       "默认 `100`. 限制列出的文件、文件夹数量，指定`limit <= "
+                       "0`时不限制数量"},
+                  },
+          },
+      },
+      {
+          "filesystem_read_text_file",
+          ToolPrompt{
+              .depict =
+                  "Read text file (e.g.: .txt,.md,.json,.log) contents with "
+                  "line numbers, supports offset/limit for large files.",
+              .args =
+                  {
+                      {"path", "文件绝对路径"},
+                      {"line_offset",
+                       R"(文本偏移行数,默认`0`表示不偏移.如果偏移超出文件最大行数,将返回错误提示)"},
+                      {"line_limit",
+                       R"(读取文本行数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件最大行数不报错)"},
+                  },
+          },
+      },
+      {
+          "filesystem_read_binary_file",
+          ToolPrompt{
+              .depict =
+                  R"(Read binary file (e.g.: .txt,.md,.json,.log) contents with byte offset.
+Supports offset/limit for large files.
+Returns binary content as base64 string.)",
+              .args =
+                  {
+                      {"path", "文件绝对路径"},
+                      {"byte_offset",
+                       R"(起始读取字节偏移量,默认`0`表示不偏移.如果偏移超出文件大小,将返回错误提示)"},
+                      {"byte_limit",
+                       R"(读取字节数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件大小不报错)"},
+                  },
+          },
+      },
+      {
+          "filesystem_write_file",
+          ToolPrompt{
+              .depict = "创建新文件，或覆盖文件.",
+              .args =
+                  {
+                      {"path", "文件绝对路径"},
+                      {"content", "写入文件的内容"},
+                      {"overwrite", R"(默认`false`,是否覆盖文件.
+如果为`true`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.
+如果为`false`,创建新文件并写入,若文件已存在则返回失败.)"},
+                      {"is_binary",
+                       R"(默认`false`,是否按二进制模式写入文件.
+如果为`true`,参数`content`应当为base64编码的二进制数据.
+如果为`false`,参数`content`视为普通文本,按字符串直接写入文件.)"},
+                  },
+          },
+      },
+      {
+          "filesystem_edit_text_file",
+          ToolPrompt{
+              .depict = "Perform exact string replacements in text files(e.g. "
+                        "*.txt,*.md,*.cpp).",
+              .args =
+                  {
+                      {"path", "文件绝对路径"},
+                      {"old_str", "待替换的旧字符串,精准匹配,不能为空"},
+                      {"new_str", "新字符串"},
+                      {"multi_replace", "是否替换所有匹配`old_str`的字符串."
+                                        "默认`false`只替换第一个匹配"},
+                  },
+          },
+      },
+      {
+          "filesystem_glob",
+          ToolPrompt{
+              .depict = "Find files matching patterns.",
+              .args =
+                  {
+                      {"file_patterns",
+                       R"(Absolute dir or file path and glob patterns.
+
+| Wildcard | Matches | Example
+|--- |--- |--- |
+| `*` | any characters | `*.txt` matches all files with the txt extension |
+| `**` | any name dir recursively | `include/**/*.txt` matches all files with the txt extension in dir `include` and children dirs |
+| `?` | any one character | `???` matches files with 3 characters long |
+| `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
+| `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
+| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+
+e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.
+)"},
+                  },
+          },
+      },
+      {
+          "filesystem_grep",
+          ToolPrompt{
+              .depict =
+                  "Searches file contents using regular expressions or text.",
+              .args =
+                  {
+                      {"text_patterns_is_regex",
+                       R"(The type of `text_patterns`.
+`true`:  `text_patterns` are regex syntaxs.
+`false`: `text_patterns` are crude text strings.)"},
+                      {"text_patterns",
+                       "String or regex syntax to search text content. The "
+                       "text match type depends on the "
+                       "`text_patterns_is_regex` parameter."},
+                      {"file_patterns",
+                       R"(Absolute dir or file path and glob pattern.
+
+| Wildcard | Matches | Example
+|--- |--- |--- |
+| `*` | any characters | `*.txt` matches all files with the txt extension |
+| `**` | any name dir recursively | `include/**/*.txt` matches all files with the txt extension in dir `include` and children dirs |
+| `?` | any one character | `???` matches files with 3 characters long |
+| `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
+| `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
+| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
+
+e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.)"},
+                      {"output_mode", R"(Default: `files_with_matches`. 
+Output format:
+'files_with_matches': Only file paths containing matches and count with `file:match_count` format
+'content': Matching lines with file:line:content format)"},
+                  },
+          },
+      },
+      {
+          "planning_write",
+          ToolPrompt{
+              .depict =
+                  R"(Two-level task planning tool for complex multi-step work sessions.
+
+=== Strategic Layer: `roadmap` (required) ===
+A Mermaid stateDiagram-v2 that captures the OVERALL workflow — the big picture.
+This is your roadmap: major phases, dependencies between tasks, error recovery
+paths, and the start-to-finish flow. Update this diagram whenever the plan
+changes (new tasks, completed phases, dead ends). After the execution is completed, 
+an overall summary should be made.
+
+State diagram conventions:
+- Use `[*]` for start/end pseudo-states
+- Name state nodes like `phase_N_description` (e.g. `phase_1_search_codebase`)
+- Status transitions: pending → in_progress → completed | failed
+- Show branching: what happens on success vs failure
+- Replace the entire diagram each call
+
+=== Tactical Layer: `todos` (optional) ===
+A short list of IMMEDIATE and NEXT-STEP tasks only. Do NOT list every state
+from the diagram — only the tasks you are actively working on or about to
+start. Each item records execution details, lessons learned, and issues
+encountered to help with re-planning.
+
+Example for a "fix a bug" workflow:
+- roadmap:
+```mermaid
+stateDiagram-v2
+    [*] --> phase_1_reproduce_bug
+    phase_1_reproduce_bug --> phase_1_in_progress: start
+    phase_1_in_progress --> phase_1_completed: reproduced
+    phase_1_in_progress --> phase_1_failed: cannot reproduce
+    phase_1_completed --> phase_2_locate_root_cause
+    phase_2_locate_root_cause --> phase_2_in_progress: analyze
+    phase_2_in_progress --> phase_2_completed: found cause
+    phase_2_completed --> phase_3_implement_fix
+    phase_3_implement_fix --> phase_3_in_progress: coding
+    phase_3_in_progress --> phase_3_completed: fix works
+    phase_3_completed --> [*]
+```
+- todos (only current + next):
+[
+  {"state":"in_progress", "content":"Reproduce the crash with provided stack trace",
+   "summary":"Found that it crashes on null pointer at line 342"},
+  {"state":"pending", "content":"Locate root cause by tracing the null pointer source"}
+]
+)",
+              .args =
+                  {
+                      {"roadmap",
+                       R"(STRATEGIC LAYER: Mermaid stateDiagram-v2 of the overall workflow.
+This is the big-picture roadmap. Include ALL phases even if not yet started.
+Each phase gets state nodes for its statuses (pending/in_progress/completed/failed)
+with transitions showing dependencies and error recovery paths.
+Use `[*]` for start/end. Replace the entire diagram each call.)"},
+                      {"todos", R"(TACTICAL LAYER: Near-term task items.
+Focus on what you are actively doing NOW and what comes NEXT.
+Do NOT list all phases from the diagram — only immediate execution items.
+Each item records what was tried, what worked, and what to watch out for.
+
+Item struct:
+{
+    "state": "pending",   // enum: pending, in_progress, completed, failed
+    "content": "",        // task description
+    "summary": ""         // execution notes: methods tried, issues encountered,
+                          // optimization suggestions for re-planning
+}
+)"},
+                  },
+          },
+      },
+      {
+          "rag_search",
+          ToolPrompt{
+              .depict =
+                  R"(Search the knowledge base for relevant documents using semantic similarity. 
+Use this tool to find information before answering questions. 
+Returns the most relevant documents with their content, source, and similarity score.)",
+              .args =
+                  {
+                      {"query", "Search query to find relevant documents"},
+                      {"top_k", "Number of results to return (default: 3)"},
+                  },
+          },
+      },
+      {
+          "web_search",
+          ToolPrompt{
+              .depict =
+                  R"(进行网络搜索. 返回一个 markdown 列表结果. 
+然后可以使用 fetch_url_markdown 工具拉取网页具体内容.)",
+              .args =
+                  {
+                      {"query", "Search query."},
+                  },
+          },
+      },
+      {
+          "web_fetch_url",
+          ToolPrompt{
+              .depict = "(Http GET) 发起网络请求,返回响应体原文.",
+              .args =
+                  {
+                      {"url", "Absolute http/https URL."},
+                      {"timeout", "GET requiest timeout, default 60 seconds."},
+                  },
+          },
+      },
+      {
+          "web_fetch_url_markdown",
+          ToolPrompt{
+              .depict =
+                  R"((Http GET) 拉取一个网页,返回其Markdown格式的页面内容. 
+常用于在 web_search 之后获取具体页面内容.)",
+              .args =
+                  {
+                      {"url", R"(Absolute http/https URL.
+如果需要获取MD中的相对路径链接网页,应当结合本次传入的`url`. 例如:
+- 网页`http://example.com/help/`内:
+    - 包含相对路径`model/delete/`(非/开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/delete/`
+    - 包含相对路径`./model/create/`(以.开头为相对路径),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/help/model/create/`
+    - 包含相对路径`../model/create/`(以..开头为相对路径，上一级目录),则顺着当前网页末尾拼接得到的完整链接为`http://example.com/model/create/`
+    - 包含绝对路径`/model/view/`(以/开头为绝对路径),则替换网页路径得到`http://example.com/model/view/`
+- 网页`http://example.com/help/what.html`内:
+    - 包含相对路径`model/delete/`(非/开头为相对路径),则移除末尾文件名，顺着当前网页末尾拼接，得到的完整链接为`http://example.com/help/model/delete/`
+)"},
+                  },
+          },
+      },
+      {
+          "share_store",
+          ToolPrompt{
+              .depict =
+                  R"(Store text, return a unique id, used to get text when need.
+Insert text or get/set/delete text by unique id.)",
+              .args =
+                  {
+                      {"opt", R"(operation.
+`get` Get text by unique id
+`insert` New store `text`, return unique id
+`set` Modify `text` by unique id
+`delete` Delete text by unique id
+)"},
+                      {"text", "待存储的文本内容"},
+                      {"line_offset",
+                       R"(`insert`,`set`时可选. 文本偏移行数,默认`0`表示不偏移.如果偏移超出文件最大行数,将返回错误提示)"},
+                      {"line_limit",
+                       R"(`insert`,`set`时可选. 读取文本行数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件最大行数不报错)"},
+                      {"id", "unique id to store text when opt is `get`,`set` "
+                             "or `delete`"},
+                  },
+          },
+      },
+      {
+          "string_html_to_markdown",
+          ToolPrompt{
+              .depict = "HTML to markdown",
+              .args =
+                  {
+                      {"content", "HTML content."},
+                  },
+          },
+      },
+      {
+          "string_regexp",
+          ToolPrompt{
+              .depict =
+                  "text search,replace or remove by regexp(Regular Expression)",
+              .args =
+                  {
+                      {"content", "text content."},
+                      {"exps", "grep regexp array. Search succeeds if any of "
+                               "the provided array match."},
+                      {"opt", R"(match operator.
+`search` return match result(s).
+`replace` replace match result(s) with `replace_str`. return result text content.
+`remove` remove match result(s) from content. return result text content.
+)"},
+                      {"replace_str",
+                       R"(Default empty string. When opt is `replace`, replace string for match result(s).)"},
+                  },
+          },
+      },
+      {
+          "get_current_datetime",
+          ToolPrompt{
+              .depict = "Get current date,time and timestamp.",
+              .args = {},
+          },
+      },
+      {
+          "codegraph_search",
+          ToolPrompt{
+              .depict =
+                  R"(Search for code symbols (functions, classes, etc.) by name using 
+codegraph index. Returns matched symbols with file locations and 
+signatures.)",
+              .args =
+                  {
+                      {"query",
+                       "Symbol name to search for (supports partial match)."},
+                      {"limit", "Max number of results to return, default 20."},
+                  },
+          },
+      },
+      {
+          "codegraph_context",
+          ToolPrompt{
+              .depict =
+                  R"(Get rich context for a code symbol: definition, callers, callees, 
+and methods (for classes). Useful for understanding how a function 
+or class is used in the codebase.)",
+              .args =
+                  {
+                      {"symbol", "Symbol name to get context for (e.g. "
+                                 "'MyClass::myMethod')."},
+                      {"limit", "Max results per category, default 10."},
+                      {"max_depth",
+                       "Max call graph traversal depth, default 3."},
+                  },
+          },
+      },
+      {
+          "codegraph_callers",
+          ToolPrompt{
+              .depict =
+                  R"(Find all functions that call a given symbol. Traces the call graph 
+backwards to find callers.)",
+              .args =
+                  {
+                      {"symbol", "Symbol name to find callers for."},
+                      {"max_depth", "Max traversal depth, default 3."},
+                  },
+          },
+      },
+      {
+          "codegraph_callees",
+          ToolPrompt{
+              .depict =
+                  R"(Find all functions that a given symbol calls. Traces the call graph 
+forward to find callees.)",
+              .args =
+                  {
+                      {"symbol", "Symbol name to find callees for."},
+                      {"max_depth", "Max traversal depth, default 3."},
+                  },
+          },
+      },
+      {
+          "codegraph_impact",
+          ToolPrompt{
+              .depict =
+                  R"(Analyze the impact of modifying a symbol. Finds all downstream 
+symbols that may be affected (callers, references).)",
+              .args =
+                  {
+                      {"symbol", "Symbol name to analyze impact for."},
+                      {"max_depth", "Max traversal depth, default 5."},
+                  },
+          },
+      },
+      {
+          "codegraph_status",
+          ToolPrompt{
+              .depict =
+                  R"(Get codegraph index statistics: total nodes, edges, files, and 
+circular dependency count.)",
+              .args = {},
+          },
+      },
+      {
+          "codegraph_index",
+          ToolPrompt{
+              .depict =
+                  R"(Index a directory for code analysis. Analyzes source files and 
+builds the symbol database for search and context queries.)",
+              .args =
+                  {
+                      {"path", "Absolute path to the directory to index."},
+                      {"incremental",
+                       "Default `true`. Only index changed files."},
+                  },
+          },
+      },
+      {
+          "codegraph_path",
+          ToolPrompt{
+              .depict = "Find the call chain path between two symbols in the "
+                        "call graph.",
+              .args =
+                  {
+                      {"from", "Starting symbol name."},
+                      {"to", "Target symbol name."},
+                      {"max_depth", "Max search depth, default 10."},
+                  },
+          },
+      },
+      {
+          "ui_control_keyboard_mouse",
+          ToolPrompt{
+              .depict =
+                  R"(Control mouse and keyboard on Windows. Accepts a list of UI commands and executes them sequentially.
+
+## Actions
+
+### Mouse
+- `mouse_move`: Move cursor. Params: `x`, `y`
+- `mouse_click`: Click. Params: `button`("left"/"right"/"middle", default "left"), `x`, `y`(optional, move then click)
+- `mouse_double_click`: Double click. Params: same as mouse_click
+- `mouse_scroll`: Scroll wheel. Params: `delta`(positive=up, negative=down, ±120 per notch), `x`, `y`(optional)
+- `mouse_drag`: Drag. Params: `x1`, `y1`, `x2`, `y2`, `button`(default "left"), `duration_ms`(default 200)
+
+### Keyboard
+- `key_press`: Press and release a key. Params: `key`
+- `key_down`: Hold a key down. Params: `key`
+- `key_up`: Release a held key. Params: `key`
+- `key_combo`: Press key combination (e.g. Ctrl+C). Params: `keys`(array of key names)
+- `key_type`: Type a text string. Params: `text`
+
+### Utility
+- `wait`: Pause execution. Params: `ms`(milliseconds, max 30000)
+- `get_cursor_pos`: Get current cursor position. No params
+- `get_screen_size`: Get screen resolution. No params
+
+### Key Names
+Single characters: "a"-"z", "0"-"9"
+Special keys: "enter", "tab", "escape", "backspace", "delete", "insert", "home", "end", "pageup", "pagedown", "up", "down", "left", "right", "space"
+Modifiers: "shift", "ctrl", "alt", "win"
+F-keys: "f1"-"f12"
+Lock keys: "capslock", "numlock", "scrolllock"
+Other: "printscreen", "pause", "apps"
+
+### Examples
+```json
+{"action": "mouse_click", "button": "left", "x": 100, "y": 200}
+{"action": "key_combo", "keys": ["ctrl", "c"]}
+{"action": "key_type", "text": "Hello World"}
+{"action": "mouse_drag", "x1": 100, "y1": 100, "x2": 300, "y2": 300}
+```)",
+              .args =
+                  {
+                      {"commands",
+                       "Ordered list of UI commands to execute sequentially."},
+                      {"interval_ms",
+                       "Default interval between commands in milliseconds. "
+                       "Default 50. Set 0 for no delay."},
                   },
           },
       },

@@ -223,7 +223,6 @@ public:
           "load skill metadata failed, can not found metadata in SKILL.md file",
           data);
     } catch (const std::exception &e) {
-      stream.close();
       co_return std::make_pair(e.what(), data);
     }
   }

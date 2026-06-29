@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agentxx/agent/config.h"
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -17,8 +18,6 @@ class SubAgentManagerTool;
 }
 
 namespace agent {
-
-class AgentConfig;
 
 class AgentContext {
 public:

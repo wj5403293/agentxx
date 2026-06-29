@@ -1,4 +1,5 @@
 #include "agentxx/tools/ui_control.h"
+#include "agentxx/agent/prompt.h"
 #include "agentxx/util/log.h"
 #include "agentxx/util/string_util.h"
 #include "asio/awaitable.hpp"
@@ -9,6 +10,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+
 
 #if XX_IS_WIN_D
 #include <windows.h>
@@ -874,46 +876,13 @@ uiControlExecuteOne(const neograph::json &cmd) {
 #endif // XX_IS_WIN_D
 
 neograph::ChatTool UIControlKeyboardMouseTool::get_definition() const {
+  auto agentPtr = agentContext.lock();
+  const auto &prompt =
+      agentPtr->agentConfig->prompt.toolPrompt["ui_control_keyboard_mouse"];
+
   return {
       "ui_control_keyboard_mouse",
-      R"(Control mouse and keyboard on Windows. Accepts a list of UI commands and executes them sequentially.
-
-## Actions
-
-### Mouse
-- `mouse_move`: Move cursor. Params: `x`, `y`
-- `mouse_click`: Click. Params: `button`("left"/"right"/"middle", default "left"), `x`, `y`(optional, move then click)
-- `mouse_double_click`: Double click. Params: same as mouse_click
-- `mouse_scroll`: Scroll wheel. Params: `delta`(positive=up, negative=down, ±120 per notch), `x`, `y`(optional)
-- `mouse_drag`: Drag. Params: `x1`, `y1`, `x2`, `y2`, `button`(default "left"), `duration_ms`(default 200)
-
-### Keyboard
-- `key_press`: Press and release a key. Params: `key`
-- `key_down`: Hold a key down. Params: `key`
-- `key_up`: Release a held key. Params: `key`
-- `key_combo`: Press key combination (e.g. Ctrl+C). Params: `keys`(array of key names)
-- `key_type`: Type a text string. Params: `text`
-
-### Utility
-- `wait`: Pause execution. Params: `ms`(milliseconds, max 30000)
-- `get_cursor_pos`: Get current cursor position. No params
-- `get_screen_size`: Get screen resolution. No params
-
-### Key Names
-Single characters: "a"-"z", "0"-"9"
-Special keys: "enter", "tab", "escape", "backspace", "delete", "insert", "home", "end", "pageup", "pagedown", "up", "down", "left", "right", "space"
-Modifiers: "shift", "ctrl", "alt", "win"
-F-keys: "f1"-"f12"
-Lock keys: "capslock", "numlock", "scrolllock"
-Other: "printscreen", "pause", "apps"
-
-### Examples
-```json
-{"action": "mouse_click", "button": "left", "x": 100, "y": 200}
-{"action": "key_combo", "keys": ["ctrl", "c"]}
-{"action": "key_type", "text": "Hello World"}
-{"action": "mouse_drag", "x1": 100, "y1": 100, "x2": 300, "y2": 300}
-```)",
+      prompt.depict,
       {
           {"type", "object"},
           {
@@ -923,8 +892,7 @@ Other: "printscreen", "pause", "apps"
                       "commands",
                       {
                           {"type", "array"},
-                          {"description", "Ordered list of UI commands to "
-                                          "execute sequentially."},
+                          {"description", prompt.getArg("commands")},
                           {
                               "items",
                               {
@@ -1010,9 +978,7 @@ Other: "printscreen", "pause", "apps"
                           {"type", "number"},
                           {
                               "description",
-                              "Default interval between commands in "
-                              "milliseconds. "
-                              "Default 50. Set 0 for no delay.",
+                              prompt.getArg("interval_ms"),
                           },
                       },
                   },

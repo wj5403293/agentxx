@@ -74,11 +74,13 @@ public:
       : XXToolBase("filesystem_list_file", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_list_file"];
+
     return {
         "filesystem_list_file",
-        R"(列出文件夹内的文件和文件夹信息，包含文件大小/Bytes, 类型, 最后写入时间(时间戳/nanoseconds)
-指定文件路径可以得到文件信息.
-也可用于检查文件/文件夹是否存在.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -88,23 +90,21 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "文件或文件夹的绝对路径"},
+                            {"description", prompt.getArg("path")},
                         },
                     },
                     {
                         "recursive",
                         {
                             {"type", "boolean"},
-                            {"description", "默认 `false`. 是否递归子目录"},
+                            {"description", prompt.getArg("recursive")},
                         },
                     },
                     {
                         "limit",
                         {
                             {"type", "number"},
-                            {"description", "默认 `100`. "
-                                            "限制列出的文件、文件夹数量，指定`"
-                                            "limit <= 0`时不限制数量"},
+                            {"description", prompt.getArg("limit")},
                         },
                     },
                 },
@@ -183,9 +183,13 @@ public:
   }
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_read_text_file"];
+
     return {
         "filesystem_read_text_file",
-        R"(Read text file (e.g.: .txt,.md,.json,.log) contents with line numbers, supports offset/limit for large files.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -195,23 +199,21 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "文件绝对路径"},
+                            {"description", prompt.getArg("path")},
                         },
                     },
                     {
                         "line_offset",
                         {
                             {"type", "number"},
-                            {"description",
-                             R"(文本偏移行数,默认`0`表示不偏移.如果偏移超出文件最大行数,将返回错误提示)"},
+                            {"description", prompt.getArg("line_offset")},
                         },
                     },
                     {
                         "line_limit",
                         {
                             {"type", "number"},
-                            {"description",
-                             R"(读取文本行数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件最大行数不报错)"},
+                            {"description", prompt.getArg("line_limit")},
                         },
                     },
                 },
@@ -244,150 +246,137 @@ public:
 
       /// 异步读取文件
       asio::stream_file stream{currentIoCtx};
-      try {
-        neograph_asio_error_code errCode;
-        stream.open(filepath, asio::stream_file::read_only, errCode);
-        if (false == stream.is_open()) {
-          stream.close();
-          throw std::runtime_error{
-              fmt::format(R"(Can not open file: {}")", errCode.message())};
-        }
+      neograph_asio_error_code errCode;
+      stream.open(filepath, asio::stream_file::read_only, errCode);
+      if (false == stream.is_open()) {
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file: {}")", errCode.message())};
+      }
 
-        if (text_line_offset >= 0 || text_line_limit >= 0) {
-          const auto offset =
-              (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
-          const auto limit = (text_line_limit >= 0)
-                                 ? size_t(text_line_limit)
-                                 : std::numeric_limits<size_t>::max();
-          std::stringstream result{};
-          size_t lineNum = 0;
+      if (text_line_offset >= 0 || text_line_limit >= 0) {
+        const auto offset =
+            (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
+        const auto limit = (text_line_limit >= 0)
+                               ? size_t(text_line_limit)
+                               : std::numeric_limits<size_t>::max();
+        std::stringstream result{};
+        size_t lineNum = 0;
 
-          for (std::string buf; lineNum < offset + limit; lineNum++) {
-            auto readlen = co_await asio::async_read_until(
-                stream, asio::dynamic_buffer(buf), '\n',
-                asio::redirect_error(asio::use_awaitable, errCode));
+        for (std::string buf; lineNum < offset + limit; lineNum++) {
+          auto readlen = co_await asio::async_read_until(
+              stream, asio::dynamic_buffer(buf), '\n',
+              asio::redirect_error(asio::use_awaitable, errCode));
 
-            if (errCode == asio::error::eof) {
-              if (lineNum >= offset) {
-                result << buf;
-              }
-              break;
-            } else if (errCode) {
-              throw std::system_error{errCode};
-            }
-
+          if (errCode == asio::error::eof) {
             if (lineNum >= offset) {
-              auto line = std::string_view{buf}.substr(0, readlen);
-              result << line;
+              result << buf;
             }
-
-            buf.erase(0, readlen);
+            break;
+          } else if (errCode) {
+            throw std::system_error{errCode};
           }
 
-          stream.close();
-          if (lineNum <= offset) {
-            // offset 超出文件行数
-            throw std::runtime_error{fmt::format(
-                R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
-                offset, lineNum)};
+          if (lineNum >= offset) {
+            auto line = std::string_view{buf}.substr(0, readlen);
+            result << line;
           }
 
-          auto raw_str = result.str();
-          std::string encoding;
-          std::string converted;
-          if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
-            co_return converted;
-          }
-          co_return raw_str;
+          buf.erase(0, readlen);
         }
 
-        // 读取完整文件
-        std::string data;
-        co_await asio::async_read(
-            stream, asio::dynamic_buffer(data), asio::transfer_all(),
-            asio::redirect_error(asio::use_awaitable, errCode));
-        if (errCode && errCode != asio::error::eof) {
-          throw std::system_error{errCode};
-        }
         stream.close();
+        if (lineNum <= offset) {
+          // offset 超出文件行数
+          throw std::runtime_error{fmt::format(
+              R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
+              offset, lineNum)};
+        }
+
+        auto raw_str = result.str();
         std::string encoding;
         std::string converted;
-        if (agentxx::util::autoConvertToUtf8(data, encoding, converted)) {
+        if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
           co_return converted;
         }
-        co_return data;
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemReadTextFileTool exception: {}", e.what());
-        throw e;
+        co_return raw_str;
       }
+
+      // 读取完整文件
+      std::string data;
+      co_await asio::async_read(
+          stream, asio::dynamic_buffer(data), asio::transfer_all(),
+          asio::redirect_error(asio::use_awaitable, errCode));
+      if (errCode && errCode != asio::error::eof) {
+        throw std::system_error{errCode};
+      }
+      stream.close();
+      std::string encoding;
+      std::string converted;
+      if (agentxx::util::autoConvertToUtf8(data, encoding, converted)) {
+        co_return converted;
+      }
+      co_return data;
     }
 #endif
 
     {
       /// 同步阻塞读取文件
       std::ifstream stream;
-      try {
-        stream.open(filepath);
-        if (!stream) {
-          auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{
-              fmt::format(R"(Can not open file. Error: {})", ec.message())};
+      stream.open(filepath);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
+      }
+
+      if (text_line_offset >= 0 || text_line_limit >= 0) {
+        // 读取部分文件
+        const auto offset =
+            (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
+        const auto limit = (text_line_limit > 0)
+                               ? size_t(text_line_limit)
+                               : std::numeric_limits<size_t>::max();
+        std::stringstream result{};
+        size_t lineNum = 0;
+
+        for (std::string line;
+             std::getline(stream, line) && lineNum < offset + limit;
+             lineNum++) {
+          // 跳过偏移行
+          if (lineNum < offset) {
+            continue;
+          }
+
+          result << line << "\n";
         }
 
-        if (text_line_offset >= 0 || text_line_limit >= 0) {
-          // 读取部分文件
-          const auto offset =
-              (text_line_offset >= 0) ? size_t(text_line_offset) : 0;
-          const auto limit = (text_line_limit > 0)
-                                 ? size_t(text_line_limit)
-                                 : std::numeric_limits<size_t>::max();
-          std::stringstream result{};
-          size_t lineNum = 0;
-
-          for (std::string line;
-               std::getline(stream, line) && lineNum < offset + limit;
-               lineNum++) {
-            // 跳过偏移行
-            if (lineNum < offset) {
-              continue;
-            }
-
-            result << line << "\n";
-          }
-
-          stream.close();
-          if (lineNum <= offset) {
-            // offset 超出文件行数
-            throw std::runtime_error{fmt::format(
-                R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
-                offset, lineNum)};
-          }
-
-          auto raw_str = result.str();
-          std::string encoding;
-          std::string converted;
-          if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
-            co_return converted;
-          }
-          co_return raw_str;
-        }
-
-        // 读取完整文件
-        auto result = std::string{std::istreambuf_iterator<char>(stream),
-                                  std::istreambuf_iterator<char>()};
         stream.close();
+        if (lineNum <= offset) {
+          // offset 超出文件行数
+          throw std::runtime_error{fmt::format(
+              R"(Arg `line_offset`({} lines) is out of range of file lines({} lines).)",
+              offset, lineNum)};
+        }
+
+        auto raw_str = result.str();
         std::string encoding;
         std::string converted;
-        if (agentxx::util::autoConvertToUtf8(result, encoding, converted)) {
+        if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
           co_return converted;
         }
-        co_return result;
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemReadTextFileTool exception: {}", e.what());
-        throw e;
+        co_return raw_str;
       }
+
+      // 读取完整文件
+      auto result = std::string{std::istreambuf_iterator<char>(stream),
+                                std::istreambuf_iterator<char>()};
+      stream.close();
+      std::string encoding;
+      std::string converted;
+      if (agentxx::util::autoConvertToUtf8(result, encoding, converted)) {
+        co_return converted;
+      }
+      co_return result;
     }
   }
 };
@@ -401,11 +390,13 @@ public:
                    false) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_read_binary_file"];
+
     return {
         "filesystem_read_binary_file",
-        R"(Read binary file (e.g.: .txt,.md,.json,.log) contents with byte offset.
-Supports offset/limit for large files.
-Returns binary content as base64 string.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -415,23 +406,21 @@ Returns binary content as base64 string.)",
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "文件绝对路径"},
+                            {"description", prompt.getArg("path")},
                         },
                     },
                     {
                         "byte_offset",
                         {
                             {"type", "number"},
-                            {"description",
-                             R"(起始读取字节偏移量,默认`0`表示不偏移.如果偏移超出文件大小,将返回错误提示)"},
+                            {"description", prompt.getArg("byte_offset")},
                         },
                     },
                     {
                         "byte_limit",
                         {
                             {"type", "number"},
-                            {"description",
-                             R"(读取字节数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件大小不报错)"},
+                            {"description", prompt.getArg("byte_limit")},
                         },
                     },
                 },
@@ -465,74 +454,35 @@ Returns binary content as base64 string.)",
       /// 异步读取文件
       if (byte_offset >= 0 || byte_limit >= 0) {
         asio::random_access_file stream{currentIoCtx};
-        try {
-          neograph_asio_error_code errCode;
-          stream.open(filepath, asio::random_access_file::read_only, errCode);
-          if (false == stream.is_open()) {
-            stream.close();
-            throw std::runtime_error{
-                fmt::format(R"(Can not open file: {}")", errCode.message())};
-          }
-
-          // 读取部分文件
-          const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
-          const size_t limit = (byte_limit >= 0)
-                                   ? size_t(byte_limit)
-                                   : std::numeric_limits<size_t>::max();
-
-          auto fileSize = stream.size();
-          auto bytesAvailable =
-              std::max((int64_t)fileSize - (int64_t)offset, (int64_t)0);
-          auto bytesRead =
-              std::min(static_cast<std::streamsize>(limit),
-                       static_cast<std::streamsize>(bytesAvailable));
-
-          // 没有数据可读
-          if (bytesRead <= 0) {
-            throw std::runtime_error{fmt::format(
-                R"(Arg `byte_offset`({}) is out of range of file size({}).)",
-                offset, (size_t)fileSize)};
-          }
-
-          std::string result;
-          auto bytesReadLen = co_await asio::async_read_at(
-              stream, offset, asio::buffer(result, bytesRead),
-              asio::redirect_error(asio::use_awaitable, errCode));
-          if (errCode && errCode != asio::error::eof) {
-            throw std::system_error{errCode};
-          }
-          stream.close();
-          auto readRange = std::string_view{result}.substr(0, bytesReadLen);
-          co_return neograph::json{
-              {"bytes_read_len", bytesReadLen},
-              {
-                  "base64_data",
-                  agentxx::util::base64Encode(readRange.data(),
-                                              readRange.size()),
-              },
-          }
-              .dump();
-        } catch (const std::exception &e) {
-          stream.close();
-          XX_LOGD("FilesystemReadBinaryFileTool exception: {}", e.what());
-          throw e;
-        }
-      }
-
-      // 读取完整文件
-      asio::stream_file stream{currentIoCtx};
-      try {
         neograph_asio_error_code errCode;
-        stream.open(filepath, asio::stream_file::read_only, errCode);
+        stream.open(filepath, asio::random_access_file::read_only, errCode);
         if (false == stream.is_open()) {
-          stream.close();
           throw std::runtime_error{
               fmt::format(R"(Can not open file: {}")", errCode.message())};
         }
 
+        // 读取部分文件
+        const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
+        const size_t limit = (byte_limit >= 0)
+                                 ? size_t(byte_limit)
+                                 : std::numeric_limits<size_t>::max();
+
+        auto fileSize = stream.size();
+        auto bytesAvailable =
+            std::max((int64_t)fileSize - (int64_t)offset, (int64_t)0);
+        auto bytesRead = std::min(static_cast<std::streamsize>(limit),
+                                  static_cast<std::streamsize>(bytesAvailable));
+
+        // 没有数据可读
+        if (bytesRead <= 0) {
+          throw std::runtime_error{fmt::format(
+              R"(Arg `byte_offset`({}) is out of range of file size({}).)",
+              offset, (size_t)fileSize)};
+        }
+
         std::string result;
-        auto bytesReadLen = co_await asio::async_read(
-            stream, asio::dynamic_buffer(result), asio::transfer_all(),
+        auto bytesReadLen = co_await asio::async_read_at(
+            stream, offset, asio::buffer(result, bytesRead),
             asio::redirect_error(asio::use_awaitable, errCode));
         if (errCode && errCode != asio::error::eof) {
           throw std::system_error{errCode};
@@ -547,86 +497,102 @@ Returns binary content as base64 string.)",
             },
         }
             .dump();
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemReadBinaryFileTool exception: {}", e.what());
-        throw e;
       }
+
+      // 读取完整文件
+      asio::stream_file stream{currentIoCtx};
+      neograph_asio_error_code errCode;
+      stream.open(filepath, asio::stream_file::read_only, errCode);
+      if (false == stream.is_open()) {
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file: {}")", errCode.message())};
+      }
+
+      std::string result;
+      auto bytesReadLen = co_await asio::async_read(
+          stream, asio::dynamic_buffer(result), asio::transfer_all(),
+          asio::redirect_error(asio::use_awaitable, errCode));
+      if (errCode && errCode != asio::error::eof) {
+        throw std::system_error{errCode};
+      }
+      stream.close();
+      auto readRange = std::string_view{result}.substr(0, bytesReadLen);
+      co_return neograph::json{
+          {"bytes_read_len", bytesReadLen},
+          {
+              "base64_data",
+              agentxx::util::base64Encode(readRange.data(), readRange.size()),
+          },
+      }
+          .dump();
     }
 #endif
 
     {
       /// 同步读取
       std::ifstream stream;
-      try {
-        stream.open(filepath, std::ios::binary);
-        if (!stream) {
+      stream.open(filepath, std::ios::binary);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
+      }
+
+      if (byte_offset >= 0 || byte_limit >= 0) {
+        // 读取部分文件
+        const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
+        const size_t limit = (byte_limit >= 0)
+                                 ? size_t(byte_limit)
+                                 : std::numeric_limits<size_t>::max();
+
+        // 计算实际需要读取的字节数
+        size_t fileSize =
+            static_cast<size_t>(std::filesystem::file_size(filepath));
+        auto bytesAvailable =
+            std::max((int64_t)fileSize - (int64_t)offset, (int64_t)0);
+        auto bytesRead = std::min(static_cast<std::streamsize>(limit),
+                                  static_cast<std::streamsize>(bytesAvailable));
+
+        // 没有数据可读
+        if (bytesRead <= 0) {
+          throw std::runtime_error{fmt::format(
+              R"(Arg `byte_offset`({}) is out of range of file size({}).)",
+              offset, fileSize)};
+        }
+
+        stream.seekg(offset, std::ios::beg);
+        if (!stream.good()) {
           auto ec = std::error_code{errno, std::system_category()};
           throw std::runtime_error{
-              fmt::format(R"(Can not open file. Error: {})", ec.message())};
+              fmt::format(R"(Read offset {} bytes failed. Error: {})", offset,
+                          ec.message())};
         }
 
-        if (byte_offset >= 0 || byte_limit >= 0) {
-          // 读取部分文件
-          const size_t offset = (byte_offset >= 0) ? size_t(byte_offset) : 0;
-          const size_t limit = (byte_limit >= 0)
-                                   ? size_t(byte_limit)
-                                   : std::numeric_limits<size_t>::max();
+        std::vector<char> result{};
+        result.resize(bytesRead);
+        stream.read(result.data(), bytesRead);
+        std::streamsize realBytesRead = stream.gcount();
 
-          // 计算实际需要读取的字节数
-          size_t fileSize =
-              static_cast<size_t>(std::filesystem::file_size(filepath));
-          auto bytesAvailable =
-              std::max((int64_t)fileSize - (int64_t)offset, (int64_t)0);
-          auto bytesRead =
-              std::min(static_cast<std::streamsize>(limit),
-                       static_cast<std::streamsize>(bytesAvailable));
-
-          // 没有数据可读
-          if (bytesRead <= 0) {
-            throw std::runtime_error{fmt::format(
-                R"(Arg `byte_offset`({}) is out of range of file size({}).)",
-                offset, fileSize)};
-          }
-
-          stream.seekg(offset, std::ios::beg);
-          if (!stream.good()) {
-            auto ec = std::error_code{errno, std::system_category()};
-            throw std::runtime_error{
-                fmt::format(R"(Read offset {} bytes failed. Error: {})", offset,
-                            ec.message())};
-          }
-
-          std::vector<char> result{};
-          result.resize(bytesRead);
-          stream.read(result.data(), bytesRead);
-          std::streamsize realBytesRead = stream.gcount();
-
-          stream.close();
-          co_return neograph::json{
-              {"bytes_read_len", realBytesRead},
-              {"base64_data",
-               agentxx::util::base64Encode(result.data(), result.size())},
-          }
-              .dump();
-        }
-
-        // 读取完整文件
-        auto result = std::string((std::istreambuf_iterator<char>(stream)),
-                                  std::istreambuf_iterator<char>());
-        auto bytesReadLen = result.size();
         stream.close();
         co_return neograph::json{
-            {"bytes_read_len", bytesReadLen},
+            {"bytes_read_len", realBytesRead},
             {"base64_data",
              agentxx::util::base64Encode(result.data(), result.size())},
         }
             .dump();
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemReadBinaryFileTool exception: {}", e.what());
-        throw e;
       }
+
+      // 读取完整文件
+      auto result = std::string((std::istreambuf_iterator<char>(stream)),
+                                std::istreambuf_iterator<char>());
+      auto bytesReadLen = result.size();
+      stream.close();
+      co_return neograph::json{
+          {"bytes_read_len", bytesReadLen},
+          {"base64_data",
+           agentxx::util::base64Encode(result.data(), result.size())},
+      }
+          .dump();
     }
   }
 };
@@ -639,9 +605,13 @@ public:
       : XXToolBase("filesystem_write_file", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_write_file"];
+
     return {
         "filesystem_write_file",
-        "创建新文件，或覆盖文件.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -651,34 +621,28 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "文件绝对路径"},
+                            {"description", prompt.getArg("path")},
                         },
                     },
                     {
                         "content",
                         {
                             {"type", "string"},
-                            {"description", "写入文件的内容"},
+                            {"description", prompt.getArg("content")},
                         },
                     },
                     {
                         "overwrite",
                         {
                             {"type", "boolean"},
-                            {"description",
-                             R"(默认`false`,是否覆盖文件.
-如果为`true`,若文件不存在则创建并写入,若文件已经存在,则覆盖文件内容.
-如果为`false`,创建新文件并写入,若文件已存在则返回失败.)"},
+                            {"description", prompt.getArg("overwrite")},
                         },
                     },
                     {
                         "is_binary",
                         {
                             {"type", "boolean"},
-                            {"description",
-                             R"(默认`false`,是否按二进制模式写入文件.
-如果为`true`,参数`content`应当为base64编码的二进制数据.
-如果为`false`,参数`content`视为普通文本,按字符串直接写入文件.)"},
+                            {"description", prompt.getArg("is_binary")},
                         },
                     },
                 },
@@ -712,111 +676,98 @@ public:
 
       // 读取完整文件
       asio::stream_file stream{currentIoCtx};
-      try {
-        auto path = std::filesystem::path{filepath};
-        if (false == overwrite && std::filesystem::exists(path)) {
-          throw std::runtime_error{"File already exist"};
-        }
-        if (false == std::filesystem::exists(path.parent_path()) &&
-            false == std::filesystem::create_directories(path.parent_path())) {
-          // 创建父目录
-          throw std::runtime_error{
-              fmt::format(R"(Can not create `path`({})'s parent dirs.)",
-                          path.parent_path().string())};
-        }
-
-        neograph_asio_error_code errCode;
-        stream.open(filepath,
-                    asio::stream_file::write_only | asio::stream_file::create |
-                        asio::stream_file::truncate,
-                    errCode);
-        if (false == stream.is_open()) {
-          stream.close();
-          throw std::runtime_error{
-              fmt::format(R"(Can not open file: {}")", errCode.message())};
-        }
-
-        if (false == content.empty()) {
-          // 写入文件内容
-          if (is_binary) {
-            auto result = agentxx::util::base64Decode(content);
-            if (result.empty()) {
-              throw std::runtime_error{"base64 decode failed"};
-            }
-            co_await asio::async_write(
-                stream, asio::buffer(result),
-                asio::redirect_error(asio::use_awaitable, errCode));
-          } else {
-            co_await asio::async_write(
-                stream, asio::buffer(content),
-                asio::redirect_error(asio::use_awaitable, errCode));
-          }
-          if (errCode) {
-            throw std::system_error{errCode};
-          }
-        }
-
-        stream.close();
-        co_return "success";
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemWriteFileTool exception: {}", e.what());
-        throw e;
+      auto path = std::filesystem::path{filepath};
+      if (false == overwrite && std::filesystem::exists(path)) {
+        throw std::runtime_error{"File already exist"};
       }
+      if (false == std::filesystem::exists(path.parent_path()) &&
+          false == std::filesystem::create_directories(path.parent_path())) {
+        // 创建父目录
+        throw std::runtime_error{
+            fmt::format(R"(Can not create `path`({})'s parent dirs.)",
+                        path.parent_path().string())};
+      }
+
+      neograph_asio_error_code errCode;
+      stream.open(filepath,
+                  asio::stream_file::write_only | asio::stream_file::create |
+                      asio::stream_file::truncate,
+                  errCode);
+      if (false == stream.is_open()) {
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file: {}")", errCode.message())};
+      }
+
+      if (false == content.empty()) {
+        // 写入文件内容
+        if (is_binary) {
+          auto result = agentxx::util::base64Decode(content);
+          if (result.empty()) {
+            throw std::runtime_error{"base64 decode failed"};
+          }
+          co_await asio::async_write(
+              stream, asio::buffer(result),
+              asio::redirect_error(asio::use_awaitable, errCode));
+        } else {
+          co_await asio::async_write(
+              stream, asio::buffer(content),
+              asio::redirect_error(asio::use_awaitable, errCode));
+        }
+        if (errCode) {
+          throw std::system_error{errCode};
+        }
+      }
+
+      stream.close();
+      co_return "success";
     }
 #endif
 
     {
       std::ofstream stream;
-      try {
-        auto path = std::filesystem::path{filepath};
-        if (false == overwrite && std::filesystem::exists(path)) {
-          throw std::runtime_error{"File already exist"};
-        }
-        if (false == std::filesystem::exists(path.parent_path()) &&
-            false == std::filesystem::create_directories(path.parent_path())) {
-          // 创建父目录
-          throw std::runtime_error{
-              fmt::format(R"(Can not create `path`({})'s parent dirs.)",
-                          path.parent_path().string())};
-        }
+      auto path = std::filesystem::path{filepath};
+      if (false == overwrite && std::filesystem::exists(path)) {
+        throw std::runtime_error{"File already exist"};
+      }
+      if (false == std::filesystem::exists(path.parent_path()) &&
+          false == std::filesystem::create_directories(path.parent_path())) {
+        // 创建父目录
+        throw std::runtime_error{
+            fmt::format(R"(Can not create `path`({})'s parent dirs.)",
+                        path.parent_path().string())};
+      }
 
-        stream.open(filepath, is_binary
-                                  ? std::ios_base::out | std::ios_base::binary |
-                                        std::ios_base::trunc
-                                  : std::ios_base::out | std::ios_base::trunc);
+      stream.open(filepath, is_binary
+                                ? std::ios_base::out | std::ios_base::binary |
+                                      std::ios_base::trunc
+                                : std::ios_base::out | std::ios_base::trunc);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{fmt::format(
+            R"(Can not create or open file. Error: {})", ec.message())};
+      }
+
+      if (false == content.empty()) {
+        // 写入文件内容
+        if (is_binary) {
+          auto result = agentxx::util::base64Decode(content);
+          if (result.empty()) {
+            throw std::runtime_error{"base64 decode failed"};
+          }
+          stream << result;
+        } else {
+          stream << content;
+        }
         if (!stream) {
           auto ec = std::error_code{errno, std::system_category()};
           throw std::runtime_error{fmt::format(
-              R"(Can not create or open file. Error: {})", ec.message())};
+              R"(File created success, but write failed. Error: {})",
+              ec.message())};
         }
-
-        if (false == content.empty()) {
-          // 写入文件内容
-          if (is_binary) {
-            auto result = agentxx::util::base64Decode(content);
-            if (result.empty()) {
-              throw std::runtime_error{"base64 decode failed"};
-            }
-            stream << result;
-          } else {
-            stream << content;
-          }
-          if (!stream) {
-            auto ec = std::error_code{errno, std::system_category()};
-            throw std::runtime_error{fmt::format(
-                R"(File created success, but write failed. Error: {})",
-                ec.message())};
-          }
-        }
-
-        stream.close();
-        co_return "success";
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemWriteFileTool exception: {}", e.what());
-        throw e;
       }
+
+      stream.close();
+      co_return "success";
     }
   }
 };
@@ -830,9 +781,13 @@ public:
   }
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_edit_text_file"];
+
     return {
         "filesystem_edit_text_file",
-        R"(Perform exact string replacements in text files(e.g. *.txt,*.md,*.cpp).)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -842,30 +797,28 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description", "文件绝对路径"},
+                            {"description", prompt.getArg("path")},
                         },
                     },
                     {
                         "old_str",
                         {
                             {"type", "string"},
-                            {"description",
-                             "待替换的旧字符串,精准匹配,不能为空"},
+                            {"description", prompt.getArg("old_str")},
                         },
                     },
                     {
                         "new_str",
                         {
                             {"type", "string"},
-                            {"description", "新字符串"},
+                            {"description", prompt.getArg("new_str")},
                         },
                     },
                     {
                         "multi_replace",
                         {
                             {"type", "boolean"},
-                            {"description",
-                             R"(是否替换所有匹配`old_str`的字符串.默认`false`只替换第一个匹配)"},
+                            {"description", prompt.getArg("multi_replace")},
                         },
                     },
 
@@ -903,135 +856,123 @@ public:
 
       // 读取完整文件
       asio::stream_file stream{currentIoCtx};
-      try {
-        auto path = std::filesystem::path{filepath};
-        if (false == std::filesystem::exists(path)) {
-          throw std::runtime_error{"File not exist"};
-        }
+      auto path = std::filesystem::path{filepath};
+      if (false == std::filesystem::exists(path)) {
+        throw std::runtime_error{"File not exist"};
+      }
 
-        neograph_asio_error_code errCode;
-        stream.open(filepath, asio::stream_file::read_only, errCode);
-        if (false == stream.is_open()) {
-          stream.close();
-          throw std::runtime_error{
-              fmt::format(R"(Can not open file: {}")", errCode.message())};
-        }
+      neograph_asio_error_code errCode;
+      stream.open(filepath, asio::stream_file::read_only, errCode);
+      if (false == stream.is_open()) {
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file: {}")", errCode.message())};
+      }
 
-        std::string content;
-        // 读出文件
-        co_await asio::async_read(
-            stream, asio::dynamic_buffer(content), asio::transfer_all(),
-            asio::redirect_error(asio::use_awaitable, errCode));
-        if (errCode && errCode != asio::error::eof) {
-          throw std::system_error{errCode};
-        }
-        stream.close();
+      std::string content;
+      // 读出文件
+      co_await asio::async_read(
+          stream, asio::dynamic_buffer(content), asio::transfer_all(),
+          asio::redirect_error(asio::use_awaitable, errCode));
+      if (errCode && errCode != asio::error::eof) {
+        throw std::system_error{errCode};
+      }
+      stream.close();
 
-        int replaceHit = 0;
-        size_t pos = 0;
-        while ((pos = content.find(old_str, pos)) != std::string::npos) {
-          replaceHit++;
-          content.replace(pos, old_str.length(), new_str);
-          // 跳过新字符串，避免死循环
-          pos += new_str.length();
-          if (false == multi_replace) {
-            break;
-          }
+      int replaceHit = 0;
+      size_t pos = 0;
+      while ((pos = content.find(old_str, pos)) != std::string::npos) {
+        replaceHit++;
+        content.replace(pos, old_str.length(), new_str);
+        // 跳过新字符串，避免死循环
+        pos += new_str.length();
+        if (false == multi_replace) {
+          break;
         }
+      }
 
-        if (0 == replaceHit) {
-          throw std::runtime_error{R"(No match `old_str` found)"};
-        }
+      if (0 == replaceHit) {
+        throw std::runtime_error{R"(No match `old_str` found)"};
+      }
 
-        // 覆盖写入文件内容
-        stream.open(filepath,
-                    asio::stream_file::write_only | asio::stream_file::create |
-                        asio::stream_file::truncate,
-                    errCode);
-        if (false == stream.is_open()) {
-          stream.close();
-          throw std::runtime_error{fmt::format(
-              R"(Can not open file to write: {}")", errCode.message())};
-        }
-        co_await asio::async_write(
-            stream, asio::buffer(content),
-            asio::redirect_error(asio::use_awaitable, errCode));
-        if (errCode) {
-          throw std::system_error{errCode};
-        }
+      // 覆盖写入文件内容
+      stream.open(filepath,
+                  asio::stream_file::write_only | asio::stream_file::create |
+                      asio::stream_file::truncate,
+                  errCode);
+      if (false == stream.is_open()) {
+        throw std::runtime_error{fmt::format(
+            R"(Can not open file to write: {}")", errCode.message())};
+      }
+      co_await asio::async_write(
+          stream, asio::buffer(content),
+          asio::redirect_error(asio::use_awaitable, errCode));
+      if (errCode) {
+        throw std::system_error{errCode};
+      }
 
-        stream.close();
-        if (multi_replace) {
-          co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
-        } else {
-          co_return "success";
-        }
-      } catch (const std::exception &e) {
-        stream.close();
-        throw e;
+      stream.close();
+      if (multi_replace) {
+        co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
+      } else {
+        co_return "success";
       }
     }
 #endif
 
     {
       std::fstream stream;
-      try {
-        auto path = std::filesystem::path{filepath};
-        if (false == std::filesystem::exists(path)) {
-          throw std::runtime_error{"File not exist"};
-        }
+      auto path = std::filesystem::path{filepath};
+      if (false == std::filesystem::exists(path)) {
+        throw std::runtime_error{"File not exist"};
+      }
 
-        stream.open(filepath, std::ios_base::in);
-        if (!stream) {
-          auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{
-              fmt::format(R"(Can not open file. Error: {})", ec.message())};
-        }
+      stream.open(filepath, std::ios_base::in);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
+      }
 
-        std::ostringstream output;
-        output << stream.rdbuf();
-        std::string content = output.str();
+      std::ostringstream output;
+      output << stream.rdbuf();
+      std::string content = output.str();
 
-        int replaceHit = 0;
-        size_t pos = 0;
-        while ((pos = content.find(old_str, pos)) != std::string::npos) {
-          replaceHit++;
-          content.replace(pos, old_str.length(), new_str);
-          // 跳过新字符串，避免死循环
-          pos += new_str.length();
-          if (false == multi_replace) {
-            break;
-          }
+      int replaceHit = 0;
+      size_t pos = 0;
+      while ((pos = content.find(old_str, pos)) != std::string::npos) {
+        replaceHit++;
+        content.replace(pos, old_str.length(), new_str);
+        // 跳过新字符串，避免死循环
+        pos += new_str.length();
+        if (false == multi_replace) {
+          break;
         }
+      }
 
-        if (0 == replaceHit) {
-          throw std::runtime_error{R"(No match `old_str` found)"};
-        }
+      if (0 == replaceHit) {
+        throw std::runtime_error{R"(No match `old_str` found)"};
+      }
 
-        // 写入文件内容
-        stream.close();
-        stream.open(filepath, std::ios_base::out);
-        if (!stream) {
-          auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{fmt::format(
-              R"(Can not open file to write. Error: {})", ec.message())};
-        }
-        stream << content;
-        if (!stream) {
-          auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{
-              fmt::format(R"(Edit file failed. Error: {})", ec.message())};
-        }
+      // 写入文件内容
+      stream.close();
+      stream.open(filepath, std::ios_base::out);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{fmt::format(
+            R"(Can not open file to write. Error: {})", ec.message())};
+      }
+      stream << content;
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{
+            fmt::format(R"(Edit file failed. Error: {})", ec.message())};
+      }
 
-        stream.close();
-        if (multi_replace) {
-          co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
-        } else {
-          co_return "success";
-        }
-      } catch (const std::exception &e) {
-        stream.close();
-        throw e;
+      stream.close();
+      if (multi_replace) {
+        co_return fmt::format(R"(Success, Replace {} times)", replaceHit);
+      } else {
+        co_return "success";
       }
     }
   }
@@ -1044,9 +985,13 @@ public:
       : XXToolBase("filesystem_glob", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_glob"];
+
     return {
         "filesystem_glob",
-        R"(Find files matching patterns.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -1057,20 +1002,7 @@ public:
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
-                            {"description",
-                             R"(Absolute dir or file path and glob patterns.
-
-| Wildcard | Matches | Example
-|--- |--- |--- |
-| `*` | any characters | `*.txt` matches all files with the txt extension |
-| `**` | any name dir recursively | `include/**/*.txt` matches all files with the txt extension in dir `include` and children dirs |
-| `?` | any one character | `???` matches files with 3 characters long |
-| `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
-| `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
-| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
-
-e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.
-)"},
+                            {"description", prompt.getArg("file_patterns")},
                         },
                     },
                 },
@@ -1109,9 +1041,13 @@ public:
       : XXToolBase("filesystem_grep", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["filesystem_grep"];
+
     return {
         "filesystem_grep",
-        R"(Searches file contents using regular expressions or text.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -1122,9 +1058,7 @@ public:
                         {
                             {"type", "boolean"},
                             {"description",
-                             R"(The type of `text_patterns`.
-`true`:  `text_patterns` are regex syntaxs.
-`false`: `text_patterns` are crude text strings.)"},
+                             prompt.getArg("text_patterns_is_regex")},
                         },
                     },
                     {
@@ -1132,8 +1066,7 @@ public:
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
-                            {"description",
-                             R"(String or regex syntax to search text content. The text match type depends on the `text_patterns_is_regex` parameter.)"},
+                            {"description", prompt.getArg("text_patterns")},
                         },
                     },
                     {
@@ -1141,19 +1074,7 @@ public:
                         {
                             {"type", "array"},
                             {"items", {{"type", "string"}}},
-                            {"description",
-                             R"(Absolute dir or file path and glob pattern.
-
-| Wildcard | Matches | Example
-|--- |--- |--- |
-| `*` | any characters | `*.txt` matches all files with the txt extension |
-| `**` | any name dir recursively | `include/**/*.txt` matches all files with the txt extension in dir `include` and children dirs |
-| `?` | any one character | `???` matches files with 3 characters long |
-| `[]` | any character listed in the brackets | `[ABC]*` matches files starting with A,B or C | 
-| `[-]` | any character in the range listed in brackets | `[A-Z]*` matches files starting with capital letters |
-| `[!]` | any character not listed in the brackets | `[!ABC]*` matches files that do not start with A,B or C |
-
-e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0-9].*`,`C:/down/read/??.txt`.)"},
+                            {"description", prompt.getArg("file_patterns")},
                         },
                     },
                     {
@@ -1162,11 +1083,7 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
                             {"type", "string"},
                             {"enum", neograph::json::array(
                                          {"files_with_matches", "content"})},
-                            {"description",
-                             R"(Default: `files_with_matches`. 
-Output format:
-'files_with_matches': Only file paths containing matches and count with `file:match_count` format
-'content': Matching lines with file:line:content format)"},
+                            {"description", prompt.getArg("output_mode")},
                         },
                     },
                 },
@@ -1187,54 +1104,41 @@ Output format:
 
       /// 异步读取文件
       asio::stream_file stream{currentIoCtx};
-      try {
-        neograph_asio_error_code errCode;
-        stream.open(filepath, asio::stream_file::read_only, errCode);
-        if (false == stream.is_open()) {
-          stream.close();
-          throw std::runtime_error{fmt::format(
-              R"(Can not open file. Error: {})", errCode.message())};
-        }
-
-        // 读取完整文件
-        std::string data;
-        co_await asio::async_read(
-            stream, asio::dynamic_buffer(data), asio::transfer_all(),
-            asio::redirect_error(asio::use_awaitable, errCode));
-        if (errCode && errCode != asio::error::eof) {
-          throw std::system_error{errCode};
-        }
-        stream.close();
-        co_return data;
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemGrepTool exception: {}", e.what());
-        throw e;
+      neograph_asio_error_code errCode;
+      stream.open(filepath, asio::stream_file::read_only, errCode);
+      if (false == stream.is_open()) {
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file. Error: {})", errCode.message())};
       }
+
+      // 读取完整文件
+      std::string data;
+      co_await asio::async_read(
+          stream, asio::dynamic_buffer(data), asio::transfer_all(),
+          asio::redirect_error(asio::use_awaitable, errCode));
+      if (errCode && errCode != asio::error::eof) {
+        throw std::system_error{errCode};
+      }
+      stream.close();
+      co_return data;
     }
 #endif
 
     {
       /// 同步阻塞读取文件
       std::ifstream stream;
-      try {
-        stream.open(filepath);
-        if (!stream) {
-          auto ec = std::error_code{errno, std::system_category()};
-          throw std::runtime_error{
-              fmt::format(R"(Can not open file. Error: {})", ec.message())};
-        }
-
-        // 读取完整文件
-        auto result = std::string{std::istreambuf_iterator<char>(stream),
-                                  std::istreambuf_iterator<char>()};
-        stream.close();
-        co_return result;
-      } catch (const std::exception &e) {
-        stream.close();
-        XX_LOGD("FilesystemGrepTool exception: {}", e.what());
-        throw e;
+      stream.open(filepath);
+      if (!stream) {
+        auto ec = std::error_code{errno, std::system_category()};
+        throw std::runtime_error{
+            fmt::format(R"(Can not open file. Error: {})", ec.message())};
       }
+
+      // 读取完整文件
+      auto result = std::string{std::istreambuf_iterator<char>(stream),
+                                std::istreambuf_iterator<char>()};
+      stream.close();
+      co_return result;
     }
   }
 

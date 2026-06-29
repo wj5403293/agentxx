@@ -1,6 +1,8 @@
 #pragma once
 
 #include "agentxx/nodes/warp_handle.h"
+#include "agentxx/util/exception.h"
+#include "agentxx/util/log.h"
 #include "asio/io_context.hpp"
 #include "asio/steady_timer.hpp"
 #include "asio/use_awaitable.hpp"
@@ -46,17 +48,18 @@ public:
   }
 
   void
-  onHandleStartError(bool errorRethrow, const std::exception *e,
+  onHandleStartError(bool errorRethrow, bool isCurrentError,
+                     std::string_view exceptionStr,
                      agentxx::middleware::BaseMiddlewareHandleInterface &item,
                      neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
+                     neograph::graph::NodeOutput &result) noexcept override {
     // 插入消息，保证消息顺序正确
     if (false == errorRethrow) {
       auto msg = neograph::ChatMessage{
           .role = "assistant",
-          .content = fmt::format(
-              R"({{"error": "{}/Start call `{}` exception: {}"}})", nodeName,
-              item.name, (nullptr != e) ? e->what() : "")};
+          .content =
+              fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
+                          nodeName, item.name, exceptionStr)};
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
@@ -65,15 +68,18 @@ public:
       });
     }
   }
-  void onHandleBaseRunError(bool errorRethrow, const std::exception *e,
-                            neograph::graph::NodeInput &in,
-                            neograph::graph::NodeOutput &result) override {
+
+  void
+  onHandleBaseRunError(bool errorRethrow, bool isCurrentError,
+                       std::string_view exceptionStr,
+                       neograph::graph::NodeInput &in,
+                       neograph::graph::NodeOutput &result) noexcept override {
     // 插入消息，保证消息顺序正确
-    if (false == errorRethrow && nullptr != e) {
+    if (false == errorRethrow && isCurrentError) {
       auto msg = neograph::ChatMessage{
           .role = "assistant",
           .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
-                                 nodeName, e->what())};
+                                 nodeName, exceptionStr)};
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
@@ -145,25 +151,38 @@ public:
     size_t retry = 0;
     auto timer = asio::steady_timer(co_await asio::this_coro::executor);
     do {
+      std::string errInfo;
       try {
         co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(
             in, result);
         co_return;
       } catch (const neograph::graph::CancelledException &e) {
         throw;
-      } catch (const neograph::graph::NodeInterrupt &e) {
-        throw;
+        // } catch (const neograph::graph::NodeInterrupt &e) {
+        // llm node 无 Interrupt
       } catch (const std::exception &e) {
-        if (retry < agentCtxPtr->agentConfig->llmMaxRetry) {
-          // TODO: 附加已有的 llm 消息，而不是覆盖
-          retry++;
-          XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
-                  agentCtxPtr->agentConfig->llmMaxRetry, e.what());
-        } else {
+        if (retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
+          throw;
+        }
+        errInfo = e.what();
+      } catch (const boost::exception &e) {
+        if (retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
+          throw;
+        }
+        errInfo = boost::diagnostic_information(e);
+      } catch (...) {
+        if (retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
           throw;
         }
       }
-      timer.expires_after(std::chrono::microseconds(retry * 1000));
+
+      // 自动重试
+      // TODO: 附加已有的 llm 消息，而不是覆盖
+      retry++;
+      XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
+              agentCtxPtr->agentConfig->llmMaxRetry, errInfo);
+      // 延时等待
+      timer.expires_after(std::chrono::milliseconds(retry * 1000));
       co_await timer.async_wait(asio::use_awaitable);
     } while (true);
   }

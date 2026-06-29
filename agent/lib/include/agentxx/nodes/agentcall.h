@@ -85,10 +85,11 @@ public:
   }
 
   void
-  onHandleEndError(bool errorRethrow, const std::exception *e,
+  onHandleEndError(bool errorRethrow, bool isCurrentError,
+                   std::string_view exceptionStr,
                    agentxx::middleware::BaseMiddlewareHandleInterface &item,
                    const neograph::graph::NodeInput &in,
-                   neograph::graph::NodeOutput &result) override {
+                   neograph::graph::NodeOutput &result) noexcept override {
     {
       // 清理单次执行的临时数据
       auto ptr = agentContext.lock();

@@ -23,11 +23,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_search"];
+
     return {
         "codegraph_search",
-        "Search for code symbols (functions, classes, etc.) by name using "
-        "codegraph index. Returns matched symbols with file locations and "
-        "signatures.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -37,17 +39,14 @@ public:
                         "query",
                         {
                             {"type", "string"},
-                            {"description",
-                             "Symbol name to search for (supports partial "
-                             "match)."},
+                            {"description", prompt.getArg("query")},
                         },
                     },
                     {
                         "limit",
                         {
                             {"type", "number"},
-                            {"description",
-                             "Max number of results to return, default 20."},
+                            {"description", prompt.getArg("limit")},
                         },
                     },
                 },
@@ -97,11 +96,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_context"];
+
     return {
         "codegraph_context",
-        "Get rich context for a code symbol: definition, callers, callees, "
-        "and methods (for classes). Useful for understanding how a function "
-        "or class is used in the codebase.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -111,25 +112,21 @@ public:
                         "symbol",
                         {
                             {"type", "string"},
-                            {"description",
-                             "Symbol name to get context for (e.g. "
-                             "'MyClass::myMethod')."},
+                            {"description", prompt.getArg("symbol")},
                         },
                     },
                     {
                         "limit",
                         {
                             {"type", "number"},
-                            {"description",
-                             "Max results per category, default 10."},
+                            {"description", prompt.getArg("limit")},
                         },
                     },
                     {
                         "max_depth",
                         {
                             {"type", "number"},
-                            {"description",
-                             "Max call graph traversal depth, default 3."},
+                            {"description", prompt.getArg("max_depth")},
                         },
                     },
                 },
@@ -169,10 +166,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_callers"];
+
     return {
         "codegraph_callers",
-        "Find all functions that call a given symbol. Traces the call graph "
-        "backwards to find callers.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -182,14 +182,14 @@ public:
                         "symbol",
                         {
                             {"type", "string"},
-                            {"description", "Symbol name to find callers for."},
+                            {"description", prompt.getArg("symbol")},
                         },
                     },
                     {
                         "max_depth",
                         {
                             {"type", "number"},
-                            {"description", "Max traversal depth, default 3."},
+                            {"description", prompt.getArg("max_depth")},
                         },
                     },
                 },
@@ -227,10 +227,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_callees"];
+
     return {
         "codegraph_callees",
-        "Find all functions that a given symbol calls. Traces the call graph "
-        "forward to find callees.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -240,14 +243,14 @@ public:
                         "symbol",
                         {
                             {"type", "string"},
-                            {"description", "Symbol name to find callees for."},
+                            {"description", prompt.getArg("symbol")},
                         },
                     },
                     {
                         "max_depth",
                         {
                             {"type", "number"},
-                            {"description", "Max traversal depth, default 3."},
+                            {"description", prompt.getArg("max_depth")},
                         },
                     },
                 },
@@ -285,10 +288,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_impact"];
+
     return {
         "codegraph_impact",
-        "Analyze the impact of modifying a symbol. Finds all downstream "
-        "symbols that may be affected (callers, references).",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -298,15 +304,14 @@ public:
                         "symbol",
                         {
                             {"type", "string"},
-                            {"description",
-                             "Symbol name to analyze impact for."},
+                            {"description", prompt.getArg("symbol")},
                         },
                     },
                     {
                         "max_depth",
                         {
                             {"type", "number"},
-                            {"description", "Max traversal depth, default 5."},
+                            {"description", prompt.getArg("max_depth")},
                         },
                     },
                 },
@@ -344,10 +349,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_status"];
+
     return {
         "codegraph_status",
-        "Get codegraph index statistics: total nodes, edges, files, and "
-        "circular dependency count.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {"properties", neograph::json::object()},
@@ -381,10 +389,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_index"];
+
     return {
         "codegraph_index",
-        "Index a directory for code analysis. Analyzes source files and "
-        "builds the symbol database for search and context queries.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -394,16 +405,14 @@ public:
                         "path",
                         {
                             {"type", "string"},
-                            {"description",
-                             "Absolute path to the directory to index."},
+                            {"description", prompt.getArg("path")},
                         },
                     },
                     {
                         "incremental",
                         {
                             {"type", "boolean"},
-                            {"description",
-                             "Default `true`. Only index changed files."},
+                            {"description", prompt.getArg("incremental")},
                         },
                     },
                 },
@@ -446,9 +455,13 @@ public:
         codegraph(std::move(in_codegraph)) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["codegraph_path"];
+
     return {
         "codegraph_path",
-        "Find the call chain path between two symbols in the call graph.",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -458,21 +471,21 @@ public:
                         "from",
                         {
                             {"type", "string"},
-                            {"description", "Starting symbol name."},
+                            {"description", prompt.getArg("from")},
                         },
                     },
                     {
                         "to",
                         {
                             {"type", "string"},
-                            {"description", "Target symbol name."},
+                            {"description", prompt.getArg("to")},
                         },
                     },
                     {
                         "max_depth",
                         {
                             {"type", "number"},
-                            {"description", "Max search depth, default 10."},
+                            {"description", prompt.getArg("max_depth")},
                         },
                     },
                 },

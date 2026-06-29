@@ -568,6 +568,8 @@ public:
           }
         } catch (const std::exception &e) {
           XX_LOGE(R"({{"error": "Agent Response failed: {}"}})", e.what());
+        } catch (...) {
+          XX_LOGE(R"({{"error": "Agent Response failed: Unknown error"}})");
         }
       }
       std::cout << "\n\n>>> ";

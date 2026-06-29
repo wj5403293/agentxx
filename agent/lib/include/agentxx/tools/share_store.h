@@ -61,10 +61,13 @@ public:
   }
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["share_store"];
+
     return {
         "share_store",
-        R"(Store text, return a unique id, used to get text when need.
-Insert text or get/set/delete text by unique id.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -80,43 +83,35 @@ Insert text or get/set/delete text by unique id.)",
                                          "set",
                                          "delete",
                                      })},
-                            {"description", R"(operation.
-`get` Get text by unique id
-`insert` New store `text`, return unique id
-`set` Modify `text` by unique id
-`delete` Delete text by unique id
-)"},
+                            {"description", prompt.getArg("opt")},
                         },
                     },
                     {
                         "text",
                         {
                             {"type", "string"},
-                            {"description", "待存储的文本内容"},
+                            {"description", prompt.getArg("text")},
                         },
                     },
                     {
                         "line_offset",
                         {
                             {"type", "number"},
-                            {"description",
-                             R"(`insert`,`set`时可选. 文本偏移行数,默认`0`表示不偏移.如果偏移超出文件最大行数,将返回错误提示)"},
+                            {"description", prompt.getArg("line_offset")},
                         },
                     },
                     {
                         "line_limit",
                         {
                             {"type", "number"},
-                            {"description",
-                             R"(`insert`,`set`时可选. 读取文本行数限制,取值范围 [1, ~],默认`null`表示不限制.允许指定的限制值超出文件最大行数不报错)"},
+                            {"description", prompt.getArg("line_limit")},
                         },
                     },
                     {
                         "id",
                         {
                             {"type", "number"},
-                            {"description", "unique id to store text when opt "
-                                            "is `get`,`set` or `delete`"},
+                            {"description", prompt.getArg("id")},
                         },
                     },
                 },

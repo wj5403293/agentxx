@@ -21,9 +21,13 @@ public:
       : XXToolBase("get_current_datetime", in_agentContext, false, true) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["get_current_datetime"];
+
     return {
         "get_current_datetime",
-        "Get current date,time and timestamp.",
+        prompt.depict,
         neograph::json{},
     };
   }

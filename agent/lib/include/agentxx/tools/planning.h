@@ -42,53 +42,13 @@ public:
         planningContext(in_planningContext) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt =
+        agentPtr->agentConfig->prompt.toolPrompt["planning_write"];
+
     return {
         "planning_write",
-        R"(Two-level task planning tool for complex multi-step work sessions.
-
-=== Strategic Layer: `roadmap` (required) ===
-A Mermaid stateDiagram-v2 that captures the OVERALL workflow — the big picture.
-This is your roadmap: major phases, dependencies between tasks, error recovery
-paths, and the start-to-finish flow. Update this diagram whenever the plan
-changes (new tasks, completed phases, dead ends). After the execution is completed, 
-an overall summary should be made.
-
-State diagram conventions:
-- Use `[*]` for start/end pseudo-states
-- Name state nodes like `phase_N_description` (e.g. `phase_1_search_codebase`)
-- Status transitions: pending → in_progress → completed | failed
-- Show branching: what happens on success vs failure
-- Replace the entire diagram each call
-
-=== Tactical Layer: `todos` (optional) ===
-A short list of IMMEDIATE and NEXT-STEP tasks only. Do NOT list every state
-from the diagram — only the tasks you are actively working on or about to
-start. Each item records execution details, lessons learned, and issues
-encountered to help with re-planning.
-
-Example for a "fix a bug" workflow:
-- roadmap:
-```mermaid
-stateDiagram-v2
-    [*] --> phase_1_reproduce_bug
-    phase_1_reproduce_bug --> phase_1_in_progress: start
-    phase_1_in_progress --> phase_1_completed: reproduced
-    phase_1_in_progress --> phase_1_failed: cannot reproduce
-    phase_1_completed --> phase_2_locate_root_cause
-    phase_2_locate_root_cause --> phase_2_in_progress: analyze
-    phase_2_in_progress --> phase_2_completed: found cause
-    phase_2_completed --> phase_3_implement_fix
-    phase_3_implement_fix --> phase_3_in_progress: coding
-    phase_3_in_progress --> phase_3_completed: fix works
-    phase_3_completed --> [*]
-```
-- todos (only current + next):
-[
-  {"state":"in_progress", "content":"Reproduce the crash with provided stack trace",
-   "summary":"Found that it crashes on null pointer at line 342"},
-  {"state":"pending", "content":"Locate root cause by tracing the null pointer source"}
-]
-)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {"required", neograph::json::array({"roadmap"})},
@@ -99,12 +59,7 @@ stateDiagram-v2
                         "roadmap",
                         {
                             {"type", "string"},
-                            {"description",
-                             R"(STRATEGIC LAYER: Mermaid stateDiagram-v2 of the overall workflow.
-This is the big-picture roadmap. Include ALL phases even if not yet started.
-Each phase gets state nodes for its statuses (pending/in_progress/completed/failed)
-with transitions showing dependencies and error recovery paths.
-Use `[*]` for start/end. Replace the entire diagram each call.)"},
+                            {"description", prompt.getArg("roadmap")},
                         },
                     },
                     {
@@ -112,20 +67,7 @@ Use `[*]` for start/end. Replace the entire diagram each call.)"},
                         {
                             {"type", "array"},
                             {"items", {{"type", "object"}}},
-                            {"description",
-                             R"(TACTICAL LAYER: Near-term task items.
-Focus on what you are actively doing NOW and what comes NEXT.
-Do NOT list all phases from the diagram — only immediate execution items.
-Each item records what was tried, what worked, and what to watch out for.
-
-Item struct:
-{
-    "state": "pending",   // enum: pending, in_progress, completed, failed
-    "content": "",        // task description
-    "summary": ""         // execution notes: methods tried, issues encountered,
-                          // optimization suggestions for re-planning
-}
-)"},
+                            {"description", prompt.getArg("todos")},
                         },
                     },
                 },

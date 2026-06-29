@@ -517,7 +517,6 @@ public:
             });
             return true;
           } catch (const std::exception &e) {
-            stream.close();
             XX_LOGD("RAG/scanDocument item exception: {} / {}", path, e.what());
           }
         }
@@ -639,11 +638,12 @@ public:
         store(in_store) {}
 
   neograph::ChatTool get_definition() const override {
+    auto agentPtr = agentContext.lock();
+    const auto &prompt = agentPtr->agentConfig->prompt.toolPrompt["rag_search"];
+
     return {
         "rag_search",
-        R"(Search the knowledge base for relevant documents using semantic similarity. 
-Use this tool to find information before answering questions. 
-Returns the most relevant documents with their content, source, and similarity score.)",
+        prompt.depict,
         neograph::json{
             {"type", "object"},
             {
@@ -653,16 +653,14 @@ Returns the most relevant documents with their content, source, and similarity s
                         "query",
                         {
                             {"type", "string"},
-                            {"description",
-                             "Search query to find relevant documents"},
+                            {"description", prompt.getArg("query")},
                         },
                     },
                     {
                         "top_k",
                         {
                             {"type", "integer"},
-                            {"description",
-                             "Number of results to return (default: 3)"},
+                            {"description", prompt.getArg("top_k")},
                         },
                     },
                 },

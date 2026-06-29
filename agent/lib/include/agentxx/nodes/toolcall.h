@@ -32,17 +32,18 @@ public:
             in_name, in_agentContext, in_ctx) {}
 
   void
-  onHandleStartError(bool errorRethrow, const std::exception *e,
+  onHandleStartError(bool errorRethrow, bool isCurrentError,
+                     std::string_view exceptionStr,
                      agentxx::middleware::BaseMiddlewareHandleInterface &item,
                      neograph::graph::NodeInput &in,
-                     neograph::graph::NodeOutput &result) override {
+                     neograph::graph::NodeOutput &result) noexcept override {
     // 插入消息，保证消息顺序正确
     if (false == errorRethrow) {
       auto msg = neograph::ChatMessage{
           .role = "tool",
-          .content = fmt::format(
-              R"({{"error": "{}/Start call `{}` exception: {}"}})", nodeName,
-              item.name, (nullptr != e) ? e->what() : "")};
+          .content =
+              fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
+                          nodeName, item.name, exceptionStr)};
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
@@ -52,15 +53,17 @@ public:
     }
   }
 
-  void onHandleBaseRunError(bool errorRethrow, const std::exception *e,
-                            neograph::graph::NodeInput &in,
-                            neograph::graph::NodeOutput &result) override {
+  void
+  onHandleBaseRunError(bool errorRethrow, bool isCurrentError,
+                       std::string_view exceptionStr,
+                       neograph::graph::NodeInput &in,
+                       neograph::graph::NodeOutput &result) noexcept override {
     // 插入消息，保证消息顺序正确
-    if (false == errorRethrow && nullptr != e) {
+    if (false == errorRethrow && isCurrentError) {
       auto msg = neograph::ChatMessage{
           .role = "tool",
           .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
-                                 nodeName, e->what())};
+                                 nodeName, exceptionStr)};
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
@@ -120,6 +123,14 @@ public:
           retry++;
           XX_LOGD("ToolCallNode {} retry: {}/{} | {}", tool->get_name(), retry,
                   maxRetry, e.what());
+        } else {
+          throw;
+        }
+      } catch (...) {
+        if (retry < maxRetry) {
+          retry++;
+          XX_LOGD("ToolCallNode {} retry: {}/{} | Unknown error",
+                  tool->get_name(), retry, maxRetry);
         } else {
           throw;
         }
