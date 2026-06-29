@@ -135,7 +135,7 @@ set_target_properties(agentxx_shared PROPERTIES
   OUTPUT_NAME "agentxx"
   PUBLIC_HEADER "include/agentxx/agentxx.h"
   PREFIX "lib"
-  CXX_STANDARD 23
+  CXX_STANDARD 26
   LINK_LIBRARIES_STRATEGY "REORDER_MINIMALLY"
   VS_GLOBAL_VcpkgEnabled false
 )
@@ -144,7 +144,7 @@ set_target_properties(agentxx_static PROPERTIES
   OUTPUT_NAME "agentxx_static"
   PUBLIC_HEADER "include/agentxx/agentxx.h"
   PREFIX "lib"
-  CXX_STANDARD 23
+  CXX_STANDARD 26
   LINK_LIBRARIES_STRATEGY "REORDER_MINIMALLY"
   VS_GLOBAL_VcpkgEnabled false
 )
