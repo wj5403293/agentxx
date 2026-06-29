@@ -130,8 +130,10 @@ class SubAgentManagerTool : public XXToolBase {
 public:
   std::map<std::string, std::shared_ptr<SubAgentTaskBase>> subAgentList{};
 
-  explicit SubAgentManagerTool(std::string_view in_nodeName)
-      : XXToolBase(in_nodeName, true, false) {}
+  SubAgentManagerTool(
+      std::string_view in_nodeName,
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase(in_nodeName, in_agentContext, true, false) {}
 
   std::string get_name() const override { return "subagent_switch"; }
 

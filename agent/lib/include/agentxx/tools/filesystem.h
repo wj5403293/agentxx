@@ -69,8 +69,9 @@ inline void _defFileRWSummarizationRespHandle(
 /// ls
 class FileSystemListFileTool : public XXToolBase {
 public:
-  explicit FileSystemListFileTool()
-      : XXToolBase("filesystem_list_file", false, false) {}
+  FileSystemListFileTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_list_file", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -176,8 +177,10 @@ public:
 class FilesystemReadTextFileTool : public XXToolBase {
 protected:
 public:
-  explicit FilesystemReadTextFileTool()
-      : XXToolBase("filesystem_read_text_file", false, false) {}
+  FilesystemReadTextFileTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_read_text_file", in_agentContext, false, false) {
+  }
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -392,8 +395,10 @@ public:
 /// read
 class FilesystemReadBinaryFileTool : public XXToolBase {
 public:
-  explicit FilesystemReadBinaryFileTool()
-      : XXToolBase("filesystem_read_binary_file", false, false) {}
+  FilesystemReadBinaryFileTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_read_binary_file", in_agentContext, false,
+                   false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -629,8 +634,9 @@ Returns binary content as base64 string.)",
 /// write
 class FilesystemWriteFileTool : public XXToolBase {
 public:
-  explicit FilesystemWriteFileTool()
-      : XXToolBase("filesystem_write_file", false, false) {}
+  FilesystemWriteFileTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_write_file", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -818,8 +824,10 @@ public:
 /// edit file
 class FilesystemEditTextFileTool : public XXToolBase {
 public:
-  explicit FilesystemEditTextFileTool()
-      : XXToolBase("filesystem_edit_text_file", false, false) {}
+  FilesystemEditTextFileTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_edit_text_file", in_agentContext, false, false) {
+  }
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -1031,7 +1039,9 @@ public:
 
 class FilesystemGlobTool : public XXToolBase {
 public:
-  explicit FilesystemGlobTool() : XXToolBase("filesystem_glob", false, false) {}
+  FilesystemGlobTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_glob", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -1094,7 +1104,9 @@ e.g., `/upload/**/*.txt`,`/docx/*[0-9].txt`,`/usr/include/nc*.h`,`/output/file[0
 
 class FilesystemGrepTool : public XXToolBase {
 public:
-  explicit FilesystemGrepTool() : XXToolBase("filesystem_grep", false, false) {}
+  FilesystemGrepTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("filesystem_grep", in_agentContext, false, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {

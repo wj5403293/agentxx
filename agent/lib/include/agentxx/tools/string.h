@@ -23,8 +23,9 @@ namespace tools {
 
 class StringHtml2MarkdownTool : public XXToolBase {
 public:
-  explicit StringHtml2MarkdownTool()
-      : XXToolBase("string_html_to_markdown", true, true) {}
+  StringHtml2MarkdownTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("string_html_to_markdown", in_agentContext, true, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -64,7 +65,8 @@ public:
 
 class StringRegexpTool : public XXToolBase {
 public:
-  explicit StringRegexpTool() : XXToolBase("string_regexp", true) {}
+  StringRegexpTool(std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("string_regexp", in_agentContext, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

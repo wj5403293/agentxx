@@ -16,8 +16,9 @@ namespace tools {
 /// 获取系统日期和时间
 class GetCurrentDateTimeTool : public XXToolBase {
 public:
-  explicit GetCurrentDateTimeTool()
-      : XXToolBase("get_current_datetime", false, true) {}
+  GetCurrentDateTimeTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("get_current_datetime", in_agentContext, false, true) {}
 
   neograph::ChatTool get_definition() const override {
     return {

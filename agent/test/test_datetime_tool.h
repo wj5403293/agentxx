@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agentxx/agent/context.h"
 #include "agentxx/tools/get_current_datetime.h"
 #include "neograph/neograph.h"
 #include <asio/awaitable.hpp>
@@ -10,8 +11,9 @@
 namespace agentxx {
 namespace test {
 
-inline asio::awaitable<void> test_datetime_get_definition() {
-  auto tool = agentxx::tools::GetCurrentDateTimeTool{};
+inline asio::awaitable<void> test_datetime_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::GetCurrentDateTimeTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "get_current_datetime") {
     std::cout << "[PASS] GetCurrentDateTimeTool::get_definition() name correct"
@@ -24,8 +26,9 @@ inline asio::awaitable<void> test_datetime_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_datetime_execute() {
-  auto tool = agentxx::tools::GetCurrentDateTimeTool{};
+inline asio::awaitable<void> test_datetime_execute(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::GetCurrentDateTimeTool{agentContext};
   auto result = co_await tool.execute_async(neograph::json{});
 
   bool hasTimestamp = result.find("Timestamp:") != std::string::npos;
@@ -43,8 +46,9 @@ inline asio::awaitable<void> test_datetime_execute() {
   co_return;
 }
 
-inline asio::awaitable<void> test_datetime_timestamp_format() {
-  auto tool = agentxx::tools::GetCurrentDateTimeTool{};
+inline asio::awaitable<void> test_datetime_timestamp_format(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::GetCurrentDateTimeTool{agentContext};
   auto result = co_await tool.execute_async(neograph::json{});
 
   std::regex timestampRegex(R"(Timestamp: (\d+) millisecond)");
@@ -67,8 +71,9 @@ inline asio::awaitable<void> test_datetime_timestamp_format() {
   co_return;
 }
 
-inline asio::awaitable<void> test_datetime_date_format() {
-  auto tool = agentxx::tools::GetCurrentDateTimeTool{};
+inline asio::awaitable<void> test_datetime_date_format(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::GetCurrentDateTimeTool{agentContext};
   auto result = co_await tool.execute_async(neograph::json{});
 
   std::regex dateRegex(R"(\d{4}-\d{2}-\d{2})");
@@ -90,8 +95,9 @@ inline asio::awaitable<void> test_datetime_date_format() {
   co_return;
 }
 
-inline asio::awaitable<void> test_datetime_time_format() {
-  auto tool = agentxx::tools::GetCurrentDateTimeTool{};
+inline asio::awaitable<void> test_datetime_time_format(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::GetCurrentDateTimeTool{agentContext};
   auto result = co_await tool.execute_async(neograph::json{});
 
   std::regex timeRegex(R"(\d{2}:\d{2}:\d{2})");
@@ -113,12 +119,13 @@ inline asio::awaitable<void> test_datetime_time_format() {
   co_return;
 }
 
-inline asio::awaitable<void> run_datetime_tool_tests() {
+inline asio::awaitable<void> run_datetime_tool_tests(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   std::cout << "======= Test: DateTime Tool =======" << std::endl;
 
-  auto run = [](auto testFn) -> asio::awaitable<void> {
+  auto run = [agentContext](auto testFn) -> asio::awaitable<void> {
     try {
-      co_await testFn();
+      co_await testFn(agentContext);
     } catch (const std::exception &e) {
       std::cout << "[FAIL] Exception in test: " << e.what() << std::endl;
     }

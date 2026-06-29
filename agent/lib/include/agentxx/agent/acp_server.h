@@ -21,7 +21,7 @@ namespace server {
 
 class UppercaseNode : public neograph::graph::GraphNode {
 public:
-  explicit UppercaseNode(std::string n) : name_(std::move(n)) {}
+  UppercaseNode(std::string n) : name_(std::move(n)) {}
   asio::awaitable<neograph::graph::NodeOutput>
   run(neograph::graph::NodeInput in) override {
     auto raw = in.state.get("prompt");

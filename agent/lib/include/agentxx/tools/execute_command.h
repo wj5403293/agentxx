@@ -26,8 +26,9 @@ namespace tools {
 
 class ExecuteLinuxCommandTool : public XXToolBase {
 public:
-  explicit ExecuteLinuxCommandTool()
-      : XXToolBase("execute_linux_command", true, false) {}
+  ExecuteLinuxCommandTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("execute_linux_command", in_agentContext, true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -165,8 +166,9 @@ Current System is {}{}, please use linux shell/bash commands.)",
 /// 支持 WSL
 class ExecuteWindowsCommandTool : public XXToolBase {
 public:
-  explicit ExecuteWindowsCommandTool()
-      : XXToolBase("execute_windows_command", true, false) {}
+  ExecuteWindowsCommandTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("execute_windows_command", in_agentContext, true, false) {}
 
   neograph::ChatTool get_definition() const override{return {
     "execute_windows_command",
@@ -347,7 +349,8 @@ execute_async(const neograph::json &arguments) override {
 
 class ExecutePythonTool : public XXToolBase {
 public:
-  explicit ExecutePythonTool() : XXToolBase("execute_python", true, false) {}
+  ExecutePythonTool(std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("execute_python", in_agentContext, true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {
@@ -385,8 +388,9 @@ public:
 
 class ExecuteJavaScriptTool : public XXToolBase {
 public:
-  explicit ExecuteJavaScriptTool()
-      : XXToolBase("execute_javascript", true, false) {}
+  ExecuteJavaScriptTool(
+      std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("execute_javascript", in_agentContext, true, false) {}
 
   neograph::ChatTool get_definition() const override {
     return {

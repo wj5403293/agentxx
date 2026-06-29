@@ -102,7 +102,7 @@ public:
         std::make_shared<agentxx::middleware::MiddlewareContext>();
     auto subagentManagerTool =
         std::make_unique<agentxx::tools::SubAgentManagerTool>(
-            "subagent_manager");
+            "subagent_manager", agentContext);
     agentContext->subagentManagerToolPtr = subagentManagerTool.get();
     {
       {
@@ -117,7 +117,7 @@ public:
             std::make_shared<agentxx::middleware::SkillMiddlewareHandle>(
                 config->skillDirPaths, agentContext);
         // skillMiddleware->toolcalls.push_back(
-        //     std::make_unique<agentxx::tools::SkillTool>());
+        //     std::make_unique<agentxx::tools::SkillTool>(agentContext));
         agentContext->middlewareHandleContext->handles.push_back(
             skillMiddleware);
       }
@@ -134,7 +134,7 @@ public:
                 agentContext);
         planningMiddleware->toolcalls.push_back(
             std::make_unique<agentxx::tools::WritePlanningTool>(
-                planningMiddleware));
+                planningMiddleware, agentContext));
         agentContext->middlewareHandleContext->handles.push_back(
             planningMiddleware);
       }
@@ -180,7 +180,7 @@ public:
           XX_LOGD("append mcp tool size: {}", mcpTools.size());
           for (auto &tool : mcpTools) {
             tools.push_back(std::make_unique<agentxx::tools::XXToolWarp>(
-                std::move(tool), false, true, 0));
+                std::move(tool), agentContext, false, true, 0));
           }
         }
       }
@@ -188,22 +188,28 @@ public:
     {
       tools.push_back(
           std::make_unique<agentxx::tools::ThreadShareStoreTool>(agentContext));
+      tools.push_back(std::make_unique<agentxx::tools::FileSystemListFileTool>(
+          agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::FileSystemListFileTool>());
+          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>(
+              agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadTextFileTool>());
+          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>(
+              agentContext));
+      tools.push_back(std::make_unique<agentxx::tools::FilesystemWriteFileTool>(
+          agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemReadBinaryFileTool>());
+          std::make_unique<agentxx::tools::FilesystemEditTextFileTool>(
+              agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemWriteFileTool>());
+          std::make_unique<agentxx::tools::FilesystemGlobTool>(agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::FilesystemEditTextFileTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FilesystemGlobTool>());
-      tools.push_back(std::make_unique<agentxx::tools::FilesystemGrepTool>());
+          std::make_unique<agentxx::tools::FilesystemGrepTool>(agentContext));
 
+      tools.push_back(std::make_unique<agentxx::tools::StringHtml2MarkdownTool>(
+          agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::StringHtml2MarkdownTool>());
-      tools.push_back(std::make_unique<agentxx::tools::StringRegexpTool>());
+          std::make_unique<agentxx::tools::StringRegexpTool>(agentContext));
 
       if (false == config->ragDocsPaths.empty()) {
         auto client = std::make_shared<agentxx::tools::EmbeddingClient>(
@@ -220,32 +226,37 @@ public:
           std::cout << "┣━ ❌ failed" << std::endl;
         }
         std::cout << "┗━━━━━━ RAG embedding ━━━━━━┛\n" << std::endl;
-        tools.push_back(
-            std::make_unique<agentxx::tools::RAGSearchTool>(docsStore));
+        tools.push_back(std::make_unique<agentxx::tools::RAGSearchTool>(
+            docsStore, agentContext));
       }
 
       if (false == config->websearchApiUrl.empty()) {
         tools.push_back(std::make_unique<agentxx::tools::WebSearchTool>(
-            config->websearchApiUrl, config->websearchConvertHtml2markdown));
+            config->websearchApiUrl, config->websearchConvertHtml2markdown,
+            agentContext));
       }
-      tools.push_back(std::make_unique<agentxx::tools::WebFetchUrlTool>());
       tools.push_back(
-          std::make_unique<agentxx::tools::WebFetchUrlMarkdownTool>());
+          std::make_unique<agentxx::tools::WebFetchUrlTool>(agentContext));
+      tools.push_back(std::make_unique<agentxx::tools::WebFetchUrlMarkdownTool>(
+          agentContext));
 
-      tools.push_back(
-          std::make_unique<agentxx::tools::GetCurrentDateTimeTool>());
+      tools.push_back(std::make_unique<agentxx::tools::GetCurrentDateTimeTool>(
+          agentContext));
 
 #if XX_IS_WIN_D
       tools.push_back(
-          std::make_unique<agentxx::tools::UIControlKeyboardMouseTool>());
+          std::make_unique<agentxx::tools::UIControlKeyboardMouseTool>(
+              agentContext));
       tools.push_back(
-          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+          std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>(
+              agentContext));
 #elif XX_IS_LINUX_D
-      tools.push_back(
-          std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>());
+      tools.push_back(std::make_unique<agentxx::tools::ExecuteLinuxCommandTool>(
+          agentContext));
       if (agentxx::util::isRunningInWSL()) {
         tools.push_back(
-            std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>());
+            std::make_unique<agentxx::tools::ExecuteWindowsCommandTool>(
+                agentContext));
       }
 #endif
 

@@ -633,8 +633,10 @@ public:
 
   std::shared_ptr<VectorStore> store;
 
-  explicit RAGSearchTool(std::shared_ptr<VectorStore> in_store)
-      : XXToolBase("rag_search", false, true), store(in_store) {}
+  RAGSearchTool(std::shared_ptr<VectorStore> in_store,
+                std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
+      : XXToolBase("rag_search", in_agentContext, false, true),
+        store(in_store) {}
 
   neograph::ChatTool get_definition() const override {
     return {

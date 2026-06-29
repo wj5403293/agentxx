@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agentxx/agent/context.h"
 #include "agentxx/tools/web_search.h"
 #include "neograph/neograph.h"
 #include <asio/awaitable.hpp>
@@ -9,9 +10,10 @@
 namespace agentxx {
 namespace test {
 
-inline asio::awaitable<void> test_web_search_get_definition() {
-  auto tool =
-      agentxx::tools::WebSearchTool{"https://example.com/search?q={}", false};
+inline asio::awaitable<void> test_web_search_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebSearchTool{"https://example.com/search?q={}",
+                                            false, agentContext};
   auto def = tool.get_definition();
   if (def.name == "web_search") {
     std::cout << "[PASS] WebSearchTool::get_definition() name correct"
@@ -23,9 +25,10 @@ inline asio::awaitable<void> test_web_search_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_search_empty_query() {
-  auto tool =
-      agentxx::tools::WebSearchTool{"https://example.com/search?q={}", false};
+inline asio::awaitable<void> test_web_search_empty_query(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebSearchTool{"https://example.com/search?q={}",
+                                            false, agentContext};
   auto args = neograph::json{{"query", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -39,9 +42,10 @@ inline asio::awaitable<void> test_web_search_empty_query() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_search_definition_has_required_query() {
-  auto tool =
-      agentxx::tools::WebSearchTool{"https://example.com/search?q={}", false};
+inline asio::awaitable<void> test_web_search_definition_has_required_query(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebSearchTool{"https://example.com/search?q={}",
+                                            false, agentContext};
   auto def = tool.get_definition();
   auto &params = def.parameters;
   if (params.is_object() && params.contains("required") &&
@@ -69,8 +73,9 @@ inline asio::awaitable<void> test_web_search_definition_has_required_query() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_fetch_url_get_definition() {
-  auto tool = agentxx::tools::WebFetchUrlTool{};
+inline asio::awaitable<void> test_web_fetch_url_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebFetchUrlTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "web_fetch_url") {
     std::cout << "[PASS] WebFetchUrlTool::get_definition() name correct"
@@ -82,8 +87,9 @@ inline asio::awaitable<void> test_web_fetch_url_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_fetch_url_empty_url() {
-  auto tool = agentxx::tools::WebFetchUrlTool{};
+inline asio::awaitable<void> test_web_fetch_url_empty_url(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebFetchUrlTool{agentContext};
   auto args = neograph::json{{"url", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -97,8 +103,9 @@ inline asio::awaitable<void> test_web_fetch_url_empty_url() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_fetch_url_default_timeout() {
-  auto tool = agentxx::tools::WebFetchUrlTool{};
+inline asio::awaitable<void> test_web_fetch_url_default_timeout(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebFetchUrlTool{agentContext};
   auto def = tool.get_definition();
   auto &params = def.parameters;
   if (params.is_object() && params.contains("properties") &&
@@ -115,8 +122,9 @@ inline asio::awaitable<void> test_web_fetch_url_default_timeout() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_fetch_url_markdown_get_definition() {
-  auto tool = agentxx::tools::WebFetchUrlMarkdownTool{};
+inline asio::awaitable<void> test_web_fetch_url_markdown_get_definition(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebFetchUrlMarkdownTool{agentContext};
   auto def = tool.get_definition();
   if (def.name == "web_fetch_url_markdown") {
     std::cout << "[PASS] WebFetchUrlMarkdownTool::get_definition() name correct"
@@ -129,8 +137,9 @@ inline asio::awaitable<void> test_web_fetch_url_markdown_get_definition() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_fetch_url_markdown_empty_url() {
-  auto tool = agentxx::tools::WebFetchUrlMarkdownTool{};
+inline asio::awaitable<void> test_web_fetch_url_markdown_empty_url(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebFetchUrlMarkdownTool{agentContext};
   auto args = neograph::json{{"url", ""}};
   auto result = co_await tool.execute_async(args);
   if (result.find("\"error\"") != std::string::npos) {
@@ -144,8 +153,9 @@ inline asio::awaitable<void> test_web_fetch_url_markdown_empty_url() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_fetch_url_markdown_description() {
-  auto tool = agentxx::tools::WebFetchUrlMarkdownTool{};
+inline asio::awaitable<void> test_web_fetch_url_markdown_description(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebFetchUrlMarkdownTool{agentContext};
   auto def = tool.get_definition();
   if (def.description.find("markdown") != std::string::npos ||
       def.description.find("Markdown") != std::string::npos) {
@@ -159,9 +169,10 @@ inline asio::awaitable<void> test_web_fetch_url_markdown_description() {
   co_return;
 }
 
-inline asio::awaitable<void> test_web_search_convert_html2markdown() {
-  auto tool =
-      agentxx::tools::WebSearchTool{"https://example.com/search?q={}", true};
+inline asio::awaitable<void> test_web_search_convert_html2markdown(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
+  auto tool = agentxx::tools::WebSearchTool{"https://example.com/search?q={}",
+                                            true, agentContext};
   auto def = tool.get_definition();
   if (def.name == "web_search") {
     std::cout << "[PASS] WebSearchTool with convertHtml2markdown=true created "
@@ -174,12 +185,13 @@ inline asio::awaitable<void> test_web_search_convert_html2markdown() {
   co_return;
 }
 
-inline asio::awaitable<void> run_web_search_tools_tests() {
+inline asio::awaitable<void> run_web_search_tools_tests(
+    std::weak_ptr<agentxx::agent::AgentContext> agentContext) {
   std::cout << "======= Test: Web Search Tools =======" << std::endl;
 
-  auto run = [](auto testFn) -> asio::awaitable<void> {
+  auto run = [agentContext](auto testFn) -> asio::awaitable<void> {
     try {
-      co_await testFn();
+      co_await testFn(agentContext);
     } catch (const std::exception &e) {
       std::cout << "[FAIL] Exception in test: " << e.what() << std::endl;
     }
