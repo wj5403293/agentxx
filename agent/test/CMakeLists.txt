@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.30)
 
 project(agentxx_test VERSION 0.1.0 LANGUAGES C CXX)
+include(GNUInstallDirs)
 
 # 建议使用 c++ 26 
 set(CMAKE_CXX_STANDARD 26)

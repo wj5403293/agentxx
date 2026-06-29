@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.30)
 
 project(agentxx VERSION 0.1.0 LANGUAGES C CXX)
+include(GNUInstallDirs) # CMAKE_INSTALL_*DIR
 
 # 建议使用 c++ 26 
 set(CMAKE_CXX_STANDARD 26)
@@ -152,8 +153,70 @@ target_link_directories(agentxx_shared PUBLIC ${CMAKE_PREFIX_PATH}/lib/)
 target_link_directories(agentxx_static PUBLIC ${CMAKE_PREFIX_PATH}/lib/)
 
 if (AGENTXX_ENABLE_CODEGRAPH)
-  target_link_libraries(agentxx_shared PUBLIC codegraph_core)
-  target_link_libraries(agentxx_static PUBLIC codegraph_core)
+  target_include_directories(agentxx_shared PUBLIC ${CMAKE_PREFIX_PATH}/include/tree_sitter/)
+  target_include_directories(agentxx_static PUBLIC ${CMAKE_PREFIX_PATH}/include/tree_sitter/)
+  target_link_libraries(agentxx_shared PUBLIC 
+    codegraph_core 
+    tree_sitter
+    ts_cpp
+    ts_python
+    ts_javascript
+    ts_dart
+    ts_typescript
+    ts_tsx
+    ts_markdown
+    ts_markdown_inline
+    ts_rust
+    ts_bash
+    ts_go
+    ts_java
+    ts_kotlin
+    ts_php
+    ts_swift
+    ts_objc
+    ts_csharp
+    ts_sql
+    ts_lua
+    ts_yaml
+    ts_json
+    ts_xml
+    ts_html
+    ts_css
+    ts_zig
+    ts_ruby
+    ts_glsl
+  )
+  target_link_libraries(agentxx_static PUBLIC 
+    codegraph_core
+    tree_sitter
+    ts_cpp
+    ts_python
+    ts_javascript
+    ts_dart
+    ts_typescript
+    ts_tsx
+    ts_markdown
+    ts_markdown_inline
+    ts_rust
+    ts_bash
+    ts_go
+    ts_java
+    ts_kotlin
+    ts_php
+    ts_swift
+    ts_objc
+    ts_csharp
+    ts_sql
+    ts_lua
+    ts_yaml
+    ts_json
+    ts_xml
+    ts_html
+    ts_css
+    ts_zig
+    ts_ruby
+    ts_glsl
+  )
 endif()
 if (AGENTXX_ENABLE_HYPERSCAN OR AGENTXX_ENABLE_VECTORSCAN)
   pkg_check_modules(hyperscan REQUIRED IMPORTED_TARGET libhs)
