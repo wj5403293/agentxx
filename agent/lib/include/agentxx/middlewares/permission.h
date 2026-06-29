@@ -19,8 +19,6 @@ namespace middleware {
 
 class PermissionMiddlewareState : public BaseMiddlewareState {
 public:
-  std::map<std::string, neograph::json> handles{};
-
   PermissionMiddlewareState() {}
 };
 
