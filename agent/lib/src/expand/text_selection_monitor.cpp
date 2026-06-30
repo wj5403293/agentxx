@@ -25,15 +25,32 @@ namespace expand {
 /// 系统级 文本选择事件流
 /// - 当选择 程序窗口、浏览器 中的文本时，收到事件，分析文本内容并发起通知
 /// - 启动独立线程处理接收事件
-class TextSelectionMonitor::Impl {
+class TextSelectionMonitor::Impl : public IUIAutomationEventHandler {
 public:
   static constexpr UINT WM_SELECTION_COMPLETE = WM_APP + 1;
 
   Impl()
       : running_(false), debounceMs_(300), lastSelectionChangeTime_({}),
-        selectionPending_(false), lastSelectionHwnd_(nullptr) {}
+        selectionPending_(false), lastSelectionHwnd_(nullptr), refCount_(1) {}
 
   ~Impl() { stop(); }
+
+  // IUnknown
+  HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppv) override {
+    if (riid == IID_IUnknown || riid == IID_IUIAutomationEventHandler) {
+      *ppv = static_cast<IUIAutomationEventHandler *>(this);
+      AddRef();
+      return S_OK;
+    }
+    *ppv = nullptr;
+    return E_NOINTERFACE;
+  }
+  ULONG STDMETHODCALLTYPE AddRef() override {
+    return InterlockedIncrement(&refCount_);
+  }
+  ULONG STDMETHODCALLTYPE Release() override {
+    return InterlockedDecrement(&refCount_);
+  }
 
   void addListener(TextSelectionListener listener) {
     std::lock_guard<std::mutex> lock(listenersMutex_);
@@ -73,6 +90,16 @@ public:
 
     instancePtr() = this;
     running_.store(true);
+
+    IUIAutomationElement *desktop = nullptr;
+    hr = automation_->GetRootElement(&desktop);
+    if (SUCCEEDED(hr) && desktop) {
+      automation_->AddAutomationEventHandler(
+          UIA_Text_TextSelectionChangedEventId, desktop, TreeScope_Descendants,
+          nullptr, static_cast<IUIAutomationEventHandler *>(this));
+      desktop->Release();
+    }
+
     workerThread_ = std::thread(&Impl::workerLoop, this);
     XX_LOGI("TextSelectionMonitor: started");
     return true;
@@ -106,6 +133,7 @@ public:
     }
 
     if (automation_) {
+      automation_->RemoveAllEventHandlers();
       automation_->Release();
       automation_ = nullptr;
     }
@@ -197,14 +225,12 @@ private:
             HWND hwnd = WindowFromPoint(pMouseStruct->pt);
             if (hwnd) {
               HWND rootHwnd = GetAncestor(hwnd, GA_ROOT);
-              if (needsClipboardFallback(rootHwnd)) {
-                std::lock_guard<std::mutex> lock(self->debounceMutex_);
-                self->lastSelectionHwnd_ = rootHwnd;
-                self->lastSelectionChangeTime_ = now;
-                self->selectionPending_.store(true, std::memory_order_release);
-                PostThreadMessageW(GetCurrentThreadId(), WM_SELECTION_COMPLETE,
-                                   0, 0);
-              }
+              std::lock_guard<std::mutex> lock(self->debounceMutex_);
+              self->lastSelectionHwnd_ = rootHwnd;
+              self->lastSelectionChangeTime_ = now;
+              self->selectionPending_.store(true, std::memory_order_release);
+              PostThreadMessageW(GetCurrentThreadId(), WM_SELECTION_COMPLETE, 0,
+                                 0);
             }
           }
           self->lastClickTime_ = now;
@@ -241,6 +267,60 @@ private:
       self->lastSelectionChangeTime_ = now;
     }
     self->selectionPending_.store(true, std::memory_order_release);
+  }
+
+  HRESULT STDMETHODCALLTYPE HandleAutomationEvent(IUIAutomationElement *sender,
+                                                  EVENTID eventId) override {
+    if (eventId != UIA_Text_TextSelectionChangedEventId) {
+      return S_OK;
+    }
+    if (!running_.load()) {
+      return S_OK;
+    }
+
+    IUIAutomationTextPattern *textPattern = nullptr;
+    HRESULT hr = sender->GetCurrentPatternAs(
+        UIA_TextPatternId, IID_IUIAutomationTextPattern,
+        reinterpret_cast<void **>(&textPattern));
+
+    std::string extractedText;
+    if (SUCCEEDED(hr) && textPattern) {
+      IUIAutomationTextRangeArray *selectionRanges = nullptr;
+      hr = textPattern->GetSelection(&selectionRanges);
+      if (SUCCEEDED(hr) && selectionRanges) {
+        int count = 0;
+        selectionRanges->get_Length(&count);
+        for (int i = 0; i < count; ++i) {
+          IUIAutomationTextRange *range = nullptr;
+          hr = selectionRanges->GetElement(i, &range);
+          if (SUCCEEDED(hr) && range) {
+            BSTR text = nullptr;
+            hr = range->GetText(-1, &text);
+            if (SUCCEEDED(hr) && text) {
+              extractedText += bstrToUtf8(text);
+              SysFreeString(text);
+            }
+            range->Release();
+          }
+        }
+        selectionRanges->Release();
+      }
+      textPattern->Release();
+    }
+
+    if (extractedText.empty()) {
+      return S_OK;
+    }
+
+    auto now = std::chrono::steady_clock::now();
+    {
+      std::lock_guard<std::mutex> lock(debounceMutex_);
+      lastSelectionChangeTime_ = now;
+      pendingUiaText_ = std::move(extractedText);
+    }
+    selectionPending_.store(true, std::memory_order_release);
+
+    return S_OK;
   }
 
   static std::string bstrToUtf8(BSTR bstr) {
@@ -1003,19 +1083,6 @@ private:
     return {result, TextSource::Clipboard};
   }
 
-  std::pair<std::string, TextSource> getSelectedTextByDevTools(HWND hwnd) {
-    if (!needsClipboardFallback(hwnd)) {
-      return {};
-    }
-
-    auto cdpResult = getSelectedTextByCDP(hwnd);
-    if (!cdpResult.first.empty()) {
-      return cdpResult;
-    }
-
-    return getSelectedTextByClipboard(hwnd);
-  }
-
   std::pair<std::string, TextSource> getSelectedText(HWND hwnd) {
     auto legacyResult = getSelectedTextByEmGetSel(hwnd);
     if (!legacyResult.first.empty()) {
@@ -1132,13 +1199,18 @@ private:
       return legacyResult;
     }
 
-    legacyResult = getSelectedTextByDevTools(hwnd);
-    if (!legacyResult.first.empty()) {
-      return legacyResult;
+    if (needsClipboardFallback(hwnd)) {
+      auto cdpResult = getSelectedTextByCDP(hwnd);
+      if (!cdpResult.first.empty()) {
+        return cdpResult;
+      }
     }
 
-    if (needsClipboardFallback(hwnd)) {
-      return {};
+    {
+      auto clipboardResult = getSelectedTextByClipboard(hwnd);
+      if (!clipboardResult.first.empty()) {
+        return clipboardResult;
+      }
     }
 
     return getSelectedTextByWmGetText(hwnd);
@@ -1149,10 +1221,31 @@ private:
       return;
     }
 
+    std::string uiaText;
     HWND hwnd = nullptr;
     {
       std::lock_guard<std::mutex> lock(debounceMutex_);
       hwnd = lastSelectionHwnd_;
+      if (!pendingUiaText_.empty()) {
+        uiaText = std::move(pendingUiaText_);
+        pendingUiaText_.clear();
+      }
+    }
+
+    if (!uiaText.empty()) {
+      selectionPending_.store(false, std::memory_order_release);
+
+      if (processingThread_.joinable()) {
+        processingThread_.join();
+      }
+      processingThread_ = std::thread([this, text = std::move(uiaText)]() {
+        TextSelectionEvent evt;
+        evt.text = std::move(text);
+        evt.timestamp = std::chrono::steady_clock::now();
+        evt.source = TextSource::FlutterAccessibility;
+        notifyListeners(evt);
+      });
+      return;
     }
 
     if (!hwnd) {
@@ -1232,6 +1325,8 @@ private:
   std::mutex debounceMutex_;
   std::mutex listenersMutex_;
   std::vector<TextSelectionListener> listeners_;
+  LONG refCount_;
+  std::string pendingUiaText_;
 };
 
 #else

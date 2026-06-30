@@ -17,6 +17,7 @@ enum class TextSource {
   AccessibleObject,
   WmGetText,
   DevTools,
+  FlutterAccessibility,
   Clipboard,
 };
 
