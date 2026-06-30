@@ -255,8 +255,7 @@ public:
       retry++;
       XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
               agentCtxPtr->agentConfig->llmMaxRetry, errInfo);
-
-      // 延时等待
+      // 逐渐延长延时等待
       timer.expires_after(std::chrono::milliseconds(retry * 1000));
       co_await timer.async_wait(asio::use_awaitable);
     } while (true);
