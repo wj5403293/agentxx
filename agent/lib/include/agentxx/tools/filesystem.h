@@ -893,7 +893,8 @@ public:
       }
 
       if (0 == replaceHit) {
-        throw std::runtime_error{R"(No match `old_str` found)"};
+        throw std::runtime_error{
+            R"(No match `old_str` found, Try re-reading to get the latest file content.)"};
       }
 
       // 覆盖写入文件内容
@@ -952,7 +953,8 @@ public:
       }
 
       if (0 == replaceHit) {
-        throw std::runtime_error{R"(No match `old_str` found)"};
+        throw std::runtime_error{
+            R"(No match `old_str` found, Try re-reading to get the latest file content.)"};
       }
 
       // 写入文件内容

@@ -158,6 +158,7 @@ public:
           std::make_unique<codegraph::ContextBuilder>(*db_, *traverser_);
       fts_search_ = std::make_unique<codegraph::FtsSearch>(*db_);
       needs_initialize_ = false;
+      running_.store(true);
       return true;
     } catch (const std::exception &e) {
       XX_LOGE("CodeGraphManager: initialize failed: {}", e.what());
@@ -235,11 +236,14 @@ public:
         db_->delete_nodes_by_file(file_path);
 
         int64_t file_node_id = -1;
+        std::vector<int64_t> id_map;
+        id_map.reserve(result.nodes.size());
         for (auto &node : result.nodes) {
           if (node.kind == codegraph::NodeKind::File) {
             node.file_path = file_path;
           }
           int64_t id = db_->insert_node(node);
+          id_map.push_back(id);
           if (node.kind == codegraph::NodeKind::File) {
             file_node_id = id;
           }
@@ -258,7 +262,12 @@ public:
         }
         db_->insert_file(fr);
 
-        for (const auto &ref : result.unresolved) {
+        for (auto ref : result.unresolved) {
+          int original_index = static_cast<int>(-ref.source_node_id) - 1;
+          if (original_index >= 0 &&
+              original_index < static_cast<int>(id_map.size())) {
+            ref.source_node_id = id_map[original_index];
+          }
           db_->insert_unresolved_ref(ref);
         }
 
@@ -367,7 +376,12 @@ public:
     try {
       result.context =
           context_builder_->build_context(symbol, limit, max_depth);
-      result.success = true;
+      if (result.context.contains("error")) {
+        result.error = result.context["error"].get<std::string>();
+        result.success = false;
+      } else {
+        result.success = true;
+      }
     } catch (const std::exception &e) {
       result.error = e.what();
     }
@@ -383,7 +397,12 @@ public:
     }
     try {
       result.impact = context_builder_->get_callers(symbol, max_depth);
-      result.success = true;
+      if (result.impact.contains("error")) {
+        result.error = result.impact["error"].get<std::string>();
+        result.success = false;
+      } else {
+        result.success = true;
+      }
     } catch (const std::exception &e) {
       result.error = e.what();
     }
@@ -399,7 +418,12 @@ public:
     }
     try {
       result.impact = context_builder_->get_callees(symbol, max_depth);
-      result.success = true;
+      if (result.impact.contains("error")) {
+        result.error = result.impact["error"].get<std::string>();
+        result.success = false;
+      } else {
+        result.success = true;
+      }
     } catch (const std::exception &e) {
       result.error = e.what();
     }
@@ -415,7 +439,12 @@ public:
     }
     try {
       result.impact = context_builder_->get_impact(symbol, max_depth);
-      result.success = true;
+      if (result.impact.contains("error")) {
+        result.error = result.impact["error"].get<std::string>();
+        result.success = false;
+      } else {
+        result.success = true;
+      }
     } catch (const std::exception &e) {
       result.error = e.what();
     }
@@ -573,11 +602,14 @@ private:
       db_->delete_unresolved_refs_by_file(file_path);
       db_->delete_nodes_by_file(file_path);
 
+      std::vector<int64_t> id_map;
+      id_map.reserve(result.nodes.size());
       for (auto &node : result.nodes) {
         if (node.kind == codegraph::NodeKind::File) {
           node.file_path = file_path;
         }
-        db_->insert_node(node);
+        int64_t id = db_->insert_node(node);
+        id_map.push_back(id);
       }
 
       codegraph::FileRecord fr;
@@ -593,7 +625,12 @@ private:
       }
       db_->insert_file(fr);
 
-      for (const auto &ref : result.unresolved) {
+      for (auto ref : result.unresolved) {
+        int original_index = static_cast<int>(-ref.source_node_id) - 1;
+        if (original_index >= 0 &&
+            original_index < static_cast<int>(id_map.size())) {
+          ref.source_node_id = id_map[original_index];
+        }
         db_->insert_unresolved_ref(ref);
       }
 
