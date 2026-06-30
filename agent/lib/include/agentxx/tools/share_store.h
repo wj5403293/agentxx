@@ -52,6 +52,8 @@ public:
                 const auto key = fmt::format("share_store:{}", argId);
                 if (lastWriteIndex.contains(key)) {
                   msg.content = "[Outdated Content truncated]";
+                  msg.flags |= neograph::MessageFlag::ShareStoreTruncated |
+                               neograph::MessageFlag::Outdated;
                 } else {
                   lastWriteIndex[key] = index;
                 }

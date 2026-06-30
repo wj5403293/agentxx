@@ -100,6 +100,7 @@ public:
           .role = "assistant",
           .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
                                  nodeName, exceptionStr),
+          .flags = neograph::MessageFlag::AutoInserted,
       };
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
@@ -120,8 +121,11 @@ public:
         return;
       }
       // 插入 user msg
-      auto userMsg =
-          neograph::ChatMessage{.role = "user", .content = "[Please continue]"};
+      auto userMsg = neograph::ChatMessage{
+          .role = "user",
+          .content = "[Please continue]",
+          .flags = neograph::MessageFlag::AutoInserted,
+      };
       auto userMsgJson = neograph::json{};
       neograph::to_json(userMsgJson, userMsg);
       in.state.write("messages", userMsgJson);
@@ -138,7 +142,7 @@ public:
     auto newSystemMsg = neograph::ChatMessage{.role = "system"};
     if (msglist.is_array() && false == msglist.empty()) {
       auto systemMsg = neograph::ChatMessage{};
-      from_json(msglist.front(), systemMsg);
+      neograph::from_json(msglist.front(), systemMsg);
       if (systemMsg.role == "system") {
         haveSystemMsg = true;
         newSystemMsg = std::move(systemMsg);
@@ -237,6 +241,7 @@ public:
             .content = fmt::format("{}\n{}", nodeName,
                                    isCancel ? "[User cancelled]"
                                             : "[Exception aborted]"),
+            .flags = neograph::MessageFlag::AutoInserted,
         };
         auto msgJson = neograph::json{};
         neograph::to_json(msgJson, msg);

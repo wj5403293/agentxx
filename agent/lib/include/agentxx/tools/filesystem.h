@@ -60,6 +60,8 @@ inline void _defFileRWSummarizationRespHandle(
     auto key = fmt::format("file_rw:{}", argPath);
     if (lastWriteIndex.contains(key)) {
       msg.content = "[Outdated Content truncated]";
+      msg.flags |= neograph::MessageFlag::ShareStoreTruncated |
+                   neograph::MessageFlag::Outdated;
     } else {
       lastWriteIndex[key] = index;
     }

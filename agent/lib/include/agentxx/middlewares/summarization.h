@@ -176,6 +176,8 @@ Output ONLY the summary text, no meta-commentary.
     msg.summaryContent = msg.content;
     msg.content =
         fmt::format("[Content offloaded to `share_store`, id={}]", id);
+    msg.flags |= neograph::MessageFlag::ContentOffloaded;
+    msg.extra["offload_id"] = id;
   }
 
   void doSummarizeToolcall(std::vector<neograph::ChatMessage> &messages) {
@@ -292,10 +294,14 @@ Output ONLY the summary text, no meta-commentary.
             newMessages.push_back(neograph::ChatMessage{
                 .role = "user",
                 .content = "[Please compact context to save space]",
+                .flags = neograph::MessageFlag::AutoInserted |
+                         neograph::MessageFlag::Summarized,
             });
             newMessages.push_back(neograph::ChatMessage{
                 .role = "assistant",
                 .content = "[Previous conversation summary]: \n" + summary,
+                .flags = neograph::MessageFlag::AutoInserted |
+                         neograph::MessageFlag::Summarized,
             });
           } else {
             // system | oldMessages | recentMessages

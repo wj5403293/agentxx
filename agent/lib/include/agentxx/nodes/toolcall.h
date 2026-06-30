@@ -43,7 +43,9 @@ public:
           .role = "tool",
           .content =
               fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
-                          nodeName, item.name, exceptionStr)};
+                          nodeName, item.name, exceptionStr),
+          .flags = neograph::MessageFlag::AutoInserted,
+      };
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
@@ -63,7 +65,9 @@ public:
       auto msg = neograph::ChatMessage{
           .role = "tool",
           .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
-                                 nodeName, exceptionStr)};
+                                 nodeName, exceptionStr),
+          .flags = neograph::MessageFlag::AutoInserted,
+      };
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
