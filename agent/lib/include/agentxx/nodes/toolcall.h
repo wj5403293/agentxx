@@ -114,26 +114,34 @@ public:
     std::string result;
     size_t retry = 0;
     do {
+      bool isCancel = false;
+      std::string errInfo;
+      std::exception_ptr errorPtr;
+
       try {
         result =
             co_await neograph::graph::ToolDispatchNode::execTool(tool, args);
         break;
+      } catch (const neograph::graph::CancelledException &e) {
+        isCancel = true;
+        errorPtr = std::current_exception();
       } catch (const std::exception &e) {
-        if (retry < maxRetry) {
-          retry++;
-          XX_LOGD("ToolCallNode {} retry: {}/{} | {}", tool->get_name(), retry,
-                  maxRetry, e.what());
-        } else {
-          throw;
-        }
+        errInfo = e.what();
+        errorPtr = std::current_exception();
+      } catch (const boost::exception &e) {
+        errorPtr = std::current_exception();
+        errInfo = boost::diagnostic_information(e);
       } catch (...) {
-        if (retry < maxRetry) {
-          retry++;
-          XX_LOGD("ToolCallNode {} retry: {}/{} | Unknown error",
-                  tool->get_name(), retry, maxRetry);
-        } else {
-          throw;
-        }
+        errorPtr = std::current_exception();
+      }
+
+      // 触发异常
+      XX_LOGD("ToolCallNode {} retry: {}/{} | {}", tool->get_name(), retry,
+              maxRetry, errInfo);
+      if (retry >= maxRetry || isCancel) {
+        std::rethrow_exception(errorPtr);
+      } else {
+        retry++;
       }
     } while (true);
 

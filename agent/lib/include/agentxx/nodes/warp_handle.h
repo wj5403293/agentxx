@@ -208,41 +208,44 @@ public:
       break;
     }
 
-    if (i >= len) {
-      std::string errInfo;
-      try {
-        co_await baseRun(in, out);
-      } catch (const neograph::graph::CancelledException &e) {
-        errorRethrow = true;
-        onHandleBaseRunError(errorRethrow, true, "", in, out);
-        errorPtr = std::current_exception();
-      } catch (const neograph::graph::NodeInterrupt &e) {
-        errorRethrow = true;
-        onHandleBaseRunError(errorRethrow, true, "", in, out);
-        errorPtr = std::current_exception();
-      } catch (const std::exception &e) {
-        errInfo = e.what();
-        onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
-        errorPtr = std::current_exception();
-      } catch (const boost::exception &e) {
-        errInfo = boost::diagnostic_information(e);
-        onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
-        errorPtr = std::current_exception();
-      } catch (...) {
-        errInfo = "Unknown error";
-        onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
-        errorPtr = std::current_exception();
+    do {
+      if (i >= len) {
+        std::string errInfo;
+        try {
+          co_await baseRun(in, out);
+          i = len;
+          break;
+        } catch (const neograph::graph::CancelledException &e) {
+          errorRethrow = true;
+          onHandleBaseRunError(errorRethrow, true, "", in, out);
+          errorPtr = std::current_exception();
+        } catch (const neograph::graph::NodeInterrupt &e) {
+          errorRethrow = true;
+          onHandleBaseRunError(errorRethrow, true, "", in, out);
+          errorPtr = std::current_exception();
+        } catch (const std::exception &e) {
+          errInfo = e.what();
+          onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+          errorPtr = std::current_exception();
+        } catch (const boost::exception &e) {
+          errInfo = boost::diagnostic_information(e);
+          onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+          errorPtr = std::current_exception();
+        } catch (...) {
+          errInfo = "Unknown error";
+          onHandleBaseRunError(errorRethrow, true, errInfo, in, out);
+          errorPtr = std::current_exception();
+        }
+        XX_LOGE("{}/run exception: {})", nodeName, errInfo);
+      } else if (nullptr != errorPtr) {
+        onHandleBaseRunError(errorRethrow, false, "", in, out);
+      } else {
+        XX_LOGE(
+            R"_({}/run, Before `baseRun` should exec all `onStart` or catch exception)_",
+            nodeName);
+        assert(false);
       }
-      XX_LOGE("{}/run exception: {})", nodeName, errInfo);
-      i = len;
-    } else if (nullptr != errorPtr) {
-      onHandleBaseRunError(errorRethrow, false, "", in, out);
-    } else {
-      XX_LOGE(
-          R"_({}/run, Before `baseRun` should exec all `onStart` or catch exception)_",
-          nodeName);
-      assert(false);
-    }
+    } while (false);
 
     for (; i-- > 0;) {
       auto &item = agentCtxPtr->middlewareHandleContext->handles[i];
@@ -252,6 +255,7 @@ public:
         std::string errInfo;
         try {
           co_await onHandleEnd(*item, in, out);
+          continue;
         } catch (const neograph::graph::CancelledException &e) {
           errorRethrow = true;
           onHandleEndError(errorRethrow, true, "", *item, in, out);

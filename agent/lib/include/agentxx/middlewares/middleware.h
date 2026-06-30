@@ -100,6 +100,26 @@ public:
 
   virtual ~BaseMiddlewareHandleInterface() = default;
 
+  inline static neograph::json
+  getLastMessageJson(const neograph::graph::NodeInput &in) {
+    auto messages = in.state.get("messages");
+    if (messages.is_array() && messages.size() > 0) {
+      return messages.back();
+    }
+    return neograph::json(nullptr);
+  }
+
+  inline static std::optional<neograph::ChatMessage>
+  getLastMessage(const neograph::graph::NodeInput &in) {
+    auto lastMsgJson = getLastMessageJson(in);
+    if (false == lastMsgJson.is_object()) {
+      return std::nullopt;
+    }
+    auto result = neograph::ChatMessage{};
+    neograph::from_json(lastMsgJson, result);
+    return result;
+  }
+
   inline static const neograph::ChatMessage *getLastAssistantToolcallMessage(
       std::vector<neograph::ChatMessage> &messages) {
     const neograph::ChatMessage *assistant_msg = nullptr;
@@ -346,17 +366,21 @@ public:
 
   inline static const std::string interruptHandleName_default = "default";
   inline static const std::string graphDataKey_systemMessage{"systemMessage"};
+  inline static const std::string graphDataKey_tempLLMMessage{
+      "xx_ModelCallWrap_tempLLMMessage"};
 
   /// <thread_id, <id, value>>
   /// - 存储变量内容，留出 id 到 上下文中，llm 需要时可以通过
   /// toolcall/share_store 读取
   /// - 如: 压缩上下文时会将部分长文本存入这里替换为 id
-  std::map<std::string, ThreadShareStore> shareStore{};
+  std::map<std::string, ThreadShareStore, std::less<>> shareStore{};
 
   /// <thread_id, itemData>
   /// [会话独立] 每次执行的临时数据，在 [AgentStartCall] 时刷新，在
   /// [AgentEndCall] 时清理
-  std::map<std::string, std::map<std::string, std::any>> graphData{};
+  std::map<std::string, std::map<std::string, std::any, std::less<>>,
+           std::less<>>
+      graphData{};
 
   /// 用基类声明类型，以便支持插入不同子类
   /// - 中间的指针是必要的，直接写 std::vector<BaseMiddlewareHandleInterface>
@@ -372,8 +396,8 @@ public:
 
   void registerInterruptHandles();
 
-  std::optional<std::string>
-  getShareStoreItemValue(const std::string &thread_id, const int id) {
+  std::optional<std::string> getShareStoreItemValue(std::string_view thread_id,
+                                                    const int id) {
     auto it = shareStore.find(thread_id);
     if (shareStore.end() != it) {
       auto reslut = it->second.store.find(id);
@@ -397,7 +421,7 @@ public:
     return id;
   }
 
-  void removeShareStoreItemValue(const std::string &thread_id, const int id) {
+  void removeShareStoreItemValue(std::string_view thread_id, const int id) {
     auto it = shareStore.find(thread_id);
     if (shareStore.end() != it) {
       auto reslutIt = it->second.store.find(id);
@@ -407,15 +431,54 @@ public:
     }
   }
 
-  template <typename T>
-  T &getGraphDataItemValue(const std::string &thread_id,
-                           const std::string &key) {
-    auto &itemGraphData = graphData[thread_id];
-    auto sysMsgIt = itemGraphData.find(key);
-    if (sysMsgIt == itemGraphData.end()) {
-      itemGraphData.insert(std::pair<std::string, std::any>{key, T{}});
+  void removeGraphDataItem(const std::string &thread_id, std::string_view key) {
+    auto it = graphData.find(thread_id);
+    if (graphData.end() != it) {
+      auto reslutIt = it->second.find(key);
+      if (it->second.end() != reslutIt) {
+        it->second.erase(reslutIt);
+      }
     }
-    return std::any_cast<T &>(itemGraphData[key]);
+  }
+
+  template <typename T>
+  T &getGraphDataItemValue(const std::string &thread_id, std::string_view key) {
+    auto &itemGraphData = graphData[thread_id];
+    auto it = itemGraphData.find(key);
+    if (it == itemGraphData.end()) {
+      auto [insertIt, _] =
+          itemGraphData.insert(std::pair<std::string, std::any>{key, T{}});
+      it = insertIt;
+    }
+    return std::any_cast<T &>(it->second);
+  }
+
+  template <typename T>
+  void setGraphDataItemValue(const std::string &thread_id, std::string_view key,
+                             const T &value) {
+    auto &itemGraphData = graphData[thread_id];
+    auto it = itemGraphData.find(key);
+    if (it == itemGraphData.end()) {
+      itemGraphData.insert(std::pair<std::string, std::any>{key, value});
+    } else {
+      it->second = value;
+    }
+  }
+
+  template <typename T>
+  void modifyGraphDataItemValue(const std::string &thread_id,
+                                std::string_view key,
+                                std::function<void(T &)> &&modify) {
+    auto &itemGraphData = graphData[thread_id];
+    auto it = itemGraphData.find(key);
+    if (it == itemGraphData.end()) {
+      auto value = T{};
+      modify(value);
+      itemGraphData.insert(
+          std::pair<std::string, std::any>{key, std::move(value)});
+    } else {
+      modify(std::any_cast<T &>((it->second)));
+    }
   }
 
   asio::awaitable<std::optional<neograph::json>>

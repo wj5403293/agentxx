@@ -380,15 +380,21 @@ public:
             "channels",
             {
                 {"messages", {{"type", "list"}, {"reducer", "append"}}},
-                {agentxx::middleware::BaseMiddlewareHandleInterface::
-                     channelKey_interruptMessages,
-                 {{"reducer", "overwrite"}}},
-                {agentxx::middleware::BaseMiddlewareHandleInterface::
-                     channelKey_interruptArg,
-                 {{"reducer", "overwrite"}}},
-                {agentxx::middleware::BaseMiddlewareHandleInterface::
-                     channelKey_interruptResult,
-                 {{"reducer", "overwrite"}}},
+                {
+                    agentxx::middleware::BaseMiddlewareHandleInterface::
+                        channelKey_interruptMessages,
+                    {{"reducer", "overwrite"}},
+                },
+                {
+                    agentxx::middleware::BaseMiddlewareHandleInterface::
+                        channelKey_interruptArg,
+                    {{"reducer", "overwrite"}},
+                },
+                {
+                    agentxx::middleware::BaseMiddlewareHandleInterface::
+                        channelKey_interruptResult,
+                    {{"reducer", "overwrite"}},
+                },
             },
         },
         {

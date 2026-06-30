@@ -26,13 +26,31 @@ class NEOGRAPH_API ModelCallWrapNode
 protected:
 public:
   inline static constexpr auto defNodeType =
-      std::string_view{"xx_MiddlewareWrapModelCall"};
+      std::string_view{"xx_ModelCallWrap"};
 
   ModelCallWrapNode(const std::string &name,
                     const neograph::graph::NodeContext &ctx,
                     std::weak_ptr<agentxx::agent::AgentContext> in_agentContext)
       : WrapHandleBaseNode<neograph::graph::LLMCallNode>(name, in_agentContext,
                                                          ctx) {}
+
+  void onReceiveToken(const neograph::graph::GraphStreamCallback &callback,
+                      neograph::graph::NodeInput input,
+                      const std::string &nodeName,
+                      const std::string &token) override {
+    // 记录 本次请求的临时LLM消息，以便触发异常时处理
+    auto ctxPtr = agentContext.lock()->middlewareHandleContext;
+    ctxPtr->modifyGraphDataItemValue<std::string>(
+        input.ctx.thread_id,
+        agentxx::middleware::MiddlewareContext::graphDataKey_tempLLMMessage,
+        [&token](std::string &msg) { msg += token; });
+
+    callback(neograph::graph::GraphEvent{
+        neograph::graph::GraphEvent::Type::LLM_TOKEN,
+        nodeName,
+        neograph::json(token),
+    });
+  }
 
   asio::awaitable<void>
   onHandleStart(agentxx::middleware::BaseMiddlewareHandleInterface &item,
@@ -54,12 +72,14 @@ public:
                      neograph::graph::NodeInput &in,
                      neograph::graph::NodeOutput &result) noexcept override {
     // 插入消息，保证消息顺序正确
+    // 不会记录 toolcall
     if (false == errorRethrow) {
       auto msg = neograph::ChatMessage{
           .role = "assistant",
           .content =
               fmt::format(R"({{"error": "{}/Start call `{}` exception: {}"}})",
-                          nodeName, item.name, exceptionStr)};
+                          nodeName, item.name, exceptionStr),
+      };
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
@@ -79,13 +99,32 @@ public:
       auto msg = neograph::ChatMessage{
           .role = "assistant",
           .content = fmt::format(R"({{"error": "{}/run exception: {}"}})",
-                                 nodeName, exceptionStr)};
+                                 nodeName, exceptionStr),
+      };
       auto msgJson = neograph::json{};
       neograph::to_json(msgJson, msg);
       result.writes.push_back(neograph::graph::ChannelWrite{
           "messages",
           msgJson,
       });
+    }
+  }
+
+  void repairMessages(neograph::graph::NodeInput &in) {
+    // 最后一条消息应当是 system/user/toolcall
+    auto lastMsg =
+        agentxx::middleware::BaseMiddlewareHandleInterface::getLastMessage(in);
+    if (lastMsg.has_value()) {
+      const auto &role = lastMsg.value().role;
+      if ("system" == role || "user" == role || "tool" == role) {
+        return;
+      }
+      // 插入 user msg
+      auto userMsg =
+          neograph::ChatMessage{.role = "user", .content = "[Please continue]"};
+      auto userMsgJson = neograph::json{};
+      neograph::to_json(userMsgJson, userMsg);
+      in.state.write("messages", userMsgJson);
     }
   }
 
@@ -148,39 +187,70 @@ public:
           in.state.get_messages());
     }
 
-    size_t retry = 0;
+    auto ctxPtr = agentContext.lock()->middlewareHandleContext;
     auto timer = asio::steady_timer(co_await asio::this_coro::executor);
+    size_t retry = 0;
     do {
+      // 清理过时的 临时 LLM 消息
+      ctxPtr->removeGraphDataItem(
+          in.ctx.thread_id,
+          agentxx::middleware::MiddlewareContext::graphDataKey_tempLLMMessage);
+      // 修正上下文角色顺序
+      repairMessages(in);
+
+      bool isCancel = false;
       std::string errInfo;
+      std::exception_ptr errorPtr;
+
       try {
+        // 触发异常时，本次 LLM 消息不会添加到 result 中，因此需要额外处理
         co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(
             in, result);
         co_return;
       } catch (const neograph::graph::CancelledException &e) {
-        throw;
+        isCancel = true;
+        errorPtr = std::current_exception();
         // } catch (const neograph::graph::NodeInterrupt &e) {
+        // isCancel = true;
         // llm node 无 Interrupt
       } catch (const std::exception &e) {
-        if (retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
-          throw;
-        }
+        errorPtr = std::current_exception();
         errInfo = e.what();
       } catch (const boost::exception &e) {
-        if (retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
-          throw;
-        }
+        errorPtr = std::current_exception();
         errInfo = boost::diagnostic_information(e);
       } catch (...) {
-        if (retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
-          throw;
-        }
+        errorPtr = std::current_exception();
       }
 
+      // 触发异常
+      auto lastMsg = ctxPtr->getGraphDataItemValue<std::string>(
+          in.ctx.thread_id,
+          agentxx::middleware::MiddlewareContext::graphDataKey_tempLLMMessage);
+      if (lastMsg.size() >= 512) {
+        // - 保留已有的 llm 消息，而不是丢弃
+        // - 插入 assistant 消息，此时末尾消息未 assistant, 将在下一次进入
+        // baseRun 时自动修复上下文角色顺序 [repairMessages]
+        // TODO: 修正消息上下文，应当与客户端同步信息
+        auto msg = neograph::ChatMessage{
+            .role = "assistant",
+            .content = fmt::format("{}\n{}", nodeName,
+                                   isCancel ? "[User cancelled]"
+                                            : "[Exception aborted]"),
+        };
+        auto msgJson = neograph::json{};
+        neograph::to_json(msgJson, msg);
+        in.state.write("messages", msgJson);
+      }
+
+      if (isCancel || retry >= agentCtxPtr->agentConfig->llmMaxRetry) {
+        std::rethrow_exception(errorPtr);
+      }
       // 自动重试
-      // TODO: 附加已有的 llm 消息，而不是覆盖
       retry++;
       XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
               agentCtxPtr->agentConfig->llmMaxRetry, errInfo);
+
       // 延时等待
       timer.expires_after(std::chrono::milliseconds(retry * 1000));
       co_await timer.async_wait(asio::use_awaitable);

@@ -12,8 +12,7 @@ agentxx::middleware::MiddlewareContext::execInterruptHandle(
     std::string_view name, agentxx::middleware::InterruptHandleArg &arg) {
   auto handleIt = interruptHandles.find(arg.name);
   if (handleIt != interruptHandles.end()) {
-    auto resumeValue = co_await handleIt->second(arg);
-    co_return resumeValue;
+    co_return co_await handleIt->second(arg);
   }
   co_return std::nullopt;
 }

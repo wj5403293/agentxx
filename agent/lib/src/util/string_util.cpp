@@ -112,7 +112,7 @@ std::string agentxx::util::convertToUtf8(std::string_view src,
 
   // 缓冲区
   size_t src_len = src.size();
-  // UTF8单字符最大6字节
+  // UTF8 单字符最大6字节
   size_t dst_buf_size = src_len * 6;
   std::vector<char> dst_buf(dst_buf_size);
   char *dst_ptr = dst_buf.data();
