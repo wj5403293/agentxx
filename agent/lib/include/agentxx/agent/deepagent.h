@@ -486,6 +486,7 @@ public:
     for (std::string line; std::getline(std::cin, line);) {
       if (false == line.empty()) {
         try {
+          agentxx::util::autoConvertToUtf8(line);
           messages.push_back(neograph::json{
               {"role", "user"},
               {"content", line},
