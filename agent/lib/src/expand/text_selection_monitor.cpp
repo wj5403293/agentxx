@@ -1089,121 +1089,122 @@ private:
       return legacyResult;
     }
 
-    if (!automation_) {
-      return {};
-    }
-
-    IUIAutomationElement *element = nullptr;
-    HRESULT hr = automation_->ElementFromHandle(hwnd, &element);
-    if (FAILED(hr) || !element) {
-      return {};
-    }
-
-    IUIAutomationTextPattern *textPattern = nullptr;
-    TextSource source = TextSource::TextPattern;
-    hr = element->GetCurrentPatternAs(UIA_TextPatternId,
-                                      IID_IUIAutomationTextPattern,
-                                      reinterpret_cast<void **>(&textPattern));
-    if (FAILED(hr) || !textPattern) {
-      IUIAutomationElement *focused = nullptr;
-      hr = automation_->GetFocusedElement(&focused);
-      if (SUCCEEDED(hr) && focused) {
-        hr = focused->GetCurrentPatternAs(
-            UIA_TextPatternId, IID_IUIAutomationTextPattern,
-            reinterpret_cast<void **>(&textPattern));
-        focused->Release();
+    if (needsClipboardFallback(hwnd)) {
+      auto cdpResult = getSelectedTextByCDP(hwnd);
+      if (!cdpResult.first.empty()) {
+        return cdpResult;
       }
     }
 
-    if (!textPattern) {
-      IUIAutomationTextChildPattern *textChildPattern = nullptr;
+    if (automation_) {
+      IUIAutomationElement *element = nullptr;
+      HRESULT hr = automation_->ElementFromHandle(hwnd, &element);
+      if (FAILED(hr) || !element) {
+        return {};
+      }
+
+      IUIAutomationTextPattern *textPattern = nullptr;
+      TextSource source = TextSource::TextPattern;
       hr = element->GetCurrentPatternAs(
-          UIA_TextChildPatternId, IID_IUIAutomationTextChildPattern,
-          reinterpret_cast<void **>(&textChildPattern));
-      if (SUCCEEDED(hr) && textChildPattern) {
-        IUIAutomationElement *container = nullptr;
-        hr = textChildPattern->get_TextContainer(&container);
-        if (SUCCEEDED(hr) && container) {
-          hr = container->GetCurrentPatternAs(
+          UIA_TextPatternId, IID_IUIAutomationTextPattern,
+          reinterpret_cast<void **>(&textPattern));
+      if (FAILED(hr) || !textPattern) {
+        IUIAutomationElement *focused = nullptr;
+        hr = automation_->GetFocusedElement(&focused);
+        if (SUCCEEDED(hr) && focused) {
+          hr = focused->GetCurrentPatternAs(
               UIA_TextPatternId, IID_IUIAutomationTextPattern,
               reinterpret_cast<void **>(&textPattern));
-          container->Release();
-        }
-        textChildPattern->Release();
-        if (textPattern) {
-          source = TextSource::TextChildPattern;
+          focused->Release();
         }
       }
-    }
 
-    element->Release();
+      if (!textPattern) {
+        IUIAutomationTextChildPattern *textChildPattern = nullptr;
+        hr = element->GetCurrentPatternAs(
+            UIA_TextChildPatternId, IID_IUIAutomationTextChildPattern,
+            reinterpret_cast<void **>(&textChildPattern));
+        if (SUCCEEDED(hr) && textChildPattern) {
+          IUIAutomationElement *container = nullptr;
+          hr = textChildPattern->get_TextContainer(&container);
+          if (SUCCEEDED(hr) && container) {
+            hr = container->GetCurrentPatternAs(
+                UIA_TextPatternId, IID_IUIAutomationTextPattern,
+                reinterpret_cast<void **>(&textPattern));
+            container->Release();
+          }
+          textChildPattern->Release();
+          if (textPattern) {
+            source = TextSource::TextChildPattern;
+          }
+        }
+      }
 
-    if (textPattern) {
-      std::string result;
+      element->Release();
 
-      IUIAutomationTextRangeArray *selectionRanges = nullptr;
-      hr = textPattern->GetSelection(&selectionRanges);
-      if (SUCCEEDED(hr) && selectionRanges) {
-        int count = 0;
-        selectionRanges->get_Length(&count);
+      if (textPattern) {
+        std::string result;
 
-        for (int i = 0; i < count; ++i) {
-          IUIAutomationTextRange *range = nullptr;
-          hr = selectionRanges->GetElement(i, &range);
-          if (SUCCEEDED(hr) && range) {
-            BSTR text = nullptr;
-            hr = range->GetText(-1, &text);
-            if (SUCCEEDED(hr) && text) {
-              result = bstrToUtf8(text);
-              SysFreeString(text);
+        IUIAutomationTextRangeArray *selectionRanges = nullptr;
+        hr = textPattern->GetSelection(&selectionRanges);
+        if (SUCCEEDED(hr) && selectionRanges) {
+          int count = 0;
+          selectionRanges->get_Length(&count);
+
+          for (int i = 0; i < count; ++i) {
+            IUIAutomationTextRange *range = nullptr;
+            hr = selectionRanges->GetElement(i, &range);
+            if (SUCCEEDED(hr) && range) {
+              BSTR text = nullptr;
+              hr = range->GetText(-1, &text);
+              if (SUCCEEDED(hr) && text) {
+                result = bstrToUtf8(text);
+                SysFreeString(text);
+              }
+              range->Release();
             }
-            range->Release();
+          }
+          selectionRanges->Release();
+          if (false == result.empty()) {
+            textPattern->Release();
+            return {result, source};
           }
         }
-        selectionRanges->Release();
+
+        textPattern->Release();
       }
 
-      textPattern->Release();
-      return {result, source};
-    }
-
-    {
-      IUIAutomationElement *elemForValue = nullptr;
-      hr = automation_->ElementFromHandle(hwnd, &elemForValue);
-      if (SUCCEEDED(hr) && elemForValue) {
-        IUIAutomationValuePattern *valuePattern = nullptr;
-        hr = elemForValue->GetCurrentPatternAs(
-            UIA_ValuePatternId, IID_IUIAutomationValuePattern,
-            reinterpret_cast<void **>(&valuePattern));
-        if (SUCCEEDED(hr) && valuePattern) {
-          BSTR value = nullptr;
-          hr = valuePattern->get_CurrentValue(&value);
-          if (SUCCEEDED(hr) && value) {
-            std::string result = bstrToUtf8(value);
-            SysFreeString(value);
+      {
+        IUIAutomationElement *elemForValue = nullptr;
+        hr = automation_->ElementFromHandle(hwnd, &elemForValue);
+        if (SUCCEEDED(hr) && elemForValue) {
+          IUIAutomationValuePattern *valuePattern = nullptr;
+          hr = elemForValue->GetCurrentPatternAs(
+              UIA_ValuePatternId, IID_IUIAutomationValuePattern,
+              reinterpret_cast<void **>(&valuePattern));
+          if (SUCCEEDED(hr) && valuePattern) {
+            BSTR value = nullptr;
+            hr = valuePattern->get_CurrentValue(&value);
+            if (SUCCEEDED(hr) && value) {
+              std::string result = bstrToUtf8(value);
+              SysFreeString(value);
+              valuePattern->Release();
+              elemForValue->Release();
+              return {result, TextSource::ValuePattern};
+            }
+            if (value) {
+              SysFreeString(value);
+            }
             valuePattern->Release();
-            elemForValue->Release();
-            return {result, TextSource::ValuePattern};
           }
-          if (value) {
-            SysFreeString(value);
-          }
-          valuePattern->Release();
+          elemForValue->Release();
         }
-        elemForValue->Release();
       }
     }
 
     legacyResult = getSelectedTextByAccessible(hwnd);
     if (!legacyResult.first.empty()) {
       return legacyResult;
-    }
-
-    if (needsClipboardFallback(hwnd)) {
-      auto cdpResult = getSelectedTextByCDP(hwnd);
-      if (!cdpResult.first.empty()) {
-        return cdpResult;
-      }
     }
 
     {
