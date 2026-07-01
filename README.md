@@ -114,7 +114,8 @@
 - ⬜**事件通知**
     - ✅支持注册事件功能/订阅事件通知，事件触发时通知订阅者
     - 预设功能:
-        - 定时任务
+        - 定时通知
+        - 定长延时循环通知
 - ✅**Skill支持** `SkillMiddleware`
     - 文件夹扫描/metadata读取收集 + `filesystem`文件内容读取 + `execute_command`执行
 - ❌**MCP支持** (Neograph已实现，但暂时使用有问题)

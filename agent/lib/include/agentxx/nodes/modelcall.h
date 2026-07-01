@@ -45,11 +45,13 @@ public:
         agentxx::middleware::MiddlewareContext::graphDataKey_tempLLMMessage,
         [&token](std::string &msg) { msg += token; });
 
-    callback(neograph::graph::GraphEvent{
-        neograph::graph::GraphEvent::Type::LLM_TOKEN,
-        nodeName,
-        neograph::json(token),
-    });
+    if (nullptr != callback) {
+      callback(neograph::graph::GraphEvent{
+          neograph::graph::GraphEvent::Type::LLM_TOKEN,
+          nodeName,
+          neograph::json(token),
+      });
+    }
   }
 
   asio::awaitable<void>
