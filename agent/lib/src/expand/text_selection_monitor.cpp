@@ -85,6 +85,8 @@ public:
       return false;
     }
 
+    com_initialized_ = (SUCCEEDED(hr));
+
     hr = CoCreateInstance(CLSID_CUIAutomation, nullptr, CLSCTX_INPROC_SERVER,
                           IID_IUIAutomation,
                           reinterpret_cast<void **>(&automation_));
@@ -92,7 +94,10 @@ public:
       XX_LOGE("TextSelectionMonitor: CoCreateInstance CUIAutomation failed, "
               "hr=0x{:08X}",
               static_cast<unsigned>(hr));
-      CoUninitialize();
+      if (com_initialized_) {
+        CoUninitialize();
+        com_initialized_ = false;
+      }
       return false;
     }
 
@@ -147,7 +152,10 @@ public:
     }
 
     instancePtr() = nullptr;
-    CoUninitialize();
+    if (com_initialized_) {
+      CoUninitialize();
+      com_initialized_ = false;
+    }
     XX_LOGI("TextSelectionMonitor: stopped");
   }
 
@@ -1361,6 +1369,7 @@ private:
   }
 
   std::atomic<bool> running_;
+  bool com_initialized_ = false;
   std::thread workerThread_;
   std::thread processingThread_;
   HWINEVENTHOOK hook_ = nullptr;

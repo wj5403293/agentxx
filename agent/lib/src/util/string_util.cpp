@@ -4,14 +4,9 @@
 #include <cstring>
 #include <iconv.h>
 #include <map>
+#include <mutex>
 #include <set>
 #include <vector>
-
-#if defined(__GNUC__) || defined(__clang__)
-#define AUTO_DESTROY __attribute__((destructor))
-#else
-#define AUTO_DESTROY
-#endif
 
 const agentxx::util::IgnoreCaseSet g_encoding_priorities = {
     "UTF-8", "UTF-16", "GB2312", "GBK", "GB18030",
@@ -24,14 +19,7 @@ const agentxx::util::IgnoreCaseMap<std::string> g_encoding_shift = {
 };
 const size_t defShortStringLength = 30;
 
-static uchardet_t cChardetHandle = uchardet_new();
-
-AUTO_DESTROY void chardetDestroyHandle() {
-  if (nullptr != cChardetHandle) {
-    uchardet_delete(cChardetHandle);
-    cChardetHandle = nullptr;
-  }
-}
+static const thread_local uchardet_t g_chardetHandle = uchardet_new();
 
 // BOM 判断UTF16编码
 static std::string detectUtfBom(std::string_view str) {
@@ -141,11 +129,6 @@ agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
     return {true, ""};
   }
 
-  const auto handle = cChardetHandle;
-  if (handle == nullptr) {
-    return {false, ""};
-  }
-
   // 手动检测UTF16 BOM
   std::string bom_enc = detectUtfBom(str);
   if (!bom_enc.empty()) {
@@ -157,14 +140,14 @@ agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
   }
 
   // uchardet检测
-  uchardet_reset(handle);
-  int ret = uchardet_handle_data(handle, str.data(), str.size());
+  uchardet_reset(g_chardetHandle);
+  int ret = uchardet_handle_data(g_chardetHandle, str.data(), str.size());
   if (ret != 0) {
     return {false, ""};
   }
-  uchardet_data_end(handle);
+  uchardet_data_end(g_chardetHandle);
 
-  int n_candidates = uchardet_get_n_candidates(handle);
+  int n_candidates = uchardet_get_n_candidates(g_chardetHandle);
   if (n_candidates <= 0) {
     return {false, ""};
   }
@@ -173,7 +156,7 @@ agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
   // }
   std::vector<std::string> detected_candidates;
   for (int i = 0; i < n_candidates; ++i) {
-    const char *enc = uchardet_get_encoding(handle, i);
+    const char *enc = uchardet_get_encoding(g_chardetHandle, i);
     if (enc && std::strlen(enc) > 0) {
       detected_candidates.emplace_back(enc);
     }

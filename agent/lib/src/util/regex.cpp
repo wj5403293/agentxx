@@ -47,20 +47,16 @@ public:
       : hs_db(nullptr), hs_scratch(nullptr) {
     // 编译正则表达式到Hyperscan数据库
     hs_compile_error_t *compile_err = nullptr;
-    auto flagslist = new unsigned int[regstrs.size()];
-    auto reglist = new const char *[regstrs.size()];
-    for (size_t i = 0; i < regstrs.size(); ++i) {
-      flagslist[i] = flags;
-      reglist[i] = regstrs[i].c_str();
+    std::vector<unsigned int> flagslist(regstrs.size(), flags);
+    std::vector<const char *> reglist;
+    reglist.reserve(regstrs.size());
+    for (const auto &reg : regstrs) {
+      reglist.push_back(reg.c_str());
     }
 
-    hs_error_t err =
-        hs_compile_multi(reglist, flagslist, nullptr, regstrs.size(),
-                         HS_MODE_BLOCK, nullptr, &hs_db, &compile_err);
-    delete[] flagslist;
-    flagslist = nullptr;
-    delete[] reglist;
-    reglist = nullptr;
+    hs_error_t err = hs_compile_multi(reglist.data(), flagslist.data(), nullptr,
+                                      regstrs.size(), HS_MODE_BLOCK, nullptr,
+                                      &hs_db, &compile_err);
 
     if (err != HS_SUCCESS) {
       XX_LOGE("Hyperscan编译正则失败: {} | {}", compile_err->message,
