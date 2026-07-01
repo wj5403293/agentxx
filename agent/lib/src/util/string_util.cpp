@@ -76,20 +76,20 @@ getIconvCandidateEncodings(const char *src_encoding) {
 }
 
 // 转UTF8
-std::string agentxx::util::convertToUtf8(std::string_view src,
-                                         const char *src_encoding) {
+std::tuple<bool, std::string>
+agentxx::util::convertToUtf8(std::string_view src,
+                             std::string_view srcEncoding) {
   // 已是UTF8/空字符串，直接返回
-  if (std::strcmp(src_encoding, "UTF-8") == 0 ||
-      std::strcmp(src_encoding, "utf8") == 0) {
-    return std::string{src};
+  if ("UTF-8" == srcEncoding || "utf8" == srcEncoding) {
+    return {true, ""};
   }
   if (src.empty()) {
-    return "";
+    return {false, ""};
   }
 
-  auto candidate_encs = getIconvCandidateEncodings(src_encoding);
+  auto candidate_encs = getIconvCandidateEncodings(srcEncoding.data());
   if (candidate_encs.empty()) {
-    return "";
+    return {false, ""};
   }
 
   // 遍历候选编码，逐个尝试
@@ -107,7 +107,7 @@ std::string agentxx::util::convertToUtf8(std::string_view src,
   }
   if (cd == (iconv_t)-1) {
     // 所有候选编码名都失败，直接返回
-    return "";
+    return {false, ""};
   }
 
   // 缓冲区
@@ -124,30 +124,35 @@ std::string agentxx::util::convertToUtf8(std::string_view src,
   int ret = iconv(cd, const_cast<char **>(&src_ptr), &src_remain, &dst_ptr,
                   &dst_remain);
 
-  std::string utf8_str;
+  std::string utf8Str;
   if (ret != -1 && src_remain == 0) {
-    utf8_str = std::string(dst_buf.data(), dst_buf_size - dst_remain);
+    utf8Str = std::string(dst_buf.data(), dst_buf_size - dst_remain);
   }
 
   iconv_close(cd);
-  return utf8_str;
+  return {true, utf8Str};
 }
 
-bool agentxx::util::autoConvertToUtf8(std::string_view str,
-                                      std::string &encoding,
-                                      std::string &result) {
+/// <isSuccess, result>
+/// 如果 [result] 为空字符串，不需要转换
+std::tuple<bool, std::string>
+agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
+  if (str.empty()) {
+    return {true, ""};
+  }
+
   const auto handle = cChardetHandle;
   if (handle == nullptr) {
-    return false;
+    return {false, ""};
   }
 
   // 手动检测UTF16 BOM
   std::string bom_enc = detectUtfBom(str);
   if (!bom_enc.empty()) {
     encoding = bom_enc;
-    result = convertToUtf8(str, encoding.c_str());
-    if (!result.empty() || str.empty()) {
-      return true;
+    auto [isSuccess, result] = convertToUtf8(str, encoding.c_str());
+    if (isSuccess) {
+      return {true, result};
     }
   }
 
@@ -155,13 +160,13 @@ bool agentxx::util::autoConvertToUtf8(std::string_view str,
   uchardet_reset(handle);
   int ret = uchardet_handle_data(handle, str.data(), str.size());
   if (ret != 0) {
-    return false;
+    return {false, ""};
   }
   uchardet_data_end(handle);
 
   int n_candidates = uchardet_get_n_candidates(handle);
   if (n_candidates <= 0) {
-    return false;
+    return {false, ""};
   }
   // if (n_candidates > 5) {
   //     n_candidates = 5;
@@ -174,7 +179,7 @@ bool agentxx::util::autoConvertToUtf8(std::string_view str,
     }
   }
   if (detected_candidates.empty()) {
-    return false;
+    return {false, ""};
   }
 
   std::string selected_enc;
@@ -221,10 +226,19 @@ bool agentxx::util::autoConvertToUtf8(std::string_view str,
     encoding = "UTF-16LE";
   }
 
-  result = convertToUtf8(str, encoding.c_str());
-  if (result.empty() && !str.empty()) {
-    return false;
-  }
+  return convertToUtf8(str, encoding);
+}
 
-  return true;
+std::tuple<bool, std::string>
+agentxx::util::autoConvertToUtf8(std::string_view str, bool _) {
+  std::string encoding;
+  return autoConvertToUtf8(str, encoding);
+}
+
+bool agentxx::util::autoConvertToUtf8(std::string &str) {
+  auto [isSuccess, result] = autoConvertToUtf8(str, true);
+  if (isSuccess) {
+    str = std::move(result);
+  }
+  return isSuccess;
 }

@@ -294,13 +294,11 @@ public:
               offset, lineNum)};
         }
 
-        auto raw_str = result.str();
-        std::string encoding;
-        std::string converted;
-        if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
-          co_return converted;
+        auto rawStr = result.str();
+        if (agentxx::util::autoConvertToUtf8(rawStr)) {
+          co_return rawStr;
         }
-        co_return raw_str;
+        co_return rawStr;
       }
 
       // 读取完整文件
@@ -312,10 +310,8 @@ public:
         throw std::system_error{errCode};
       }
       stream.close();
-      std::string encoding;
-      std::string converted;
-      if (agentxx::util::autoConvertToUtf8(data, encoding, converted)) {
-        co_return converted;
+      if (agentxx::util::autoConvertToUtf8(data)) {
+        co_return data;
       }
       co_return data;
     }
@@ -360,23 +356,19 @@ public:
               offset, lineNum)};
         }
 
-        auto raw_str = result.str();
-        std::string encoding;
-        std::string converted;
-        if (agentxx::util::autoConvertToUtf8(raw_str, encoding, converted)) {
-          co_return converted;
+        auto rawStr = result.str();
+        if (agentxx::util::autoConvertToUtf8(rawStr)) {
+          co_return rawStr;
         }
-        co_return raw_str;
+        co_return rawStr;
       }
 
       // 读取完整文件
       auto result = std::string{std::istreambuf_iterator<char>(stream),
                                 std::istreambuf_iterator<char>()};
       stream.close();
-      std::string encoding;
-      std::string converted;
-      if (agentxx::util::autoConvertToUtf8(result, encoding, converted)) {
-        co_return converted;
+      if (agentxx::util::autoConvertToUtf8(result)) {
+        co_return result;
       }
       co_return result;
     }

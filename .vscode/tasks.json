@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "compileDebugCxx",
+            "label": "compileLinuxDebugCxx",
             "type": "shell",
             "command": "${workspaceFolder}/agent/script/debug_build.sh",
             "args": [],
@@ -10,9 +10,18 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": []
+        },
+        {
+            "label": "compileWindowsDebugCxx",
+            "type": "shell",
+            "command": "${workspaceFolder}/agent/script/debug_build.bat",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
         }
     ]
 }

@@ -114,16 +114,13 @@ public:
       result << "## ExitCode: " << exitCode << std::endl;
       if (all_output || 0 != exitCode) {
         // failed
-        std::string encoding, str;
-        if (strout.empty() ||
-            agentxx::util::autoConvertToUtf8(strout, encoding, str)) {
-          result << "## StdOut:\n" << str << std::endl;
+        if (strout.empty() || agentxx::util::autoConvertToUtf8(strout)) {
+          result << "## StdOut:\n" << strout << std::endl;
         } else {
           result << "## StdOut convert to utf8 faild, truncated" << std::endl;
         }
-        if (strerr.empty() ||
-            agentxx::util::autoConvertToUtf8(strerr, encoding, str)) {
-          result << "## StdErr:\n" << str << std::endl;
+        if (strerr.empty() || agentxx::util::autoConvertToUtf8(strerr)) {
+          result << "## StdErr:\n" << strerr << std::endl;
         } else {
           result << "## StdErr convert to utf8 faild, truncated" << std::endl;
         }
@@ -255,16 +252,13 @@ public:
       result << "## ExitCode: " << exitCode << std::endl;
       if (all_output || 0 != exitCode) {
         // failed
-        std::string encoding, str;
-        if (strout.empty() ||
-            agentxx::util::autoConvertToUtf8(strout, encoding, str)) {
-          result << "## StdOut:\n" << str << std::endl;
+        if (strout.empty() || agentxx::util::autoConvertToUtf8(strout)) {
+          result << "## StdOut:\n" << strout << std::endl;
         } else {
           result << "## StdOut convert to utf8 faild, truncated" << std::endl;
         }
-        if (strerr.empty() ||
-            agentxx::util::autoConvertToUtf8(strerr, encoding, str)) {
-          result << "## StdErr:\n" << str << std::endl;
+        if (strerr.empty() || agentxx::util::autoConvertToUtf8(strerr)) {
+          result << "## StdErr:\n" << strerr << std::endl;
         } else {
           result << "## StdErr convert to utf8 faild, truncated" << std::endl;
         }
@@ -292,10 +286,9 @@ public:
       out << buffer.data();
     }
     std::string result = out.str();
-    std::string encoding, utf8result;
-    if (agentxx::util::autoConvertToUtf8(result, encoding, utf8result)) {
+    if (agentxx::util::autoConvertToUtf8(result)) {
       // 转 utf8
-      co_return utf8result;
+      co_return result;
     }
     co_return result;
   }

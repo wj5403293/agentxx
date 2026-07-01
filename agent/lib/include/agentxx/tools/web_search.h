@@ -158,10 +158,8 @@ public:
       if (data.empty()) {
         co_return R"({"error": "Http GET request Success, but got empty body."})";
       }
-      std::string encoding;
-      std::string converted;
-      if (agentxx::util::autoConvertToUtf8(data, encoding, converted)) {
-        co_return converted;
+      if (agentxx::util::autoConvertToUtf8(data)) {
+        co_return data;
       }
       co_return data;
     }
