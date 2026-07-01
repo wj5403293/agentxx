@@ -50,7 +50,7 @@ target_compile_definitions(agentxx_shared PUBLIC
   XX_IS_IOS_D=${XX_IS_IOS_D}
 
   NEOGRAPH_STATIC_BUILD
-  NEOGRAPH_USE_BOODT_ASIO
+  NEOGRAPH_USE_BOOST_ASIO
 )
 target_compile_definitions(agentxx_static PUBLIC
   __STDC_CONSTANT_MACROS
@@ -65,7 +65,7 @@ target_compile_definitions(agentxx_static PUBLIC
   XX_IS_IOS_D=${XX_IS_IOS_D}
 
   NEOGRAPH_STATIC_BUILD
-  NEOGRAPH_USE_BOODT_ASIO
+  NEOGRAPH_USE_BOOST_ASIO
 )
 if (AGENTXX_ENABLE_VECTORSCAN)
   target_compile_definitions(agentxx_shared PUBLIC AGENTXX_ENABLE_VECTORSCAN=1)

@@ -28,7 +28,7 @@
                 "_UNICODE",
                 "ASIO_HAS_IO_URING",
                 "ASIO_HAS_FILE",
-                "NEOGRAPH_USE_BOODT_ASIO",
+                "NEOGRAPH_USE_BOOST_ASIO",
                 "AGENTXX_ENABLE_VECTORSCAN"
             ],
             "compileCommands": "${workspaceFolder}/agent/build/debug/compile_commands.json",
@@ -65,7 +65,7 @@
                 "ASIO_HAS_IOCP",
                 "ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE",
                 "ASIO_HAS_FILE",
-                "NEOGRAPH_USE_BOODT_ASIO",
+                "NEOGRAPH_USE_BOOST_ASIO",
                 "AGENTXX_ENABLE_HYPERSCAN"
             ],
             "windowsSdkVersion": "10.0.22000.0",
@@ -101,7 +101,7 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "NEOGRAPH_USE_BOODT_ASIO"
+                "NEOGRAPH_USE_BOOST_ASIO"
             ],
             "cStandard": "c23",
             "cppStandard": "c++23"
