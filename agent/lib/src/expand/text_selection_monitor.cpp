@@ -12,10 +12,18 @@
 #include <windows.h>
 #include <winhttp.h>
 
+// ---
+#include "simdjson.h"
+#include <asio/io_context.hpp>
+#include <asio/steady_timer.hpp>
+#include <optional>
+
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winhttp.lib")
 
 #endif
+
+namespace asio = boost::asio;
 
 namespace agentxx {
 namespace expand {
@@ -46,10 +54,10 @@ public:
     return E_NOINTERFACE;
   }
   ULONG STDMETHODCALLTYPE AddRef() override {
-    return InterlockedIncrement(&refCount_);
+    return static_cast<ULONG>(InterlockedIncrement(&refCount_));
   }
   ULONG STDMETHODCALLTYPE Release() override {
-    return InterlockedDecrement(&refCount_);
+    return static_cast<ULONG>(InterlockedDecrement(&refCount_));
   }
 
   void addListener(TextSelectionListener listener) {
@@ -462,7 +470,6 @@ private:
         }
         enumVar->Release();
       }
-      varSel.pdispVal->Release();
     }
     VariantClear(&varSel);
     acc->Release();
@@ -502,8 +509,8 @@ private:
     wchar_t className[64] = {};
     GetClassNameW(hwnd, className, 64);
     if (wcscmp(className, L"Chrome_WidgetWin_1") == 0 ||
-        wcscmp(className, L"MozillaWindowClass") == 0 ||
-        wcsstr(className, L"Chrome") != nullptr) {
+        wcscmp(className, L"Chrome_RenderWidgetHostHWND") == 0 ||
+        wcscmp(className, L"MozillaWindowClass") == 0) {
       return true;
     }
 
@@ -530,17 +537,18 @@ private:
         ++fileName;
       }
       _wcslwr_s(fileName, wcslen(fileName) + 1);
-      isBrowser = (wcsstr(fileName, L"chrome") != nullptr ||
-                   wcsstr(fileName, L"firefox") != nullptr ||
-                   wcsstr(fileName, L"edge") != nullptr ||
-                   wcsstr(fileName, L"opera") != nullptr ||
-                   wcsstr(fileName, L"brave") != nullptr ||
-                   wcsstr(fileName, L"browser") != nullptr ||
-                   wcsstr(fileName, L"360") != nullptr ||
-                   wcsstr(fileName, L"sogou") != nullptr ||
-                   wcsstr(fileName, L"qqbrowser") != nullptr ||
-                   wcsstr(fileName, L"maxthon") != nullptr ||
-                   wcsstr(fileName, L"liebao") != nullptr);
+      static constexpr auto browserKeywords = std::array<const wchar_t *, 19>{
+          L"chrome",       L"chromium",     L"firefox",  L"msedge",
+          L"edge",         L"opera",        L"brave",    L"vivaldi",
+          L"arc",          L"360chrome",    L"360se",    L"sogouexplorer",
+          L"qqbrowser",    L"maxthon",      L"liebao",   L"browser",
+          L"2345explorer", L"baidubrowser", L"ucbrowser"};
+      for (const auto &kw : browserKeywords) {
+        if (wcsstr(fileName, kw)) {
+          isBrowser = true;
+          break;
+        }
+      }
     }
     CloseHandle(hProcess);
     return isBrowser;
@@ -633,11 +641,19 @@ private:
 
   static int findCDPPort() {
     static int cachedPort = 0;
+    static std::chrono::steady_clock::time_point cacheTime = {};
+    constexpr auto kCacheTtl = std::chrono::seconds(30);
+
     if (cachedPort != 0) {
-      return (cachedPort > 0) ? cachedPort : 0;
+      auto age = std::chrono::duration_cast<std::chrono::seconds>(
+          std::chrono::steady_clock::now() - cacheTime);
+      if (age < kCacheTtl) {
+        return (cachedPort > 0) ? cachedPort : 0;
+      }
+      cachedPort = 0;
     }
 
-    for (int port : {9222, 9223, 9224, 9225}) {
+    for (int port : {9222, 9223, 9224, 9225, 9226, 9227, 9228, 9229, 9230}) {
       SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
       if (sock == INVALID_SOCKET) {
         continue;
@@ -670,6 +686,7 @@ private:
                                    WINHTTP_NO_REQUEST_DATA, 0, 0, 0) &&
                 WinHttpReceiveResponse(hRequest, nullptr)) {
               cachedPort = port;
+              cacheTime = std::chrono::steady_clock::now();
               WinHttpCloseHandle(hRequest);
               WinHttpCloseHandle(hConnect);
               WinHttpCloseHandle(hSession);
@@ -686,6 +703,7 @@ private:
     }
 
     cachedPort = -1;
+    cacheTime = std::chrono::steady_clock::now();
     return 0;
   }
 
@@ -746,7 +764,7 @@ private:
     addr.sin_port = htons(static_cast<u_short>(port));
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    if (connect(sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) != 0) {
+    if (!tcpConnectWithTimeout(sock, addr, 3000)) {
       closesocket(sock);
       return INVALID_SOCKET;
     }
@@ -771,6 +789,7 @@ private:
       return INVALID_SOCKET;
     }
 
+    wsSetRecvTimeout(sock, 3000);
     char recvBuf[4096] = {};
     int recvLen = recv(sock, recvBuf, sizeof(recvBuf) - 1, 0);
     if (recvLen <= 0) {
@@ -785,6 +804,12 @@ private:
     }
 
     return sock;
+  }
+
+  static bool wsSetRecvTimeout(SOCKET sock, int timeoutMs) {
+    DWORD tv = static_cast<DWORD>(timeoutMs);
+    return setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO,
+                      reinterpret_cast<const char *>(&tv), sizeof(tv)) == 0;
   }
 
   static bool wsSend(SOCKET sock, std::string_view message) {
@@ -816,6 +841,7 @@ private:
   }
 
   static std::string wsRecv(SOCKET sock) {
+    wsSetRecvTimeout(sock, 5000);
     unsigned char header[2] = {};
     if (recv(sock, reinterpret_cast<char *>(header), 2, 0) != 2) {
       return {};
@@ -863,22 +889,31 @@ private:
     }
   }
 
-  static std::string_view extractJsonString(std::string_view json,
-                                            std::string_view key) {
-    std::string search = fmt::format("\"{}\"", key);
-    size_t pos = json.find(search);
-    if (pos == std::string::npos) {
-      return {};
+  static std::optional<std::string> extractCdpResult(std::string_view json) {
+    simdjson::ondemand::parser parser;
+    simdjson::padded_string padded(json);
+    auto doc = parser.iterate(padded);
+    if (doc.error()) {
+      return std::nullopt;
     }
-    pos = json.find('"', pos + search.size());
-    if (pos == std::string::npos) {
-      return {};
+    auto result = doc.find_field("result");
+    if (result.error()) {
+      return std::nullopt;
     }
-    size_t end = json.find('"', pos + 1);
-    if (end == std::string::npos) {
-      return {};
+    auto innerResult = result.find_field("result");
+    if (innerResult.error()) {
+      return std::nullopt;
     }
-    return json.substr(pos + 1, end - pos - 1);
+    auto val = innerResult.find_field("value");
+    if (val.error()) {
+      return std::nullopt;
+    }
+    std::string_view sv;
+    auto err = val.get(sv);
+    if (err) {
+      return std::nullopt;
+    }
+    return std::string(sv);
   }
 
   std::pair<std::string, TextSource> getSelectedTextByCDP(HWND hwnd) {
@@ -898,56 +933,53 @@ private:
 
     std::string targetId;
     std::string targetTitle;
-    size_t pos = 0;
-    while (true) {
-      pos = targetsJson.find("\"id\"", pos);
-      if (pos == std::string::npos) {
-        break;
-      }
-      pos = targetsJson.find('"', pos + 4);
-      if (pos == std::string::npos) {
-        break;
-      }
-      size_t idEnd = targetsJson.find('"', pos + 1);
-      if (idEnd == std::string::npos) {
-        break;
-      }
-      std::string id = targetsJson.substr(pos + 1, idEnd - pos - 1);
 
-      size_t titlePos = targetsJson.find("\"title\"", idEnd);
-      if (titlePos == std::string::npos) {
-        break;
-      }
-      titlePos = targetsJson.find('"', titlePos + 7);
-      if (titlePos == std::string::npos) {
-        break;
-      }
-      size_t titleEnd = targetsJson.find('"', titlePos + 1);
-      if (titleEnd == std::string::npos) {
-        break;
-      }
-      std::string title =
-          targetsJson.substr(titlePos + 1, titleEnd - titlePos - 1);
+    {
+      simdjson::ondemand::parser parser;
+      simdjson::padded_string padded(targetsJson);
+      auto doc = parser.iterate(padded);
+      if (!doc.error()) {
+        for (auto elem : doc.get_array()) {
+          if (elem.error()) {
+            continue;
+          }
+          std::string_view id;
+          std::string_view title;
+          auto obj = elem.get_object();
+          if (obj.error()) {
+            continue;
+          }
+          auto idField = obj["id"];
+          auto titleField = obj["title"];
+          if (idField.error() || titleField.error()) {
+            continue;
+          }
+          if (idField.get(id) || titleField.get(title)) {
+            continue;
+          }
 
-      int titleLen =
-          MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, nullptr, 0);
-      if (titleLen > 0) {
-        std::vector<wchar_t> wTitleBuf(titleLen);
-        MultiByteToWideChar(CP_UTF8, 0, title.c_str(), -1, wTitleBuf.data(),
-                            titleLen);
-        if (wTitle.find(wTitleBuf.data()) != std::wstring::npos) {
-          targetId = id;
-          targetTitle = title;
-          break;
+          int titleLen =
+              MultiByteToWideChar(CP_UTF8, 0, title.data(),
+                                  static_cast<int>(title.size()), nullptr, 0);
+          if (titleLen > 0) {
+            std::vector<wchar_t> wTitleBuf(titleLen);
+            MultiByteToWideChar(CP_UTF8, 0, title.data(),
+                                static_cast<int>(title.size()),
+                                wTitleBuf.data(), titleLen);
+            if (wTitle.find(wTitleBuf.data()) != std::wstring::npos) {
+              targetId = std::string(id);
+              targetTitle = std::string(title);
+              break;
+            }
+          }
+
+          if (targetId.empty() &&
+              title.find("about:blank") == std::string_view::npos) {
+            targetId = std::string(id);
+            targetTitle = std::string(title);
+          }
         }
       }
-
-      if (targetId.empty() && title.find("about:blank") == std::string::npos) {
-        targetId = id;
-        targetTitle = title;
-      }
-
-      pos = titleEnd;
     }
 
     if (targetId.empty()) {
@@ -976,12 +1008,12 @@ private:
       return {};
     }
 
-    auto value = extractJsonString(response, "value");
-    if (value.empty()) {
+    auto value = extractCdpResult(response);
+    if (!value || value->empty()) {
       return {};
     }
 
-    return std::pair<std::string, TextSource>{value, TextSource::DevTools};
+    return std::pair<std::string, TextSource>{*value, TextSource::DevTools};
   }
 
   std::pair<std::string, TextSource> getSelectedTextByClipboard(HWND hwnd) {
@@ -994,17 +1026,18 @@ private:
     bool needRestoreFocus =
         (foregroundHwnd != rootHwnd && foregroundHwnd != nullptr);
 
+    DWORD targetThreadId = 0;
+    DWORD currentThreadId = GetCurrentThreadId();
     if (needRestoreFocus) {
-      DWORD targetThreadId = GetWindowThreadProcessId(rootHwnd, nullptr);
-      DWORD currentThreadId = GetCurrentThreadId();
+      targetThreadId = GetWindowThreadProcessId(rootHwnd, nullptr);
       AttachThreadInput(currentThreadId, targetThreadId, TRUE);
       SetForegroundWindow(rootHwnd);
-      AttachThreadInput(currentThreadId, targetThreadId, FALSE);
-      Sleep(50);
+      delayMs(50);
     }
 
     if (!OpenClipboard(nullptr)) {
       if (needRestoreFocus) {
+        AttachThreadInput(currentThreadId, targetThreadId, FALSE);
         SetForegroundWindow(foregroundHwnd);
       }
       return {};
@@ -1034,7 +1067,7 @@ private:
     keybd_event('C', 0, 0, 0);
     keybd_event('C', 0, KEYEVENTF_KEYUP, 0);
     keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
-    Sleep(30);
+    delayMs(30);
 
     std::string result;
     if (OpenClipboard(nullptr)) {
@@ -1073,6 +1106,7 @@ private:
     }
 
     if (needRestoreFocus) {
+      AttachThreadInput(currentThreadId, targetThreadId, FALSE);
       SetForegroundWindow(foregroundHwnd);
     }
 
@@ -1096,10 +1130,19 @@ private:
       }
     }
 
-    if (automation_) {
+    {
+      IUIAutomation *localAutomation = nullptr;
+      HRESULT hr = CoCreateInstance(
+          CLSID_CUIAutomation, nullptr, CLSCTX_INPROC_SERVER, IID_IUIAutomation,
+          reinterpret_cast<void **>(&localAutomation));
+      if (FAILED(hr) || !localAutomation) {
+        return {};
+      }
+
       IUIAutomationElement *element = nullptr;
-      HRESULT hr = automation_->ElementFromHandle(hwnd, &element);
+      hr = localAutomation->ElementFromHandle(hwnd, &element);
       if (FAILED(hr) || !element) {
+        localAutomation->Release();
         return {};
       }
 
@@ -1110,7 +1153,7 @@ private:
           reinterpret_cast<void **>(&textPattern));
       if (FAILED(hr) || !textPattern) {
         IUIAutomationElement *focused = nullptr;
-        hr = automation_->GetFocusedElement(&focused);
+        hr = localAutomation->GetFocusedElement(&focused);
         if (SUCCEEDED(hr) && focused) {
           hr = focused->GetCurrentPatternAs(
               UIA_TextPatternId, IID_IUIAutomationTextPattern,
@@ -1167,6 +1210,7 @@ private:
           selectionRanges->Release();
           if (false == result.empty()) {
             textPattern->Release();
+            localAutomation->Release();
             return {result, source};
           }
         }
@@ -1176,7 +1220,7 @@ private:
 
       {
         IUIAutomationElement *elemForValue = nullptr;
-        hr = automation_->ElementFromHandle(hwnd, &elemForValue);
+        hr = localAutomation->ElementFromHandle(hwnd, &elemForValue);
         if (SUCCEEDED(hr) && elemForValue) {
           IUIAutomationValuePattern *valuePattern = nullptr;
           hr = elemForValue->GetCurrentPatternAs(
@@ -1190,6 +1234,7 @@ private:
               SysFreeString(value);
               valuePattern->Release();
               elemForValue->Release();
+              localAutomation->Release();
               return {result, TextSource::ValuePattern};
             }
             if (value) {
@@ -1199,6 +1244,7 @@ private:
           }
           elemForValue->Release();
         }
+        localAutomation->Release();
       }
     }
 
@@ -1218,7 +1264,10 @@ private:
   }
 
   void processPendingSelection() {
-    if (!selectionPending_.load(std::memory_order_acquire)) {
+    bool expected = true;
+    if (!selectionPending_.compare_exchange_strong(expected, false,
+                                                   std::memory_order_acquire,
+                                                   std::memory_order_relaxed)) {
       return;
     }
 
@@ -1234,8 +1283,6 @@ private:
     }
 
     if (!uiaText.empty()) {
-      selectionPending_.store(false, std::memory_order_release);
-
       if (processingThread_.joinable()) {
         processingThread_.join();
       }
@@ -1250,11 +1297,8 @@ private:
     }
 
     if (!hwnd) {
-      selectionPending_.store(false, std::memory_order_release);
       return;
     }
-
-    selectionPending_.store(false, std::memory_order_release);
 
     if (processingThread_.joinable()) {
       processingThread_.join();
@@ -1310,6 +1354,12 @@ private:
     return ptr;
   }
 
+  void delayMs(int ms) {
+    asio::steady_timer timer(ioContext_);
+    timer.expires_after(std::chrono::milliseconds(ms));
+    timer.wait();
+  }
+
   std::atomic<bool> running_;
   std::thread workerThread_;
   std::thread processingThread_;
@@ -1326,8 +1376,9 @@ private:
   std::mutex debounceMutex_;
   std::mutex listenersMutex_;
   std::vector<TextSelectionListener> listeners_;
-  LONG refCount_;
+  volatile LONG refCount_;
   std::string pendingUiaText_;
+  asio::io_context ioContext_;
 };
 
 #else
