@@ -28,6 +28,11 @@ namespace fs = std::filesystem;
 static constexpr std::string_view kCodeGraphDbPath = ".codegraph";
 
 static bool should_skip(const std::string &file_path) {
+  static const std::string kSkipAgentxx = fmt::format(
+      "/{}/", agentxx::agent::AgentConfigStatic::agentxxDataDirPath);
+  static const std::string kSkipCodeGraph =
+      fmt::format("/{}/", kCodeGraphDbPath);
+
   fs::path p(file_path);
   std::string path_str = p.generic_string();
   return path_str.find("/.") != std::string::npos ||
@@ -36,18 +41,16 @@ static bool should_skip(const std::string &file_path) {
          path_str.find("/build-") != std::string::npos ||
          path_str.find("/__pycache__/") != std::string::npos ||
          path_str.find("/.git/") != std::string::npos ||
-         path_str.find(fmt::format(
-             "/{}/", agentxx::agent::AgentConfigStatic::agentxxDataDirPath)) !=
-             std::string::npos ||
-         path_str.find(fmt::format("/{}/", kCodeGraphDbPath)) !=
-             std::string::npos;
+         path_str.find(kSkipAgentxx) != std::string::npos ||
+         path_str.find(kSkipCodeGraph) != std::string::npos;
 }
 
 static std::vector<std::string>
 collect_source_files(const std::string &root_path) {
   std::vector<std::string> files;
   try {
-    for (const auto &entry : fs::recursive_directory_iterator(root_path)) {
+    for (const auto &entry : fs::recursive_directory_iterator(
+             root_path, fs::directory_options::skip_permission_denied)) {
       if (!entry.is_regular_file())
         continue;
       std::string path = entry.path().generic_string();
@@ -133,13 +136,20 @@ public:
   }
 
   bool initialize(const std::string &project_root) {
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      if (!needs_initialize_ && project_root_ == project_root && db_) {
+        return true;
+      }
+    }
+
+    shutdown();
+
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (!needs_initialize_ && project_root_ == project_root && db_) {
       return true;
     }
-
-    shutdown();
 
     project_root_ = project_root;
     fs::path cg_dir = fs::path(project_root) /
@@ -229,54 +239,7 @@ public:
           "CodeGraphManager: extracted {} nodes, {} unresolved refs from {}",
           result.nodes.size(), result.unresolved.size(), file_path);
 
-      db_->begin_transaction();
-      try {
-        db_->delete_edges_for_file_nodes(file_path);
-        db_->delete_unresolved_refs_by_file(file_path);
-        db_->delete_nodes_by_file(file_path);
-
-        int64_t file_node_id = -1;
-        std::vector<int64_t> id_map;
-        id_map.reserve(result.nodes.size());
-        for (auto &node : result.nodes) {
-          if (node.kind == codegraph::NodeKind::File) {
-            node.file_path = file_path;
-          }
-          int64_t id = db_->insert_node(node);
-          id_map.push_back(id);
-          if (node.kind == codegraph::NodeKind::File) {
-            file_node_id = id;
-          }
-        }
-
-        codegraph::FileRecord fr;
-        fr.path = file_path;
-        fr.language = lang;
-        try {
-          auto ftime = fs::last_write_time(fs::path(file_path));
-          fr.mtime = std::chrono::duration_cast<std::chrono::seconds>(
-                         ftime.time_since_epoch())
-                         .count();
-          fr.size = fs::file_size(fs::path(file_path));
-        } catch (...) {
-        }
-        db_->insert_file(fr);
-
-        for (auto ref : result.unresolved) {
-          int original_index = static_cast<int>(-ref.source_node_id) - 1;
-          if (original_index >= 0 &&
-              original_index < static_cast<int>(id_map.size())) {
-            ref.source_node_id = id_map[original_index];
-          }
-          db_->insert_unresolved_ref(ref);
-        }
-
-        db_->commit();
-      } catch (const std::exception &e) {
-        db_->rollback();
-        XX_LOGE("CodeGraphManager: index error for {}: {}", file_path,
-                e.what());
-      }
+      writeExtractionResult(file_path, lang, result);
 
       processed++;
     }
@@ -303,47 +266,57 @@ public:
       return false;
 
     auto unresolved = db_->get_unresolved_refs();
+    if (unresolved.empty())
+      return true;
 
-    for (const auto &ref : unresolved) {
-      if (!running_.load())
-        break;
+    db_->begin_transaction();
+    try {
+      for (const auto &ref : unresolved) {
+        if (!running_.load())
+          break;
 
-      auto source_node = db_->get_node(ref.source_node_id);
-      if (!source_node.has_value())
-        continue;
+        auto source_node = db_->get_node(ref.source_node_id);
+        if (!source_node.has_value())
+          continue;
 
-      auto candidates = db_->find_nodes_by_name(ref.ref_name, 10);
-      if (candidates.empty())
-        continue;
+        auto candidates = db_->find_nodes_by_name(ref.ref_name, 10);
+        if (candidates.empty())
+          continue;
 
-      if (candidates.size() == 1) {
-        codegraph::Edge edge;
-        edge.source_id = source_node->id;
-        edge.target_id = candidates[0].id;
-        edge.kind = codegraph::EdgeKind::Calls;
-        edge.line = ref.line;
-        edge.col = ref.col;
-        db_->insert_edge(edge);
-      } else {
-        codegraph::Node best = candidates[0];
-        int best_score = -1;
-        for (const auto &cand : candidates) {
-          int s = score_target(source_node.value(), cand);
-          if (s > best_score) {
-            best_score = s;
-            best = cand;
+        if (candidates.size() == 1) {
+          codegraph::Edge edge;
+          edge.source_id = source_node->id;
+          edge.target_id = candidates[0].id;
+          edge.kind = codegraph::EdgeKind::Calls;
+          edge.line = ref.line;
+          edge.col = ref.col;
+          db_->insert_edge(edge);
+        } else {
+          codegraph::Node best = candidates[0];
+          int best_score = -1;
+          for (const auto &cand : candidates) {
+            int s = score_target(source_node.value(), cand);
+            if (s > best_score) {
+              best_score = s;
+              best = cand;
+            }
           }
+          codegraph::Edge edge;
+          edge.source_id = source_node->id;
+          edge.target_id = best.id;
+          edge.kind = codegraph::EdgeKind::Calls;
+          edge.line = ref.line;
+          edge.col = ref.col;
+          db_->insert_edge(edge);
         }
-        codegraph::Edge edge;
-        edge.source_id = source_node->id;
-        edge.target_id = best.id;
-        edge.kind = codegraph::EdgeKind::Calls;
-        edge.line = ref.line;
-        edge.col = ref.col;
-        db_->insert_edge(edge);
-      }
 
-      db_->delete_unresolved_ref(ref.id);
+        db_->delete_unresolved_ref(ref.id);
+      }
+      db_->commit();
+    } catch (const std::exception &e) {
+      db_->rollback();
+      XX_LOGE("CodeGraphManager: resolveReferences error: {}", e.what());
+      return false;
     }
 
     return true;
@@ -578,24 +551,9 @@ public:
 
   bool isRunning() const { return running_.load(); }
 
-private:
-  void indexFile(const std::string &file_path, const std::string &lang) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (!db_)
-      return;
-
-    auto extractor = codegraph::create_extractor(lang);
-    if (!extractor)
-      return;
-
-    std::ifstream ifs(file_path);
-    if (!ifs.is_open())
-      return;
-    std::string source((std::istreambuf_iterator<char>(ifs)),
-                       std::istreambuf_iterator<char>());
-
-    auto result = extractor->extract(file_path, source);
-
+  void writeExtractionResult(const std::string &file_path,
+                             const std::string &lang,
+                             codegraph::ExtractionResult &result) {
     db_->begin_transaction();
     try {
       db_->delete_edges_for_file_nodes(file_path);
@@ -637,11 +595,35 @@ private:
       db_->commit();
     } catch (const std::exception &e) {
       db_->rollback();
-      XX_LOGE("CodeGraphManager: indexFile error for {}: {}", file_path,
-              e.what());
+      XX_LOGE("CodeGraphManager: write error for {}: {}", file_path, e.what());
     }
   }
 
+  void indexFile(const std::string &file_path, const std::string &lang) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!db_)
+      return;
+
+    auto extractor = codegraph::create_extractor(lang);
+    if (!extractor)
+      return;
+
+    std::ifstream ifs(file_path);
+    if (!ifs.is_open())
+      return;
+    std::string source((std::istreambuf_iterator<char>(ifs)),
+                       std::istreambuf_iterator<char>());
+
+    auto result = extractor->extract(file_path, source);
+    writeExtractionResult(file_path, lang, result);
+  }
+
+  bool resolveReferencesLocked() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return resolveReferences();
+  }
+
+private:
   std::string project_root_;
   std::unique_ptr<codegraph::Database> db_;
   std::unique_ptr<codegraph::GraphTraverser> traverser_;
@@ -673,7 +655,7 @@ bool CodeGraphManager::indexDirectory(const std::string &path,
 }
 bool CodeGraphManager::updateIndex() { return impl_->updateIndex(); }
 bool CodeGraphManager::resolveReferences() {
-  return impl_->resolveReferences();
+  return impl_->resolveReferencesLocked();
 }
 CodeGraphSearchResult CodeGraphManager::searchSymbols(const std::string &query,
                                                       int limit) {

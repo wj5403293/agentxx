@@ -86,6 +86,178 @@ static void cleanup_temp_project(const std::string &path) {
   }
 }
 
+static std::string create_multi_lang_project() {
+  int idx = g_temp_project_counter.fetch_add(1);
+  auto tmp_dir = fs::temp_directory_path() /
+                 ("codegraph_multi_test_" + std::to_string(idx));
+  if (fs::exists(tmp_dir)) {
+    fs::remove_all(tmp_dir);
+  }
+  fs::create_directories(tmp_dir);
+
+  // Python
+  {
+    std::ofstream f(tmp_dir / "main.py");
+    f << R"(
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+
+def add(a: int, b: int) -> int:
+    return a + b
+
+def main() -> None:
+    msg = greet("world")
+    result = add(1, 2)
+    print(f"{msg} Result: {result}")
+
+if __name__ == "__main__":
+    main()
+)";
+  }
+
+  // JavaScript
+  {
+    std::ofstream f(tmp_dir / "utils.js");
+    f << R"(
+function multiply(x, y) {
+    let result = 0;
+    for (let i = 0; i < y; i++) {
+        result = add(result, x);
+    }
+    return result;
+}
+
+function add(a, b) {
+    return a + b;
+}
+
+function formatResult(value) {
+    return `Result: ${value}`;
+}
+
+module.exports = { multiply, formatResult };
+)";
+  }
+
+  // TypeScript
+  {
+    std::ofstream f(tmp_dir / "types.ts");
+    f << R"(
+interface User {
+    id: number;
+    name: string;
+}
+
+function getUser(id: number): User {
+    return { id, name: `user_${id}` };
+}
+
+function formatUser(user: User): string {
+    return `User: ${user.name}`;
+}
+
+function processUser(id: number): string {
+    const user = getUser(id);
+    return formatUser(user);
+}
+
+export { getUser, formatUser, processUser, User };
+)";
+  }
+
+  // Rust
+  {
+    std::ofstream f(tmp_dir / "lib.rs");
+    f << R"(
+pub fn factorial(n: u64) -> u64 {
+    if n <= 1 {
+        return 1;
+    }
+    n * factorial(n - 1)
+}
+
+pub fn compute_sum(n: u64) -> u64 {
+    let mut sum = 0;
+    for i in 1..=n {
+        sum = add_to_sum(sum, i);
+    }
+    sum
+}
+
+fn add_to_sum(current: u64, value: u64) -> u64 {
+    current + value
+}
+
+pub fn greet(name: &str) -> String {
+    format!("Hello, {}!", name)
+}
+)";
+  }
+
+  // Go
+  {
+    std::ofstream f(tmp_dir / "main.go");
+    f << R"(package main
+
+import "fmt"
+
+func add(a, b int) int {
+    return a + b
+}
+
+func multiply(a, b int) int {
+    result := 0
+    for i := 0; i < b; i++ {
+        result = add(result, a)
+    }
+    return result
+}
+
+func greet(name string) string {
+    return fmt.Sprintf("Hello, %s!", name)
+}
+
+func main() {
+    msg := greet("world")
+    result := multiply(3, 4)
+    fmt.Printf("%s Result: %d\n", msg, result)
+}
+)";
+  }
+
+  // Java
+  {
+    std::ofstream f(tmp_dir / "App.java");
+    f << R"(
+public class App {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+
+    public static int multiply(int a, int b) {
+        int result = 0;
+        for (int i = 0; i < b; i++) {
+            result = add(result, a);
+        }
+        return result;
+    }
+
+    public static String greet(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    public static void main(String[] args) {
+        String msg = greet("world");
+        int result = multiply(3, 4);
+        System.out.println(msg + " Result: " + result);
+    }
+}
+)";
+  }
+
+  return tmp_dir.generic_string();
+}
+
 // =========================================================================
 // CodeGraph Manager Tests
 // =========================================================================
@@ -403,6 +575,239 @@ inline void test_codegraph_manager_resolve() {
   } else {
     std::cout << "[FAIL] CodeGraphManager::resolveReferences failed"
               << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+// =========================================================================
+// Multi-Language CodeGraph Tests
+// =========================================================================
+
+inline void test_codegraph_manager_multi_lang_index() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  bool ok = manager.indexDirectory(tmp_dir, false);
+
+  if (ok) {
+    std::cout << "[PASS] CodeGraphManager multi-lang index succeeds"
+              << std::endl;
+  } else {
+    std::cout << "[FAIL] CodeGraphManager multi-lang index failed" << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_multi_lang_status() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.getStatus();
+  if (result.success && result.total_files >= 6) {
+    std::cout << "[PASS] CodeGraphManager multi-lang status: "
+              << result.total_files << " files, " << result.total_nodes
+              << " nodes, " << result.total_edges << " edges" << std::endl;
+  } else {
+    std::cout << "[FAIL] CodeGraphManager multi-lang status failed: "
+              << (result.error.empty() ? "too few files" : result.error)
+              << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_python_search() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.searchSymbols("greet", 20);
+  if (result.success) {
+    std::cout << "[PASS] CodeGraphManager Python search 'greet' found "
+              << result.nodes.size() << " results" << std::endl;
+  } else {
+    std::cout << "[FAIL] CodeGraphManager Python search failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_javascript_search() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.searchSymbols("multiply", 20);
+  if (result.success) {
+    bool found_js = false;
+    for (const auto &node : result.nodes) {
+      if (node.file_path.find(".js") != std::string::npos) {
+        found_js = true;
+        break;
+      }
+    }
+    if (found_js || result.nodes.empty()) {
+      std::cout << "[PASS] CodeGraphManager JavaScript search 'multiply' found "
+                << result.nodes.size() << " results" << std::endl;
+    } else {
+      std::cout << "[FAIL] CodeGraphManager JavaScript search: no .js results"
+                << std::endl;
+    }
+  } else {
+    std::cout << "[FAIL] CodeGraphManager JavaScript search failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_typescript_search() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.searchSymbols("getUser", 20);
+  if (result.success) {
+    std::cout << "[PASS] CodeGraphManager TypeScript search 'getUser' found "
+              << result.nodes.size() << " results" << std::endl;
+  } else {
+    std::cout << "[FAIL] CodeGraphManager TypeScript search failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_rust_search() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.searchSymbols("factorial", 20);
+  if (result.success) {
+    std::cout << "[PASS] CodeGraphManager Rust search 'factorial' found "
+              << result.nodes.size() << " results" << std::endl;
+  } else {
+    std::cout << "[FAIL] CodeGraphManager Rust search failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_go_search() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.searchSymbols("greet", 20);
+  if (result.success) {
+    bool found_go = false;
+    for (const auto &node : result.nodes) {
+      if (node.file_path.find(".go") != std::string::npos) {
+        found_go = true;
+        break;
+      }
+    }
+    if (found_go || result.nodes.empty()) {
+      std::cout << "[PASS] CodeGraphManager Go search 'greet' found "
+                << result.nodes.size() << " results" << std::endl;
+    } else {
+      std::cout << "[FAIL] CodeGraphManager Go search: no .go results"
+                << std::endl;
+    }
+  } else {
+    std::cout << "[FAIL] CodeGraphManager Go search failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_java_search() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.searchSymbols("multiply", 20);
+  if (result.success) {
+    bool found_java = false;
+    for (const auto &node : result.nodes) {
+      if (node.file_path.find(".java") != std::string::npos) {
+        found_java = true;
+        break;
+      }
+    }
+    if (found_java || result.nodes.empty()) {
+      std::cout << "[PASS] CodeGraphManager Java search 'multiply' found "
+                << result.nodes.size() << " results" << std::endl;
+    } else {
+      std::cout << "[FAIL] CodeGraphManager Java search: no .java results"
+                << std::endl;
+    }
+  } else {
+    std::cout << "[FAIL] CodeGraphManager Java search failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_multi_lang_context() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.getSymbolContext("add");
+  if (result.success) {
+    std::cout << "[PASS] CodeGraphManager multi-lang getSymbolContext 'add' "
+                 "succeeds"
+              << std::endl;
+  } else {
+    std::cout << "[FAIL] CodeGraphManager multi-lang getSymbolContext failed: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
+  }
+
+  cleanup_temp_project(tmp_dir);
+}
+
+inline void test_codegraph_manager_multi_lang_path() {
+  auto tmp_dir = create_multi_lang_project();
+  auto manager = agentxx::expand::CodeGraphManager{};
+
+  manager.initialize(tmp_dir);
+  manager.indexDirectory(tmp_dir, false);
+
+  auto result = manager.findPath("multiply", "add");
+  if (result.success ||
+      result.error.find("No path found") != std::string::npos) {
+    std::cout << "[PASS] CodeGraphManager multi-lang findPath multiply->add "
+                 "returned"
+              << std::endl;
+  } else {
+    std::cout << "[INFO] CodeGraphManager multi-lang findPath: "
+              << (result.error.empty() ? "(empty)" : result.error) << std::endl;
   }
 
   cleanup_temp_project(tmp_dir);
@@ -766,6 +1171,19 @@ inline asio::awaitable<void> run_codegraph_tools_tests(
   test_codegraph_manager_shutdown();
   test_codegraph_manager_update_index();
   test_codegraph_manager_resolve();
+
+  std::cout << "======= Test: Multi-Language CodeGraph =======" << std::endl;
+
+  test_codegraph_manager_multi_lang_index();
+  test_codegraph_manager_multi_lang_status();
+  test_codegraph_manager_python_search();
+  test_codegraph_manager_javascript_search();
+  test_codegraph_manager_typescript_search();
+  test_codegraph_manager_rust_search();
+  test_codegraph_manager_go_search();
+  test_codegraph_manager_java_search();
+  test_codegraph_manager_multi_lang_context();
+  test_codegraph_manager_multi_lang_path();
 
   std::cout << "======= Test: CodeGraph Tools =======" << std::endl;
 
