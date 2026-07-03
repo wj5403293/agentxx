@@ -230,20 +230,31 @@ Output ONLY the summary text, no meta-commentary.
   }
 
   asio::awaitable<void>
-  onModelcallStartFunc(neograph::graph::NodeInput &in) override {
+  onModelcallRunFunc(neograph::graph::NodeInput &in) override {
+    auto agentCtxPtr = agentContext.lock();
     auto messages = in.state.get_messages();
     if (messages.empty()) {
       co_return;
     }
-    auto count = countTokens(messages);
+    // - 接口返回的 token usage，可能不准确，因为 llm node
+    // 重试时可能会额外附加消息、也可能是上一轮的 api 返回的，本轮开始已经添加了
+    // toolcall / userInput 等消息
+    auto apiTokenUsage =
+        agentCtxPtr->middlewareHandleContext->getGraphDataItemValue<int>(
+            in.ctx.thread_id,
+            agentxx::middleware::MiddlewareContext::graphDataKey_LLMTokenUsage);
+    if (apiTokenUsage < 0) {
+      apiTokenUsage = 0;
+    }
+    const auto countTokenUsage = countTokens(messages);
+    const auto tokenUsage = std::max((size_t)apiTokenUsage, countTokenUsage);
 
     const auto &thread_id = in.ctx.thread_id;
     neograph::json newMsgsJson;
-
-    if (count >= modelSupportMaxToken * 0.65) {
+    bool doSummary = false;
+    if (tokenUsage >= modelSupportMaxToken * 0.65) {
       doSummarizeToolcall(messages);
       {
-        auto agentCtxPtr = agentContext.lock();
         for (auto &msg : messages) {
           offloadLongContentToTempStore(
               msg, agentCtxPtr->middlewareHandleContext, thread_id);
@@ -252,9 +263,10 @@ Output ONLY the summary text, no meta-commentary.
       neograph::to_json(newMsgsJson, messages);
     }
 
-    if (count >= modelSupportMaxToken * 0.9) {
+    if (tokenUsage >= modelSupportMaxToken * 0.9) {
       const size_t systemCount =
           (!messages.empty() && messages[0].role == "system") ? 1 : 0;
+      // TODO: 如果最近消息+system 已经超过，则无法压缩
       if (messages.size() > keepRecentMessageCount + systemCount) {
         size_t oldEnd = messages.size() - keepRecentMessageCount;
         for (size_t i = oldEnd; i > 0; i--) {
@@ -319,9 +331,34 @@ Output ONLY the summary text, no meta-commentary.
         }
       }
     }
-    if (false == newMsgsJson.empty()) {
-      in.state.overwrite("messages", newMsgsJson);
+
+    if (newMsgsJson.is_array() && false == newMsgsJson.empty()) {
+      in.state.overwrite("messages", std::move(newMsgsJson));
+      if (agentCtxPtr->agentConfig->logPrintSummarizationResultTokenCount) {
+        fmt::println(R"_(
+┏━━━━━━ Summary ━━━━━━┓
+┣━ MAX Token Limit: {}
+┣━ Api TokenUsage: {}
+┣━ Count Messages Token: {}/{}
+┣━ Summary To: {}
+┗━━━━━━ Summary ━━━━━━┛)_",
+                     modelSupportMaxToken, apiTokenUsage, tokenUsage,
+                     countTokenUsage, countTokens(in.state.get_messages()));
+      }
+    } else {
+      if (agentCtxPtr->agentConfig->logPrintSummarizationResultTokenCount) {
+        fmt::println(R"_(
+┏━━━━━━ Summary ━━━━━━┓
+┣━ MAX Token Limit: {}
+┣━ Api TokenUsage: {}
+┣━ Count Messages Token: {}/{}
+┣━ Not Need Summary
+┗━━━━━━ Summary ━━━━━━┛)_",
+                     modelSupportMaxToken, apiTokenUsage, tokenUsage,
+                     countTokenUsage, countTokens(in.state.get_messages()));
+      }
     }
+
     co_return;
   }
 };
