@@ -206,7 +206,7 @@ public:
     }
 
     fmt::print(R"(
-┏━━━━━━ Toolcall  Run ━━━━━━┓
+┏━━━━━━ Toolcall ━━━━━━┓
 {}
 )",
                out.str());
@@ -235,7 +235,7 @@ public:
 
     fmt::print(R"(
 {}
-┗━━━━━━ Toolcall Done ━━━━━━┛
+┗━━━━━━ Toolcall ━━━━━━┛
 
 )",
                out.str());

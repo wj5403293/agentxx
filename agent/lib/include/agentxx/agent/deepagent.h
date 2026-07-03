@@ -147,6 +147,7 @@ public:
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
+              (agentxx::middleware::onGraphNodeBeforeCallFunc) nullptr,
               (agentxx::middleware::onGraphNodeAfterCallFunc) nullptr,
               [](neograph::graph::NodeInput &in) -> asio::awaitable<void> {
                 return agentxx::nodes::ToolcallWrapNode::
@@ -219,13 +220,13 @@ public:
             std::make_shared<agentxx::tools::RAGSearchTool::VectorStore>(
                 client);
         auto docs = co_await docsStore->scanDocument(config->ragDocsPaths);
-        std::cout << "\n┏━━━━━━ RAG embedding ━━━━━━┓" << std::endl;
+        std::cout << "\n┏━━━━━━ RAG Embedding ━━━━━━┓" << std::endl;
         if (co_await docsStore->addDocuments(std::move(docs))) {
           fmt::println("┣━ ✅ success: append {} docs", docs.size());
         } else {
           std::cout << "┣━ ❌ failed" << std::endl;
         }
-        std::cout << "┗━━━━━━ RAG embedding ━━━━━━┛\n" << std::endl;
+        std::cout << "┗━━━━━━ RAG Embedding ━━━━━━┛\n" << std::endl;
         tools.push_back(std::make_unique<agentxx::tools::RAGSearchTool>(
             docsStore, agentContext));
       }
@@ -557,8 +558,9 @@ public:
                         agentxx::middleware::BaseMiddlewareHandleInterface::
                             channelKey_interruptResult,
                         resumeValue.value());
-                    state.overwrite("messages", messages);
+                    state.overwrite("messages", std::move(messages));
                   });
+              // [messages] 已清空
 
               std::cout << agentContext->agentConfig->agentNameView
                         << " [Resume]: " << std::flush;

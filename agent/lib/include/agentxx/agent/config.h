@@ -38,6 +38,8 @@ public:
   bool websearchConvertHtml2markdown = true;
 
   bool logPrintMessagesBeforeLLM = false;
+  bool logPrintMessagesBeforeLLMWithSystemMsg = false;
+  bool logPrintSummarizationResultTokenCount = false;
 };
 
 } // namespace agent

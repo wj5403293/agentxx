@@ -268,7 +268,7 @@ public:
         }
       }
 
-      std::cout << "\n┏━━━━━━ Skill Load Start ━━━━━━┓" << std::endl;
+      std::cout << "\n┏━━━━━━ Skill Load ━━━━━━┓" << std::endl;
       for (const auto &item : skillCache.skillData) {
         fmt::println("┣━ ✅ Load skill metadata success: `{}`({}): {}",
                      item.second.name, item.second.dirpath,
@@ -278,7 +278,7 @@ public:
         fmt::println("┣━ ❌ Load skill metadata failed: {} | {}", item.first,
                      item.second);
       }
-      std::cout << "┗━━━━━━ Skill Load  Done ━━━━━━┛\n" << std::endl;
+      std::cout << "┗━━━━━━ Skill Load ━━━━━━┛\n" << std::endl;
     }
     co_return;
   }

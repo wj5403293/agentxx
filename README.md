@@ -97,7 +97,7 @@
     - mermaid/stateDiagram-v2 状态图描述大方向的任务规划
     - todo_list 描述近期需要实现的任务细节步骤
 - ✅**压缩上下文** `SummarizationMiddleware`
-    - 自动估算 tokens，达到阈值时自动启动压缩
+    - Api TokenUsage / 自动估算 tokens，达到阈值时自动启动压缩
     - toolcall 各自实现压缩处理
         - 裁剪历史消息中过时的 (filesystem)文件读写、(planning)任务规划、(share_store)变量读写消息
     - 将部分重要的长消息内容暂存到 `share_store`，而不压缩，模型需要时可以提取

@@ -34,24 +34,38 @@ public:
       : WrapHandleBaseNode<neograph::graph::LLMCallNode>(name, in_agentContext,
                                                          ctx) {}
 
-  void onReceiveToken(const neograph::graph::GraphStreamCallback &callback,
-                      neograph::graph::NodeInput input,
-                      const std::string &nodeName,
-                      const std::string &token) override {
-    // 记录 本次请求的临时LLM消息，以便触发异常时处理
+  asio::awaitable<neograph::ChatCompletion>
+  onReceiveToken(neograph::CompletionParams &params,
+                 neograph::graph::NodeInput input) override {
     auto ctxPtr = agentContext.lock()->middlewareHandleContext;
-    ctxPtr->modifyGraphDataItemValue<std::string>(
-        input.ctx.thread_id,
-        agentxx::middleware::MiddlewareContext::graphDataKey_tempLLMMessage,
-        [&token](std::string &msg) { msg += token; });
 
+    auto callback = input.stream_cb;
+    std::function<void(const std::string &chunk)> onToken;
     if (nullptr != callback) {
-      callback(neograph::graph::GraphEvent{
-          neograph::graph::GraphEvent::Type::LLM_TOKEN,
-          nodeName,
-          neograph::json(token),
-      });
+      onToken = [&input, callback, ctxPtr, this](const std::string &token) {
+        // 记录 本次请求的临时LLM消息，以便触发异常时处理
+        ctxPtr->modifyGraphDataItemValue<std::string>(
+            input.ctx.thread_id,
+            agentxx::middleware::MiddlewareContext::graphDataKey_tempLLMMessage,
+            [&token](std::string &msg) { msg += token; });
+
+        if (nullptr != callback) {
+          (*callback)(neograph::graph::GraphEvent{
+              neograph::graph::GraphEvent::Type::LLM_TOKEN,
+              nodeName,
+              neograph::json(token),
+          });
+        }
+      };
     }
+    auto completion = co_await provider_->invoke(params, onToken);
+
+    // 记录 token使用量
+    ctxPtr->setGraphDataItemValue<int>(
+        input.ctx.thread_id,
+        agentxx::middleware::MiddlewareContext::graphDataKey_LLMTokenUsage,
+        completion.usage.total_tokens);
+    co_return completion.message;
   }
 
   asio::awaitable<void>
@@ -134,63 +148,63 @@ public:
     }
   }
 
-  asio::awaitable<void> baseRun(neograph::graph::NodeInput &in,
-                                neograph::graph::NodeOutput &result) override {
+  asio::awaitable<void>
+  baseRun(std::vector<std::shared_ptr<
+              agentxx::middleware::BaseMiddlewareHandleInterface>> &handles,
+          neograph::graph::NodeInput &in,
+          neograph::graph::NodeOutput &result) override {
     auto agentCtxPtr = agentContext.lock();
 
-    // 添加 system Msg
-    auto msglist = in.state.get("messages");
-    bool haveSystemMsg = false;
-    auto newSystemMsg = neograph::ChatMessage{.role = "system"};
-    if (msglist.is_array() && false == msglist.empty()) {
-      auto systemMsg = neograph::ChatMessage{};
-      neograph::from_json(msglist.front(), systemMsg);
-      if (systemMsg.role == "system") {
-        haveSystemMsg = true;
-        newSystemMsg = std::move(systemMsg);
-      }
-    }
-
     {
-      auto &appendSystemMsgList =
-          agentCtxPtr->middlewareHandleContext
-              ->getGraphDataItemValue<std::vector<std::string>>(
-                  in.ctx.thread_id, agentxx::middleware::MiddlewareContext::
-                                        graphDataKey_systemMessage);
-
-      // 清空原本的 content
-      newSystemMsg.content = "";
-      std::ostringstream oss;
-      oss << agentCtxPtr->agentConfig->prompt.systemPrompt;
-
-      if (false == appendSystemMsgList.empty()) {
-        for (const auto &item : appendSystemMsgList) {
-          oss << item << "\n";
+      // 添加 system Msg
+      auto msglist = in.state.get("messages");
+      bool haveSystemMsg = false;
+      auto newSystemMsg = neograph::ChatMessage{.role = "system"};
+      if (msglist.is_array() && false == msglist.empty()) {
+        auto systemMsg = neograph::ChatMessage{};
+        neograph::from_json(msglist.front(), systemMsg);
+        if (systemMsg.role == "system") {
+          haveSystemMsg = true;
+          newSystemMsg = std::move(systemMsg);
         }
       }
 
-      newSystemMsg.content = oss.str();
-    }
+      {
+        auto &appendSystemMsgList =
+            agentCtxPtr->middlewareHandleContext
+                ->getGraphDataItemValue<std::vector<std::string>>(
+                    in.ctx.thread_id, agentxx::middleware::MiddlewareContext::
+                                          graphDataKey_systemMessage);
 
-    neograph::json sysMsgJson;
-    neograph::to_json(sysMsgJson, newSystemMsg);
-    if (haveSystemMsg) {
-      // 替换 system msg
-      msglist[0] = std::move(sysMsgJson);
-    } else {
-      // 缺少 system msg，在开头插入
-      auto newlist = neograph::json::array();
-      newlist.push_back(std::move(sysMsgJson));
-      for (auto item : msglist.items()) {
-        newlist.push_back(std::move(item.second));
+        // 清空原本的 content
+        newSystemMsg.content = "";
+        std::ostringstream oss;
+        oss << agentCtxPtr->agentConfig->prompt.systemPrompt;
+
+        if (false == appendSystemMsgList.empty()) {
+          for (const auto &item : appendSystemMsgList) {
+            oss << item << "\n";
+          }
+        }
+
+        newSystemMsg.content = oss.str();
       }
-      msglist = std::move(newlist);
-    }
-    in.state.overwrite("messages", msglist);
 
-    if (agentCtxPtr->agentConfig->logPrintMessagesBeforeLLM) {
-      agentxx::middleware::BaseMiddlewareHandleInterface::printMessages(
-          in.state.get_messages());
+      neograph::json sysMsgJson;
+      neograph::to_json(sysMsgJson, newSystemMsg);
+      if (haveSystemMsg) {
+        // 替换 system msg
+        msglist[0] = std::move(sysMsgJson);
+      } else {
+        // 缺少 system msg，在开头插入
+        auto newlist = neograph::json::array();
+        newlist.push_back(std::move(sysMsgJson));
+        for (auto item : msglist.items()) {
+          newlist.push_back(std::move(item.second));
+        }
+        msglist = std::move(newlist);
+      }
+      in.state.overwrite("messages", std::move(msglist));
     }
 
     auto ctxPtr = agentContext.lock()->middlewareHandleContext;
@@ -204,6 +218,16 @@ public:
       // 修正上下文角色顺序
       repairMessages(in);
 
+      for (auto &handle : handles) {
+        co_await handle->onModelcallRunFunc(in);
+      }
+
+      if (agentCtxPtr->agentConfig->logPrintMessagesBeforeLLM) {
+        agentxx::middleware::BaseMiddlewareHandleInterface::printMessages(
+            in.state.get_messages(),
+            agentCtxPtr->agentConfig->logPrintMessagesBeforeLLMWithSystemMsg);
+      }
+
       bool isCancel = false;
       std::string errInfo;
       std::exception_ptr errorPtr;
@@ -211,7 +235,7 @@ public:
       try {
         // 触发异常时，本次 LLM 消息不会添加到 result 中，因此需要额外处理
         co_await WrapHandleBaseNode<neograph::graph::LLMCallNode>::baseRun(
-            in, result);
+            agentCtxPtr->middlewareHandleContext->handles, in, result);
         co_return;
       } catch (const neograph::graph::CancelledException &e) {
         isCancel = true;
@@ -254,9 +278,9 @@ public:
         std::rethrow_exception(errorPtr);
       }
       // 自动重试
-      retry++;
       XX_LOGD("LLMCallNode retry: {}/{} | {}", retry,
               agentCtxPtr->agentConfig->llmMaxRetry, errInfo);
+      retry++;
       // 逐渐延长延时等待
       timer.expires_after(std::chrono::milliseconds(retry * 1000));
       co_await timer.async_wait(asio::use_awaitable);

@@ -88,6 +88,9 @@ public:
   onModelcallStartFunc(neograph::graph::NodeInput &in) = 0;
 
   virtual asio::awaitable<void>
+  onModelcallRunFunc(neograph::graph::NodeInput &in) = 0;
+
+  virtual asio::awaitable<void>
   onModelcallEndFunc(const neograph::graph::NodeInput &in,
                      neograph::graph::NodeOutput &result) = 0;
 
@@ -149,10 +152,14 @@ public:
   }
 
   inline static void
-  printMessages(const std::vector<neograph::ChatMessage> &messages) {
+  printMessages(const std::vector<neograph::ChatMessage> &messages,
+                bool printSystemMsg = true) {
     size_t index = 0;
     for (const auto &msg : messages) {
       ++index;
+      if (false == printSystemMsg && msg.role == "system") {
+        continue;
+      }
       std::string tools;
       for (const auto &tool : msg.tool_calls) {
         tools += fmt::format(R"(  - {}/{}
@@ -195,6 +202,11 @@ public:
 
   asio::awaitable<void>
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
+    co_return;
+  }
+
+  asio::awaitable<void>
+  onModelcallRunFunc(neograph::graph::NodeInput &in) override {
     co_return;
   }
 
@@ -288,6 +300,7 @@ public:
   onGraphNodeBeforeCallFunc onAgentcallStart;
   onGraphNodeAfterCallFunc onAgentcallEnd;
   onGraphNodeBeforeCallFunc onModelcallStart;
+  onGraphNodeBeforeCallFunc onModelcallRun;
   onGraphNodeAfterCallFunc onModelcallEnd;
   onGraphNodeBeforeCallFunc onToolcallStart;
   onGraphNodeAfterCallFunc onToolcallEnd;
@@ -298,6 +311,7 @@ public:
       const onGraphNodeBeforeCallFunc &in_onAgentcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onAgentcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onModelcallStart = nullptr,
+      const onGraphNodeBeforeCallFunc &in_onModelcallRun = nullptr,
       const onGraphNodeAfterCallFunc &in_onModelcallEnd = nullptr,
       const onGraphNodeBeforeCallFunc &in_onToolcallStart = nullptr,
       const onGraphNodeAfterCallFunc &in_onToolcallEnd = nullptr)
@@ -305,8 +319,8 @@ public:
         onAgentcallStart(in_onAgentcallStart),
         onAgentcallEnd(in_onAgentcallEnd),
         onModelcallStart(in_onModelcallStart),
-        onModelcallEnd(in_onModelcallEnd), onToolcallStart(in_onToolcallStart),
-        onToolcallEnd(in_onToolcallEnd) {}
+        onModelcallRun(in_onModelcallRun), onModelcallEnd(in_onModelcallEnd),
+        onToolcallStart(in_onToolcallStart), onToolcallEnd(in_onToolcallEnd) {}
 
   asio::awaitable<void>
   onAgentcallStartFunc(neograph::graph::NodeInput &in) override {
@@ -327,6 +341,13 @@ public:
   onModelcallStartFunc(neograph::graph::NodeInput &in) override {
     if (nullptr != onModelcallStart) {
       co_await onModelcallStart(in);
+    }
+  }
+
+  asio::awaitable<void>
+  onModelcallRunFunc(neograph::graph::NodeInput &in) override {
+    if (nullptr != onModelcallRun) {
+      co_await onModelcallRun(in);
     }
   }
 
@@ -368,6 +389,8 @@ public:
   inline static const std::string graphDataKey_systemMessage{"systemMessage"};
   inline static const std::string graphDataKey_tempLLMMessage{
       "xx_ModelCallWrap_tempLLMMessage"};
+  inline static const std::string graphDataKey_LLMTokenUsage{
+      "xx_ModelCallWrap_LLMTokenUsage"};
 
   /// <thread_id, <id, value>>
   /// - 存储变量内容，留出 id 到 上下文中，llm 需要时可以通过

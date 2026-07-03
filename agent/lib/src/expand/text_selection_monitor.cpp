@@ -21,9 +21,9 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winhttp.lib")
 
-#endif
-
 namespace asio = boost::asio;
+
+#endif
 
 namespace agentxx {
 namespace expand {

@@ -152,8 +152,10 @@ public:
                    const neograph::graph::NodeInput &in,
                    neograph::graph::NodeOutput &result) noexcept {}
 
-  virtual asio::awaitable<void> baseRun(neograph::graph::NodeInput &in,
-                                        neograph::graph::NodeOutput &result) {
+  virtual asio::awaitable<void>
+  baseRun(std::vector<std::shared_ptr<
+              agentxx::middleware::BaseMiddlewareHandleInterface>> &handles,
+          neograph::graph::NodeInput &in, neograph::graph::NodeOutput &result) {
     result = co_await T::run(in);
   }
 
@@ -212,7 +214,8 @@ public:
       if (i >= len) {
         std::string errInfo;
         try {
-          co_await baseRun(in, out);
+          co_await baseRun(agentCtxPtr->middlewareHandleContext->handles, in,
+                           out);
           i = len;
           break;
         } catch (const neograph::graph::CancelledException &e) {
