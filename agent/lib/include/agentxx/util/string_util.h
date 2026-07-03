@@ -439,13 +439,14 @@ inline std::string base64Decode(std::string_view str) {
   return result;
 }
 
-std::tuple<bool, std::string> convertToUtf8(std::string_view src,
-                                            std::string_view srcEncoding);
+std::tuple<bool, std::optional<std::string>>
+convertToUtf8(std::string_view src, std::string_view srcEncoding);
 
-std::tuple<bool, std::string> autoConvertToUtf8(std::string_view str,
-                                                std::string &encoding);
+std::tuple<bool, std::optional<std::string>>
+autoConvertToUtf8(std::string_view str, std::string &encoding);
 
-std::tuple<bool, std::string> autoConvertToUtf8(std::string_view str, bool _);
+std::tuple<bool, std::optional<std::string>>
+autoConvertToUtf8(std::string_view str, bool _);
 
 bool autoConvertToUtf8(std::string &str);
 

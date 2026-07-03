@@ -62,22 +62,20 @@ getIconvCandidateEncodings(const char *src_encoding) {
   }
   return candidates;
 }
-
-// 转UTF8
-std::tuple<bool, std::string>
+std::tuple<bool, std::optional<std::string>>
 agentxx::util::convertToUtf8(std::string_view src,
                              std::string_view srcEncoding) {
   // 已是UTF8/空字符串，直接返回
   if ("UTF-8" == srcEncoding || "utf8" == srcEncoding) {
-    return {true, ""};
+    return {true, std::nullopt};
   }
   if (src.empty()) {
-    return {false, ""};
+    return {false, std::nullopt};
   }
 
   auto candidate_encs = getIconvCandidateEncodings(srcEncoding.data());
   if (candidate_encs.empty()) {
-    return {false, ""};
+    return {false, std::nullopt};
   }
 
   // 遍历候选编码，逐个尝试
@@ -95,7 +93,7 @@ agentxx::util::convertToUtf8(std::string_view src,
   }
   if (cd == (iconv_t)-1) {
     // 所有候选编码名都失败，直接返回
-    return {false, ""};
+    return {false, std::nullopt};
   }
 
   // 缓冲区
@@ -122,11 +120,10 @@ agentxx::util::convertToUtf8(std::string_view src,
 }
 
 /// <isSuccess, result>
-/// 如果 [result] 为空字符串，不需要转换
-std::tuple<bool, std::string>
+std::tuple<bool, std::optional<std::string>>
 agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
   if (str.empty()) {
-    return {true, ""};
+    return {true, std::nullopt};
   }
 
   // 手动检测UTF16 BOM
@@ -143,13 +140,13 @@ agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
   uchardet_reset(g_chardetHandle);
   int ret = uchardet_handle_data(g_chardetHandle, str.data(), str.size());
   if (ret != 0) {
-    return {false, ""};
+    return {false, std::nullopt};
   }
   uchardet_data_end(g_chardetHandle);
 
   int n_candidates = uchardet_get_n_candidates(g_chardetHandle);
   if (n_candidates <= 0) {
-    return {false, ""};
+    return {false, std::nullopt};
   }
   // if (n_candidates > 5) {
   //     n_candidates = 5;
@@ -162,7 +159,7 @@ agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
     }
   }
   if (detected_candidates.empty()) {
-    return {false, ""};
+    return {false, std::nullopt};
   }
 
   std::string selected_enc;
@@ -212,7 +209,7 @@ agentxx::util::autoConvertToUtf8(std::string_view str, std::string &encoding) {
   return convertToUtf8(str, encoding);
 }
 
-std::tuple<bool, std::string>
+std::tuple<bool, std::optional<std::string>>
 agentxx::util::autoConvertToUtf8(std::string_view str, bool _) {
   std::string encoding;
   return autoConvertToUtf8(str, encoding);
@@ -220,8 +217,8 @@ agentxx::util::autoConvertToUtf8(std::string_view str, bool _) {
 
 bool agentxx::util::autoConvertToUtf8(std::string &str) {
   auto [isSuccess, result] = autoConvertToUtf8(str, true);
-  if (isSuccess) {
-    str = std::move(result);
+  if (isSuccess && result.has_value()) {
+    str = std::move(result.value());
   }
   return isSuccess;
 }
