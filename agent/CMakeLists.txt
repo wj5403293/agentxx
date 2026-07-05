@@ -73,6 +73,7 @@ else ()
   return()
 endif ()
 
+message("[agentxx] Test Utf8 Log: 你好！")
 message("[agentxx] Current Configure Type: ${CMAKE_CONFIGURATION_TYPES}")
 message("[agentxx] Current Build Type: ${CMAKE_BUILD_TYPE}")
 message("[agentxx] Current Compiler: ${CMAKE_C_COMPILER_ID}")

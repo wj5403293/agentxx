@@ -83,9 +83,6 @@ int main(int argn, char **argv) {
   auto monitor = test_text_selection_monitor();
 
   std::cout << "======= Test Done =======" << std::endl;
-  std::cout << ">>>";
-  int num = 0;
-  std::cin >> num;
 
   if (nullptr != monitor) {
     monitor->stop();
