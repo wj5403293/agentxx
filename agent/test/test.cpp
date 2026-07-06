@@ -15,6 +15,7 @@
 #include "asio/use_awaitable.hpp"
 #include "test_codegraph_tools.h"
 #include "test_command_tools.h"
+#include "test_cpu_gpu_use.h"
 #include "test_datetime_tool.h"
 #include "test_filesystem_tools.h"
 #include "test_rag_search_tools.h"
@@ -74,6 +75,7 @@ int main(int argn, char **argv) {
         co_await run(agentxx::test::run_command_tools_tests, agentContext);
         co_await run(agentxx::test::run_web_search_tools_tests, agentContext);
         co_await run(agentxx::test::run_codegraph_tools_tests, agentContext);
+        co_await agentxx::test::test_cpu_gpu_use();
       },
       asio::detached);
   ioCtx.run();
