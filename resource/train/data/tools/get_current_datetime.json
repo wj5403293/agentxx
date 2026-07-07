@@ -1,0 +1,709 @@
+[
+    {
+        "name": "get_current_datetime - 获取当前日期时间",
+        "input": "请告诉我现在是什么时间",
+        "expectedOutput": "返回当前时间戳（毫秒）、本地时间和 UTC 时间，格式为 Timestamp/ Local Time/ UTC Time",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间戳",
+        "input": "获取当前时间戳",
+        "expectedOutput": "返回 Timestamp 字段，单位为毫秒",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取本地时间",
+        "input": "现在本地时间是几点",
+        "expectedOutput": "返回 Local Time (24Hour) 字段，格式为 YYYY-MM-DD HH:MM:SS",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取UTC时间",
+        "input": "请问现在的 UTC 时间是多少",
+        "expectedOutput": "返回 UTC Time (24Hour) 字段，格式为 YYYY-MM-DD HH:MM:SS",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 同时获取多种时间",
+        "input": "获取当前的时间戳、本地时间和UTC时间",
+        "expectedOutput": "返回包含 Timestamp、Local Time、UTC Time 三个字段的完整时间信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询日期",
+        "input": "今天是什么日期",
+        "expectedOutput": "返回本地时间，日期部分格式为 YYYY-MM-DD",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询星期",
+        "input": "今天星期几",
+        "expectedOutput": "返回本地时间，可通过日期推算星期",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 英文查询时间",
+        "input": "What is the current date and time",
+        "expectedOutput": "返回当前时间戳、本地时间和 UTC 时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取系统时间",
+        "input": "系统当前时间是多少",
+        "expectedOutput": "返回本地时间，格式为 24 小时制",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取毫秒级时间戳",
+        "input": "给我当前的毫秒级时间戳",
+        "expectedOutput": "返回 Timestamp 字段，值为毫秒级别的时间戳",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询年月日",
+        "input": "现在的年月日是什么",
+        "expectedOutput": "返回本地时间，包含完整的年月日信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询时分秒",
+        "input": "现在几点几分几秒",
+        "expectedOutput": "返回本地时间，包含 HH:MM:SS 格式的时分秒",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 对比本地和UTC时间",
+        "input": "帮我对比一下本地时间和UTC时间的差异",
+        "expectedOutput": "同时返回 Local Time 和 UTC Time，可对比两者差异",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取时间用于日志",
+        "input": "获取当前时间，我要记录日志",
+        "expectedOutput": "返回包含时间戳和本地时间的完整时间信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取24小时制时间",
+        "input": "用24小时制告诉我现在的时间",
+        "expectedOutput": "返回 24Hour 格式的本地时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取时间用于文件命名",
+        "input": "给我当前时间戳用于文件命名",
+        "expectedOutput": "返回 Timestamp 毫秒时间戳，可用于文件命名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询当前时间信息",
+        "input": "现在的时间信息",
+        "expectedOutput": "返回完整的时间信息，包含 Timestamp、Local Time、UTC Time",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间多种格式",
+        "input": "以多种格式告诉我当前时间",
+        "expectedOutput": "返回时间戳、本地时间和UTC时间三种格式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询当前日期时间精确值",
+        "input": "请精确告诉我当前的日期和时间",
+        "expectedOutput": "返回精确到秒的本地时间和UTC时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间的完整描述",
+        "input": "完整描述一下当前的时间信息",
+        "expectedOutput": "返回完整的 Timestamp、Local Time、UTC Time 信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 仅需时间戳",
+        "input": "只要时间戳",
+        "expectedOutput": "返回 Timestamp 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 仅需本地时间",
+        "input": "只要本地时间",
+        "expectedOutput": "返回 Local Time (24Hour) 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 仅需UTC时间",
+        "input": "只要UTC时间",
+        "expectedOutput": "返回 UTC Time (24Hour) 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间作为基准",
+        "input": "获取当前时间作为后续操作的基准时间",
+        "expectedOutput": "返回完整的时间信息，可作为后续时间计算的基准",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取时间用于计时开始",
+        "input": "记录一下开始时间，我要计时",
+        "expectedOutput": "返回当前时间戳，可用于计时起点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取时间用于计时结束",
+        "input": "记录一下结束时间",
+        "expectedOutput": "返回当前时间戳，可用于计时终点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询当前时间并格式化",
+        "input": "获取当前时间，按YYYY-MM-DD HH:MM:SS格式返回",
+        "expectedOutput": "返回本地时间，格式为 YYYY-MM-DD HH:MM:SS",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于调试",
+        "input": "获取当前时间，用于调试",
+        "expectedOutput": "返回包含时间戳和本地时间的完整时间信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前utc时间戳",
+        "input": "utc timestamp now",
+        "expectedOutput": "返回 UTC Time 和时间戳",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前日期时间用于报告",
+        "input": "获取当前日期时间，用于生成报告",
+        "expectedOutput": "返回本地时间，包含完整的日期和时间信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询现在的时间",
+        "input": "现在时间",
+        "expectedOutput": "返回本地时间 (24Hour)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取系统当前日期",
+        "input": "系统日期",
+        "expectedOutput": "返回本地时间，包含日期部分",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取系统当前时钟",
+        "input": "系统时钟",
+        "expectedOutput": "返回本地时间，包含时分秒",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于版本标记",
+        "input": "获取当前时间用于版本标记",
+        "expectedOutput": "返回时间戳，适合用于版本号或标记",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据库记录",
+        "input": "获取当前时间，用于数据库记录的时间字段",
+        "expectedOutput": "返回包含时间戳和UTC时间的完整时间信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 多次获取时间",
+        "input": "获取当前时间，然后再获取一次",
+        "expectedOutput": "返回时间信息，两次调用可能有微小差异",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间并解释格式",
+        "input": "获取当前时间，并解释返回的格式",
+        "expectedOutput": "返回时间信息，包含 Timestamp、Local Time、UTC Time 三个字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询当前时间用于安排任务",
+        "input": "获取当前时间，我需要安排后续任务",
+        "expectedOutput": "返回本地时间，可用于任务调度参考",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间显示给用户",
+        "input": "获取当前时间并显示给用户",
+        "expectedOutput": "返回本地时间，格式清晰可读",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取精密时间",
+        "input": "请给我最精密的时间",
+        "expectedOutput": "返回毫秒级时间戳和精确到秒的本地时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于API调用",
+        "input": "获取当前时间用于API请求的时间头",
+        "expectedOutput": "返回 UTC 时间和时间戳，适合API时间头",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 查询当前时间是否在某个范围内",
+        "input": "获取当前时间，判断是否在工作时间内",
+        "expectedOutput": "返回本地时间，可根据时间判断是否在9:00-18:00范围内",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于会话记录",
+        "input": "获取当前时间记录会话开始",
+        "expectedOutput": "返回完整的时间信息用于会话记录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间英文描述",
+        "input": "current time please",
+        "expectedOutput": "返回 Timestamp、Local Time、UTC Time",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前日期时间简洁版",
+        "input": "时间",
+        "expectedOutput": "返回本地时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间作为文件名后缀",
+        "input": "获取当前时间戳作为文件名后缀",
+        "expectedOutput": "返回 Timestamp 毫秒时间戳，适合作为文件名后缀",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间截取日期部分",
+        "input": "获取当前日期，不需要时间部分",
+        "expectedOutput": "返回本地时间，日期部分为 YYYY-MM-DD",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间截取时间部分",
+        "input": "获取当前时间，只需要时分秒",
+        "expectedOutput": "返回本地时间，时间部分为 HH:MM:SS",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于超时计算",
+        "input": "获取当前时间，用于计算超时",
+        "expectedOutput": "返回时间戳，可用于超时计算",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于缓存过期",
+        "input": "获取当前时间设置缓存过期时间",
+        "expectedOutput": "返回时间戳，可用于设置缓存过期基准",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前日期用于日历",
+        "input": "获取当前日期用于日历显示",
+        "expectedOutput": "返回本地时间，包含年月日",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间同步",
+        "input": "获取当前UTC时间用于时间同步",
+        "expectedOutput": "返回 UTC Time，可用于时间同步",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于性能测试开始",
+        "input": "获取当前时间戳，开始性能测试",
+        "expectedOutput": "返回毫秒级 Timestamp，适合性能测试起始点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于性能测试结束",
+        "input": "获取当前时间戳，结束性能测试",
+        "expectedOutput": "返回毫秒级 Timestamp，适合性能测试结束点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于日志时间戳",
+        "input": "获取当前时间用于日志记录的时间戳",
+        "expectedOutput": "返回时间戳和本地时间，适合日志记录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间中文查询",
+        "input": "现在几点了",
+        "expectedOutput": "返回本地时间 (24Hour)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间日文查询",
+        "input": "現在の日時を教えてください",
+        "expectedOutput": "返回当前时间戳、本地时间和 UTC 时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于定时任务",
+        "input": "获取当前时间，计算距离下一个整点还有多久",
+        "expectedOutput": "返回本地时间，可用于计算到下一个整点的剩余时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于倒计时",
+        "input": "获取当前时间，我要设置一个倒计时",
+        "expectedOutput": "返回时间戳，可用于倒计时基准",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据版本",
+        "input": "获取当前时间作为数据版本号",
+        "expectedOutput": "返回时间戳，适合作为数据版本标识",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间验证时区",
+        "input": "获取本地时间和UTC时间，验证时区设置",
+        "expectedOutput": "同时返回 Local Time 和 UTC Time，可验证时区偏移",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于过期判断",
+        "input": "获取当前时间，用于判断token是否过期",
+        "expectedOutput": "返回时间戳，可用于比较过期时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于排序",
+        "input": "获取当前时间戳用于数据排序",
+        "expectedOutput": "返回 Timestamp 毫秒时间戳，适合数据排序",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于唯一ID生成",
+        "input": "获取当前时间戳用于生成唯一ID",
+        "expectedOutput": "返回毫秒级 Timestamp，可用于生成唯一ID",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于快照标记",
+        "input": "获取当前时间标记快照",
+        "expectedOutput": "返回完整的时间信息，可用于快照时间标记",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于审计",
+        "input": "获取当前时间用于审计记录",
+        "expectedOutput": "返回UTC时间和时间戳，适合审计日志",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于请求限流",
+        "input": "获取当前时间戳用于请求限流判断",
+        "expectedOutput": "返回毫秒级 Timestamp，可用于限流窗口计算",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据过期清理",
+        "input": "获取当前时间，用于判断哪些数据已过期需要清理",
+        "expectedOutput": "返回时间戳，可用于与数据过期时间比较",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于会话超时",
+        "input": "获取当前时间，判断会话是否超时",
+        "expectedOutput": "返回时间戳，可用于会话超时计算",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于任务调度",
+        "input": "获取当前时间用于任务调度",
+        "expectedOutput": "返回本地时间，可用于 cron 表达式参考",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于构建时间范围查询",
+        "input": "获取当前时间，构建一个时间范围查询",
+        "expectedOutput": "返回时间戳，可用于构建时间范围查询的起止点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间序列数据",
+        "input": "获取当前时间用于时间序列数据点",
+        "expectedOutput": "返回时间戳，适合作为时间序列数据的时间索引",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于延迟计算",
+        "input": "获取当前时间，计算延迟",
+        "expectedOutput": "返回毫秒级时间戳，可用于精确延迟计算",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于频率限制",
+        "input": "获取当前时间用于频率限制检查",
+        "expectedOutput": "返回时间戳，可用于频率限制的时间窗口",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于监控指标",
+        "input": "获取当前时间用于监控指标时间戳",
+        "expectedOutput": "返回时间戳，适合监控指标的时间标记",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于计划任务",
+        "input": "获取当前时间，计划5分钟后执行任务",
+        "expectedOutput": "返回时间戳，可用于计算5分钟后的时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于备份标记",
+        "input": "获取当前时间用于备份文件的时间标记",
+        "expectedOutput": "返回时间戳，适合备份文件命名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于事件记录",
+        "input": "获取当前时间记录事件发生时间",
+        "expectedOutput": "返回完整的时间信息，适合事件记录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于请求签名",
+        "input": "获取当前时间戳用于API请求签名",
+        "expectedOutput": "返回毫秒级 Timestamp，适合请求签名中的时间戳",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据同步",
+        "input": "获取当前UTC时间用于数据同步",
+        "expectedOutput": "返回 UTC Time，适合跨时区数据同步",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于消息队列",
+        "input": "获取当前时间作为消息的时间戳",
+        "expectedOutput": "返回时间戳，适合消息队列中的消息时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于轮询间隔",
+        "input": "获取当前时间，用于计算轮询间隔",
+        "expectedOutput": "返回毫秒级时间戳，适合轮询间隔计算",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于TTL设置",
+        "input": "获取当前时间，设置TTL过期时间",
+        "expectedOutput": "返回时间戳，可用于计算TTL过期时间点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于统计分析",
+        "input": "获取当前时间用于统计分析的时间维度",
+        "expectedOutput": "返回本地时间，可用于统计分析的时间维度",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据分区",
+        "input": "获取当前日期用于数据分区",
+        "expectedOutput": "返回本地时间，日期部分可用于数据分区键",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于日志滚动",
+        "input": "获取当前时间，判断是否需要滚动日志文件",
+        "expectedOutput": "返回本地时间，可用于判断是否需要按天滚动日志",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于随机种子",
+        "input": "获取当前时间戳作为随机数种子",
+        "expectedOutput": "返回毫秒级 Timestamp，适合作为随机数生成种子",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间格式化输出",
+        "input": "获取当前时间，以人类可读格式输出",
+        "expectedOutput": "返回本地时间，格式清晰易读",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于构建时间字符串",
+        "input": "获取当前时间，构建 ISO 8601 格式的时间字符串",
+        "expectedOutput": "返回本地时间，可用于构建 ISO 8601 格式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于请求ID",
+        "input": "获取当前时间戳用于生成请求ID",
+        "expectedOutput": "返回毫秒级 Timestamp，适合请求ID生成",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于定期报告",
+        "input": "获取当前时间用于生成定期报告",
+        "expectedOutput": "返回本地时间，包含完整日期时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于会话管理",
+        "input": "获取当前时间用于会话管理",
+        "expectedOutput": "返回时间戳，适合会话创建时间和过期时间管理",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据版本控制",
+        "input": "获取当前时间用于数据版本控制",
+        "expectedOutput": "返回时间戳，适合乐观锁版本号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间窗口聚合",
+        "input": "获取当前时间用于时间窗口聚合计算",
+        "expectedOutput": "返回时间戳，可用于时间窗口的起始点计算",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于流量控制",
+        "input": "获取当前时间用于流量控制的时间窗口",
+        "expectedOutput": "返回毫秒级时间戳，适合流量控制算法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于防重放攻击",
+        "input": "获取当前时间戳用于防重放攻击的nonce",
+        "expectedOutput": "返回毫秒级 Timestamp，可用于防重放攻击",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于数据新鲜度",
+        "input": "获取当前时间检查数据新鲜度",
+        "expectedOutput": "返回时间戳，可与数据更新时间比较判断新鲜度",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间线展示",
+        "input": "获取当前时间用于时间线展示",
+        "expectedOutput": "返回本地时间，适合时间线UI展示",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于截止时间判断",
+        "input": "获取当前时间，判断是否超过截止时间",
+        "expectedOutput": "返回时间戳，可用于与截止时间比较",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间差计算",
+        "input": "获取当前时间，计算与目标时间的差值",
+        "expectedOutput": "返回时间戳，可用于计算时间差",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "get_current_datetime - 获取当前时间用于时间区间判断",
+        "input": "获取当前时间，判断是否在指定时间区间内",
+        "expectedOutput": "返回本地时间，可用于时间区间判断",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

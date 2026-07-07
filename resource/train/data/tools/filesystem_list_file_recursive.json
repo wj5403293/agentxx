@@ -1,0 +1,702 @@
+[
+    {
+        "name": "filesystem_list_file_recursive - 递归列出目录",
+        "input": "请递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件和子目录",
+        "expectedOutput": "返回该目录下所有文件和子目录的完整列表，包含嵌套子目录中的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度限制",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，最大深度为 2",
+        "expectedOutput": "返回该目录下深度不超过2层的文件和子目录列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出agent目录",
+        "input": "递归列出 {agentxx_root}/agent 目录下的所有内容",
+        "expectedOutput": "返回 agent 目录下所有文件和子目录的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出tools目录",
+        "input": "递归列出 {agentxx_root}/agent/lib/include/agentxx/tools 目录下的所有文件",
+        "expectedOutput": "返回 tools 目录下所有头文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出resource目录",
+        "input": "递归列出 {agentxx_root}/resource 目录下的所有文件和子目录",
+        "expectedOutput": "返回 resource 目录下所有内容的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出不存在的目录",
+        "input": "递归列出 {agentxx_root}/nonexistent_dir 目录下的所有文件",
+        "expectedOutput": "返回错误信息，提示目录不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出空目录",
+        "input": "递归列出 {agentxx_root}/temp 目录下的所有文件",
+        "expectedOutput": "返回该目录的内容列表，可能为空或包含临时文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出根目录",
+        "input": "递归列出 {agentxx_root} 目录下的所有文件和子目录",
+        "expectedOutput": "返回项目根目录下所有内容的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度1",
+        "input": "递归列出 {agentxx_root}/agent 目录，最大深度为 1",
+        "expectedOutput": "返回 agent 目录下直接子项列表，不包含更深层内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度3",
+        "input": "递归列出 {agentxx_root} 目录，最大深度为 3",
+        "expectedOutput": "返回项目根目录下深度不超过3层的文件和目录列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并统计数量",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，并统计总文件数",
+        "expectedOutput": "返回到表并统计文件总数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出只显示文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，只显示文件不显示目录",
+        "expectedOutput": "返回所有文件的递归列表，不包含目录项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出只显示目录",
+        "input": "递归列出 {agentxx_root}/agent 目录，只显示子目录不显示文件",
+        "expectedOutput": "返回所有子目录的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出过滤cpp文件",
+        "input": "递归列出 {agentxx_root} 目录下所有 .cpp 文件",
+        "expectedOutput": "返回所有 .cpp 文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出过滤h文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下所有 .h 文件",
+        "expectedOutput": "返回所有 .h 头文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出过滤json文件",
+        "input": "递归列出 {agentxx_root}/resource 目录下所有 .json 文件",
+        "expectedOutput": "返回所有 .json 文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出多种扩展名",
+        "input": "递归列出 {agentxx_root}/agent 目录下所有 .cpp 和 .h 文件",
+        "expectedOutput": "返回所有 .cpp 和 .h 文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出训练数据",
+        "input": "递归列出 {agentxx_root}/resource/train 目录下的所有文件",
+        "expectedOutput": "返回 train 目录下所有训练相关文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出技能目录",
+        "input": "递归列出 {agentxx_root}/resource/skills 目录下的所有文件",
+        "expectedOutput": "返回 skills 目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出lib目录",
+        "input": "递归列出 {agentxx_root}/agent/lib 目录下的所有文件和子目录",
+        "expectedOutput": "返回 lib 目录下所有内容的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出src目录",
+        "input": "递归列出 {agentxx_root}/agent/src 目录下的所有文件",
+        "expectedOutput": "返回 src 目录下所有源文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度0",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，最大深度为 0",
+        "expectedOutput": "返回该目录自身的直接子项列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度5",
+        "input": "递归列出 {agentxx_root} 目录，最大深度为 5",
+        "expectedOutput": "返回项目根目录下深度不超过5层的文件和目录列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并排序",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，按名称排序",
+        "expectedOutput": "返回按名称排序的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出按大小排序",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，按文件大小排序",
+        "expectedOutput": "返回按文件大小排序的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出按修改时间排序",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，按修改时间排序",
+        "expectedOutput": "返回按修改时间排序的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含隐藏文件",
+        "input": "递归列出 {agentxx_root} 目录下的所有文件，包括隐藏文件",
+        "expectedOutput": "返回包含隐藏文件在内的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出排除隐藏文件",
+        "input": "递归列出 {agentxx_root} 目录下的所有文件，排除隐藏文件",
+        "expectedOutput": "返回不包含隐藏文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并显示文件大小",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，并显示每个文件的大小",
+        "expectedOutput": "返回包含文件大小信息的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并显示修改时间",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，并显示每个文件的修改时间",
+        "expectedOutput": "返回包含修改时间信息的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并显示权限",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，并显示每个文件的权限",
+        "expectedOutput": "返回包含权限信息的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出大型目录",
+        "input": "递归列出 {agentxx_root} 目录下的所有文件，预期结果可能超过1000项",
+        "expectedOutput": "返回完整的递归文件列表，能处理大量文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并格式化输出",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，以树形结构格式化输出",
+        "expectedOutput": "返回树形结构格式的递归目录列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出到JSON格式",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，输出为JSON格式",
+        "expectedOutput": "返回JSON格式的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出符号链接",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，跟随符号链接",
+        "expectedOutput": "返回包含符号链接目标的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出不跟随符号链接",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，不跟随符号链接",
+        "expectedOutput": "返回不跟随符号链接的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出限制最大返回数",
+        "input": "递归列出 {agentxx_root} 目录，限制最多返回 50 条结果",
+        "expectedOutput": "返回最多50条结果的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出限制100条",
+        "input": "递归列出 {agentxx_root} 目录，限制最多返回 100 条结果",
+        "expectedOutput": "返回最多100条结果的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出限制200条",
+        "input": "递归列出 {agentxx_root} 目录，限制最多返回 200 条结果",
+        "expectedOutput": "返回最多200条结果的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出从指定偏移",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，从第10条开始返回",
+        "expectedOutput": "返回从第10条开始的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出分页",
+        "input": "递归列出 {agentxx_root}/agent 目录，分页显示，每页20条，第1页",
+        "expectedOutput": "返回第1页的递归文件列表，每页20条",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出分页第2页",
+        "input": "递归列出 {agentxx_root}/agent 目录，分页显示，每页20条，第2页",
+        "expectedOutput": "返回第2页的递归文件列表，每页20条",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出分页第3页",
+        "input": "递归列出 {agentxx_root}/agent 目录，分页显示，每页20条，第3页",
+        "expectedOutput": "返回第3页的递归文件列表，每页20条",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出include目录深度2",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，最大深度为 2，过滤 .h 文件",
+        "expectedOutput": "返回深度不超过2层的 .h 文件递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出图片文件",
+        "input": "递归列出 {agentxx_root}/resource 目录下所有图片文件（.png,.jpg,.gif,.svg）",
+        "expectedOutput": "返回所有图片文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出文档文件",
+        "input": "递归列出 {agentxx_root} 目录下所有 .md 文件",
+        "expectedOutput": "返回所有 .md 文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出配置文件",
+        "input": "递归列出 {agentxx_root} 目录下所有 .yaml 和 .yml 和 .toml 文件",
+        "expectedOutput": "返回所有配置文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出脚本文件",
+        "input": "递归列出 {agentxx_root} 目录下所有 .sh 和 .bat 和 .ps1 文件",
+        "expectedOutput": "返回所有脚本文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出构建文件",
+        "input": "递归列出 {agentxx_root} 目录下所有 CMakeLists.txt 文件",
+        "expectedOutput": "返回所有 CMakeLists.txt 文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并找最大文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，找到最大的文件",
+        "expectedOutput": "返回最大文件的路径和大小信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并找最小文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，找到最小的文件",
+        "expectedOutput": "返回最小文件的路径和大小信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并找最新文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，找到最近修改的文件",
+        "expectedOutput": "返回最近修改的文件路径和修改时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并找最旧文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，找到最早修改的文件",
+        "expectedOutput": "返回最早修改的文件路径和修改时间",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并检查空目录",
+        "input": "递归列出 {agentxx_root} 目录，找出所有空目录",
+        "expectedOutput": "返回所有空目录的列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度为全部",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，不限制深度",
+        "expectedOutput": "返回该目录下所有层级的所有文件和子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出指定相对路径",
+        "input": "递归列出 agent/lib/include 目录下的所有文件，基础路径为 {agentxx_root}",
+        "expectedOutput": "返回 agent/lib/include 目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出用绝对路径",
+        "input": "使用绝对路径递归列出 {agentxx_root}/agent/lib/include/agentxx 目录下的所有文件",
+        "expectedOutput": "返回 agentxx 目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含文件类型统计",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，并统计每种文件类型的数量",
+        "expectedOutput": "返回文件列表及每种扩展名的文件数量统计",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含目录大小",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，并计算每个子目录的总大小",
+        "expectedOutput": "返回包含每个子目录总大小的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并对比两个目录",
+        "input": "递归列出 {agentxx_root}/agent/lib/include/agentxx/tools 和 {agentxx_root}/agent/lib/include/agentxx/agent 目录，对比文件差异",
+        "expectedOutput": "返回两个目录的文件列表对比",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出所有子目录路径",
+        "input": "递归列出 {agentxx_root}/agent 目录，只输出所有子目录的完整路径",
+        "expectedOutput": "返回所有子目录的完整路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度限制英语",
+        "input": "Recursively list all files in {agentxx_root}/agent/lib/include with max depth 2",
+        "expectedOutput": "返回深度不超过2层的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出日语提示",
+        "input": "{agentxx_root}/agent/lib/include ディレクトリのすべてのファイルを再帰的にリストしてください",
+        "expectedOutput": "返回该目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出大深度限制",
+        "input": "递归列出 {agentxx_root}/agent 目录，最大深度为 10",
+        "expectedOutput": "返回 agent 目录下深度不超过10层的所有文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出零深度",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，深度为 0",
+        "expectedOutput": "返回该目录的直接子项列表（等同于非递归列出）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并输出总数",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，最后输出文件和目录的总数",
+        "expectedOutput": "返回到表及文件总数和目录总数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出支持通配符",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下所有以 agent 开头的文件",
+        "expectedOutput": "返回所有以 agent 开头的文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出排除特定目录",
+        "input": "递归列出 {agentxx_root}/agent 目录，排除 build 目录",
+        "expectedOutput": "返回不包含 build 目录的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出排除多个目录",
+        "input": "递归列出 {agentxx_root} 目录，排除 build、temp、.git 目录",
+        "expectedOutput": "返回排除指定目录后的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含特定目录",
+        "input": "递归列出 {agentxx_root}/agent 目录，只包含 lib 和 src 子目录",
+        "expectedOutput": "返回只包含 lib 和 src 子目录的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出大于1KB的文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下所有大于 1KB 的文件",
+        "expectedOutput": "返回所有大于1KB的文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出小于100B的文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下所有小于 100B 的文件",
+        "expectedOutput": "返回所有小于100B的文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出指定大小范围",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下大小在 1KB 到 10KB 之间的文件",
+        "expectedOutput": "返回大小在1KB到10KB之间的文件递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出最近7天修改的文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下最近7天修改的文件",
+        "expectedOutput": "返回最近7天内修改的文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出本月修改的文件",
+        "input": "递归列出 {agentxx_root}/agent 目录下本月修改的文件",
+        "expectedOutput": "返回本月修改的文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并生成文件树",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，生成可视化的文件树",
+        "expectedOutput": "返回可视化文件树格式的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度限制并排序",
+        "input": "递归列出 {agentxx_root}/agent 目录，深度为 3，按名称倒序排序",
+        "expectedOutput": "返回深度不超过3层、按名称倒序排序的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含完整路径",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，显示完整绝对路径",
+        "expectedOutput": "返回包含完整绝对路径的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含相对路径",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，显示相对路径",
+        "expectedOutput": "返回包含相对路径的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出只有文件名",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下的所有文件，只显示文件名不含路径",
+        "expectedOutput": "返回只包含文件名的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并检查权限问题",
+        "input": "递归列出 {agentxx_root}/agent 目录，标记无法访问的子目录",
+        "expectedOutput": "返回递归列表，标记无法访问的目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出到XML格式",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，输出为XML格式",
+        "expectedOutput": "返回XML格式的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出到CSV格式",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，输出为CSV格式",
+        "expectedOutput": "返回CSV格式的递归文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出符号链接目标",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，显示符号链接及其目标",
+        "expectedOutput": "返回包含符号链接信息的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出硬链接",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，显示硬链接信息",
+        "expectedOutput": "返回包含硬链接信息的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出文件系统类型",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，显示文件系统类型",
+        "expectedOutput": "返回包含文件系统类型信息的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出inode信息",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，在Linux上显示inode信息",
+        "expectedOutput": "返回包含inode信息的递归列表（Linux）或文件列表（Windows）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出current目录",
+        "input": "递归列出当前目录下的所有文件",
+        "expectedOutput": "返回当前工作目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出parent目录",
+        "input": "递归列出 {agentxx_root}/agent/lib 目录下的所有文件",
+        "expectedOutput": "返回 agent/lib 目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出home目录",
+        "input": "递归列出用户主目录下的所有文件（限制深度2）",
+        "expectedOutput": "返回用户主目录下深度不超过2层的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出tmp目录",
+        "input": "递归列出系统临时目录下的所有文件",
+        "expectedOutput": "返回系统临时目录下所有文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出带颜色输出",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，用颜色区分文件和目录",
+        "expectedOutput": "返回带颜色标记的递归列表（如果支持）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并查找重复文件",
+        "input": "递归列出 {agentxx_root}/agent 目录，找出相同文件名的文件",
+        "expectedOutput": "返回重复文件名的文件列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出多个目录",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 和 {agentxx_root}/agent/src 目录",
+        "expectedOutput": "返回两个目录的合并递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出排除特定扩展名",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，排除 .o 和 .obj 文件",
+        "expectedOutput": "返回不包含 .o 和 .obj 文件的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出包含隐藏目录",
+        "input": "递归列出 {agentxx_root} 目录，包含 .git 目录但不展开其内容",
+        "expectedOutput": "返回包含 .git 目录项但不展开其内容的递归列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出深度限制边界值",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录，深度为 -1",
+        "expectedOutput": "如果支持负深度，可能返回错误或视为无限深度",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出超大深度",
+        "input": "递归列出 {agentxx_root}/agent 目录，深度为 9999",
+        "expectedOutput": "返回 agent 目录下所有层级的所有文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出并限制limit",
+        "input": "递归列出 {agentxx_root}/agent 目录下的所有文件，限制最多返回 50 个结果",
+        "expectedOutput": "返回 agent 目录下最多 50 个文件和子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_list_file_recursive - 递归列出.h头文件",
+        "input": "递归列出 {agentxx_root}/agent/lib/include 目录下所有 .h 文件",
+        "expectedOutput": "返回 include 目录及其子目录下所有 .h 头文件列表",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

@@ -1,0 +1,702 @@
+[
+    {
+        "name": "filesystem_read_text_file_range - 读取指定行范围",
+        "input": "请读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第10行到第50行",
+        "expectedOutput": "返回该文件第10-50行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取文件开头部分",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第30行",
+        "expectedOutput": "返回该文件第1-30行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取文件末尾部分",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第900行到第1000行",
+        "expectedOutput": "返回该文件第900-1000行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取文件中间部分",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第200行到第350行",
+        "expectedOutput": "返回该文件第200-350行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取单行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第42行（开始行和结束行相同）",
+        "expectedOutput": "返回该文件第42行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取大范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第500行",
+        "expectedOutput": "返回该文件前500行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取小范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第105行",
+        "expectedOutput": "返回该文件第100-105行的内容，共6行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取零行范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第10行到第10行",
+        "expectedOutput": "返回该文件第10行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取training.h指定范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/agent/training.h 从第100行到第200行",
+        "expectedOutput": "返回 training.h 第100-200行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取web_search.h指定范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h 从第1行到第50行",
+        "expectedOutput": "返回 web_search.h 前50行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取codegraph_tool.h指定范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/codegraph_tool.h 从第5行到第55行",
+        "expectedOutput": "返回 codegraph_tool.h 第5-55行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取string.h指定范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 从第20行到第80行",
+        "expectedOutput": "返回 string.h 第20-80行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取execute_command.h指定范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/execute_command.h 从第1行到第30行",
+        "expectedOutput": "返回 execute_command.h 前30行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取JSON文件指定范围",
+        "input": "读取文件 {agentxx_root}/resource/train/data/get_current_datetime.json 从第1行到第20行",
+        "expectedOutput": "返回该JSON文件前20行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取不存在的文件",
+        "input": "读取文件 {agentxx_root}/nonexistent.txt 从第1行到第10行",
+        "expectedOutput": "返回错误信息，提示文件不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取超出文件范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第99999行到第100000行",
+        "expectedOutput": "返回空内容或提示超出文件范围",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取开始行大于结束行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第10行",
+        "expectedOutput": "返回错误提示或空内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取负行号",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第-5行到第10行",
+        "expectedOutput": "返回错误提示",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取零行号",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第0行到第10行",
+        "expectedOutput": "返回错误提示或从第1行开始",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取文件开头到结束",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到文件末尾",
+        "expectedOutput": "返回该文件的完整内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取大文件指定范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第500行到第1000行",
+        "expectedOutput": "返回该文件第500-1000行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并显示行号",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第100行，并显示原始行号",
+        "expectedOutput": "返回带原始行号的第50-100行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并统计",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第200行，统计该范围内的class出现次数",
+        "expectedOutput": "返回第100-200行内容和class出现次数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并过滤",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第100行，只显示包含 #include 的行",
+        "expectedOutput": "返回第1-100行中所有包含 #include 的行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并格式化",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第30行到第60行，以Markdown代码块格式输出",
+        "expectedOutput": "返回Markdown代码块格式的第30-60行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range带偏移",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第200行开始，读取100行",
+        "expectedOutput": "返回该文件第200-299行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range到文件末尾",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1000行到文件末尾",
+        "expectedOutput": "返回该文件从第1000行到末尾的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range跳过空行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第100行，跳过空行",
+        "expectedOutput": "返回第1-100行中非空行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range提取注释",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第50行，提取所有注释",
+        "expectedOutput": "返回第1-50行中的所有注释内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并反转",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第10行到第30行，按行倒序输出",
+        "expectedOutput": "返回第30-10行（倒序）的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并去重",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第100行，去除重复行",
+        "expectedOutput": "返回第1-100行去重后的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range随机抽样",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第200行，随机抽取5行",
+        "expectedOutput": "返回从第1-200行中随机抽取的5行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range找最长行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第200行，找出最长的行",
+        "expectedOutput": "返回第100-200行中最长行的内容和行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range找最短行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第200行，找出最短非空行",
+        "expectedOutput": "返回第100-200行中最短非空行的内容和行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range计算平均长度",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第200行，计算平均行长度",
+        "expectedOutput": "返回第100-200行内容和平均行长度",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range包含头文件",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第30行，通常包含头文件信息",
+        "expectedOutput": "返回该文件的前30行，包含版权声明和include语句",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range包含类定义",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第300行，可能包含类定义",
+        "expectedOutput": "返回第100-300行内容，可能包含类定义",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range包含函数实现",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第300行到第600行",
+        "expectedOutput": "返回第300-600行内容，可能包含函数实现",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range为空",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第500行到第500行",
+        "expectedOutput": "返回该文件第500行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range接近末尾",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从倒数第20行到文件末尾",
+        "expectedOutput": "返回该文件最后20行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range从末尾开始",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从文件末尾倒数第50行到倒数第10行",
+        "expectedOutput": "返回倒数第50行到倒数第10行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range中文注释区域",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第150行",
+        "expectedOutput": "返回第50-150行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range枚举定义区域",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第200行到第250行",
+        "expectedOutput": "返回第200-250行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range大偏移量",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第500行开始，读取200行",
+        "expectedOutput": "返回该文件第500-699行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并返回JSON",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第20行，以JSON格式返回",
+        "expectedOutput": "返回JSON格式的第1-20行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并返回XML",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第20行，以XML格式返回",
+        "expectedOutput": "返回XML格式的第1-20行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range带上下文",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第110行，前后各加2行上下文",
+        "expectedOutput": "返回第98-112行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range带前后上下文",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第55行，前后各加5行上下文",
+        "expectedOutput": "返回第45-60行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range并显示进度",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到第500行，显示读取进度",
+        "expectedOutput": "返回第100-500行内容，可能包含进度信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range和文件大小",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第100行，并获取文件总大小",
+        "expectedOutput": "返回第1-100行内容，并显示文件总大小信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取巨大的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第10000行",
+        "expectedOutput": "返回第1行到文件实际最后一行的内容，因为文件没那么长",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取负数行号",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第-5行到第10行",
+        "expectedOutput": "返回错误信息，行号不能为负数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取strand.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/strand.h 从第1行到第50行",
+        "expectedOutput": "返回strand.h文件第1-50行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取training.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/agent/training.h 的第5行到第45行",
+        "expectedOutput": "返回training.h的第5-45行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取CMakeLists.txt的Range",
+        "input": "读取文件 {agentxx_root}/CMakeLists.txt 从第1行到第80行",
+        "expectedOutput": "返回CMakeLists.txt第1-80行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取tool.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 从第1行到第100行",
+        "expectedOutput": "返回tool.h第1-100行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取string.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 从第1行到第60行",
+        "expectedOutput": "返回string.h第1-60行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取web_search.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h 从第1行到第40行",
+        "expectedOutput": "返回web_search.h第1-40行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取planning.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/planning.h 从第10行到第60行",
+        "expectedOutput": "返回planning.h第10-60行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取share_store.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/share_store.h 从第1行到第80行",
+        "expectedOutput": "返回share_store.h第1-80行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取execute_command.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/execute_command.h 从第1行到第50行",
+        "expectedOutput": "返回execute_command.h第1-50行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取sub_agent.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/sub_agent.h 从第1行到第70行",
+        "expectedOutput": "返回sub_agent.h第1-70行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取ui_control.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/ui_control.h 从第1行到第30行",
+        "expectedOutput": "返回ui_control.h第1-30行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取rag_search.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/rag_search.h 从第1行到第50行",
+        "expectedOutput": "返回rag_search.h第1-50行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取codegraph_tool.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/codegraph_tool.h 从第1行到第80行",
+        "expectedOutput": "返回codegraph_tool.h第1-80行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取tool_skill_search.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool_skill_search.h 从第1行到第40行",
+        "expectedOutput": "返回tool_skill_search.h第1-40行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取get_current_datetime.h的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/get_current_datetime.h 从第1行到第30行",
+        "expectedOutput": "返回get_current_datetime.h第1-30行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取cpp源文件的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/src/agentxx/tools/filesystem.cpp 从第1行到第100行",
+        "expectedOutput": "返回filesystem.cpp第1-100行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取第1行到第2行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第2行",
+        "expectedOutput": "返回该文件前2行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取最后10行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从倒数第10行到最后一行",
+        "expectedOutput": "返回该文件最后10行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取最后1行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的最后一行",
+        "expectedOutput": "返回该文件最后一行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取从第100行到文件末尾",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第100行到文件末尾",
+        "expectedOutput": "返回该文件第100行到末尾的所有内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取前三行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的前三行",
+        "expectedOutput": "返回该文件前3行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取JSON配置文件的Range",
+        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_read_text_file.json 从第1行到第20行",
+        "expectedOutput": "返回该JSON文件第1-20行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取大JSON的中间Range",
+        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_list_file.json 从第200行到第250行",
+        "expectedOutput": "返回该JSON文件第200-250行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取训练用例文件的Range",
+        "input": "读取文件 {agentxx_root}/resource/train/data/planning_write.json 从第50行到第80行",
+        "expectedOutput": "返回该训练用例文件第50-80行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取包含中文注释的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/share_store.h 从第1行到第50行",
+        "expectedOutput": "返回share_store.h第1-50行内容，包含中文注释",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取包含宏定义的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 从第1行到第50行",
+        "expectedOutput": "返回tool.h第1-50行内容，包含宏定义和include指令",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取包含类定义的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第40行到第100行",
+        "expectedOutput": "返回包含类定义和成员函数声明的行范围内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取包含枚举定义的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 从第50行到第100行",
+        "expectedOutput": "返回包含枚举定义的行范围内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取注释块的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第25行",
+        "expectedOutput": "返回文件头部注释块的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取函数体实现Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/src/agentxx/tools/filesystem.cpp 从第200行到第350行",
+        "expectedOutput": "返回函数体实现部分的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取包含模板的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 从第100行到第200行",
+        "expectedOutput": "返回包含模板定义的行范围内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取namespace内部的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第10行到第150行",
+        "expectedOutput": "返回namespace内部声明的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取连续多个Range",
+        "input": "先读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第1-50行，再读取第51-100行",
+        "expectedOutput": "分别返回两个Range的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取不同文件的不同Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第1-30行和 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 的第1-30行",
+        "expectedOutput": "分别返回两个文件的指定Range内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 仅指定开始行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行开始",
+        "expectedOutput": "返回该文件第50行到末尾的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取空文件的Range",
+        "input": "读取文件 {agentxx_root}/temp/empty_file.txt 从第1行到第10行",
+        "expectedOutput": "返回空内容或提示文件为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取不存在的文件Range",
+        "input": "读取文件 {agentxx_root}/nonexistent/nofile.txt 从第1行到第10行",
+        "expectedOutput": "返回错误信息，文件不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取二进制文件Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第10行，该文件是文本文件",
+        "expectedOutput": "正常返回文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 结束行小于开始行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第10行",
+        "expectedOutput": "返回错误信息，结束行不能小于开始行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 行号为0",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第0行到第10行",
+        "expectedOutput": "返回错误信息，行号应从1开始",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取超长行号",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第999999行到第1000000行",
+        "expectedOutput": "返回空内容或提示行号超出文件范围",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 对比Range和完整读取",
+        "input": "分别用Range模式和完整模式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，验证Range读取的第1-100行与完整读取的前100行一致",
+        "expectedOutput": "两种方式读取的内容一致",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range作为代码审查输入",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第150行，然后审查这段代码",
+        "expectedOutput": "返回该Range内容，后续可进行代码审查",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range做diff对比",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第50行到第100行，与第150行到第200行进行对比",
+        "expectedOutput": "分别返回两个Range的内容，可进行对比分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取含中文路径的Range",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/share_store.h 从第1行到第30行",
+        "expectedOutput": "返回share_store.h第1-30行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range提取函数签名",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第40行到第80行，提取所有函数签名",
+        "expectedOutput": "返回该Range内容，可从中提取函数签名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range分析include依赖",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第1行到第30行，分析所有include依赖",
+        "expectedOutput": "返回该Range的include语句，可分析依赖",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file_range - 读取Range拼凑完整文件",
+        "input": "分三段读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h：第1-300行、第301-600行、第601行到末尾，拼凑成完整文件",
+        "expectedOutput": "三段内容拼接后等于完整文件内容",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

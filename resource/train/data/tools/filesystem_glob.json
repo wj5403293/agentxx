@@ -1,0 +1,716 @@
+[
+    {
+        "name": "filesystem_glob - 通配符搜索文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 .h 结尾的头文件，返回匹配的文件路径列表",
+        "expectedOutput": "返回所有匹配 .h 模式的文件路径列表，应包含 tool.h、filesystem.h、string.h、web_search.h、codegraph_tool.h 等头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有C++源文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib 目录下所有 .cpp 文件",
+        "expectedOutput": "返回所有匹配 .cpp 模式的文件路径列表，包含 agent/lib 目录及其子目录下的所有 .cpp 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有JSON文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有 .json 文件",
+        "expectedOutput": "返回所有匹配 .json 模式的文件路径列表，包含该目录下所有训练用例 JSON 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有CMake文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 CMakeLists.txt 文件",
+        "expectedOutput": "返回所有匹配 CMakeLists.txt 的文件路径列表，列出项目及其子目录下的所有 CMake 配置文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以tool开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 tool 开头的文件",
+        "expectedOutput": "返回所有匹配 tool* 模式的文件路径列表，应包含 tool.h、tool_skill_search.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以codegraph开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 codegraph 开头的文件",
+        "expectedOutput": "返回所有匹配 codegraph* 模式的文件路径列表，应包含 codegraph_tool.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索包含特定关键词的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有文件名包含 search 的文件",
+        "expectedOutput": "返回所有匹配 *search* 模式的文件路径列表，应包含 web_search.h、tool_skill_search.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索包含file关键词的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有文件名包含 file 的文件",
+        "expectedOutput": "返回所有匹配 *file* 模式的文件路径列表，应包含 filesystem.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索包含string关键词的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有文件名包含 string 的文件",
+        "expectedOutput": "返回所有匹配 *string* 模式的文件路径列表，应包含 string.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索agent目录下所有头文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent 目录下所有 .h 文件",
+        "expectedOutput": "返回所有匹配 *.h 模式的文件路径列表，包含 agent 目录及其子目录下的所有头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索resource目录下所有JSON文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource 目录下所有 .json 文件",
+        "expectedOutput": "返回所有匹配 *.json 模式的文件路径列表，包含 resource 目录及其子目录下的所有 JSON 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索temp目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/temp 目录下所有文件",
+        "expectedOutput": "返回所有匹配 * 模式的文件路径列表，列出 temp 目录下的所有文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索temp目录下所有txt文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/temp 目录下所有 .txt 文件",
+        "expectedOutput": "返回所有匹配 *.txt 模式的文件路径列表，列出 temp 目录下所有文本文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索temp目录下所有bin文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/temp 目录下所有 .bin 文件",
+        "expectedOutput": "返回所有匹配 *.bin 模式的文件路径列表，列出 temp 目录下所有二进制文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索temp目录下所有tar.gz文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/temp 目录下所有 .tar.gz 文件",
+        "expectedOutput": "返回所有匹配 *.tar.gz 模式的文件路径列表，列出 temp 目录下所有压缩包文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索agent目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx 目录下所有文件",
+        "expectedOutput": "返回所有匹配 * 模式的文件路径列表，包含该目录及其子目录下所有文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有文件",
+        "expectedOutput": "返回所有匹配 * 模式的文件路径列表，列出 tools 目录下所有头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 使用问号通配符搜索",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 tool?.h 的文件（问号匹配单个字符）",
+        "expectedOutput": "返回所有匹配 tool?.h 模式的文件路径列表，单个字符通配符匹配",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 使用字符集通配符搜索",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 [a-z]*.h 的文件（以小写字母开头）",
+        "expectedOutput": "返回所有匹配 [a-z]*.h 模式的文件路径列表，以字母开头且以 .h 结尾的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以特定字符开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 s 开头的文件",
+        "expectedOutput": "返回所有匹配 s* 模式的文件路径列表，应包含 string.h、share_store.h、sub_agent.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以e开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 e 开头的文件",
+        "expectedOutput": "返回所有匹配 e* 模式的文件路径列表，应包含 execute_command.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以w开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 w 开头的文件",
+        "expectedOutput": "返回所有匹配 w* 模式的文件路径列表，应包含 web_search.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以u开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 u 开头的文件",
+        "expectedOutput": "返回所有匹配 u* 模式的文件路径列表，应包含 ui_control.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以p开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 p 开头的文件",
+        "expectedOutput": "返回所有匹配 p* 模式的文件路径列表，应包含 planning.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以r开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 r 开头的文件",
+        "expectedOutput": "返回所有匹配 r* 模式的文件路径列表，应包含 rag_search.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以g开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 g 开头的文件",
+        "expectedOutput": "返回所有匹配 g* 模式的文件路径列表，应包含 get_current_datetime.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以f开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 f 开头的文件",
+        "expectedOutput": "返回所有匹配 f* 模式的文件路径列表，应包含 filesystem.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以c开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 c 开头的文件",
+        "expectedOutput": "返回所有匹配 c* 模式的文件路径列表，应包含 codegraph_tool.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索以t开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有以 t 开头的文件",
+        "expectedOutput": "返回所有匹配 t* 模式的文件路径列表，应包含 tool.h、tool_skill_search.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下.md文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有 .md 文件",
+        "expectedOutput": "返回所有匹配 *.md 模式的文件路径列表，可能为空（该目录下可能没有 .md 文件）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下.cpp文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有 .cpp 文件",
+        "expectedOutput": "返回所有匹配 *.cpp 模式的文件路径列表，可能为空（该目录是头文件目录）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下.hpp文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有 .hpp 文件",
+        "expectedOutput": "返回所有匹配 *.hpp 模式的文件路径列表，可能为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索include目录下所有.h文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include 目录下所有 .h 文件",
+        "expectedOutput": "返回所有匹配 *.h 模式的文件路径列表，包含 include 目录及其子目录下所有头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索resource目录下所有.md文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource 目录下所有 .md 文件",
+        "expectedOutput": "返回所有匹配 *.md 模式的文件路径列表，包含 resource 目录下的 Markdown 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索train目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train 目录下所有文件",
+        "expectedOutput": "返回所有匹配 * 模式的文件路径列表，包含 train 目录及其子目录下所有文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索data目录下所有JSON文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以 codegraph 开头的 JSON 文件",
+        "expectedOutput": "返回所有匹配 codegraph*.json 模式的文件路径列表，包含 codegraph_search.json、codegraph_callers.json 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索data目录下所有filesystem开头文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以 filesystem 开头的 JSON 文件",
+        "expectedOutput": "返回所有匹配 filesystem*.json 模式的文件路径列表，包含 filesystem_list_file.json 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索data目录下所有string开头文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以 string 开头的 JSON 文件",
+        "expectedOutput": "返回所有匹配 string*.json 模式的文件路径列表，包含 string_regexp.json、string_html_to_markdown.json",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索data目录下所有web开头文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以 web 开头的 JSON 文件",
+        "expectedOutput": "返回所有匹配 web*.json 模式的文件路径列表，包含 web_search.json、web_fetch_url.json 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索data目录下所有execute开头文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以 execute 开头的 JSON 文件",
+        "expectedOutput": "返回所有匹配 execute*.json 模式的文件路径列表，包含 execute_linux_command.json、execute_windows_command.json",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索data目录下所有子目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train 目录下所有子目录",
+        "expectedOutput": "返回所有匹配 */ 模式（目录模式）的路径列表，列出 train 目录下的所有子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索agent目录下所有子目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent 目录下所有子目录",
+        "expectedOutput": "返回所有匹配 */ 模式（目录模式）的路径列表，列出 agent 目录下的所有子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索lib目录下所有子目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib 目录下所有子目录",
+        "expectedOutput": "返回所有匹配 */ 模式（目录模式）的路径列表，列出 lib 目录下的所有子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索include目录下所有子目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include 目录下所有子目录",
+        "expectedOutput": "返回所有匹配 */ 模式（目录模式）的路径列表，列出 include 目录下的所有子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索agentxx目录下所有子目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx 目录下所有子目录",
+        "expectedOutput": "返回所有匹配 */ 模式（目录模式）的路径列表，列出 agentxx 目录下的所有子目录（如 tools、agent、nodes 等）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools子目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx 目录下所有名为 tools 的子目录",
+        "expectedOutput": "返回所有匹配 tools 的路径，应包含 tools 目录路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索双星号递归所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib 目录下所有文件（使用 **/* 递归模式）",
+        "expectedOutput": "返回所有匹配 **/* 模式的文件路径列表，包含 lib 目录及其所有子目录下的所有文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索双星号递归所有.h文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib 目录下所有 .h 文件（使用 **/*.h 递归模式）",
+        "expectedOutput": "返回所有匹配 **/*.h 模式的文件路径列表，包含所有子目录下的头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索双星号递归所有.cpp文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent 目录下所有 .cpp 文件（使用 **/*.cpp 递归模式）",
+        "expectedOutput": "返回所有匹配 **/*.cpp 模式的文件路径列表，包含所有子目录下的 C++ 源文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索特定深度目录下的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/*/agentxx 目录下所有文件",
+        "expectedOutput": "返回所有匹配 agent/lib/*/agentxx/* 模式的文件路径列表（单层通配符）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索多层目录下的tools目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有名为 tools 的目录（使用 **/tools 模式）",
+        "expectedOutput": "返回所有匹配 **/tools 的目录路径，包含各层级的 tools 目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索多层目录下的data目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有名为 data 的目录（使用 **/data 模式）",
+        "expectedOutput": "返回所有匹配 **/data 的目录路径，包含各层级的 data 目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索多层目录下的include目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有名为 include 的目录（使用 **/include 模式）",
+        "expectedOutput": "返回所有匹配 **/include 的目录路径，包含各层级的 include 目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 使用大括号扩展模式",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 {tool,filesystem,string}.h 的文件",
+        "expectedOutput": "返回所有匹配 {tool,filesystem,string}.h 模式的文件路径列表，应包含 tool.h、filesystem.h、string.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 使用大括号扩展多个目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/{include,src} 目录下所有文件",
+        "expectedOutput": "返回所有匹配 agent/lib/{include,src}/* 模式的文件路径列表，列出 include 和 src 目录下的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索不存在的目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/nonexistent_dir 目录下所有文件",
+        "expectedOutput": "返回空列表或错误信息，因为该目录不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索不存在文件模式",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有 .xyz 文件",
+        "expectedOutput": "返回空列表，因为该目录下没有 .xyz 扩展名的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 空模式搜索",
+        "input": "请使用 glob 模式以空字符串搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录",
+        "expectedOutput": "返回空列表或错误信息（空模式匹配）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 仅搜索目录",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx 目录下所有子目录（仅匹配目录）",
+        "expectedOutput": "返回所有匹配的目录路径列表，不含文件，列出 agentxx 下的所有子目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 仅搜索普通文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有普通文件（排除目录）",
+        "expectedOutput": "返回所有匹配的普通文件路径列表，不包含目录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索隐藏文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有以点开头的隐藏文件（如 .gitignore）",
+        "expectedOutput": "返回所有匹配 .* 模式的文件路径列表，列出项目根目录下的隐藏文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索带数字的文件名",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有文件名包含数字的 JSON 文件",
+        "expectedOutput": "返回所有匹配 *[0-9]*.json 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索特定名称文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有名为 tool.h 的文件",
+        "expectedOutput": "返回所有匹配 **/tool.h 模式的文件路径列表，列出所有名为 tool.h 的文件位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索CMakeLists文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 CMakeLists.txt 文件（使用 **/CMakeLists.txt）",
+        "expectedOutput": "返回所有匹配 **/CMakeLists.txt 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索resource目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource 目录下所有文件（不含子目录）",
+        "expectedOutput": "返回所有匹配 resource/* 模式的文件路径列表，列出 resource 目录下的直接文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索agent目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent 目录下所有文件（不含子目录）",
+        "expectedOutput": "返回所有匹配 agent/* 模式的文件路径列表，列出 agent 目录下的直接文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索项目根目录下所有文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有文件（不含子目录）",
+        "expectedOutput": "返回所有匹配 * 模式的文件路径列表，列出项目根目录下的直接文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索.md文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 .md 文件（使用 **/*.md）",
+        "expectedOutput": "返回所有匹配 **/*.md 模式的文件路径列表，列出项目所有 Markdown 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索.py文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 Python 脚本文件（使用 **/*.py）",
+        "expectedOutput": "返回所有匹配 **/*.py 模式的文件路径列表，列出项目所有 Python 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索.sh文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 Shell 脚本文件（使用 **/*.sh）",
+        "expectedOutput": "返回所有匹配 **/*.sh 模式的文件路径列表，列出项目所有 Shell 脚本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索.bat文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有批处理文件（使用 **/*.bat）",
+        "expectedOutput": "返回所有匹配 **/*.bat 模式的文件路径列表，列出项目所有批处理文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有头文件(.h和.hpp)",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include 目录下所有 .h 和 .hpp 文件（使用大括号扩展）",
+        "expectedOutput": "返回所有匹配 {*.h,*.hpp} 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有图片文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有图片文件（使用大括号扩展 {*.png,*.jpg,*.svg}）",
+        "expectedOutput": "返回所有匹配 {*.png,*.jpg,*.svg} 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有文本文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有文本文件（使用大括号扩展 {*.txt,*.md,*.json,*.xml,*.yaml,*.yml}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出项目所有文本配置文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有CMake相关文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 CMake 相关文件（使用大括号扩展 {**/CMakeLists.txt,**/*.cmake}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出项目所有 CMake 配置文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索temp目录下所有.tar.gz和.zip",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/temp 目录下所有压缩文件（使用大括号扩展 {*.tar.gz,*.zip}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出 temp 目录下所有压缩文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下文件名长度等于7的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 ???????.h 的文件（7个字符的文件名）",
+        "expectedOutput": "返回所有匹配 ???????.h 模式的文件路径列表（文件名部分恰好7个字符）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下文件名长度范围",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 ????*.h 的文件（至少4个字符）",
+        "expectedOutput": "返回所有匹配 ????*.h 模式的文件路径列表（文件名至少4个字符）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下特定字符集结尾",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 *[ch].h 的文件（倒数第二个字符为c或h）",
+        "expectedOutput": "返回所有匹配 *[ch].h 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下非数字开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 [!0-9]*.h 的文件（不以数字开头）",
+        "expectedOutput": "返回所有匹配 [!0-9]*.h 模式的文件路径列表，排除以数字开头的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools目录下非特定字符开头",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 [!t]*.h 的文件（不以t开头）",
+        "expectedOutput": "返回所有匹配 [!t]*.h 模式的文件路径列表，排除以 t 开头的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有子目录下特定文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include 目录下所有子目录中的 .h 文件（使用 */*.h 模式）",
+        "expectedOutput": "返回所有匹配 */*.h 模式的文件路径列表，仅匹配一级子目录下的头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索两级子目录下特定文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include 目录下两级子目录中的 .h 文件（使用 */*/*.h 模式）",
+        "expectedOutput": "返回所有匹配 */*/*.h 模式的文件路径列表，仅匹配两级子目录下的头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索特定深度+通配符组合",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/*/tools/*.h 目录下所有头文件",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，在特定深度目录下搜索头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索agentxx目录下所有子目录中的.h文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/*/ 目录下所有 .h 文件",
+        "expectedOutput": "返回所有匹配 agentxx/*/ 模式子目录下的 .h 文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索tools下一级子目录文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools/*/ 目录下所有文件",
+        "expectedOutput": "返回 tools 子目录下的所有文件路径列表（如果 tools 目录下有子目录）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有以数字结尾的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以数字结尾的 JSON 文件",
+        "expectedOutput": "返回所有匹配 *[0-9].json 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有仅包含小写字母的文件名",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有匹配 [a-z]*.h 的文件",
+        "expectedOutput": "返回所有匹配 [a-z]*.h 模式的文件路径列表（仅小写字母开头）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有包含下划线的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有包含下划线的头文件",
+        "expectedOutput": "返回所有匹配 *_*.h 模式的文件路径列表，应包含 codegraph_tool.h、sub_agent.h、execute_command.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有不包含下划线的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有不包含下划线的头文件",
+        "expectedOutput": "返回所有不包含下划线的头文件路径列表，如 tool.h、string.h、planning.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索包含点号的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有文件名中包含点的文件",
+        "expectedOutput": "返回所有匹配 *.*.* 或仅 *.h 的文件路径列表（取决于实现）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有以大写字母开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有以大写字母开头的文件（如 CMakeLists.txt）",
+        "expectedOutput": "返回所有匹配 [A-Z]* 模式的文件路径列表，列出项目根目录下以大写字母开头的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有以数字开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有以数字开头的文件",
+        "expectedOutput": "返回所有匹配 [0-9]* 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索exe文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有可执行文件（使用 **/*.exe）",
+        "expectedOutput": "返回所有匹配 **/*.exe 模式的文件路径列表，列出项目所有可执行文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索dll文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有动态链接库文件（使用 **/*.dll）",
+        "expectedOutput": "返回所有匹配 **/*.dll 模式的文件路径列表，列出项目所有 DLL 文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有以test开头的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有以 test 开头的文件（使用 **/test*）",
+        "expectedOutput": "返回所有匹配 **/test* 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有包含config的文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有文件名包含 config 的文件（使用 **/*config*）",
+        "expectedOutput": "返回所有匹配 **/*config* 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有.o和.obj文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有编译中间文件（使用大括号扩展 {**/*.o,**/*.obj}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出编译中间文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有lib和.a文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有静态库文件（使用大括号扩展 {**/*.lib,**/*.a}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出静态库文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有.so和.dylib文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有共享库文件（使用大括号扩展 {**/*.so,**/*.dylib}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出共享库文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有.xml文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 XML 文件（使用 **/*.xml）",
+        "expectedOutput": "返回所有匹配 **/*.xml 模式的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_glob - 搜索所有.yaml和.yml文件",
+        "input": "请使用 glob 模式搜索 {agentxx_root} 目录下所有 YAML 文件（使用大括号扩展 {**/*.yaml,**/*.yml}）",
+        "expectedOutput": "返回所有匹配的模式的文件路径列表，列出项目所有 YAML 配置文件",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

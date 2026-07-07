@@ -1,0 +1,709 @@
+[
+    {
+        "name": "string_regexp - 匹配邮箱地址",
+        "input": "使用正则表达式从文本 'Contact us at support@example.com or sales@company.org' 中提取所有邮箱地址",
+        "expectedOutput": "返回匹配结果，包含 support@example.com 和 sales@company.org",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配电话号码",
+        "input": "使用正则表达式从文本 'Call 138-1234-5678 or 139-8765-4321' 中提取所有手机号码",
+        "expectedOutput": "返回匹配结果，包含两个手机号码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配URL",
+        "input": "使用正则表达式从文本 'Visit https://example.com or http://test.org/page' 中提取所有URL",
+        "expectedOutput": "返回匹配结果，包含两个URL",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 提取所有数字",
+        "input": "使用正则表达式从文本 'Price: 100, Discount: 20, Total: 80' 中提取所有数字",
+        "expectedOutput": "返回匹配结果，包含 100, 20, 80",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 替换文本",
+        "input": "使用正则表达式将文本中的所有 'apple' 替换为 'orange'",
+        "expectedOutput": "返回替换后的文本，所有 apple 变为 orange",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配IP地址",
+        "input": "使用正则表达式从文本 'Server IP: 192.168.1.1 and 10.0.0.1' 中提取所有IP地址",
+        "expectedOutput": "返回匹配结果，包含两个IP地址",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配日期格式",
+        "input": "使用正则表达式从文本 'Dates: 2024-01-15, 2024-02-28, 2024-03-10' 中提取所有日期",
+        "expectedOutput": "返回匹配结果，包含三个日期",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 验证是否以特定前缀开头",
+        "input": "使用正则表达式检查字符串 'Hello World' 是否以 'Hello' 开头",
+        "expectedOutput": "返回匹配成功，true",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 验证是否以特定后缀结尾",
+        "input": "使用正则表达式检查字符串 'document.pdf' 是否以 '.pdf' 结尾",
+        "expectedOutput": "返回匹配成功，true",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配中文汉字",
+        "input": "使用正则表达式从文本 'Hello 你好 World 世界' 中提取所有中文汉字",
+        "expectedOutput": "返回匹配结果，包含 你好 和 世界",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配英文单词",
+        "input": "使用正则表达式从文本 'Hello123 World456' 中提取所有纯英文单词",
+        "expectedOutput": "返回匹配结果，包含 Hello 和 World",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配空白行",
+        "input": "使用正则表达式查找文本中的空白行",
+        "expectedOutput": "返回匹配结果，包含所有空白行的位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配HTML标签",
+        "input": "使用正则表达式从HTML '<div><p>Text</p></div>' 中提取所有标签",
+        "expectedOutput": "返回匹配结果，包含 div, p, /p, /div 等标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 分割字符串",
+        "input": "使用正则表达式将 'a,b,c,d,e' 按逗号分割",
+        "expectedOutput": "返回分割后的数组 [a, b, c, d, e]",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配16进制颜色代码",
+        "input": "使用正则表达式从文本 'Colors: #FF5733, #00FF00, #0000FF' 中提取所有颜色代码",
+        "expectedOutput": "返回匹配结果，包含三个颜色代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配身份证号",
+        "input": "使用正则表达式验证 '110101199001011234' 是否为合法身份证号格式",
+        "expectedOutput": "返回匹配结果，验证18位数字格式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Markdown标题",
+        "input": "使用正则表达式从Markdown文本中提取所有标题行",
+        "expectedOutput": "返回匹配结果，包含所有 # 开头的标题",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Markdown链接",
+        "input": "使用正则表达式从Markdown '[Google](https://google.com)' 中提取链接",
+        "expectedOutput": "返回匹配结果，包含链接文本和URL",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 大小写不敏感匹配",
+        "input": "使用正则表达式大小写不敏感地匹配 'Hello' 在 'hello world HELLO WORLD' 中",
+        "expectedOutput": "返回匹配结果，包含两个匹配项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 全局替换",
+        "input": "使用正则表达式将文本中所有连续空格替换为单个空格",
+        "expectedOutput": "返回替换后的文本，多个空格被压缩为一个",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配文件扩展名",
+        "input": "使用正则表达式从文件名 'file.txt' 中提取扩展名",
+        "expectedOutput": "返回匹配结果 txt",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 提取C++类名",
+        "input": "使用正则表达式从代码 'class MyClass : public BaseClass' 中提取类名",
+        "expectedOutput": "返回匹配结果 MyClass",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 提取C++函数名",
+        "input": "使用正则表达式从代码 'void myFunction(int a, int b)' 中提取函数名",
+        "expectedOutput": "返回匹配结果 myFunction",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配C++ include语句",
+        "input": "使用正则表达式从代码中提取所有 #include 语句",
+        "expectedOutput": "返回匹配结果，包含所有 include 行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配C++注释",
+        "input": "使用正则表达式从代码中提取所有单行注释",
+        "expectedOutput": "返回匹配结果，包含所有 // 注释",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配多行注释",
+        "input": "使用正则表达式从代码中提取所有 /* */ 注释块",
+        "expectedOutput": "返回匹配结果，包含所有多行注释",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 转义特殊字符",
+        "input": "使用正则表达式匹配字符串中的点号 '.' 字符",
+        "expectedOutput": "返回匹配结果，正确匹配点号而非通配符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 非贪婪匹配",
+        "input": "使用正则表达式从 '<p>First</p><p>Second</p>' 中非贪婪匹配每个p标签内容",
+        "expectedOutput": "返回匹配结果，分别匹配 First 和 Second",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 捕获组提取",
+        "input": "使用正则表达式从 'Name: Alice, Age: 30' 中提取名字和年龄",
+        "expectedOutput": "返回捕获组结果，名字 Alice，年龄 30",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 命名捕获组",
+        "input": "使用正则表达式命名捕获组从 'John Doe' 中提取姓和名",
+        "expectedOutput": "返回命名捕获组结果，first=John, last=Doe",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 正向预查",
+        "input": "使用正则表达式匹配后面跟着 'px' 的数字",
+        "expectedOutput": "返回匹配结果，只匹配数字部分不包含 px",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 负向预查",
+        "input": "使用正则表达式匹配后面不跟着 'px' 的数字",
+        "expectedOutput": "返回匹配结果，只匹配不以px结尾的数字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 后顾断言",
+        "input": "使用正则表达式匹配前面是 '$' 的数字",
+        "expectedOutput": "返回匹配结果，只匹配数字部分不包含 $",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配数字范围",
+        "input": "使用正则表达式匹配 1 到 100 之间的数字",
+        "expectedOutput": "返回匹配结果，只匹配 1-100 范围内的数字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配固定长度字符串",
+        "input": "使用正则表达式匹配恰好8位数字的字符串",
+        "expectedOutput": "返回匹配结果，只匹配8位数字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配至少N个字符",
+        "input": "使用正则表达式匹配至少6个字符的单词",
+        "expectedOutput": "返回匹配结果，只匹配长度>=6的单词",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配至多N个字符",
+        "input": "使用正则表达式匹配至多5个字符的单词",
+        "expectedOutput": "返回匹配结果，只匹配长度<=5的单词",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 单词边界匹配",
+        "input": "使用正则表达式匹配完整单词 'is' 而非单词的一部分",
+        "expectedOutput": "返回匹配结果，只匹配独立的 is 单词",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 行首匹配",
+        "input": "使用正则表达式匹配以 'Error' 开头的行",
+        "expectedOutput": "返回匹配结果，所有以 Error 开头的行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 行尾匹配",
+        "input": "使用正则表达式匹配以分号结尾的行",
+        "expectedOutput": "返回匹配结果，所有以 ; 结尾的行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配JSON key",
+        "input": "使用正则表达式从JSON中提取所有 key",
+        "expectedOutput": "返回匹配结果，所有 JSON 键名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配JSON字符串值",
+        "input": "使用正则表达式从JSON中提取所有字符串值",
+        "expectedOutput": "返回匹配结果，所有双引号内的字符串值",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配XML标签内容",
+        "input": "使用正则表达式从 '<name>Alice</name>' 中提取标签内容",
+        "expectedOutput": "返回匹配结果 Alice",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配重复单词",
+        "input": "使用正则表达式查找文本中连续重复的单词",
+        "expectedOutput": "返回匹配结果，所有重复的单词对",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配回文",
+        "input": "使用正则表达式检查字符串是否为回文",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配十进制数字",
+        "input": "使用正则表达式匹配 '3.14' 和 '0.5' 和 '100' 中的数字",
+        "expectedOutput": "返回匹配结果，包含所有数字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配科学计数法",
+        "input": "使用正则表达式匹配 '1.5e10' 和 '2.3E-4'",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配十六进制数字",
+        "input": "使用正则表达式匹配 '0xFF' 和 '0xAB12'",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配二进制数字",
+        "input": "使用正则表达式匹配 '0b1010' 和 '0b110011'",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配八进制数字",
+        "input": "使用正则表达式匹配 '0o755' 和 '0o644'",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 脱字符处理",
+        "input": "使用正则表达式匹配字符串中除了数字以外的所有字符",
+        "expectedOutput": "返回匹配结果，非数字字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配版本号",
+        "input": "使用正则表达式从 'v1.2.3' 和 'version 4.5.6' 中提取版本号",
+        "expectedOutput": "返回匹配结果，包含版本号数字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Git分支名",
+        "input": "使用正则表达式验证 'feature/user-auth' 是否符合分支命名规范",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Docker镜像标签",
+        "input": "使用正则表达式从 'nginx:1.21-alpine' 中提取镜像名和标签",
+        "expectedOutput": "返回匹配结果，nginx 和 1.21-alpine",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配UUID",
+        "input": "使用正则表达式验证 '550e8400-e29b-41d4-a716-446655440000' 是否为UUID格式",
+        "expectedOutput": "返回匹配结果，true",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Base64字符串",
+        "input": "使用正则表达式验证 'SGVsbG8gV29ybGQ=' 是否为Base64格式",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配JWT Token",
+        "input": "使用正则表达式验证JWT token格式 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNH",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配信用卡号",
+        "input": "使用正则表达式验证 '4111-1111-1111-1111' 是否为信用卡号格式",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配邮政编码",
+        "input": "使用正则表达式验证 '100000' 是否为邮政编码格式",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配MAC地址",
+        "input": "使用正则表达式从 'MAC: 00:1A:2B:3C:4D:5E' 中提取MAC地址",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配子网掩码",
+        "input": "使用正则表达式验证 '255.255.255.0' 是否为子网掩码格式",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配端口号",
+        "input": "使用正则表达式验证端口号范围 0-65535",
+        "expectedOutput": "返回匹配结果，只匹配有效端口号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Cron表达式",
+        "input": "使用正则表达式验证 '0 0 * * *' 是否为cron表达式",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配路径分隔符",
+        "input": "使用正则表达式将路径 'a/b/c' 按 / 或 \\ 分割",
+        "expectedOutput": "返回分割结果 [a, b, c]",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Windows路径",
+        "input": "使用正则表达式验证 'C:\\Users\\Admin\\Documents' 是否为Windows路径",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Linux路径",
+        "input": "使用正则表达式验证 '/home/user/documents' 是否为Linux路径",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配文件名有效性",
+        "input": "使用正则表达式检查 'myfile.txt' 是否包含非法文件名字符",
+        "expectedOutput": "返回匹配结果，合法文件名为true",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配环境变量引用",
+        "input": "使用正则表达式从文本中提取 ${VAR_NAME} 格式的环境变量引用",
+        "expectedOutput": "返回匹配结果，包含变量名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配CMake变量",
+        "input": "使用正则表达式从CMake中提取 ${PROJECT_NAME} 变量引用",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配SQL关键字",
+        "input": "使用正则表达式从SQL中提取 SELECT, FROM, WHERE 等关键字",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配SQL注入模式",
+        "input": "使用正则表达式检测输入中是否包含 SQL 注入特征",
+        "expectedOutput": "返回匹配结果，判断是否包含危险模式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配XSS攻击模式",
+        "input": "使用正则表达式检测输入中是否包含 XSS 攻击特征",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 反向引用",
+        "input": "使用正则表达式匹配重复出现的相同单词",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 条件匹配",
+        "input": "使用正则表达式使用条件表达式匹配",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 递归匹配",
+        "input": "使用正则表达式匹配嵌套的括号结构",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配Unicode属性",
+        "input": "使用正则表达式匹配所有Unicode字母字符",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配空白字符类型",
+        "input": "使用正则表达式匹配制表符、换行符等空白字符",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配单词字符",
+        "input": "使用正则表达式从 'hello_world test-123' 中匹配所有单词字符",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 多行模式匹配",
+        "input": "使用正则表达式在多行文本中匹配每行的开头",
+        "expectedOutput": "返回匹配结果，每行开头位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 点号匹配换行",
+        "input": "使用正则表达式使 . 也匹配换行符",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配固定重复次数",
+        "input": "使用正则表达式匹配恰好3个数字的序列",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配范围重复",
+        "input": "使用正则表达式匹配 2-4 个数字的序列",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配至少N次重复",
+        "input": "使用正则表达式匹配至少2个数字的序列",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 可选匹配",
+        "input": "使用正则表达式匹配可选的 's' 使 'color' 和 'colour' 都匹配",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 交替匹配",
+        "input": "使用正则表达式匹配 'cat' 或 'dog'",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 字符类匹配",
+        "input": "使用正则表达式匹配元音字母 aeiou",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 字符类范围",
+        "input": "使用正则表达式匹配 a-z 范围的小写字母",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 排除字符类",
+        "input": "使用正则表达式匹配除了数字以外的所有字符",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 复杂模式提取C++声明",
+        "input": "使用正则表达式从C++代码中提取所有函数声明",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 提取模板参数",
+        "input": "使用正则表达式从 'std::vector<int, std::allocator<int>>' 中提取模板参数",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配lambda表达式",
+        "input": "使用正则表达式从C++代码中匹配 lambda 表达式",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 提取命名空间",
+        "input": "使用正则表达式从 'namespace agentxx::tools' 中提取命名空间",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配构建目标",
+        "input": "使用正则表达式从Makefile中提取 target 名称",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配编译器警告",
+        "input": "使用正则表达式从编译输出中提取警告信息",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配错误信息",
+        "input": "使用正则表达式从日志中提取包含 'ERROR' 的行",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配堆栈跟踪",
+        "input": "使用正则表达式从堆栈跟踪中提取文件名和行号",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配时间戳",
+        "input": "使用正则表达式从日志中提取时间戳",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配日志级别",
+        "input": "使用正则表达式从日志中提取 INFO, WARN, ERROR 等日志级别",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配HTTP请求方法",
+        "input": "使用正则表达式从HTTP日志中提取 GET, POST, PUT, DELETE",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配HTTP状态码",
+        "input": "使用正则表达式从HTTP响应中提取状态码",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_regexp - 匹配User Agent",
+        "input": "使用正则表达式从HTTP请求中提取 User-Agent 信息",
+        "expectedOutput": "返回匹配结果",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

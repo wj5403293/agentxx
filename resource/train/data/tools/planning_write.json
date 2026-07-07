@@ -1,0 +1,702 @@
+[
+    {
+        "name": "planning_write - 创建任务规划路线图",
+        "input": "请帮我创建一个任务规划，目标是完成一个C++项目的代码重构",
+        "expectedOutput": "调用 planning_write 工具，roadmap 包含 stateDiagram-v2 格式的状态图，描述重构的各个阶段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建带todo的开发计划",
+        "input": "制定一个开发计划：先分析需求，再设计架构，然后实现代码，最后测试",
+        "expectedOutput": "roadmap 包含4个阶段的状态图，todos 列出当前需要执行的具体任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建简单的备忘录",
+        "input": "帮我记录一下：今天要完成代码审查、写单元测试、更新文档",
+        "expectedOutput": "roadmap 包含备忘录状态图，todos 列出三项待办事项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划多步骤部署流程",
+        "input": "制定一个部署流程：备份数据、停止服务、更新代码、启动服务、验证健康检查",
+        "expectedOutput": "roadmap 包含5个步骤的状态图，todos 列出当前步骤",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建数据处理流水线规划",
+        "input": "规划一个数据处理流水线：数据采集、数据清洗、数据转换、数据加载、数据验证",
+        "expectedOutput": "roadmap 包含5个阶段的 stateDiagram-v2，todos 列出当前任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建项目里程碑规划",
+        "input": "制定项目里程碑：需求分析完成、原型设计完成、Alpha版本、Beta版本、正式发布",
+        "expectedOutput": "roadmap 包含5个里程碑的状态图，todos 列出近期任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建学习计划",
+        "input": "帮我制定一个C++学习计划：基础语法、面向对象、模板元编程、STL、并发编程",
+        "expectedOutput": "roadmap 包含5个学习阶段的状态图，todos 列出当前学习任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建问题排查流程",
+        "input": "制定一个问题排查流程：收集日志、分析症状、定位根因、制定修复方案、验证修复",
+        "expectedOutput": "roadmap 包含5个排查步骤的状态图，todos 列出当前排查任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建代码审查流程",
+        "input": "制定代码审查流程：提交PR、自动检查、人工审查、修改反馈、合并代码",
+        "expectedOutput": "roadmap 包含5个步骤的状态图，todos 包含当前审查任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建测试计划",
+        "input": "制定测试计划：单元测试、集成测试、性能测试、安全测试、回归测试",
+        "expectedOutput": "roadmap 包含5个测试阶段的状态图，todos 列出当前测试任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划API开发流程",
+        "input": "规划API开发：设计接口、实现端点、编写文档、集成测试、部署上线",
+        "expectedOutput": "roadmap 包含5个阶段的状态图，todos 列出当前开发任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建数据库迁移计划",
+        "input": "制定数据库迁移计划：备份现有数据、创建新表结构、迁移数据、验证完整性、切换服务",
+        "expectedOutput": "roadmap 包含5个步骤的状态图，todos 列出当前迁移任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划微服务拆分",
+        "input": "规划微服务拆分：分析现有架构、识别服务边界、设计接口、逐步迁移、下线旧服务",
+        "expectedOutput": "roadmap 包含5个阶段的状态图，todos 列出当前拆分任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建发布流程规划",
+        "input": "制定发布流程：版本冻结、预发布测试、灰度发布、全量发布、监控观察",
+        "expectedOutput": "roadmap 包含5个发布阶段的状态图，todos 列出当前发布任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建故障恢复计划",
+        "input": "制定故障恢复计划：故障检测、服务降级、数据恢复、服务恢复、事后复盘",
+        "expectedOutput": "roadmap 包含5个恢复步骤的状态图，todos 列出当前恢复任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划性能优化路径",
+        "input": "规划性能优化：性能分析、识别瓶颈、优化方案设计、实施优化、效果验证",
+        "expectedOutput": "roadmap 包含5个优化阶段的状态图，todos 列出当前优化任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建安全审计计划",
+        "input": "制定安全审计计划：资产盘点、漏洞扫描、风险评估、修复漏洞、复测验证",
+        "expectedOutput": "roadmap 包含5个审计步骤的状态图，todos 列出当前审计任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划CI/CD流水线",
+        "input": "规划CI/CD流水线：代码提交、自动构建、自动测试、制品发布、部署上线",
+        "expectedOutput": "roadmap 包含5个流水线阶段的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建文档编写计划",
+        "input": "制定文档编写计划：需求文档、设计文档、API文档、用户手册、运维手册",
+        "expectedOutput": "roadmap 包含5个文档类型的状态图，todos 列出当前编写任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建会议议程规划",
+        "input": "制定会议议程：项目回顾、问题讨论、方案评审、任务分配、下一步计划",
+        "expectedOutput": "roadmap 包含5个议程项的状态图，todos 列出当前待讨论事项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划代码重构步骤",
+        "input": "规划代码重构：识别坏味道、设计新结构、逐步重构、运行测试、代码审查",
+        "expectedOutput": "roadmap 包含5个重构步骤的状态图，todos 列出当前重构任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建新功能开发计划",
+        "input": "制定新功能开发计划：需求分析、技术方案、编码实现、代码审查、功能测试",
+        "expectedOutput": "roadmap 包含5个开发阶段的状态图，todos 列出当前开发任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划系统升级流程",
+        "input": "规划系统升级：评估影响、准备升级包、通知用户、执行升级、验证结果",
+        "expectedOutput": "roadmap 包含5个升级步骤的状态图，todos 列出当前升级任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建依赖更新计划",
+        "input": "制定依赖更新计划：检查更新、评估兼容性、更新依赖、运行测试、发布版本",
+        "expectedOutput": "roadmap 包含5个更新步骤的状态图，todos 列出当前更新任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划监控告警配置",
+        "input": "规划监控告警配置：确定指标、设置阈值、配置告警规则、通知渠道、验证告警",
+        "expectedOutput": "roadmap 包含5个配置步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建日志分析流程",
+        "input": "制定日志分析流程：日志收集、日志解析、异常检测、模式识别、报告生成",
+        "expectedOutput": "roadmap 包含5个分析步骤的状态图，todos 列出当前分析任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划容器化迁移流程",
+        "input": "规划容器化迁移：分析应用、编写Dockerfile、构建镜像、测试容器、编排部署",
+        "expectedOutput": "roadmap 包含5个迁移步骤的状态图，todos 列出当前迁移任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建技术选型评估流程",
+        "input": "制定技术选型评估：需求分析、技术调研、原型验证、团队评估、最终决策",
+        "expectedOutput": "roadmap 包含5个评估步骤的状态图，todos 列出当前评估任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划A/B测试流程",
+        "input": "规划A/B测试：定义指标、设计实验、实现变体、分流流量、分析结果",
+        "expectedOutput": "roadmap 包含5个测试步骤的状态图，todos 列出当前实验任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建用户反馈处理流程",
+        "input": "制定用户反馈处理：收集反馈、分类整理、优先级排序、分配处理、回复用户",
+        "expectedOutput": "roadmap 包含5个处理步骤的状态图，todos 列出当前处理任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建代码分支管理规划",
+        "input": "规划代码分支管理：创建feature分支、开发实现、合并到develop、测试验证、合并到main",
+        "expectedOutput": "roadmap 包含5个分支步骤的状态图，todos 列出当前分支任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划自动化测试建设",
+        "input": "规划自动化测试建设：测试框架选型、编写测试用例、集成CI、覆盖率监控、持续维护",
+        "expectedOutput": "roadmap 包含5个建设步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建数据备份策略规划",
+        "input": "制定数据备份策略：全量备份、增量备份、异地备份、备份验证、恢复演练",
+        "expectedOutput": "roadmap 包含5个备份步骤的状态图，todos 列出当前备份任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划服务降级方案",
+        "input": "规划服务降级：识别核心服务、定义降级策略、实现降级开关、测试降级效果、监控降级状态",
+        "expectedOutput": "roadmap 包含5个降级步骤的状态图，todos 列出当前降级配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建API版本管理规划",
+        "input": "规划API版本管理：设计版本策略、实现版本路由、编写兼容文档、废弃旧版本、下线旧版本",
+        "expectedOutput": "roadmap 包含5个版本管理步骤的状态图，todos 列出当前管理任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划灰度发布流程",
+        "input": "规划灰度发布：准备灰度版本、选择灰度用户、部署灰度实例、监控灰度指标、决策全量",
+        "expectedOutput": "roadmap 包含5个灰度步骤的状态图，todos 列出当前灰度任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建技术债务管理计划",
+        "input": "制定技术债务管理：盘点债务、评估影响、优先级排序、制定偿还计划、跟踪执行",
+        "expectedOutput": "roadmap 包含5个管理步骤的状态图，todos 列出当前偿还任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划知识库建设",
+        "input": "规划知识库建设：确定范围、收集资料、整理分类、编写文档、持续更新",
+        "expectedOutput": "roadmap 包含5个建设步骤的状态图，todos 列出当前编写任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建团队培训计划",
+        "input": "制定团队培训计划：需求调研、课程设计、材料准备、培训实施、效果评估",
+        "expectedOutput": "roadmap 包含5个培训步骤的状态图，todos 列出当前培训任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划项目启动流程",
+        "input": "规划项目启动：项目立项、团队组建、需求评审、技术方案、启动会议",
+        "expectedOutput": "roadmap 包含5个启动步骤的状态图，todos 列出当前启动任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建代码质量提升计划",
+        "input": "制定代码质量提升：静态分析、代码审查、重构优化、测试覆盖、持续监控",
+        "expectedOutput": "roadmap 包含5个提升步骤的状态图，todos 列出当前质量任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划技术架构演进",
+        "input": "规划技术架构演进：现状评估、目标架构、演进路径、分步实施、效果评估",
+        "expectedOutput": "roadmap 包含5个演进步骤的状态图，todos 列出当前演进任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建系统容量规划",
+        "input": "制定系统容量规划：负载评估、资源分析、扩容方案、实施扩容、效果验证",
+        "expectedOutput": "roadmap 包含5个容量规划步骤的状态图，todos 列出当前规划任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划数据治理流程",
+        "input": "规划数据治理：数据资产盘点、数据标准制定、数据质量监控、数据安全管控、数据生命周期管理",
+        "expectedOutput": "roadmap 包含5个治理步骤的状态图，todos 列出当前治理任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建应急响应计划",
+        "input": "制定应急响应：事件发现、应急响应、问题定位、止损恢复、总结改进",
+        "expectedOutput": "roadmap 包含5个应急步骤的状态图，todos 列出当前响应任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划产品迭代流程",
+        "input": "规划产品迭代：需求收集、优先级排序、迭代规划、开发实现、回顾总结",
+        "expectedOutput": "roadmap 包含5个迭代步骤的状态图，todos 列出当前迭代任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建权限管理规划",
+        "input": "规划权限管理：角色定义、权限分配、访问控制、审计日志、定期审查",
+        "expectedOutput": "roadmap 包含5个权限管理步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划配置管理流程",
+        "input": "规划配置管理：配置项识别、配置基线、变更控制、配置审计、状态报告",
+        "expectedOutput": "roadmap 包含5个配置管理步骤的状态图，todos 包含当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建需求管理流程",
+        "input": "制定需求管理：需求收集、需求分析、需求评审、需求跟踪、需求变更",
+        "expectedOutput": "roadmap 包含5个需求管理步骤的状态图，todos 列出当前需求任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划上线checklist",
+        "input": "制定上线checklist：代码冻结、回归测试、部署准备、上线执行、线上验证",
+        "expectedOutput": "roadmap 包含5个上线步骤的状态图，todos 列出当前检查项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建代码扫描流程",
+        "input": "规划代码扫描：选择扫描工具、配置规则、执行扫描、分析结果、修复问题",
+        "expectedOutput": "roadmap 包含5个扫描步骤的状态图，todos 列出当前扫描任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划负载测试流程",
+        "input": "规划负载测试：定义场景、准备数据、配置工具、执行测试、分析报告",
+        "expectedOutput": "roadmap 包含5个测试步骤的状态图，todos 列出当前测试任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建环境搭建计划",
+        "input": "制定环境搭建计划：开发环境、测试环境、预发布环境、生产环境、灾备环境",
+        "expectedOutput": "roadmap 包含5个环境的状态图，todos 列出当前搭建任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划服务注册发现流程",
+        "input": "规划服务注册发现：服务注册、健康检查、服务发现、负载均衡、故障转移",
+        "expectedOutput": "roadmap 包含5个步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建消息队列使用规划",
+        "input": "规划消息队列：Topic设计、生产者配置、消费者配置、死信处理、监控告警",
+        "expectedOutput": "roadmap 包含5个队列管理步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划缓存策略",
+        "input": "规划缓存策略：缓存选型、缓存粒度、过期策略、更新策略、穿透防护",
+        "expectedOutput": "roadmap 包含5个缓存策略步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建灾备演练计划",
+        "input": "制定灾备演练：演练方案、环境准备、执行演练、问题记录、总结改进",
+        "expectedOutput": "roadmap 包含5个演练步骤的状态图，todos 列出当前演练任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划接口文档生成流程",
+        "input": "规划接口文档生成：注解标记、自动生成、人工审核、发布文档、版本管理",
+        "expectedOutput": "roadmap 包含5个文档步骤的状态图，todos 列出当前文档任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建Oncall值班流程",
+        "input": "制定Oncall值班流程：接收告警、初步判断、升级处理、问题解决、事后总结",
+        "expectedOutput": "roadmap 包含5个值班步骤的状态图，todos 列出当前处理任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划Git工作流",
+        "input": "规划Git工作流：main分支、develop分支、feature分支、release分支、hotfix分支",
+        "expectedOutput": "roadmap 包含5个分支类型的状态图，todos 列出当前工作流任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建代码规范推行计划",
+        "input": "制定代码规范推行：规范制定、工具配置、团队培训、逐步推行、持续检查",
+        "expectedOutput": "roadmap 包含5个推行步骤的状态图，todos 列出当前推行任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划技术分享会",
+        "input": "规划技术分享会：主题征集、讲师安排、内容准备、会议组织、反馈收集",
+        "expectedOutput": "roadmap 包含5个分享会步骤的状态图，todos 列出当前组织任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建POC验证计划",
+        "input": "制定POC验证：技术调研、环境搭建、原型开发、功能验证、结论报告",
+        "expectedOutput": "roadmap 包含5个POC步骤的状态图，todos 列出当前验证任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划SDK开发流程",
+        "input": "规划SDK开发：接口设计、核心实现、示例代码、文档编写、发布维护",
+        "expectedOutput": "roadmap 包含5个SDK开发步骤的状态图，todos 列出当前开发任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建系统迁移计划",
+        "input": "制定系统迁移：迁移评估、方案设计、数据迁移、流量切换、下线旧系统",
+        "expectedOutput": "roadmap 包含5个迁移步骤的状态图，todos 列出当前迁移任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划开源项目贡献流程",
+        "input": "规划开源贡献：了解项目、寻找issue、提交方案、编码实现、提交PR",
+        "expectedOutput": "roadmap 包含5个贡献步骤的状态图，todos 列出当前贡献任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建错误码规范制定",
+        "input": "制定错误码规范：分类定义、编码规则、文档编写、SDK集成、使用培训",
+        "expectedOutput": "roadmap 包含5个规范步骤的状态图，todos 列出当前制定任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划多语言支持流程",
+        "input": "规划多语言支持：提取文案、翻译管理、资源加载、切换机制、测试验证",
+        "expectedOutput": "roadmap 包含5个多语言步骤的状态图，todos 列出当前实现任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建无障碍功能开发计划",
+        "input": "制定无障碍开发：标准学习、功能设计、实现开发、测试验证、持续优化",
+        "expectedOutput": "roadmap 包含5个开发步骤的状态图，todos 列出当前开发任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划搜索引擎优化",
+        "input": "规划搜索引擎优化：关键词分析、内容优化、技术优化、外链建设、效果监控",
+        "expectedOutput": "roadmap 包含5个优化步骤的状态图，todos 列出当前优化任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建合规审查流程",
+        "input": "制定合规审查：法规梳理、差距分析、整改方案、实施整改、审查验证",
+        "expectedOutput": "roadmap 包含5个审查步骤的状态图，todos 列出当前审查任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划服务SLA制定",
+        "input": "规划服务SLA制定：指标定义、目标设定、监控方案、告警机制、报告机制",
+        "expectedOutput": "roadmap 包含5个SLA步骤的状态图，todos 列出当前制定任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建客户端SDK发布流程",
+        "input": "规划客户端SDK发布：版本号管理、变更日志、构建发布、包管理推送、发布通知",
+        "expectedOutput": "roadmap 包含5个发布步骤的状态图，todos 列出当前发布任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划数据脱敏流程",
+        "input": "规划数据脱敏：敏感数据识别、脱敏规则定义、脱敏实现、脱敏验证、安全审计",
+        "expectedOutput": "roadmap 包含5个脱敏步骤的状态图，todos 列出当前脱敏任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建API网关配置流程",
+        "input": "规划API网关配置：路由配置、限流策略、认证鉴权、日志记录、监控告警",
+        "expectedOutput": "roadmap 包含5个网关配置步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划分布式事务方案",
+        "input": "规划分布式事务：场景分析、方案选型、实现开发、测试验证、上线监控",
+        "expectedOutput": "roadmap 包含5个方案步骤的状态图，todos 列出当前实现任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建Service Mesh引入计划",
+        "input": "规划Service Mesh引入：评估需求、技术选型、试点应用、逐步推广、全面切换",
+        "expectedOutput": "roadmap 包含5个引入步骤的状态图，todos 列出当前推广任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划日志系统建设",
+        "input": "规划日志系统建设：日志规范、采集方案、传输管道、存储方案、查询分析",
+        "expectedOutput": "roadmap 包含5个建设步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建链路追踪系统规划",
+        "input": "规划链路追踪：选型评估、SDK集成、采样策略、存储后端、可视化展示",
+        "expectedOutput": "roadmap 包含5个追踪步骤的状态图，todos 列出当前集成任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划配置中心建设",
+        "input": "规划配置中心：配置管理、动态刷新、灰度发布、权限控制、版本管理",
+        "expectedOutput": "roadmap 包含5个配置中心步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建限流熔断策略规划",
+        "input": "规划限流熔断：限流算法、熔断策略、降级方案、监控告警、恢复机制",
+        "expectedOutput": "roadmap 包含5个策略步骤的状态图，todos 列出当前配置任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划全链路压测",
+        "input": "规划全链路压测：环境准备、数据构造、场景设计、压测执行、结果分析",
+        "expectedOutput": "roadmap 包含5个压测步骤的状态图，todos 列出当前压测任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建代码生成器开发计划",
+        "input": "规划代码生成器：模板设计、元数据定义、代码生成、测试验证、文档编写",
+        "expectedOutput": "roadmap 包含5个生成器步骤的状态图，todos 列出当前开发任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划MCP服务开发",
+        "input": "规划MCP服务开发：协议学习、服务设计、工具定义、资源管理、测试验证",
+        "expectedOutput": "roadmap 包含5个MCP开发步骤的状态图，todos 列出当前开发任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建Prompt工程优化计划",
+        "input": "规划Prompt优化：收集用例、评估效果、迭代改进、A/B测试、最佳实践",
+        "expectedOutput": "roadmap 包含5个优化步骤的状态图，todos 列出当前优化任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划Agent能力扩展",
+        "input": "规划Agent能力扩展：需求分析、工具开发、测试验证、集成部署、效果评估",
+        "expectedOutput": "roadmap 包含5个扩展步骤的状态图，todos 列出当前扩展任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建RAG系统优化计划",
+        "input": "规划RAG优化：文档处理、向量化、检索优化、重排序、评估反馈",
+        "expectedOutput": "roadmap 包含5个RAG优化步骤的状态图，todos 列出当前优化任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划多Agent协作系统",
+        "input": "规划多Agent协作：角色定义、通信协议、任务分配、结果汇总、冲突解决",
+        "expectedOutput": "roadmap 包含5个协作步骤的状态图，todos 列出当前设计任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建模型评估流程",
+        "input": "规划模型评估：数据集准备、评估指标、基准测试、对比分析、报告生成",
+        "expectedOutput": "roadmap 包含5个评估步骤的状态图，todos 列出当前评估任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划数据标注流程",
+        "input": "规划数据标注：标注规范、工具选择、人员培训、质量审核、数据管理",
+        "expectedOutput": "roadmap 包含5个标注步骤的状态图，todos 列出当前标注任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建特征工程流程",
+        "input": "规划特征工程：数据分析、特征提取、特征选择、特征变换、特征评估",
+        "expectedOutput": "roadmap 包含5个特征步骤的状态图，todos 列出当前工程任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划模型部署流程",
+        "input": "规划模型部署：模型导出、服务封装、性能优化、上线发布、监控运维",
+        "expectedOutput": "roadmap 包含5个部署步骤的状态图，todos 列出当前部署任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建数据处理ETL流程",
+        "input": "制定ETL流程：数据抽取、数据清洗、数据转换、数据加载、数据校验",
+        "expectedOutput": "roadmap 包含5个ETL步骤的状态图，todos 列出当前ETL任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划实时计算流程",
+        "input": "规划实时计算：数据源接入、流式处理、状态管理、结果输出、监控告警",
+        "expectedOutput": "roadmap 包含5个实时计算步骤的状态图，todos 列出当前计算任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建数据仓库建设规划",
+        "input": "规划数据仓库：需求分析、模型设计、ETL开发、数据校验、BI展示",
+        "expectedOutput": "roadmap 包含5个数仓步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划数据湖建设",
+        "input": "规划数据湖：存储选型、数据入湖、元数据管理、数据治理、查询分析",
+        "expectedOutput": "roadmap 包含5个数据湖步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建数据可视化大屏规划",
+        "input": "规划数据大屏：指标定义、数据源接入、图表设计、布局排版、发布上线",
+        "expectedOutput": "roadmap 包含5个大屏步骤的状态图，todos 列出当前设计任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划AB测试平台建设",
+        "input": "规划AB测试平台：实验管理、流量分配、指标计算、统计分析、报告生成",
+        "expectedOutput": "roadmap 包含5个平台步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 创建用户画像系统规划",
+        "input": "规划用户画像：数据采集、标签体系、画像计算、存储方案、服务输出",
+        "expectedOutput": "roadmap 包含5个画像步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_write - 规划推荐系统建设",
+        "input": "规划推荐系统：召回策略、排序模型、重排规则、冷启动、效果评估",
+        "expectedOutput": "roadmap 包含5个推荐步骤的状态图，todos 列出当前建设任务",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

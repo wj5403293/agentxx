@@ -1,0 +1,702 @@
+[
+    {
+        "name": "codegraph_context - 获取符号上下文",
+        "input": "请获取符号 XXToolBase 的上下文信息，最大深度 2 层，限制返回 10 条",
+        "expectedOutput": "返回 XXToolBase 的上下文信息，应包含其继承关系、成员函数、所在命名空间等相关上下文，以 JSON 格式返回",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 获取类上下文",
+        "input": "获取 FilesystemWriteFileTool 类的上下文信息，最大深度 2 层",
+        "expectedOutput": "返回 FilesystemWriteFileTool 类的上下文，包含其继承自 XXToolBase、成员函数 execute_async、get_definition 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 默认参数",
+        "input": "获取符号 SubAgentTaskBase 的上下文，不指定 limit 和 max_depth",
+        "expectedOutput": "返回 SubAgentTaskBase 的上下文，默认 limit=10，max_depth=3",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 深度为1",
+        "input": "获取符号 CodeGraphSearchTool 的上下文，max_depth=1",
+        "expectedOutput": "返回 CodeGraphSearchTool 的浅层上下文，仅包含直接相关信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 深度为5",
+        "input": "获取符号 WebSearchTool 的上下文，max_depth=5",
+        "expectedOutput": "返回 WebSearchTool 的深层上下文，包含多层级的依赖关系",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - limit为1",
+        "input": "获取符号 execute_async 的上下文，limit=1",
+        "expectedOutput": "返回 execute_async 最多 1 条上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - limit为50",
+        "input": "获取符号 XXToolBase 的上下文，limit=50",
+        "expectedOutput": "返回 XXToolBase 最多 50 条上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 空symbol参数",
+        "input": "获取空符号名的上下文信息",
+        "expectedOutput": "返回错误信息，提示 Arg `symbol` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 不存在的符号",
+        "input": "获取符号 NonExistentClass123 的上下文",
+        "expectedOutput": "返回错误信息，提示未找到该符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 命名空间符号",
+        "input": "获取符号 agentxx::tools 的上下文信息",
+        "expectedOutput": "返回 agentxx::tools 命名空间的上下文，包含其下的类定义和函数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 函数符号上下文",
+        "input": "获取函数 defaultScoringWithSubAgent 的上下文",
+        "expectedOutput": "返回 defaultScoringWithSubAgent 函数的上下文，包含其参数类型、返回值、所在文件等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 模板类上下文",
+        "input": "获取模板类 XXToolBase 的上下文，max_depth=3",
+        "expectedOutput": "返回 XXToolBase 模板类的完整上下文，包含模板参数和继承链",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 枚举类型上下文",
+        "input": "获取 MessageFlag 枚举的上下文信息",
+        "expectedOutput": "返回 MessageFlag 枚举的上下文，包含枚举值列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 结构体上下文",
+        "input": "获取 DelayToolInfo 结构体的上下文",
+        "expectedOutput": "返回 DelayToolInfo 结构体的上下文，包含成员变量 name 和 description",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 成员函数上下文",
+        "input": "获取 get_definition 成员函数的上下文",
+        "expectedOutput": "返回 get_definition 函数的上下文，包含其所在类、返回类型、是否为虚函数等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 静态函数上下文",
+        "input": "获取 defCreateSubGraphDefine 静态函数的上下文",
+        "expectedOutput": "返回 defCreateSubGraphDefine 的上下文，包含 static 修饰符和所在类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 虚函数上下文",
+        "input": "获取 onSubagentEnd 虚函数的上下文",
+        "expectedOutput": "返回 onSubagentEnd 的上下文，包含 virtual 关键字和 override 关系",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 基类上下文",
+        "input": "获取 SubAgentManagerTool 的上下文，关注其继承链",
+        "expectedOutput": "返回 SubAgentManagerTool 的上下文，继承链应显示 XXToolBase 父类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 子类上下文",
+        "input": "获取所有继承自 XXToolBase 的类的上下文",
+        "expectedOutput": "返回 XXToolBase 的子类上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 构造函数上下文",
+        "input": "获取 ExecuteLinuxCommandTool 构造函数的上下文",
+        "expectedOutput": "返回构造函数的上下文，包含参数列表和初始化列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 操作符重载上下文",
+        "input": "获取代码库中 operator 重载的上下文",
+        "expectedOutput": "返回 operator 重载函数的上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 内联函数上下文",
+        "input": "获取内联函数 _defFileRWSummarizationReqHandle 的上下文",
+        "expectedOutput": "返回 _defFileRWSummarizationReqHandle 的上下文，包含 inline 修饰符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 宏定义上下文",
+        "input": "获取 XX_IS_WIN_D 宏的上下文",
+        "expectedOutput": "返回 XX_IS_WIN_D 宏的上下文，包含定义位置和条件编译信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 常量上下文",
+        "input": "获取 defSystemPromptTemplate 常量的上下文",
+        "expectedOutput": "返回 defSystemPromptTemplate 的上下文，包含 constexpr 修饰符和类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - HTTP客户端上下文",
+        "input": "获取 HttpClient 类的上下文",
+        "expectedOutput": "返回 HttpClient 类的上下文，包含 getAsync、fetchMarkdown 等静态方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 日志类上下文",
+        "input": "获取日志相关类的上下文信息",
+        "expectedOutput": "返回日志类的上下文，包含日志级别和输出方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 正则表达式类上下文",
+        "input": "获取 XXRegex 类的上下文",
+        "expectedOutput": "返回 XXRegex 类的上下文，包含 createRegex、match 等方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 编码转换函数上下文",
+        "input": "获取 base64Encode 函数的上下文",
+        "expectedOutput": "返回 base64Encode 的上下文，包含参数类型和返回类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 字符串工具上下文",
+        "input": "获取 autoConvertToUtf8 函数的上下文",
+        "expectedOutput": "返回 autoConvertToUtf8 的上下文，包含参数和返回值类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 代码图管理上下文",
+        "input": "获取 CodeGraphManager 类的上下文，max_depth=3",
+        "expectedOutput": "返回 CodeGraphManager 的上下文，包含 searchSymbols、getSymbolContext 等方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 全局函数上下文",
+        "input": "获取全局函数 readFileContent 的上下文",
+        "expectedOutput": "返回 readFileContent 的上下文，包含协程返回类型和参数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 递归深度为0",
+        "input": "获取符号 WebSearchTool 的上下文，max_depth=0",
+        "expectedOutput": "返回 WebSearchTool 的上下文，不展开任何关联信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 含模板参数的符号",
+        "input": "获取模板类 SubAgentManagerTool 的上下文",
+        "expectedOutput": "返回 SubAgentManagerTool 的上下文，包含模板参数信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 匿名命名空间上下文",
+        "input": "获取匿名命名空间中的符号上下文",
+        "expectedOutput": "返回匿名命名空间内符号的上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 嵌套类上下文",
+        "input": "获取嵌套类 SummarizationToolHandle 的上下文",
+        "expectedOutput": "返回 SummarizationToolHandle 的上下文，显示其嵌套关系",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 别名类型上下文",
+        "input": "获取 using 别名类型的上下文",
+        "expectedOutput": "返回 using 类型别名的上下文，包含原始类型信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 参数类型含智能指针",
+        "input": "获取使用 shared_ptr 参数的函数上下文",
+        "expectedOutput": "返回函数的上下文，参数中包含 shared_ptr 类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 协程函数上下文",
+        "input": "获取协程函数 execute_async 的上下文",
+        "expectedOutput": "返回 execute_async 的上下文，包含 awaitable 返回类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 多文件符号上下文",
+        "input": "获取在多个文件中定义的符号上下文",
+        "expectedOutput": "返回跨文件的符号上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 头文件保护宏上下文",
+        "input": "获取 #pragma once 相关符号的上下文",
+        "expectedOutput": "返回 #pragma once 指令的上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 类成员变量上下文",
+        "input": "获取 searchApiUrl 成员变量的上下文",
+        "expectedOutput": "返回 searchApiUrl 的上下文，包含类型和所在类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 静态成员变量上下文",
+        "input": "获取静态成员变量的上下文",
+        "expectedOutput": "返回静态成员变量的上下文，包含 static 修饰符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - const 成员函数上下文",
+        "input": "获取 get_definition const 成员函数的上下文",
+        "expectedOutput": "返回 get_definition 的上下文，包含 const 修饰符和 override 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 友元函数上下文",
+        "input": "获取友元函数的上下文信息",
+        "expectedOutput": "返回友元函数的上下文，包含 friend 声明",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 纯虚函数上下文",
+        "input": "获取基类纯虚函数的上下文",
+        "expectedOutput": "返回纯虚函数的上下文，包含 = 0 声明",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 带默认参数函数上下文",
+        "input": "获取带默认参数值的函数上下文",
+        "expectedOutput": "返回函数的上下文，参数中包含默认值",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 函数重载上下文",
+        "input": "获取同名函数所有重载版本的上下文",
+        "expectedOutput": "返回函数所有重载版本的上下文列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - lambda表达式上下文",
+        "input": "获取 lambda 表达式的上下文",
+        "expectedOutput": "返回 lambda 表达式的上下文，包含捕获列表和参数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 类模板特化上下文",
+        "input": "获取模板特化版本的上下文",
+        "expectedOutput": "返回模板特化的上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - concept约束上下文",
+        "input": "获取 C++20 concept 约束的上下文",
+        "expectedOutput": "返回 concept 的上下文，包含约束条件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 跨命名空间引用",
+        "input": "获取跨命名空间引用的符号上下文",
+        "expectedOutput": "返回跨命名空间符号的上下文，包含命名空间限定符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 循环依赖上下文",
+        "input": "获取存在循环依赖的符号上下文",
+        "expectedOutput": "返回符号的上下文，可检测循环依赖关系",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 大型类上下文",
+        "input": "获取包含大量成员的大型类上下文，limit=100",
+        "expectedOutput": "返回大型类的上下文，最多 100 条关联信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 条件编译符号上下文",
+        "input": "获取条件编译块中的符号上下文",
+        "expectedOutput": "返回条件编译符号的上下文，包含 #ifdef 条件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 外部库符号上下文",
+        "input": "获取外部库 boost::asio 中符号的上下文",
+        "expectedOutput": "返回外部库符号的上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 转发声明上下文",
+        "input": "获取前向声明类的上下文",
+        "expectedOutput": "返回前向声明类的上下文，可能信息不完整",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 析构函数上下文",
+        "input": "获取虚析构函数的上下文",
+        "expectedOutput": "返回虚析构函数的上下文，包含 virtual ~",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 复制构造函数上下文",
+        "input": "获取复制构造函数的上下文",
+        "expectedOutput": "返回复制构造函数的上下文，参数为 const 引用",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 移动构造函数上下文",
+        "input": "获取移动构造函数的上下文",
+        "expectedOutput": "返回移动构造函数的上下文，参数为右值引用",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 赋值运算符上下文",
+        "input": "获取 operator= 赋值运算符的上下文",
+        "expectedOutput": "返回赋值运算符的上下文，包含返回引用",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 类型转换运算符上下文",
+        "input": "获取类型转换运算符的上下文",
+        "expectedOutput": "返回类型转换运算符的上下文，包含目标类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 命名空间内函数",
+        "input": "获取 agentxx::tools 命名空间内全局函数的上下文",
+        "expectedOutput": "返回命名空间内全局函数的上下文列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 成员函数指针",
+        "input": "获取成员函数指针类型的上下文",
+        "expectedOutput": "返回成员函数指针类型符号的上下文",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 函数指针上下文",
+        "input": "获取函数指针类型的上下文",
+        "expectedOutput": "返回函数指针类型符号的上下文",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 数组类型上下文",
+        "input": "获取数组类型符号的上下文",
+        "expectedOutput": "返回数组类型符号的上下文，包含元素类型和大小",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 引用类型上下文",
+        "input": "获取引用类型符号的上下文",
+        "expectedOutput": "返回引用类型符号的上下文，包含引用目标",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 指针类型上下文",
+        "input": "获取指针类型符号的上下文",
+        "expectedOutput": "返回指针类型符号的上下文，包含指向类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 训练相关符号",
+        "input": "获取 TrainingTestCase 结构体的上下文",
+        "expectedOutput": "返回 TrainingTestCase 的上下文，包含 name、input、expectedOutput、equalOutput 等字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 评分相关符号",
+        "input": "获取 defaultScoringWithSubAgent 函数的上下文",
+        "expectedOutput": "返回 defaultScoringWithSubAgent 的上下文，包含评分逻辑",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 优化相关符号",
+        "input": "获取 optimizePromptWithLLM 函数的上下文",
+        "expectedOutput": "返回 optimizePromptWithLLM 的上下文，包含 LLM 优化逻辑",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 中间件上下文",
+        "input": "获取 MiddlewareContext 类的上下文",
+        "expectedOutput": "返回 MiddlewareContext 的上下文，包含 graphDataKey 相关常量",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 节点类型上下文",
+        "input": "获取 AgentStartCallWrapNode 的上下文",
+        "expectedOutput": "返回 AgentStartCallWrapNode 的上下文，包含 defNodeType 常量",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 图引擎上下文",
+        "input": "获取 GraphEngine 类的上下文",
+        "expectedOutput": "返回 GraphEngine 的上下文，包含 compile 方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 工具调用节点上下文",
+        "input": "获取 ToolcallWrapNode 的上下文",
+        "expectedOutput": "返回 ToolcallWrapNode 的上下文，包含 defNodeType 常量",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 模型调用节点上下文",
+        "input": "获取 ModelCallWrapNode 的上下文",
+        "expectedOutput": "返回 ModelCallWrapNode 的上下文，包含 defNodeType 常量",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 工具基类上下文",
+        "input": "获取 XXToolBase 类的完整上下文，max_depth=4",
+        "expectedOutput": "返回 XXToolBase 的深层上下文，包含所有继承关系和虚函数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 技能搜索上下文",
+        "input": "获取 ToolSkillSearchSubAgentTask 的上下文",
+        "expectedOutput": "返回 ToolSkillSearchSubAgentTask 的上下文，包含 createSystemPrompt 和 createSubgraph 方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 子代理上下文",
+        "input": "获取 SubAgentNormalTask 的上下文",
+        "expectedOutput": "返回 SubAgentNormalTask 的上下文，包含 defCreateSubGraphDefine 方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - UI控制上下文",
+        "input": "获取 UIControlKeyboardMouseTool 的上下文",
+        "expectedOutput": "返回 UIControlKeyboardMouseTool 的上下文，包含键盘鼠标控制相关方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 规划工具上下文",
+        "input": "获取 planning 相关工具的上下文",
+        "expectedOutput": "返回 planning 工具的上下文，包含任务规划相关方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - RAG搜索上下文",
+        "input": "获取 rag_search 相关工具的上下文",
+        "expectedOutput": "返回 RAG 搜索工具的上下文，包含文档检索相关方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 共享存储上下文",
+        "input": "获取 share_store 相关工具的上下文",
+        "expectedOutput": "返回共享存储工具的上下文，包含数据保存和获取方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 日期时间上下文",
+        "input": "获取 get_current_datetime 相关工具的上下文",
+        "expectedOutput": "返回日期时间工具的上下文，包含时间格式化方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 字符串处理上下文",
+        "input": "获取 string 工具类的上下文",
+        "expectedOutput": "返回字符串处理工具的上下文，包含 HTML转Markdown、正则匹配等方法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 符号含特殊字符",
+        "input": "获取名称中包含 :: 的符号上下文",
+        "expectedOutput": "返回含命名空间限定符的符号上下文",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 符号含模板参数",
+        "input": "获取模板参数 T 的上下文",
+        "expectedOutput": "返回模板参数 T 的上下文信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 公共接口上下文",
+        "input": "获取所有工具的公共接口上下文",
+        "expectedOutput": "返回工具公共接口的上下文，如 get_definition、execute_async",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 私有实现上下文",
+        "input": "获取私有成员函数的上下文",
+        "expectedOutput": "返回私有成员函数的上下文，包含 private 访问修饰符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 保护成员上下文",
+        "input": "获取 protected 成员的上下文",
+        "expectedOutput": "返回 protected 成员的上下文，包含 protected 访问修饰符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 图数据键上下文",
+        "input": "获取 graphDataKey_ 前缀常量的上下文",
+        "expectedOutput": "返回 graphDataKey_ 常量列表的上下文",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 符号依赖链",
+        "input": "获取 CodeGraphSearchTool 的完整依赖链上下文，max_depth=4",
+        "expectedOutput": "返回 CodeGraphSearchTool 的依赖链，包含 CodeGraphManager 和 XXToolBase",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 多继承上下文",
+        "input": "获取多继承类的上下文",
+        "expectedOutput": "返回多继承类的上下文，列出所有基类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 虚继承上下文",
+        "input": "获取虚继承的类上下文",
+        "expectedOutput": "返回虚继承类的上下文，包含 virtual 继承关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 成员访问控制",
+        "input": "获取包含 public/private/protected 分区的类上下文",
+        "expectedOutput": "返回类的上下文，显示不同访问控制区域",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 内联命名空间",
+        "input": "获取内联命名空间的上下文",
+        "expectedOutput": "返回内联命名空间的上下文，包含 inline namespace 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 文件作用域符号",
+        "input": "获取文件作用域内全局符号的上下文",
+        "expectedOutput": "返回文件作用域全局符号的上下文",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 块作用域符号",
+        "input": "获取块作用域内局部变量的上下文",
+        "expectedOutput": "返回块作用域局部变量的上下文",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 复杂模板嵌套",
+        "input": "获取深度嵌套模板类的上下文",
+        "expectedOutput": "返回嵌套模板类的上下文，显示模板参数层级",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 获取SubAgentTaskBase",
+        "input": "获取符号 SubAgentTaskBase 的上下文，max_depth=2",
+        "expectedOutput": "返回 SubAgentTaskBase 上下文，包含成员变量 subgraph、name、depict、systemPrompt 和虚函数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_context - 获取ToolSkillSearchSubAgentTask",
+        "input": "获取符号 ToolSkillSearchSubAgentTask 的上下文，max_depth=3",
+        "expectedOutput": "返回 ToolSkillSearchSubAgentTask 类的上下文，包含继承关系、成员函数和静态成员",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

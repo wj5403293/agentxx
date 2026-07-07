@@ -1,0 +1,702 @@
+[
+    {
+        "name": "tool_skill_search - 搜索可用的工具和技能",
+        "input": "请帮我搜索有哪些可以用于处理 JSON 解析和文件读取的工具或技能，在 {agentxx_root}/agent/lib/include/agentxx/tools 和 {agentxx_root}/resource/skills 目录中查找",
+        "expectedOutput": "返回一个 JSON 对象，包含 tool 和 skill 两个数组，列出找到的适合处理 JSON 解析和文件读取的工具名和技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码搜索工具",
+        "input": "请帮我搜索可以用于代码搜索和代码分析的工具或技能，在 {agentxx_root}/agent/lib/include/agentxx/tools 和 {agentxx_root}/resource/skills 目录中查找",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 codegraph_search 等代码分析工具，skill 数组包含代码搜索相关的技能路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文件系统操作工具",
+        "input": "请帮我搜索可以用于文件系统操作（如读取、写入、搜索文件）的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_read_text_file、filesystem_write_file、filesystem_grep 等文件系统工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索网络请求工具",
+        "input": "请帮我搜索可以用于网络请求和网页获取的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 web_fetch_url、web_fetch_url_markdown、web_search 等网络工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索字符串处理工具",
+        "input": "请帮我搜索可以用于字符串处理（如正则表达式、HTML转Markdown）的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 string_regexp、string_html_to_markdown 等字符串工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索共享存储工具",
+        "input": "请帮我搜索可以用于数据共享存储（保存、获取、删除数据）的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 share_store 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索命令执行工具",
+        "input": "请帮我搜索可以用于执行命令行命令的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 execute_linux_command 或 execute_windows_command 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索日期时间工具",
+        "input": "请帮我搜索可以用于获取当前日期时间的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 get_current_datetime 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索UI控制工具",
+        "input": "请帮我搜索可以用于键盘鼠标控制的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 ui_control_keyboard_mouse 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索计划规划工具",
+        "input": "请帮我搜索可以用于任务规划和计划编写的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 planning_write 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索子代理工具",
+        "input": "请帮我搜索可以用于切换到子代理执行任务的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 subagent_switch 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索RAG搜索工具",
+        "input": "请帮我搜索可以用于向量搜索和知识库检索的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 rag_search 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码图分析工具",
+        "input": "请帮我搜索可以用于代码图分析（如符号搜索、调用者分析、被调用者分析）的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 codegraph_search、codegraph_callers、codegraph_callees、codegraph_context 等工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文本文件读取工具",
+        "input": "请帮我搜索可以用于读取文本文件内容的工具或技能，在 {agentxx_root}/agent/lib/include/agentxx/tools 中查找",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_read_text_file 和 filesystem_read_text_file_range 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索二进制文件读取工具",
+        "input": "请帮我搜索可以用于读取二进制文件的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_read_binary_file 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文本编辑工具",
+        "input": "请帮我搜索可以用于编辑文本文件的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_edit_text_file 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文件列表工具",
+        "input": "请帮我搜索可以用于列出目录中文件的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_list_file 和 filesystem_list_file_recursive 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索通配符文件搜索工具",
+        "input": "请帮我搜索可以用于通配符模式匹配文件搜索的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_glob 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索Grep搜索工具",
+        "input": "请帮我搜索可以用于文本内容搜索（类似grep）的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_grep 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索HTML转Markdown工具",
+        "input": "请帮我搜索可以用于将HTML转换为Markdown格式的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 string_html_to_markdown 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索正则表达式工具",
+        "input": "请帮我搜索可以用于正则表达式匹配和替换的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 string_regexp 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索HTTP请求工具",
+        "input": "请帮我搜索可以用于发送HTTP请求和获取网页内容的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 web_fetch_url 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索网页转Markdown工具",
+        "input": "请帮我搜索可以用于获取网页并将其转换为Markdown格式的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 web_fetch_url_markdown 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索搜索引擎工具",
+        "input": "请帮我搜索可以用于搜索引擎查询的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 web_search 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索工具技能搜索本身",
+        "input": "请帮我搜索有没有可以用于搜索其他工具和技能的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 tool_skill_search 工具本身",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码审查相关技能",
+        "input": "请帮我搜索可以用于代码审查和代码质量分析的技能，在 {agentxx_root}/resource/skills 目录中查找",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码审查相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索测试框架相关技能",
+        "input": "请帮我搜索可以用于单元测试和测试框架使用的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含测试相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索Git版本控制技能",
+        "input": "请帮我搜索可以用于Git版本控制和代码管理的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 Git 相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索数据库操作技能",
+        "input": "请帮我搜索可以用于数据库连接和操作的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含数据库相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索容器化部署技能",
+        "input": "请帮我搜索可以用于Docker容器化和Kubernetes部署的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含容器化部署相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索CI/CD流水线技能",
+        "input": "请帮我搜索可以用于CI/CD流水线配置的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 CI/CD 相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文档生成技能",
+        "input": "请帮我搜索可以用于自动生成文档的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含文档生成相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索API设计技能",
+        "input": "请帮我搜索可以用于REST API设计和开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 API 设计相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索性能优化技能",
+        "input": "请帮我搜索可以用于代码性能优化和性能分析的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含性能优化相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索调试技能",
+        "input": "请帮我搜索可以用于代码调试和问题排查的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含调试相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索安全审计技能",
+        "input": "请帮我搜索可以用于代码安全审计和漏洞检测的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含安全审计相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索C++项目构建技能",
+        "input": "请帮我搜索可以用于C++项目构建和CMake配置的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 C++ 构建相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索Python项目相关技能",
+        "input": "请帮我搜索可以用于Python项目开发和管理的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 Python 开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索前端开发技能",
+        "input": "请帮我搜索可以用于前端开发（React、Vue、HTML/CSS）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含前端开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索后端开发技能",
+        "input": "请帮我搜索可以用于后端服务开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含后端开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索网络协议相关技能",
+        "input": "请帮我搜索可以用于HTTP、TCP/IP等网络协议处理的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含网络协议相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索加密和哈希技能",
+        "input": "请帮我搜索可以用于加密解密以及哈希计算的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含加密相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索日志分析技能",
+        "input": "请帮我搜索可以用于日志分析和监控的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含日志分析相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码重构技能",
+        "input": "请帮我搜索可以用于代码重构和优化的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码重构相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索多线程编程技能",
+        "input": "请帮我搜索可以用于多线程和并发编程的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含多线程编程相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索设计模式技能",
+        "input": "请帮我搜索可以用于设计模式应用和推荐的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含设计模式相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索配置文件解析技能",
+        "input": "请帮我搜索可以用于解析YAML、TOML、INI等配置文件的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组可能包含文件读取工具，skill 数组包含配置文件解析相关的技能路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索数据格式转换技能",
+        "input": "请帮我搜索可以用于JSON/XML/YAML格式之间互相转换的工具或技能",
+        "expectedOutput": "返回 JSON 对象，包含可用的工具和技能，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索PDF处理技能",
+        "input": "请帮我搜索可以用于PDF文件读取和生成的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 PDF 处理相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索Excel处理技能",
+        "input": "请帮我搜索可以用于Excel文件读取和写入的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 Excel 处理相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索图像处理技能",
+        "input": "请帮我搜索可以用于图像处理和转换的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含图像处理相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索机器学习技能",
+        "input": "请帮我搜索可以用于机器学习和数据处理的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含机器学习相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码生成技能",
+        "input": "请帮我搜索可以用于自动生成代码的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码生成相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码格式化技能",
+        "input": "请帮我搜索可以用于代码格式化和美化（如clang-format）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码格式化相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码检查技能",
+        "input": "请帮我搜索可以用于静态代码检查（如clang-tidy）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码检查相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索包管理技能",
+        "input": "请帮我搜索可以用于包管理（如Conan、vcpkg、npm）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含包管理相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索Shell脚本技能",
+        "input": "请帮我搜索可以用于编写Shell脚本（Bash、PowerShell）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 Shell 脚本相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索项目脚手架技能",
+        "input": "请帮我搜索可以用于快速创建项目脚手架和模板的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含项目脚手架相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索依赖管理技能",
+        "input": "请帮我搜索可以用于项目依赖管理和冲突解决的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含依赖管理相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索国际化技能",
+        "input": "请帮我搜索可以用于国际化和本地化(i18n)的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含国际化相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索嵌入式开发技能",
+        "input": "请帮我搜索可以用于嵌入式系统开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含嵌入式开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索游戏开发技能",
+        "input": "请帮我搜索可以用于游戏开发（如OpenGL、Vulkan）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含游戏开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索编译器开发技能",
+        "input": "请帮我搜索可以用于编译器开发和LLVM使用的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含编译器开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索协程编程技能",
+        "input": "请帮我搜索可以用于C++协程编程和异步编程的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含协程编程相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索同时需要工具和技能的查询",
+        "input": "请帮我查找可以处理文件读写和部署项目到服务器的工具和技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组包含文件系统工具，skill 数组包含部署相关的技能路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索模糊关键词查询",
+        "input": "请帮我搜索有没有可以处理文件的东西",
+        "expectedOutput": "返回 JSON 对象，tool 数组包含 filesystem 相关的工具，skill 数组包含文件处理相关的技能，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索精确功能名查询",
+        "input": "请帮我查找 filesystem_grep 这个工具是否存在",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_grep 工具",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索不存在的工具",
+        "input": "请帮我搜索有没有一个叫做 nonexistent_tool 的工具",
+        "expectedOutput": "返回 JSON 对象，tool 和 skill 数组都为空数组，因为找不到匹配的工具或技能",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索数据序列化工具",
+        "input": "请帮我搜索可以用于数据序列化和反序列化的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组可能包含文件读写工具，skill 数组包含序列化相关的技能路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索消息队列技能",
+        "input": "请帮我搜索可以用于消息队列（如RabbitMQ、Kafka）使用的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含消息队列相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索缓存系统技能",
+        "input": "请帮我搜索可以用于缓存系统（如Redis、Memcached）使用的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含缓存系统相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文本处理工具",
+        "input": "请帮我搜索可以用于文本分析和自然语言处理的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组可能包含字符串处理工具，skill 数组包含自然语言处理相关的技能路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索编译构建工具",
+        "input": "请帮我搜索可以用于编译和构建C++项目的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 数组可能包含命令执行工具，skill 数组包含编译构建相关的技能路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索基准测试技能",
+        "input": "请帮我搜索可以用于性能基准测试的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含基准测试相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索内存分析技能",
+        "input": "请帮我搜索可以用于内存泄漏检测和内存分析的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含内存分析相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索图数据库技能",
+        "input": "请帮我搜索可以用于图数据库（如Neo4j）操作的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含图数据库相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索微服务架构技能",
+        "input": "请帮我搜索可以用于微服务架构设计和开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含微服务架构相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索认证授权技能",
+        "input": "请帮我搜索可以用于OAuth认证和JWT令牌处理的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含认证授权相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索文件压缩技能",
+        "input": "请帮我搜索可以用于文件压缩和解压（zip、tar.gz）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含文件压缩相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索编码转换技能",
+        "input": "请帮我搜索可以用于字符编码转换（UTF-8、GBK等）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含编码转换相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索密码学技能",
+        "input": "请帮我搜索可以用于密码学和安全通信的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含密码学相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索操作系统相关技能",
+        "input": "请帮我搜索可以用于操作系统级操作（进程管理、系统调用）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含操作系统相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索深度学习框架技能",
+        "input": "请帮我搜索可以用于深度学习框架（TensorFlow、PyTorch）使用的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含深度学习相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索大数据处理技能",
+        "input": "请帮我搜索可以用于大数据处理（Hadoop、Spark）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含大数据处理相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索区块链开发技能",
+        "input": "请帮我搜索可以用于区块链和智能合约开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含区块链开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索GUI开发技能",
+        "input": "请帮我搜索可以用于GUI应用开发（如Qt、wxWidgets）的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 GUI 开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索跨平台开发技能",
+        "input": "请帮我搜索可以用于跨平台应用开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含跨平台开发相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码覆盖率技能",
+        "input": "请帮我搜索可以用于代码覆盖率分析和报告的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码覆盖率相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索发布部署技能",
+        "input": "请帮我搜索可以用于自动化发布和部署的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含发布部署相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索监控告警技能",
+        "input": "请帮我搜索可以用于系统监控和告警配置的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含监控告警相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索WebSocket技能",
+        "input": "请帮我搜索可以用于WebSocket通信的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 WebSocket 相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索RPC框架技能",
+        "input": "请帮我搜索可以用于RPC框架（如gRPC、Thrift）使用的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 RPC 框架相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索GraphQL技能",
+        "input": "请帮我搜索可以用于GraphQL API开发的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 GraphQL 相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索OpenAPI/Swagger技能",
+        "input": "请帮我搜索可以用于OpenAPI规范和Swagger文档生成的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 OpenAPI/Swagger 相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索代码混淆技能",
+        "input": "请帮我搜索可以用于代码混淆和保护的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含代码混淆相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索实时通信技能",
+        "input": "请帮我搜索可以用于实时通信和流媒体处理的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含实时通信相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索数据可视化技能",
+        "input": "请帮我搜索可以用于数据可视化和图表的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含数据可视化相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索数据库管理工具",
+        "input": "请帮我搜索可以用于数据库管理和SQL查询的工具或技能",
+        "expectedOutput": "返回 JSON 对象，tool 和 skill 数组包含数据库相关的工具和技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索容器化部署技能",
+        "input": "请帮我搜索可以用于Docker容器化和Kubernetes部署的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含 Docker/Kubernetes 相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "tool_skill_search - 搜索机器学习模型训练技能",
+        "input": "请帮我搜索可以用于机器学习模型训练和调参的技能",
+        "expectedOutput": "返回 JSON 对象，skill 数组包含机器学习相关的技能路径，如果找不到则返回空数组",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

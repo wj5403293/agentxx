@@ -1,0 +1,730 @@
+[
+    {
+        "name": "execute_linux_command - 执行Linux命令",
+        "input": "请执行 Linux 命令 'ls -la {agentxx_root}/agent/lib/include/agentxx/tools/' 列出该目录下所有文件的详细信息",
+        "expectedOutput": "返回命令执行结果，包含 ExitCode 和 StdOut，StdOut 中应列出该目录下所有 .h 文件的详细信息（权限、大小、日期等），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 列出当前目录文件",
+        "input": "请执行 Linux 命令 'ls {agentxx_root}/agent/lib/' 列出该目录下的文件和子目录",
+        "expectedOutput": "返回 StdOut 中列出 agent/lib 目录下的子目录名和文件名，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看文件内容",
+        "input": "请执行 Linux 命令 'cat {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 查看该文件内容",
+        "expectedOutput": "返回 StdOut 中包含 tool.h 的完整源码内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看文件前10行",
+        "input": "请执行 Linux 命令 'head -n 10 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 查看文件前10行",
+        "expectedOutput": "返回 StdOut 中包含 tool.h 的前10行内容，包含 #pragma once 和 include 语句等，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看文件末尾10行",
+        "input": "请执行 Linux 命令 'tail -n 10 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 查看文件最后10行",
+        "expectedOutput": "返回 StdOut 中包含 tool.h 的最后10行内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 统计文件行数",
+        "input": "请执行 Linux 命令 'wc -l {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 统计文件行数",
+        "expectedOutput": "返回 StdOut 中包含 tool.h 的行数统计结果，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 统计文件字符数",
+        "input": "请执行 Linux 命令 'wc -c {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 统计文件字符数",
+        "expectedOutput": "返回 StdOut 中包含 tool.h 的字符数统计结果，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查找包含关键词的文件",
+        "input": "请执行 Linux 命令 'grep -r \"XXToolBase\" {agentxx_root}/agent/lib/include/agentxx/tools/' 在该目录下递归搜索包含 XXToolBase 的文件",
+        "expectedOutput": "返回 StdOut 中列出所有包含 XXToolBase 的行及文件名，ExitCode 应为 0（如果找到匹配）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 递归列出目录文件",
+        "input": "请执行 Linux 命令 'find {agentxx_root}/agent/lib/include/agentxx/tools/ -name \"*.h\"' 查找该目录下所有 .h 文件",
+        "expectedOutput": "返回 StdOut 中列出所有 .h 文件的完整路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看文件类型",
+        "input": "请执行 Linux 命令 'file {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 判断文件类型",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 为 C source 或 ASCII text 文件类型，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看磁盘使用情况",
+        "input": "请执行 Linux 命令 'df -h' 查看磁盘使用情况",
+        "expectedOutput": "返回 StdOut 中包含各挂载点的磁盘使用情况（总大小、已用、可用、使用率），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看内存使用情况",
+        "input": "请执行 Linux 命令 'free -h' 查看系统内存使用情况",
+        "expectedOutput": "返回 StdOut 中包含内存总量、已用、空闲、缓存等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看系统信息",
+        "input": "请执行 Linux 命令 'uname -a' 查看完整系统信息",
+        "expectedOutput": "返回 StdOut 中包含操作系统名称、内核版本、主机名、架构等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看当前用户",
+        "input": "请执行 Linux 命令 'whoami' 查看当前登录用户名",
+        "expectedOutput": "返回 StdOut 中显示当前用户名，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看当前工作目录",
+        "input": "请执行 Linux 命令 'pwd' 查看当前工作目录路径",
+        "expectedOutput": "返回 StdOut 中显示当前工作目录的绝对路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看系统运行时间",
+        "input": "请执行 Linux 命令 'uptime' 查看系统运行时间及负载",
+        "expectedOutput": "返回 StdOut 中包含系统运行时间、当前用户数、负载平均值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看环境变量",
+        "input": "请执行 Linux 命令 'env' 或 'printenv' 查看所有环境变量",
+        "expectedOutput": "返回 StdOut 中列出当前所有环境变量及其值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 管道组合命令",
+        "input": "请执行 Linux 命令 'ls -la {agentxx_root}/agent/lib/include/agentxx/tools/ | grep \"\\.h$\"' 管道组合列出目录下 .h 文件",
+        "expectedOutput": "返回 StdOut 中仅列出以 .h 结尾的文件信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用sort排序",
+        "input": "请执行 Linux 命令 'ls {agentxx_root}/agent/lib/include/agentxx/tools/ | sort' 列出并排序目录文件",
+        "expectedOutput": "返回 StdOut 中按字母顺序排列的文件名列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 创建目录",
+        "input": "请执行 Linux 命令 'mkdir -p {agentxx_root}/temp/test_dir' 创建临时测试目录",
+        "expectedOutput": "返回 ExitCode 为 0，如果目录已存在也不报错（-p 参数），StdOut 可能为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 删除空目录",
+        "input": "请执行 Linux 命令 'rmdir {agentxx_root}/temp/test_dir' 删除之前创建的临时目录",
+        "expectedOutput": "返回 ExitCode 为 0（如果目录存在且为空），StdOut 可能为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看进程列表",
+        "input": "请执行 Linux 命令 'ps aux' 查看当前所有进程",
+        "expectedOutput": "返回 StdOut 中包含所有运行进程的详细信息（用户、PID、CPU、内存、命令等），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看网络接口",
+        "input": "请执行 Linux 命令 'ifconfig' 或 'ip addr' 查看网络接口配置",
+        "expectedOutput": "返回 StdOut 中包含各网络接口的 IP 地址、MAC 地址、状态等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 测试网络连通性",
+        "input": "请执行 Linux 命令 'ping -c 1 127.0.0.1' 测试本地回环网络连通性",
+        "expectedOutput": "返回 StdOut 中包含 ping 测试结果，1 packets transmitted, 1 received，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用sed替换文本",
+        "input": "请执行 Linux 命令 'echo \"hello world\" | sed \"s/world/agentxx/\"' 使用 sed 替换文本",
+        "expectedOutput": "返回 StdOut 中显示 \"hello agentxx\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用awk提取列",
+        "input": "请执行 Linux 命令 'echo \"name age city\" | awk \"{print \\$1}\"' 使用 awk 提取第一列",
+        "expectedOutput": "返回 StdOut 中显示 \"name\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用cut截取字段",
+        "input": "请执行 Linux 命令 'echo \"a:b:c:d\" | cut -d\":\" -f2' 使用 cut 按分隔符截取字段",
+        "expectedOutput": "返回 StdOut 中显示 \"b\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用uniq去重",
+        "input": "请执行 Linux 命令 'echo -e \"a\\na\\nb\\nc\" | sort | uniq' 排序并去重",
+        "expectedOutput": "返回 StdOut 中显示去重后的 \"a\\nb\\nc\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用diff比较文件",
+        "input": "请执行 Linux 命令 'diff {agentxx_root}/agent/lib/include/agentxx/tools/tool.h {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 比较两个相同文件",
+        "expectedOutput": "返回 StdOut 为空（两个文件相同，无差异），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用tee写入文件",
+        "input": "请执行 Linux 命令 'echo \"test content\" | tee {agentxx_root}/temp/test_output.txt' 将输出同时显示并写入文件",
+        "expectedOutput": "返回 StdOut 中显示 \"test content\"，ExitCode 应为 0，同时文件被创建",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用date查看日期",
+        "input": "请执行 Linux 命令 'date' 查看当前系统日期和时间",
+        "expectedOutput": "返回 StdOut 中显示当前日期时间，格式如 \"Mon Jan 01 12:00:00 UTC 2025\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用cal查看日历",
+        "input": "请执行 Linux 命令 'cal' 查看当前月份日历",
+        "expectedOutput": "返回 StdOut 中显示当前月份的日历表格，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用du查看目录大小",
+        "input": "请执行 Linux 命令 'du -sh {agentxx_root}/agent/lib/include/agentxx/tools/' 查看该目录的总大小",
+        "expectedOutput": "返回 StdOut 中显示该目录的总大小（以人类可读格式），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用stat查看文件状态",
+        "input": "请执行 Linux 命令 'stat {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 查看文件详细状态",
+        "expectedOutput": "返回 StdOut 中包含文件大小、inode、权限、修改时间、访问时间等详细信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用chmod修改权限",
+        "input": "请执行 Linux 命令 'chmod 644 {agentxx_root}/temp/test_output.txt' 修改测试文件权限",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件权限被修改为 644",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用ln创建软链接",
+        "input": "请执行 Linux 命令 'ln -s {agentxx_root}/agent/lib/include/agentxx/tools/tool.h {agentxx_root}/temp/tool_link.h' 创建软链接",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，创建 tool_link.h 指向 tool.h 的软链接",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 执行带引号的命令",
+        "input": "请执行 Linux 命令 'echo \"Hello AgentXX Framework\"' 输出带引号文本",
+        "expectedOutput": "返回 StdOut 中显示 \"Hello AgentXX Framework\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 多命令组合执行",
+        "input": "请执行 Linux 命令 'cd {agentxx_root}/agent/lib/include/agentxx/tools/ && ls -la && pwd' 组合多个命令执行",
+        "expectedOutput": "返回 StdOut 中包含该目录的文件列表和当前工作目录路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用tr字符转换",
+        "input": "请执行 Linux 命令 'echo \"HELLO\" | tr \"[:upper:]\" \"[:lower:]\"' 将大写转为小写",
+        "expectedOutput": "返回 StdOut 中显示 \"hello\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用xargs批量处理",
+        "input": "请执行 Linux 命令 'echo \"tool.h filesystem.h string.h\" | xargs -I{{}} echo \"File: {{}}\"' 使用 xargs 批量处理",
+        "expectedOutput": "返回 StdOut 中显示 \"File: tool.h\"、\"File: filesystem.h\"、\"File: string.h\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用readlink读取链接",
+        "input": "请执行 Linux 命令 'readlink -f {agentxx_root}/temp/tool_link.h' 读取软链接的真实路径",
+        "expectedOutput": "返回 StdOut 中显示链接指向的真实文件路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用md5sum计算校验和",
+        "input": "请执行 Linux 命令 'md5sum {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 计算文件 MD5 校验和",
+        "expectedOutput": "返回 StdOut 中包含文件的 MD5 哈希值和文件路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用sha256sum计算校验和",
+        "input": "请执行 Linux 命令 'sha256sum {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 计算文件 SHA256 校验和",
+        "expectedOutput": "返回 StdOut 中包含文件的 SHA256 哈希值和文件路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用tar打包文件",
+        "input": "请执行 Linux 命令 'tar -czf {agentxx_root}/temp/tools_backup.tar.gz {agentxx_root}/agent/lib/include/agentxx/tools/' 打包目录",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，生成 tools_backup.tar.gz 压缩包",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用zip压缩文件",
+        "input": "请执行 Linux 命令 'zip -r {agentxx_root}/temp/tools.zip {agentxx_root}/agent/lib/include/agentxx/tools/' 压缩目录",
+        "expectedOutput": "返回 StdOut 中包含压缩进度和文件列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用unzip解压文件",
+        "input": "请执行 Linux 命令 'unzip -l {agentxx_root}/temp/tools.zip' 列出压缩包内容",
+        "expectedOutput": "返回 StdOut 中列出压缩包内所有文件，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用which查找命令位置",
+        "input": "请执行 Linux 命令 'which bash' 查找 bash 命令的路径",
+        "expectedOutput": "返回 StdOut 中显示 bash 可执行文件的完整路径（如 /bin/bash），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用basename获取文件名",
+        "input": "请执行 Linux 命令 'basename {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 获取路径中的文件名",
+        "expectedOutput": "返回 StdOut 中显示 \"tool.h\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用dirname获取目录名",
+        "input": "请执行 Linux 命令 'dirname {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 获取路径中的目录部分",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 所在的目录路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 查看命令历史",
+        "input": "请执行 Linux 命令 'history' 查看命令历史记录",
+        "expectedOutput": "返回 StdOut 中列出之前执行过的命令及其编号，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用nl显示行号",
+        "input": "请执行 Linux 命令 'nl {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 带行号显示文件内容",
+        "expectedOutput": "返回 StdOut 中每行前面带有行号，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用tac反向显示文件",
+        "input": "请执行 Linux 命令 'tac {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 从最后一行开始反向显示",
+        "expectedOutput": "返回 StdOut 中从最后一行开始显示文件内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用sort按数字排序",
+        "input": "请执行 Linux 命令 'echo -e \"10\\n2\\n1\\n20\" | sort -n' 按数值排序",
+        "expectedOutput": "返回 StdOut 中显示 \"1\\n2\\n10\\n20\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用sort逆序排序",
+        "input": "请执行 Linux 命令 'ls {agentxx_root}/agent/lib/include/agentxx/tools/ | sort -r' 逆序排列目录文件",
+        "expectedOutput": "返回 StdOut 中按字母逆序排列的文件名列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用grep统计匹配行数",
+        "input": "请执行 Linux 命令 'grep -c \"#include\" {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 统计 include 行数",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 中包含 #include 的行数，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用grep忽略大小写搜索",
+        "input": "请执行 Linux 命令 'grep -i \"namespace\" {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 忽略大小写搜索",
+        "expectedOutput": "返回 StdOut 中列出所有包含 namespace 的行（不区分大小写），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用grep显示匹配行号",
+        "input": "请执行 Linux 命令 'grep -n \"class\" {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 显示匹配行及行号",
+        "expectedOutput": "返回 StdOut 中列出所有包含 class 的行及其行号，ExitCode 应为 0（如果找到匹配）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用grep反向匹配",
+        "input": "请执行 Linux 命令 'grep -v \"^$\" {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 排除空行",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 所有非空行，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用grep扩展正则",
+        "input": "请执行 Linux 命令 'grep -E \"class|struct\" {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 使用扩展正则匹配",
+        "expectedOutput": "返回 StdOut 中列出所有包含 class 或 struct 的行，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用find按类型搜索",
+        "input": "请执行 Linux 命令 'find {agentxx_root}/agent/lib/ -type f -name \"*.h\"' 查找所有 .h 文件",
+        "expectedOutput": "返回 StdOut 中列出 agent/lib/ 目录下所有 .h 文件的完整路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用find按大小搜索",
+        "input": "请执行 Linux 命令 'find {agentxx_root}/agent/lib/ -type f -size +1k' 查找大于 1KB 的文件",
+        "expectedOutput": "返回 StdOut 中列出所有大于 1KB 的文件路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用find按时间搜索",
+        "input": "请执行 Linux 命令 'find {agentxx_root}/agent/lib/ -type f -mtime -7' 查找最近7天修改的文件",
+        "expectedOutput": "返回 StdOut 中列出最近7天内修改过的文件路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用find执行操作",
+        "input": "请执行 Linux 命令 'find {agentxx_root}/agent/lib/include/agentxx/tools/ -name \"*.h\" -exec wc -l {{}} \\;' 查找并统计每个 .h 文件行数",
+        "expectedOutput": "返回 StdOut 中列出每个 .h 文件的行数统计，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用head和tail组合",
+        "input": "请执行 Linux 命令 'head -n 20 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h | tail -n 5' 显示第16到20行",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 的第16-20行内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用wc统计目录文件数",
+        "input": "请执行 Linux 命令 'ls {agentxx_root}/agent/lib/include/agentxx/tools/ | wc -l' 统计目录下文件数",
+        "expectedOutput": "返回 StdOut 中显示该目录下文件/子目录的数量，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用echo输出多行文本",
+        "input": "请执行 Linux 命令 'echo -e \"line1\\nline2\\nline3\"' 输出多行文本",
+        "expectedOutput": "返回 StdOut 中显示三行文本 \"line1\"、\"line2\"、\"line3\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用printf格式化输出",
+        "input": "请执行 Linux 命令 'printf \"Name: %s, Age: %d\\n\" \"AgentXX\" 1' 格式化输出",
+        "expectedOutput": "返回 StdOut 中显示 \"Name: AgentXX, Age: 1\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用seq生成序列",
+        "input": "请执行 Linux 命令 'seq 1 5' 生成数字序列",
+        "expectedOutput": "返回 StdOut 中显示 \"1\\n2\\n3\\n4\\n5\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用yes重复输出",
+        "input": "请执行 Linux 命令 'yes \"AgentXX\" | head -n 5' 重复输出并截取前5行",
+        "expectedOutput": "返回 StdOut 中显示5行 \"AgentXX\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用expr进行算术运算",
+        "input": "请执行 Linux 命令 'expr 10 + 20' 进行加法运算",
+        "expectedOutput": "返回 StdOut 中显示 \"30\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用bc进行浮点运算",
+        "input": "请执行 Linux 命令 'echo \"scale=2; 10/3\" | bc' 进行浮点除法运算",
+        "expectedOutput": "返回 StdOut 中显示 \"3.33\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用sleep延时",
+        "input": "请执行 Linux 命令 'sleep 1 && echo \"done\"' 延时1秒后输出",
+        "expectedOutput": "返回 StdOut 中显示 \"done\"，ExitCode 应为 0，命令执行时间约1秒",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用true命令",
+        "input": "请执行 Linux 命令 'true && echo \"success\"' 使用 true 命令测试逻辑与",
+        "expectedOutput": "返回 StdOut 中显示 \"success\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用false命令",
+        "input": "请执行 Linux 命令 'false || echo \"failed\"' 使用 false 命令测试逻辑或",
+        "expectedOutput": "返回 StdOut 中显示 \"failed\"，ExitCode 应为 0（因为 echo 成功执行）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用test判断文件存在",
+        "input": "请执行 Linux 命令 'test -f {agentxx_root}/agent/lib/include/agentxx/tools/tool.h && echo \"exists\"' 判断文件是否存在",
+        "expectedOutput": "返回 StdOut 中显示 \"exists\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用test判断目录存在",
+        "input": "请执行 Linux 命令 'test -d {agentxx_root}/agent/lib/include/agentxx/tools/ && echo \"dir exists\"' 判断目录是否存在",
+        "expectedOutput": "返回 StdOut 中显示 \"dir exists\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用[[]]条件判断",
+        "input": "请执行 Linux 命令 '[[ \"abc\" == \"abc\" ]] && echo \"match\"' 使用双方括号字符串比较",
+        "expectedOutput": "返回 StdOut 中显示 \"match\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用for循环",
+        "input": "请执行 Linux 命令 'for i in 1 2 3; do echo \"Num: $i\"; done' 执行 for 循环",
+        "expectedOutput": "返回 StdOut 中显示 \"Num: 1\"、\"Num: 2\"、\"Num: 3\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用while循环",
+        "input": "请执行 Linux 命令 'i=1; while [ $i -le 3 ]; do echo \"Count: $i\"; i=$((i+1)); done' 执行 while 循环",
+        "expectedOutput": "返回 StdOut 中显示 \"Count: 1\"、\"Count: 2\"、\"Count: 3\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用curl获取HTTP内容",
+        "input": "请执行 Linux 命令 'curl -s -o /dev/null -w \"%{http_code}\" https://www.google.com' 获取HTTP状态码",
+        "expectedOutput": "返回 StdOut 中显示 HTTP 状态码（如 200），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用wget下载文件",
+        "input": "请执行 Linux 命令 'wget --spider https://www.google.com 2>&1 | grep \"HTTP/\"' 使用 wget 检测 URL 可用性",
+        "expectedOutput": "返回 StdOut 中包含 HTTP 响应状态信息，ExitCode 应为 0（如果 URL 可访问）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用netstat查看端口",
+        "input": "请执行 Linux 命令 'netstat -tlnp 2>/dev/null || ss -tlnp' 查看监听端口",
+        "expectedOutput": "返回 StdOut 中列出当前监听的 TCP 端口及对应进程，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用lsof查看打开文件",
+        "input": "请执行 Linux 命令 'lsof -p $$ 2>/dev/null | head -5' 查看当前进程打开的文件",
+        "expectedOutput": "返回 StdOut 中列出当前进程打开的文件描述符，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用kill发送信号",
+        "input": "请执行 Linux 命令 'kill -l' 列出所有信号名称",
+        "expectedOutput": "返回 StdOut 中列出所有信号编号和名称（如 1) SIGHUP 2) SIGINT 等），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用nohup后台运行",
+        "input": "请执行 Linux 命令 'nohup echo \"background task\" > {agentxx_root}/temp/nohup_test.out 2>&1 &' 使用 nohup 后台运行",
+        "expectedOutput": "返回 StdOut 中显示后台进程 PID，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用jobs查看后台任务",
+        "input": "请执行 Linux 命令 'jobs -l' 查看当前 shell 的后台任务",
+        "expectedOutput": "返回 StdOut 中列出后台任务的状态和 PID，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 执行不存在的命令",
+        "input": "请执行 Linux 命令 'nonexistent_command_12345' 测试不存在的命令",
+        "expectedOutput": "返回 ExitCode 非 0，StdErr 中包含 \"command not found\" 或类似错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 执行空命令",
+        "input": "请执行 Linux 命令 '' 测试空命令",
+        "expectedOutput": "返回错误信息，提示 Arg `command` is empty，或 ExitCode 非 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 读取不存在的文件",
+        "input": "请执行 Linux 命令 'cat {agentxx_root}/nonexistent_file.txt' 读取不存在的文件",
+        "expectedOutput": "返回 ExitCode 非 0，StdErr 中包含 \"No such file or directory\" 错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 访问无权限目录",
+        "input": "请执行 Linux 命令 'ls /root' 尝试列出无权限访问的目录",
+        "expectedOutput": "返回 ExitCode 非 0，StdErr 中包含 \"Permission denied\" 错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用grep搜索不存在的模式",
+        "input": "请执行 Linux 命令 'grep \"XYZNOTEXIST123\" {agentxx_root}/agent/lib/include/agentxx/tools/tool.h' 搜索不存在的模式",
+        "expectedOutput": "返回 ExitCode 为 1（grep 未找到匹配项），StdOut 为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用all_output参数",
+        "input": "请执行 Linux 命令 'ls {agentxx_root}/agent/lib/' 并设置 all_output=false",
+        "expectedOutput": "返回时仅包含 ExitCode，成功时 StdOut 和 StdErr 可能被省略（因为 all_output=false）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用all_output参数显示全部",
+        "input": "请执行 Linux 命令 'echo \"test output\"' 并设置 all_output=true",
+        "expectedOutput": "返回时包含 ExitCode 和完整的 StdOut 内容（\"test output\"），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 命令输出包含特殊字符",
+        "input": "请执行 Linux 命令 'echo \"Special chars: @#$%^&*()\"' 输出包含特殊字符",
+        "expectedOutput": "返回 StdOut 中显示 \"Special chars: @#$%^&*()\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 命令输出包含Unicode",
+        "input": "请执行 Linux 命令 'echo \"你好世界 🌍\"' 输出包含 Unicode 字符",
+        "expectedOutput": "返回 StdOut 中显示 \"你好世界 🌍\"，ExitCode 应为 0，UTF-8 编码正确",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用env过滤特定变量",
+        "input": "请执行 Linux 命令 'env | grep HOME' 查找 HOME 环境变量",
+        "expectedOutput": "返回 StdOut 中显示 HOME 环境变量及其值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用wc统计单词数",
+        "input": "请执行 Linux 命令 'echo \"hello world agentxx\" | wc -w' 统计单词数",
+        "expectedOutput": "返回 StdOut 中显示 \"3\"（三个单词），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用tee追加写入",
+        "input": "请执行 Linux 命令 'echo \"appended line\" | tee -a {agentxx_root}/temp/test_output.txt' 追加内容到文件",
+        "expectedOutput": "返回 StdOut 中显示 \"appended line\"，ExitCode 应为 0，内容追加到文件末尾",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用rm删除文件",
+        "input": "请执行 Linux 命令 'rm -f {agentxx_root}/temp/test_output.txt' 删除测试文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用cp复制文件",
+        "input": "请执行 Linux 命令 'cp {agentxx_root}/agent/lib/include/agentxx/tools/tool.h {agentxx_root}/temp/tool_copy.h' 复制文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被复制到目标路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用mv移动文件",
+        "input": "请执行 Linux 命令 'mv {agentxx_root}/temp/tool_copy.h {agentxx_root}/temp/tool_moved.h' 移动/重命名文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被重命名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用touch创建空文件",
+        "input": "请执行 Linux 命令 'touch {agentxx_root}/temp/empty_file.txt' 创建空文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，空文件被创建",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用dd生成测试文件",
+        "input": "请执行 Linux 命令 'dd if=/dev/zero of={agentxx_root}/temp/test_data.bin bs=1024 count=1 2>&1' 生成1KB测试文件",
+        "expectedOutput": "返回 StdOut 中包含写入字节数和速度信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_linux_command - 使用xxd查看十六进制",
+        "input": "请执行 Linux 命令 'echo \"ABC\" | xxd' 查看文本的十六进制表示",
+        "expectedOutput": "返回 StdOut 中包含 \"ABC\" 的十六进制转储内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

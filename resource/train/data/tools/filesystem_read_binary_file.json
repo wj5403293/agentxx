@@ -1,0 +1,723 @@
+[
+    {
+        "name": "filesystem_read_binary_file - 读取二进制文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 的前 200 字节，返回 base64 编码结果",
+        "expectedOutput": "返回 JSON 格式结果，包含 bytes_read_len 和 base64_data 字段，bytes_read_len 应为 200 或文件实际大小（若小于200），base64_data 为有效 base64 编码字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取完整二进制文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 的完整内容，不指定 byte_offset 和 byte_limit",
+        "expectedOutput": "返回 JSON 格式结果，包含 bytes_read_len 和 base64_data 字段，bytes_read_len 应为文件完整大小，base64_data 为完整文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 从偏移位置读取",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h，从偏移 100 字节处开始读取 500 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 500 或从偏移位置到文件末尾的剩余字节数，base64_data 为对应部分的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取图片文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/train/data/logo.png 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为图片文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取可执行文件头部",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/agentxx.exe 的前 256 字节，分析 PE 文件头信息",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 256，base64_data 为可执行文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取JSON配置文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/train/data/execute_linux_command.json 的前 500 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 500 或文件实际大小，base64_data 包含 JSON 文件开头的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 DLL 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/some_library.dll 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 512 或文件实际大小，base64_data 为 DLL 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取压缩文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/archive.zip 的完整内容，不要指定 byte_offset 和 byte_limit",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 ZIP 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取音频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/notification.wav 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为音频文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取视频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/demo.mp4 的前 2048 字节，分析视频文件头",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 2048，base64_data 为视频文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取字体文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/fonts/NotoSansSC-Regular.ttf 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为字体文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 PDF 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/document.pdf 的前 500 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 500，base64_data 为 PDF 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取二进制数据文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/data.bin 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整二进制数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 protobuf 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/message.pb 的前 1000 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1000，base64_data 为 protobuf 数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取数据库文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/data.db 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 SQLite 数据库文件头的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取加密文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/encrypted.dat 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为加密数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取证书文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/cert.pem 的前 300 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 300，base64_data 为证书文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取日志文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/app.log 的前 1000 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1000，base64_data 为日志文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 CSV 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/data.csv 的前 500 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 500，base64_data 为 CSV 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 XML 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/config.xml 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 XML 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 YAML 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/settings.yaml 的前 200 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 200，base64_data 为 YAML 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 INI 配置文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/app.ini 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 INI 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取打包文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/package.tar.gz 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为 tar.gz 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取静态库文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/libagentxx.a 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为静态库文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取目标文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/main.o 的前 256 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 256，base64_data 为目标文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取CMake缓存文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/CMakeCache.txt 的前 300 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 300，base64_data 为 CMake 缓存文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .gitignore 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/.gitignore 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 .gitignore 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 README 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/README.md 的前 500 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 500，base64_data 为 README 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 LICENSE 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/LICENSE 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 LICENSE 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 CMakeLists.txt",
+        "input": "请以二进制方式读取文件 {agentxx_root}/CMakeLists.txt 的前 200 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 200，base64_data 为 CMakeLists.txt 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取空文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/empty.bin 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 0，base64_data 应为空字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取大文件部分内容",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/large_output.bin，从偏移 1000000 字节处开始读取 4096 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 4096，base64_data 为指定偏移处数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取小文件全部内容",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/small.txt（只有 10 字节的文件）的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 10，base64_data 为 10 字节数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取零字节偏移",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h，从偏移 0 字节处开始读取 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 100，base64_data 为文件开头 100 字节的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取到文件末尾",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h，从偏移 500 字节处开始读取到文件末尾（byte_limit 设为很大的值如 999999）",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为从偏移 500 到文件末尾的字节数，base64_data 为对应数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 路径为空错误",
+        "input": "请以二进制方式读取文件，但 path 参数为空字符串",
+        "expectedOutput": "返回错误信息，提示 Arg `path` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 文件不存在错误",
+        "input": "请以二进制方式读取文件 {agentxx_root}/nonexistent/file.bin 的前 100 字节",
+        "expectedOutput": "返回错误信息，提示文件无法打开或不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 偏移超出文件范围",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h，从偏移 999999 字节处开始读取 100 字节",
+        "expectedOutput": "返回错误信息，提示 byte_offset 超出文件大小范围",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取只读文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 100，base64_data 为 filesystem.h 开头 100 字节的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取符号链接",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/link_to_tool.h（指向 tool.h 的符号链接）的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 100，base64_data 为所指向文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取具有特殊字符路径的文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/file with spaces.bin 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取中文路径文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/测试数据.bin 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 仅指定 byte_offset 不指定 byte_limit",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h，从偏移 100 字节处开始读取（不指定 byte_limit）",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为从偏移 100 到文件末尾的字节数，base64_data 为对应数据的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 仅指定 byte_limit 不指定 byte_offset",
+        "input": "请以二进制方式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h，读取前 200 字节（不指定 byte_offset）",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 200，base64_data 为文件开头 200 字节的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取二进制文件头部魔数",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/unknown.bin 的前 16 字节，检查文件魔数",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 16，base64_data 为文件头部 16 字节的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取共享库文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/libagentxx.so 的前 256 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 256，base64_data 为共享库文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 PDB 调试符号文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/agentxx.pdb 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为 PDB 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .obj 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/tool.obj 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为 .obj 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .lib 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/agentxx.lib 的前 256 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 256，base64_data 为 .lib 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .exp 导出文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/agentxx.exp 的前 200 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 200，base64_data 为 .exp 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .ilk 增量链接文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/build/agentxx.ilk 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 .ilk 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .pyc 编译文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/script.pyc 的前 16 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 16，base64_data 为 Python 字节码文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .class 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/Hello.class 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 Java class 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .wasm 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/module.wasm 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 WebAssembly 模块头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .ico 图标文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/icon.ico 的前 256 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 256，base64_data 为 ICO 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .cur 光标文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/cursor.cur 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为光标文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .ani 动画光标文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/animated.ani 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为动画光标文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .bmp 位图文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/screenshot.bmp 的前 54 字节（BMP 文件头大小）",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应为 54，base64_data 为 BMP 文件头的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .gif 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/animation.gif 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 GIF 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .svg 文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/icon.svg 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 SVG 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .ttc 字体集合文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/fonts/NotoSansSC.ttc 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为字体集合文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .otf 字体文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/fonts/FiraCode.otf 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为 OTF 字体文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .woff2 字体文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/fonts/FiraCode.woff2 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 WOFF2 字体文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": ""
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .eot 字体文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/resource/fonts/FiraCode.eot 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 EOT 字体文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .mp3 音频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/music.mp3 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为 MP3 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .flac 音频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/music.flac 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为 FLAC 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .ogg 音频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/sound.ogg 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 OGG 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .avi 视频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/video.avi 的前 2048 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 2048，base64_data 为 AVI 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .mkv 视频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/video.mkv 的前 2048 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 2048，base64_data 为 MKV 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .webm 视频文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/video.webm 的前 1000 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1000，base64_data 为 WebM 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .7z 压缩文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/archive.7z 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 7z 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .rar 压缩文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/archive.rar 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 RAR 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .xz 压缩文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/archive.tar.xz 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 XZ 压缩文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .bz2 压缩文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/archive.tar.bz2 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 BZ2 压缩文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .zst 压缩文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/archive.tar.zst 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 ZSTD 压缩文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .iso 光盘镜像",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/disk.iso 的前 2048 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 2048，base64_data 为 ISO 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .dmg 磁盘镜像",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/disk.dmg 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为 DMG 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .vhd 虚拟磁盘",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/disk.vhd 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为 VHD 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .msi 安装包",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/installer.msi 的前 512 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 512，base64_data 为 MSI 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .deb 安装包",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/package.deb 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 DEB 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .rpm 安装包",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/package.rpm 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 RPM 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .apk 安装包",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/app.apk 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 APK 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .ipa 安装包",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/app.ipa 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 IPA 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .crx 扩展文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/extension.crx 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 CRX 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .vsix 扩展文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/extension.vsix 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 VSIX 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .nupkg 包文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/package.nupkg 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 NuGet 包文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .snk 密钥文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/key.snk 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 SNK 密钥文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .pfx 证书文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/cert.pfx 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 PFX 证书文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .p12 证书文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/cert.p12 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 P12 证书文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .der 证书文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/cert.der 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 DER 证书文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .pem 完整文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/cert.pem 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 PEM 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .crt 证书文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/cert.crt 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 CRT 证书文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .key 私钥文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/private.key 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为私钥文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .csr 证书请求文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/request.csr 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 CSR 文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .jks 密钥库文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/keystore.jks 的前 100 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 100，base64_data 为 JKS 密钥库文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .bak 备份文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/backup.bak 的前 500 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 500，base64_data 为备份文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .tmp 临时文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/temp.tmp 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整临时文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .cache 缓存文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/data.cache 的前 200 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 200，base64_data 为缓存文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .lock 锁文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/app.lock 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整锁文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .pid 进程文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/app.pid 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整 PID 文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .dat 数据文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/save.dat 的完整内容",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 为文件完整大小，base64_data 为完整数据文件的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .raw 原始数据文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/image.raw 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为原始数据文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_binary_file - 读取 .dmp 转储文件",
+        "input": "请以二进制方式读取文件 {agentxx_root}/temp/crash.dmp 的前 1024 字节",
+        "expectedOutput": "返回 JSON 格式结果，bytes_read_len 应不超过 1024，base64_data 为崩溃转储文件头部的 base64 编码",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

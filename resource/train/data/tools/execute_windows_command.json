@@ -1,0 +1,730 @@
+[
+    {
+        "name": "execute_windows_command - 执行Windows命令",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools' 列出该目录下的文件",
+        "expectedOutput": "返回命令执行结果，包含 ExitCode 和 StdOut，StdOut 中应列出该目录下所有文件的名称、大小、日期等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 列出当前目录文件",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\' 列出该目录下的文件和子目录",
+        "expectedOutput": "返回 StdOut 中列出 agent/lib 目录下的子目录名和文件名，包含日期、时间、大小等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看文件内容",
+        "input": "请执行 Windows 命令 'type {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 查看该文件内容",
+        "expectedOutput": "返回 StdOut 中包含 tool.h 的完整源码内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用echo输出文本",
+        "input": "请执行 Windows 命令 'echo Hello AgentXX Framework' 输出文本",
+        "expectedOutput": "返回 StdOut 中显示 \"Hello AgentXX Framework\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用dir按名称排序",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools /ON' 按名称排序列出文件",
+        "expectedOutput": "返回 StdOut 中按名称字母顺序排列的文件列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用dir递归列出",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx /S /B' 递归列出所有文件",
+        "expectedOutput": "返回 StdOut 中列出该目录及子目录下所有文件的完整路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 创建目录",
+        "input": "请执行 Windows 命令 'mkdir {agentxx_root}\\temp\\test_dir' 创建临时测试目录",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，目录被创建",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 删除空目录",
+        "input": "请执行 Windows 命令 'rmdir {agentxx_root}\\temp\\test_dir' 删除之前创建的临时目录",
+        "expectedOutput": "返回 ExitCode 为 0（如果目录存在且为空），StdOut 可能为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看系统信息",
+        "input": "请执行 Windows 命令 'systeminfo' 查看系统详细信息",
+        "expectedOutput": "返回 StdOut 中包含操作系统名称、版本、安装日期、内存、处理器等系统信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看当前用户",
+        "input": "请执行 Windows 命令 'whoami' 查看当前登录用户名",
+        "expectedOutput": "返回 StdOut 中显示当前用户名（格式如 计算机名\\用户名），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看当前工作目录",
+        "input": "请执行 Windows 命令 'cd' 或 'echo %cd%' 查看当前工作目录路径",
+        "expectedOutput": "返回 StdOut 中显示当前工作目录的绝对路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看环境变量",
+        "input": "请执行 Windows 命令 'set' 查看所有环境变量",
+        "expectedOutput": "返回 StdOut 中列出当前所有环境变量及其值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看特定环境变量",
+        "input": "请执行 Windows 命令 'echo %PATH%' 查看 PATH 环境变量",
+        "expectedOutput": "返回 StdOut 中显示 PATH 环境变量的值，包含多个目录路径，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看日期",
+        "input": "请执行 Windows 命令 'date /T' 查看当前系统日期",
+        "expectedOutput": "返回 StdOut 中显示当前日期，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看时间",
+        "input": "请执行 Windows 命令 'time /T' 查看当前系统时间",
+        "expectedOutput": "返回 StdOut 中显示当前时间，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看网络配置",
+        "input": "请执行 Windows 命令 'ipconfig' 查看网络接口配置",
+        "expectedOutput": "返回 StdOut 中包含各网络适配器的 IP 地址、子网掩码、默认网关等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看详细网络配置",
+        "input": "请执行 Windows 命令 'ipconfig /all' 查看完整网络配置信息",
+        "expectedOutput": "返回 StdOut 中包含 MAC 地址、DHCP 状态、DNS 服务器等详细网络信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 测试网络连通性",
+        "input": "请执行 Windows 命令 'ping 127.0.0.1 -n 1' 测试本地回环网络连通性",
+        "expectedOutput": "返回 StdOut 中包含 ping 测试结果，含 TTL 和响应时间，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看路由表",
+        "input": "请执行 Windows 命令 'route print' 查看路由表",
+        "expectedOutput": "返回 StdOut 中包含 IPv4 和 IPv6 路由表信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看ARP缓存",
+        "input": "请执行 Windows 命令 'arp -a' 查看ARP缓存表",
+        "expectedOutput": "返回 StdOut 中列出 IP 地址与 MAC 地址的映射关系，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看DNS缓存",
+        "input": "请执行 Windows 命令 'ipconfig /displaydns' 查看DNS缓存",
+        "expectedOutput": "返回 StdOut 中列出缓存的 DNS 解析记录，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看进程列表",
+        "input": "请执行 Windows 命令 'tasklist' 查看当前所有进程",
+        "expectedOutput": "返回 StdOut 中列出所有运行进程的名称、PID、会话名、内存使用等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看进程详细信息",
+        "input": "请执行 Windows 命令 'tasklist /V' 查看进程详细信息",
+        "expectedOutput": "返回 StdOut 中包含进程的详细状态、用户名、窗口标题等信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看服务列表",
+        "input": "请执行 Windows 命令 'sc query' 查看所有Windows服务状态",
+        "expectedOutput": "返回 StdOut 中列出所有服务的名称和运行状态，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看磁盘使用情况",
+        "input": "请执行 Windows 命令 'wmic logicaldisk get size,freespace,caption' 查看磁盘空间",
+        "expectedOutput": "返回 StdOut 中列出各磁盘的盘符、总大小和可用空间，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看文件属性",
+        "input": "请执行 Windows 命令 'attrib {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 查看文件属性",
+        "expectedOutput": "返回 StdOut 中显示文件的属性标志（如 A 表示存档），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看磁盘卷标",
+        "input": "请执行 Windows 命令 'vol' 查看当前磁盘卷标和序列号",
+        "expectedOutput": "返回 StdOut 中显示当前驱动器的卷标和序列号，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用find查找文本",
+        "input": "请执行 Windows 命令 'find \"class\" {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 查找包含class的行",
+        "expectedOutput": "返回 StdOut 中列出所有包含 \"class\" 的行，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用findstr正则搜索",
+        "input": "请执行 Windows 命令 'findstr /R \"class\\|struct\" {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 使用正则搜索",
+        "expectedOutput": "返回 StdOut 中列出所有包含 class 或 struct 的行，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用findstr统计匹配行数",
+        "input": "请执行 Windows 命令 'findstr /N \"#include\" {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 显示匹配行及行号",
+        "expectedOutput": "返回 StdOut 中列出所有包含 #include 的行及行号，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用findstr忽略大小写",
+        "input": "请执行 Windows 命令 'findstr /I \"namespace\" {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 忽略大小写搜索",
+        "expectedOutput": "返回 StdOut 中列出所有包含 namespace 的行（不区分大小写），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用findstr递归搜索",
+        "input": "请执行 Windows 命令 'findstr /S /M \"XXToolBase\" {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\*.h' 递归搜索文件",
+        "expectedOutput": "返回 StdOut 中列出所有包含 XXToolBase 的 .h 文件名，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 多命令组合执行",
+        "input": "请执行 Windows 命令 'cd {agentxx_root}\\agent\\lib\\include\\agentxx\\tools && dir && echo Done' 组合多个命令执行",
+        "expectedOutput": "返回 StdOut 中包含该目录的文件列表和 \"Done\" 文本，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 管道组合命令",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools | findstr \"\\.h\"' 管道过滤 .h 文件",
+        "expectedOutput": "返回 StdOut 中仅列出以 .h 结尾的文件信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用type查看文件前几行",
+        "input": "请执行 Windows 命令 'type {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h | more' 分页查看文件内容",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 的内容，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 复制文件",
+        "input": "请执行 Windows 命令 'copy {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h {agentxx_root}\\temp\\tool_copy.h' 复制文件",
+        "expectedOutput": "返回 StdOut 中显示 \"1 file(s) copied\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 移动文件",
+        "input": "请执行 Windows 命令 'move {agentxx_root}\\temp\\tool_copy.h {agentxx_root}\\temp\\tool_moved.h' 移动/重命名文件",
+        "expectedOutput": "返回 StdOut 中显示 \"1 file(s) moved\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 删除文件",
+        "input": "请执行 Windows 命令 'del {agentxx_root}\\temp\\tool_moved.h' 删除文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 创建空文件",
+        "input": "请执行 Windows 命令 'type nul > {agentxx_root}\\temp\\empty_file.txt' 创建空文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，空文件被创建",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 写入文本到文件",
+        "input": "请执行 Windows 命令 'echo test content > {agentxx_root}\\temp\\test_output.txt' 写入文本到文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被创建并包含文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 追加文本到文件",
+        "input": "请执行 Windows 命令 'echo appended line >> {agentxx_root}\\temp\\test_output.txt' 追加内容到文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，内容追加到文件末尾",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用sort排序",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools /B | sort' 列出并排序文件",
+        "expectedOutput": "返回 StdOut 中按字母顺序排列的裸文件名列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用sort逆序排序",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools /B | sort /R' 逆序排列文件",
+        "expectedOutput": "返回 StdOut 中按字母逆序排列的裸文件名列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 统计文件行数",
+        "input": "请执行 Windows 命令 'find /C /V \"\" {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 统计文件行数",
+        "expectedOutput": "返回 StdOut 中显示 tool.h 的行数统计，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用where查找命令位置",
+        "input": "请执行 Windows 命令 'where cmd.exe' 查找 cmd.exe 的路径",
+        "expectedOutput": "返回 StdOut 中显示 cmd.exe 的完整路径（如 C:\\Windows\\System32\\cmd.exe），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用tree显示目录树",
+        "input": "请执行 Windows 命令 'tree {agentxx_root}\\agent\\lib\\include\\agentxx /F' 显示目录树结构",
+        "expectedOutput": "返回 StdOut 中显示该目录的树形结构，包含所有子目录和文件，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用assoc查看文件关联",
+        "input": "请执行 Windows 命令 'assoc .h' 查看 .h 文件扩展名关联",
+        "expectedOutput": "返回 StdOut 中显示 .h 文件的关联类型，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用ftype查看文件类型",
+        "input": "请执行 Windows 命令 'ftype hfile' 查看 hfile 文件类型的打开方式",
+        "expectedOutput": "返回 StdOut 中显示 hfile 类型的打开命令，ExitCode 应为 0（如果存在）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用driverquery查看驱动",
+        "input": "请执行 Windows 命令 'driverquery' 查看已安装的驱动程序",
+        "expectedOutput": "返回 StdOut 中列出所有驱动程序名称、类型和链接日期，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用netstat查看端口",
+        "input": "请执行 Windows 命令 'netstat -an' 查看网络连接和监听端口",
+        "expectedOutput": "返回 StdOut 中列出所有 TCP/UDP 连接、监听端口和状态，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 查看netstat端口及进程",
+        "input": "请执行 Windows 命令 'netstat -ano' 查看端口及对应进程PID",
+        "expectedOutput": "返回 StdOut 中列出网络连接、监听端口和对应的 PID，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用nslookup查询DNS",
+        "input": "请执行 Windows 命令 'nslookup localhost' 查询 localhost 的 DNS 解析",
+        "expectedOutput": "返回 StdOut 中包含 DNS 服务器信息和 localhost 的解析结果（127.0.0.1），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用tracert路由追踪",
+        "input": "请执行 Windows 命令 'tracert -h 1 127.0.0.1' 追踪到本地回环的路由",
+        "expectedOutput": "返回 StdOut 中显示路由追踪结果（到 127.0.0.1 只需1跳），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用pathping网络诊断",
+        "input": "请执行 Windows 命令 'pathping -n -h 1 127.0.0.1' 进行网络路径诊断",
+        "expectedOutput": "返回 StdOut 中包含网络路径诊断统计信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用chcp查看代码页",
+        "input": "请执行 Windows 命令 'chcp' 查看当前活动代码页",
+        "expectedOutput": "返回 StdOut 中显示当前活动代码页编号（如 936 为 GBK），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用cmd内部命令help",
+        "input": "请执行 Windows 命令 'help' 查看所有可用命令列表",
+        "expectedOutput": "返回 StdOut 中列出 cmd.exe 支持的所有内部命令及其简要说明，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用cmd查看特定命令帮助",
+        "input": "请执行 Windows 命令 'help dir' 或 'dir /?' 查看 dir 命令的帮助信息",
+        "expectedOutput": "返回 StdOut 中包含 dir 命令的详细用法、参数和示例，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用ver查看系统版本",
+        "input": "请执行 Windows 命令 'ver' 查看操作系统版本号",
+        "expectedOutput": "返回 StdOut 中显示 Windows 版本信息（如 Microsoft Windows [版本 10.0.xxx]），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用taskkill终止进程",
+        "input": "请执行 Windows 命令 'tasklist /FI \"IMAGENAME eq notepad.exe\"' 查找特定进程",
+        "expectedOutput": "返回 StdOut 中列出 notepad.exe 进程信息（如果正在运行），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用wmic查看CPU信息",
+        "input": "请执行 Windows 命令 'wmic cpu get name,numberofcores,numberoflogicalprocessors' 查看CPU信息",
+        "expectedOutput": "返回 StdOut 中包含 CPU 名称、物理核心数、逻辑处理器数，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用wmic查看内存信息",
+        "input": "请执行 Windows 命令 'wmic memorychip get capacity,speed,manufacturer' 查看内存信息",
+        "expectedOutput": "返回 StdOut 中列出各内存条的容量、速度和制造商，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用schtasks查看计划任务",
+        "input": "请执行 Windows 命令 'schtasks /Query /FO LIST' 查看计划任务列表",
+        "expectedOutput": "返回 StdOut 中列出所有计划任务的名称、状态和下次运行时间，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用powercfg查看电源设置",
+        "input": "请执行 Windows 命令 'powercfg /list' 查看电源方案列表",
+        "expectedOutput": "返回 StdOut 中列出所有电源方案的 GUID 和名称，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用setx设置环境变量",
+        "input": "请执行 Windows 命令 'setx AGENTXX_TEST \"test_value\"' 设置用户环境变量",
+        "expectedOutput": "返回 StdOut 中显示 \"SUCCESS: Specified value was saved.\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用reg查询注册表",
+        "input": "请执行 Windows 命令 'reg query \"HKCU\\Environment\" /V AGENTXX_TEST' 查询注册表环境变量",
+        "expectedOutput": "返回 StdOut 中显示 AGENTXX_TEST 的值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用reg删除注册表值",
+        "input": "请执行 Windows 命令 'reg delete \"HKCU\\Environment\" /V AGENTXX_TEST /F' 删除测试注册表值",
+        "expectedOutput": "返回 StdOut 中显示 \"The operation completed successfully.\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用certutil计算哈希",
+        "input": "请执行 Windows 命令 'certutil -hashfile {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h MD5' 计算文件 MD5",
+        "expectedOutput": "返回 StdOut 中包含文件的 MD5 哈希值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用certutil计算SHA256",
+        "input": "请执行 Windows 命令 'certutil -hashfile {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h SHA256' 计算文件 SHA256",
+        "expectedOutput": "返回 StdOut 中包含文件的 SHA256 哈希值，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用compact压缩文件",
+        "input": "请执行 Windows 命令 'compact /C {agentxx_root}\\temp\\test_output.txt' 压缩文件",
+        "expectedOutput": "返回 StdOut 中显示文件压缩状态和压缩比，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用cipher加密文件",
+        "input": "请执行 Windows 命令 'cipher /C {agentxx_root}\\temp\\test_output.txt' 查看文件加密状态",
+        "expectedOutput": "返回 StdOut 中显示文件的加密状态信息，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用fc比较文件",
+        "input": "请执行 Windows 命令 'fc {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 比较两个相同文件",
+        "expectedOutput": "返回 StdOut 中显示 \"FC: no differences encountered\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用comp比较文件",
+        "input": "请执行 Windows 命令 'comp {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h' 逐字节比较文件",
+        "expectedOutput": "返回 StdOut 中显示 \"Files compare OK\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用xcopy复制目录",
+        "input": "请执行 Windows 命令 'xcopy {agentxx_root}\\agent\\lib\\include\\agentxx\\tools {agentxx_root}\\temp\\tools_backup /E /I /Y' 复制整个目录",
+        "expectedOutput": "返回 StdOut 中显示复制了多少个文件，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用robocopy镜像复制",
+        "input": "请执行 Windows 命令 'robocopy {agentxx_root}\\agent\\lib\\include\\agentxx\\tools {agentxx_root}\\temp\\tools_mirror /MIR /NJH /NJS /NDL' 镜像复制目录",
+        "expectedOutput": "返回 StdOut 中显示复制摘要信息，ExitCode 应为 0 或 1（成功复制）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用del删除目录",
+        "input": "请执行 Windows 命令 'rmdir /S /Q {agentxx_root}\\temp\\tools_backup' 删除测试备份目录",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，目录被递归删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用rmdir删除镜像目录",
+        "input": "请执行 Windows 命令 'rmdir /S /Q {agentxx_root}\\temp\\tools_mirror' 删除镜像目录",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，目录被递归删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用powercfg查看电池",
+        "input": "请执行 Windows 命令 'powercfg /batteryreport /output {agentxx_root}\\temp\\battery_report.html' 生成电池报告",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，电池报告文件已生成",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用systeminfo过滤",
+        "input": "请执行 Windows 命令 'systeminfo | findstr /C:\"Total Physical Memory\"' 过滤内存信息",
+        "expectedOutput": "返回 StdOut 中显示总物理内存大小，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用del删除临时文件",
+        "input": "请执行 Windows 命令 'del /Q {agentxx_root}\\temp\\test_output.txt' 删除测试输出文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用del删除空文件",
+        "input": "请执行 Windows 命令 'del /Q {agentxx_root}\\temp\\empty_file.txt' 删除空文件",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用del删除电池报告",
+        "input": "请执行 Windows 命令 'del /Q {agentxx_root}\\temp\\battery_report.html' 删除电池报告",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，文件被删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 执行不存在的命令",
+        "input": "请执行 Windows 命令 'nonexistent_command_12345' 测试不存在的命令",
+        "expectedOutput": "返回 ExitCode 非 0，StdErr 中包含 \"不是内部或外部命令\" 或类似错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 执行空命令",
+        "input": "请执行 Windows 命令 '' 测试空命令",
+        "expectedOutput": "返回错误信息，提示 Arg `command` is empty，或 ExitCode 非 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 读取不存在的文件",
+        "input": "请执行 Windows 命令 'type {agentxx_root}\\nonexistent_file.txt' 读取不存在的文件",
+        "expectedOutput": "返回 ExitCode 非 0，StdErr 中包含 \"系统找不到指定的文件\" 错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用all_output参数",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\' 并设置 all_output=false",
+        "expectedOutput": "返回时仅包含 ExitCode，成功时 StdOut 和 StdErr 可能被省略（因为 all_output=false）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用all_output显示全部",
+        "input": "请执行 Windows 命令 'echo test output' 并设置 all_output=true",
+        "expectedOutput": "返回时包含 ExitCode 和完整的 StdOut 内容（\"test output\"），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 命令输出包含特殊字符",
+        "input": "请执行 Windows 命令 'echo Special chars: @#$%^&*()' 输出包含特殊字符",
+        "expectedOutput": "返回 StdOut 中显示 \"Special chars: @#$%^&*()\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用wmic查看BIOS信息",
+        "input": "请执行 Windows 命令 'wmic bios get serialnumber,manufacturer,version' 查看BIOS信息",
+        "expectedOutput": "返回 StdOut 中包含 BIOS 制造商、版本和序列号，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用wmic查看操作系统",
+        "input": "请执行 Windows 命令 'wmic os get caption,version,installdate' 查看操作系统详情",
+        "expectedOutput": "返回 StdOut 中包含操作系统名称、版本和安装日期，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用dir按大小排序",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools /OS' 按文件大小排序",
+        "expectedOutput": "返回 StdOut 中按文件大小从小到大排列的文件列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用dir按日期排序",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools /OD' 按日期排序",
+        "expectedOutput": "返回 StdOut 中按文件修改日期从早到晚排列的文件列表，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用dir仅显示目录",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx /AD' 仅显示子目录",
+        "expectedOutput": "返回 StdOut 中仅列出该目录下的子目录，不包含文件，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用dir裸格式",
+        "input": "请执行 Windows 命令 'dir {agentxx_root}\\agent\\lib\\include\\agentxx\\tools /B' 仅显示文件名",
+        "expectedOutput": "返回 StdOut 中仅列出文件名（不含日期、大小等信息），ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用echo输出多行",
+        "input": "请执行 Windows 命令 'echo line1 && echo line2 && echo line3' 输出多行文本",
+        "expectedOutput": "返回 StdOut 中显示三行文本 \"line1\"、\"line2\"、\"line3\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用color设置颜色",
+        "input": "请执行 Windows 命令 'color 0A' 修改控制台颜色",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，控制台颜色被修改",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用title设置标题",
+        "input": "请执行 Windows 命令 'title AgentXX Test Window' 设置控制台窗口标题",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空，控制台窗口标题被修改",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用start启动程序",
+        "input": "请执行 Windows 命令 'start /B echo Background Task' 以后台方式启动",
+        "expectedOutput": "返回 ExitCode 为 0，StdOut 可能为空或显示 \"Background Task\"",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用call调用批处理",
+        "input": "请执行 Windows 命令 'call echo Called from batch' 使用 call 调用命令",
+        "expectedOutput": "返回 StdOut 中显示 \"Called from batch\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用for循环",
+        "input": "请执行 Windows 命令 'for %i in (1 2 3) do @echo Num: %i' 执行 for 循环",
+        "expectedOutput": "返回 StdOut 中显示 \"Num: 1\"、\"Num: 2\"、\"Num: 3\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用if条件判断",
+        "input": "请执行 Windows 命令 'if exist {agentxx_root}\\agent\\lib\\include\\agentxx\\tools\\tool.h (echo EXISTS) else (echo NOT_EXISTS)' 判断文件是否存在",
+        "expectedOutput": "返回 StdOut 中显示 \"EXISTS\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用if数值比较",
+        "input": "请执行 Windows 命令 'if 5 GTR 3 (echo GREATER) else (echo NOT_GREATER)' 数值比较判断",
+        "expectedOutput": "返回 StdOut 中显示 \"GREATER\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用errorlevel获取退出码",
+        "input": "请执行 Windows 命令 'ver && echo ExitCode: %ERRORLEVEL%' 获取上一个命令的退出码",
+        "expectedOutput": "返回 StdOut 中显示版本信息和 \"ExitCode: 0\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用setlocal本地变量",
+        "input": "请执行 Windows 命令 'setlocal && set TESTVAR=hello && echo %TESTVAR% && endlocal' 使用本地变量",
+        "expectedOutput": "返回 StdOut 中显示 \"hello\"，ExitCode 应为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "execute_windows_command - 使用timeout延时",
+        "input": "请执行 Windows 命令 'timeout /T 1 /NOBREAK > nul && echo done' 延时1秒后输出",
+        "expectedOutput": "返回 StdOut 中显示 \"done\"，ExitCode 应为 0，命令执行时间约1秒",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

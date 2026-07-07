@@ -1,0 +1,702 @@
+[
+    {
+        "name": "web_fetch_url - 获取网页原始内容",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language/coroutines 的内容",
+        "expectedOutput": "返回该网页的原始 HTML 内容，应包含 C++ coroutines 相关的文档信息，状态码为 200",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取GitHub仓库页面",
+        "input": "请获取网页 https://github.com/fmtlib/fmt 的内容",
+        "expectedOutput": "返回 fmtlib/fmt GitHub 仓库页面的原始 HTML 内容，应包含项目描述和仓库信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取C++标准文档",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/header 的内容，超时时间为 30 秒",
+        "expectedOutput": "返回 C++ 标准库头文件列表页面的原始 HTML 内容，状态码为 200",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取JSONPlaceholder API",
+        "input": "请获取网页 https://jsonplaceholder.typicode.com/posts/1 的内容",
+        "expectedOutput": "返回 JSON 格式的帖子数据，包含 userId、id、title、body 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取HTTPBin测试",
+        "input": "请获取网页 https://httpbin.org/get?name=test 的内容",
+        "expectedOutput": "返回 JSON 格式响应，包含请求参数和头部信息，args 中应包含 name=test",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Boost库文档",
+        "input": "请获取网页 https://www.boost.org/doc/libs/ 的内容",
+        "expectedOutput": "返回 Boost 库文档目录页面的原始 HTML 内容，状态码为 200",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Wikipedia页面",
+        "input": "请获取网页 https://en.wikipedia.org/wiki/C%2B%2B 的内容",
+        "expectedOutput": "返回 Wikipedia C++ 页面的原始 HTML 内容，应包含 C++ 编程语言的介绍信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取StackOverflow问题",
+        "input": "请获取网页 https://stackoverflow.com/questions/tagged/c%2b%2b 的内容",
+        "expectedOutput": "返回 StackOverflow C++ 标签页面的原始 HTML 内容，应包含相关问题列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取CMake文档",
+        "input": "请获取网页 https://cmake.org/cmake/help/latest/ 的内容，超时时间为 60 秒",
+        "expectedOutput": "返回 CMake 文档页面的原始 HTML 内容，状态码为 200",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Python官方文档",
+        "input": "请获取网页 https://docs.python.org/3/library/json.html 的内容",
+        "expectedOutput": "返回 Python JSON 模块文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取MDN文档",
+        "input": "请获取网页 https://developer.mozilla.org/en-US/docs/Web/JavaScript 的内容",
+        "expectedOutput": "返回 MDN JavaScript 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Rust文档",
+        "input": "请获取网页 https://doc.rust-lang.org/std/ 的内容",
+        "expectedOutput": "返回 Rust 标准库文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Go语言文档",
+        "input": "请获取网页 https://pkg.go.dev/fmt 的内容",
+        "expectedOutput": "返回 Go fmt 包文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Node.js文档",
+        "input": "请获取网页 https://nodejs.org/api/fs.html 的内容",
+        "expectedOutput": "返回 Node.js fs 模块文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取TypeScript文档",
+        "input": "请获取网页 https://www.typescriptlang.org/docs/ 的内容",
+        "expectedOutput": "返回 TypeScript 官方文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取React文档",
+        "input": "请获取网页 https://react.dev/reference/react 的内容",
+        "expectedOutput": "返回 React 官方参考文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Vue文档",
+        "input": "请获取网页 https://vuejs.org/api/ 的内容",
+        "expectedOutput": "返回 Vue.js API 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Docker文档",
+        "input": "请获取网页 https://docs.docker.com/reference/ 的内容",
+        "expectedOutput": "返回 Docker 参考文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Kubernetes文档",
+        "input": "请获取网页 https://kubernetes.io/docs/reference/ 的内容",
+        "expectedOutput": "返回 Kubernetes 参考文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Linux man页面",
+        "input": "请获取网页 https://man7.org/linux/man-pages/man2/open.2.html 的内容",
+        "expectedOutput": "返回 Linux open 系统调用的 man 页面 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取GCC文档",
+        "input": "请获取网页 https://gcc.gnu.org/onlinedocs/gcc/ 的内容",
+        "expectedOutput": "返回 GCC 在线文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Clang文档",
+        "input": "请获取网页 https://clang.llvm.org/docs/ 的内容",
+        "expectedOutput": "返回 Clang 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取LLVM文档",
+        "input": "请获取网页 https://llvm.org/docs/ 的内容",
+        "expectedOutput": "返回 LLVM 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取OpenGL文档",
+        "input": "请获取网页 https://www.khronos.org/opengl/wiki/ 的内容",
+        "expectedOutput": "返回 OpenGL Wiki 页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Vulkan文档",
+        "input": "请获取网页 https://docs.vulkan.org/spec/latest/ 的内容",
+        "expectedOutput": "返回 Vulkan 规范文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Qt文档",
+        "input": "请获取网页 https://doc.qt.io/qt-6/classes.html 的内容",
+        "expectedOutput": "返回 Qt 6 类列表页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取OpenCV文档",
+        "input": "请获取网页 https://docs.opencv.org/4.x/ 的内容",
+        "expectedOutput": "返回 OpenCV 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取TensorFlow文档",
+        "input": "请获取网页 https://www.tensorflow.org/api_docs 的内容",
+        "expectedOutput": "返回 TensorFlow API 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取PyTorch文档",
+        "input": "请获取网页 https://pytorch.org/docs/stable/ 的内容",
+        "expectedOutput": "返回 PyTorch 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Nginx文档",
+        "input": "请获取网页 https://nginx.org/en/docs/ 的内容",
+        "expectedOutput": "返回 Nginx 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Apache文档",
+        "input": "请获取网页 https://httpd.apache.org/docs/2.4/ 的内容",
+        "expectedOutput": "返回 Apache HTTP Server 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取MySQL文档",
+        "input": "请获取网页 https://dev.mysql.com/doc/refman/8.0/en/ 的内容",
+        "expectedOutput": "返回 MySQL 8.0 参考手册页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取PostgreSQL文档",
+        "input": "请获取网页 https://www.postgresql.org/docs/current/ 的内容",
+        "expectedOutput": "返回 PostgreSQL 当前版本文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Redis文档",
+        "input": "请获取网页 https://redis.io/docs/latest/commands/ 的内容",
+        "expectedOutput": "返回 Redis 命令文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取MongoDB文档",
+        "input": "请获取网页 https://www.mongodb.com/docs/manual/ 的内容",
+        "expectedOutput": "返回 MongoDB 手册页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取SQLite文档",
+        "input": "请获取网页 https://www.sqlite.org/docs.html 的内容",
+        "expectedOutput": "返回 SQLite 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Git文档",
+        "input": "请获取网页 https://git-scm.com/docs 的内容",
+        "expectedOutput": "返回 Git 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取VS Code文档",
+        "input": "请获取网页 https://code.visualstudio.com/docs 的内容",
+        "expectedOutput": "返回 VS Code 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Neovim文档",
+        "input": "请获取网页 https://neovim.io/doc/ 的内容",
+        "expectedOutput": "返回 Neovim 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Emacs文档",
+        "input": "请获取网页 https://www.gnu.org/software/emacs/manual/ 的内容",
+        "expectedOutput": "返回 Emacs 手册页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Vim文档",
+        "input": "请获取网页 https://www.vim.org/docs.php 的内容",
+        "expectedOutput": "返回 Vim 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取curl文档",
+        "input": "请获取网页 https://curl.se/docs/ 的内容",
+        "expectedOutput": "返回 curl 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取wget文档",
+        "input": "请获取网页 https://www.gnu.org/software/wget/manual/ 的内容",
+        "expectedOutput": "返回 wget 手册页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取ffmpeg文档",
+        "input": "请获取网页 https://ffmpeg.org/documentation.html 的内容",
+        "expectedOutput": "返回 FFmpeg 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取ImageMagick文档",
+        "input": "请获取网页 https://imagemagick.org/script/command-line-tools.php 的内容",
+        "expectedOutput": "返回 ImageMagick 命令行工具文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取OpenSSL文档",
+        "input": "请获取网页 https://www.openssl.org/docs/ 的内容",
+        "expectedOutput": "返回 OpenSSL 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Protocol Buffers文档",
+        "input": "请获取网页 https://protobuf.dev/reference/ 的内容",
+        "expectedOutput": "返回 Protocol Buffers 参考文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取gRPC文档",
+        "input": "请获取网页 https://grpc.io/docs/ 的内容",
+        "expectedOutput": "返回 gRPC 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取GraphQL文档",
+        "input": "请获取网页 https://graphql.org/learn/ 的内容",
+        "expectedOutput": "返回 GraphQL 学习文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取REST API文档",
+        "input": "请获取网页 https://restfulapi.net/ 的内容",
+        "expectedOutput": "返回 RESTful API 教程页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Swagger文档",
+        "input": "请获取网页 https://swagger.io/docs/ 的内容",
+        "expectedOutput": "返回 Swagger 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取JSON Schema文档",
+        "input": "请获取网页 https://json-schema.org/understanding-json-schema/ 的内容",
+        "expectedOutput": "返回 JSON Schema 理解文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取YAML规范",
+        "input": "请获取网页 https://yaml.org/spec/1.2.2/ 的内容",
+        "expectedOutput": "返回 YAML 1.2.2 规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Markdown规范",
+        "input": "请获取网页 https://commonmark.org/help/ 的内容",
+        "expectedOutput": "返回 CommonMark Markdown 帮助页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取正则表达式文档",
+        "input": "请获取网页 https://www.regular-expressions.info/ 的内容",
+        "expectedOutput": "返回正则表达式教程页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Unicode文档",
+        "input": "请获取网页 https://www.unicode.org/reports/tr15/ 的内容",
+        "expectedOutput": "返回 Unicode 规范化报告页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取UTF-8文档",
+        "input": "请获取网页 https://www.utf8-chartable.de/ 的内容",
+        "expectedOutput": "返回 UTF-8 字符表页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取POSIX规范",
+        "input": "请获取网页 https://pubs.opengroup.org/onlinepubs/9699919799/ 的内容",
+        "expectedOutput": "返回 POSIX 规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取RFC文档",
+        "input": "请获取网页 https://www.rfc-editor.org/rfc/rfc2616 的内容",
+        "expectedOutput": "返回 RFC 2616 (HTTP/1.1) 文档页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取IANA文档",
+        "input": "请获取网页 https://www.iana.org/assignments/media-types/ 的内容",
+        "expectedOutput": "返回 IANA 媒体类型分配页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取W3C文档",
+        "input": "请获取网页 https://www.w3.org/TR/html5/ 的内容",
+        "expectedOutput": "返回 W3C HTML5 规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取ECMAScript规范",
+        "input": "请获取网页 https://tc39.es/ecma262/ 的内容",
+        "expectedOutput": "返回 ECMAScript 规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取CSS规范",
+        "input": "请获取网页 https://www.w3.org/TR/CSS22/ 的内容",
+        "expectedOutput": "返回 CSS 2.2 规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取SVG规范",
+        "input": "请获取网页 https://www.w3.org/TR/SVG11/ 的内容",
+        "expectedOutput": "返回 SVG 1.1 规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取WebAssembly规范",
+        "input": "请获取网页 https://webassembly.github.io/spec/core/ 的内容",
+        "expectedOutput": "返回 WebAssembly 核心规范页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取C++ Core Guidelines",
+        "input": "请获取网页 https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines 的内容",
+        "expectedOutput": "返回 C++ 核心指南页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Google C++风格指南",
+        "input": "请获取网页 https://google.github.io/styleguide/cppguide.html 的内容",
+        "expectedOutput": "返回 Google C++ 风格指南页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取LLVM编码标准",
+        "input": "请获取网页 https://llvm.org/docs/CodingStandards.html 的内容",
+        "expectedOutput": "返回 LLVM 编码标准页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Design Patterns文档",
+        "input": "请获取网页 https://refactoring.guru/design-patterns/cpp 的内容",
+        "expectedOutput": "返回 C++ 设计模式页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取SOLID原则文档",
+        "input": "请获取网页 https://en.wikipedia.org/wiki/SOLID 的内容",
+        "expectedOutput": "返回 Wikipedia SOLID 原则页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Clean Code文档",
+        "input": "请获取网页 https://github.com/ryanmcdermott/clean-code-javascript 的内容",
+        "expectedOutput": "返回 Clean Code JavaScript 仓库页面的原始 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 空URL错误",
+        "input": "请获取网页内容，但 url 参数为空字符串",
+        "expectedOutput": "返回错误信息，提示 Arg `url` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 无效URL",
+        "input": "请获取网页 not-a-valid-url 的内容",
+        "expectedOutput": "返回错误信息，提示 URL 格式无效或请求失败",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 不存在的域名",
+        "input": "请获取网页 https://this-domain-does-not-exist-12345.com 的内容",
+        "expectedOutput": "返回错误信息，提示 DNS 解析失败或连接超时",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 超时设置测试",
+        "input": "请获取网页 https://httpbin.org/delay/10 的内容，超时时间设置为 3 秒",
+        "expectedOutput": "返回错误信息，提示请求超时",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取404页面",
+        "input": "请获取网页 https://httpbin.org/status/404 的内容",
+        "expectedOutput": "返回错误信息，提示 web_fetch_url failed，状态码为 404",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取500错误页面",
+        "input": "请获取网页 https://httpbin.org/status/500 的内容",
+        "expectedOutput": "返回错误信息，提示 web_fetch_url failed，状态码为 500",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取403禁止访问页面",
+        "input": "请获取网页 https://httpbin.org/status/403 的内容",
+        "expectedOutput": "返回错误信息，提示 web_fetch_url failed，状态码为 403",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取HTTP重定向",
+        "input": "请获取网页 https://httpbin.org/redirect/3 的内容",
+        "expectedOutput": "返回重定向后最终页面的内容，或重定向响应信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Gzip压缩响应",
+        "input": "请获取网页 https://httpbin.org/gzip 的内容",
+        "expectedOutput": "返回解压后的 JSON 响应内容，包含 gzipped 标志",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取带Cookie的页面",
+        "input": "请获取网页 https://httpbin.org/cookies 的内容",
+        "expectedOutput": "返回 JSON 格式的 cookies 信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取带自定义Header的响应",
+        "input": "请获取网页 https://httpbin.org/headers 的内容",
+        "expectedOutput": "返回 JSON 格式的请求头信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取用户代理信息",
+        "input": "请获取网页 https://httpbin.org/user-agent 的内容",
+        "expectedOutput": "返回 JSON 格式的用户代理信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取IP地址信息",
+        "input": "请获取网页 https://httpbin.org/ip 的内容",
+        "expectedOutput": "返回 JSON 格式的 IP 地址信息，包含 origin 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取UUID生成",
+        "input": "请获取网页 https://httpbin.org/uuid 的内容",
+        "expectedOutput": "返回 JSON 格式的 UUID 信息，包含 uuid 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Base64编码",
+        "input": "请获取网页 https://httpbin.org/base64/YWJjZGVm 的内容",
+        "expectedOutput": "返回 base64 解码后的原始文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取字节范围响应",
+        "input": "请获取网页 https://httpbin.org/bytes/1024 的内容",
+        "expectedOutput": "返回 1024 字节的随机二进制数据",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取流式响应",
+        "input": "请获取网页 https://httpbin.org/stream/5 的内容",
+        "expectedOutput": "返回 5 个 JSON 对象的流式响应内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取HTML表单页面",
+        "input": "请获取网页 https://httpbin.org/forms/post 的内容",
+        "expectedOutput": "返回 HTML 表单页面的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取XML响应",
+        "input": "请获取网页 https://httpbin.org/xml 的内容",
+        "expectedOutput": "返回 XML 格式的响应内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取robots.txt",
+        "input": "请获取网页 https://en.cppreference.com/robots.txt 的内容",
+        "expectedOutput": "返回 cppreference.com 的 robots.txt 文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取sitemap",
+        "input": "请获取网页 https://en.cppreference.com/sitemap.xml 的内容",
+        "expectedOutput": "返回 cppreference.com 的 sitemap XML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取C++标准提案",
+        "input": "请获取网页 https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/ 的内容",
+        "expectedOutput": "返回 C++ 标准委员会 2024 年论文列表页面的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取ISO C++首页",
+        "input": "请获取网页 https://isocpp.org/ 的内容",
+        "expectedOutput": "返回 ISO C++ 官方网站首页的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取C++ Now会议",
+        "input": "请获取网页 https://cppnow.org/ 的内容",
+        "expectedOutput": "返回 C++ Now 会议网站首页的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取CppCon会议",
+        "input": "请获取网页 https://cppcon.org/ 的内容",
+        "expectedOutput": "返回 CppCon 会议网站首页的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取Meeting C++会议",
+        "input": "请获取网页 https://meetingcpp.com/ 的内容",
+        "expectedOutput": "返回 Meeting C++ 会议网站首页的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取中文网站",
+        "input": "请获取网页 https://zh.cppreference.com/w/cpp 的内容",
+        "expectedOutput": "返回中文 C++ 参考文档页面的 HTML 内容，应包含 UTF-8 编码的中文字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取日文网站",
+        "input": "请获取网页 https://ja.cppreference.com/w/cpp 的内容",
+        "expectedOutput": "返回日文 C++ 参考文档页面的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url - 获取韩文网站",
+        "input": "请获取网页 https://ko.cppreference.com/w/cpp 的内容",
+        "expectedOutput": "返回韩文 C++ 参考文档页面的 HTML 内容",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

@@ -1,0 +1,702 @@
+[
+    {
+        "name": "rag_search - 基本知识库搜索",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 协程的使用方法，设置 top_k 为 5",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 协程的使用方法'，top_k 为 5，返回相似度最高的文档块列表，每个结果包含 id、title、content、source、similarity 字段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码架构设计",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentxx 项目的代码架构设计文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 'agentxx 项目的代码架构设计'，top_k 使用默认值 3，返回最相关的架构设计文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索工具类实现",
+        "input": "请使用 rag_search 在知识库中搜索关于 XXToolBase 工具类的实现和使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'XXToolBase 工具类的实现和使用方法'，返回包含 XXToolBase 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索文件系统操作",
+        "input": "请使用 rag_search 在知识库中搜索关于文件系统操作工具的使用说明，top_k 设置为 10",
+        "expectedOutput": "调用 rag_search 工具，query 为 '文件系统操作工具的使用说明'，top_k 为 10，返回最多 10 个相关文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索网络请求处理",
+        "input": "请使用 rag_search 在知识库中搜索关于 HTTP 请求和网页抓取的实现方式",
+        "expectedOutput": "调用 rag_search 工具，query 为 'HTTP 请求和网页抓取的实现方式'，返回包含网络请求相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索嵌入向量计算",
+        "input": "请使用 rag_search 在知识库中搜索关于嵌入向量（embedding）计算和余弦相似度的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 '嵌入向量计算和余弦相似度'，返回包含 embedding 和 cosine similarity 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索文本分块策略",
+        "input": "请使用 rag_search 在知识库中搜索关于文本分块（chunking）策略和方法的文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 '文本分块策略和方法'，返回包含文本分块相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索JSON处理",
+        "input": "请使用 rag_search 在知识库中搜索关于 nlohmann/json 库的使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'nlohmann/json 库的使用方法'，返回包含 JSON 库使用说明的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索CMake构建配置",
+        "input": "请使用 rag_search 在知识库中搜索关于 CMake 构建系统的配置和使用说明",
+        "expectedOutput": "调用 rag_search 工具，query 为 'CMake 构建系统的配置和使用说明'，返回包含 CMake 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索错误处理模式",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 错误处理和异常安全的实现模式",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 错误处理和异常安全'，返回包含错误处理模式相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索向量存储实现",
+        "input": "请使用 rag_search 在知识库中搜索关于向量数据库和向量存储的实现细节",
+        "expectedOutput": "调用 rag_search 工具，query 为 '向量数据库和向量存储的实现细节'，返回包含向量存储相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索RAG系统架构",
+        "input": "请使用 rag_search 在知识库中搜索关于 RAG（检索增强生成）系统的架构设计",
+        "expectedOutput": "调用 rag_search 工具，query 为 'RAG 检索增强生成系统的架构设计'，返回包含 RAG 架构相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码图分析",
+        "input": "请使用 rag_search 在知识库中搜索关于代码图分析工具（codegraph）的使用文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 '代码图分析工具 codegraph 的使用文档'，返回包含代码图分析相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索子代理系统",
+        "input": "请使用 rag_search 在知识库中搜索关于子代理（sub-agent）系统的设计和实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 '子代理系统的设计和实现'，返回包含子代理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索训练数据生成",
+        "input": "请使用 rag_search 在知识库中搜索关于训练数据生成和测试用例设计的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 '训练数据生成和测试用例设计'，返回包含训练数据相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索工具注册机制",
+        "input": "请使用 rag_search 在知识库中搜索关于工具注册和工具发现机制的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 '工具注册和工具发现机制'，返回包含工具注册相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索并发编程",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ asio 协程和并发编程的最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 'asio 协程和并发编程的最佳实践'，返回包含并发编程相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索API设计规范",
+        "input": "请使用 rag_search 在知识库中搜索关于 API 设计规范和 RESTful 接口设计指南",
+        "expectedOutput": "调用 rag_search 工具，query 为 'API 设计规范和 RESTful 接口设计指南'，返回包含 API 设计相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码审查标准",
+        "input": "请使用 rag_search 在知识库中搜索关于代码审查标准和最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 '代码审查标准和最佳实践'，返回包含代码审查相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索单元测试框架",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 单元测试框架（如 Google Test）的使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 单元测试框架的使用方法'，返回包含测试框架相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索内存管理",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 智能指针和内存管理的最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 智能指针和内存管理的最佳实践'，返回包含内存管理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索设计模式",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 设计模式（单例、工厂、观察者等）的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 设计模式的实现'，返回包含设计模式相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索性能优化",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 性能优化技巧和基准测试方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 性能优化技巧和基准测试方法'，返回包含性能优化相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索跨平台开发",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 跨平台开发（Windows 和 Linux）的注意事项",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 跨平台开发的注意事项'，返回包含跨平台开发相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索模板元编程",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 模板元编程和 SFINAE 技术的使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 模板元编程和 SFINAE 技术'，返回包含模板编程相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索正则表达式",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ std::regex 和正则表达式的使用指南",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ std::regex 和正则表达式的使用指南'，返回包含正则表达式相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索字符串处理",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 字符串处理和编码转换的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 字符串处理和编码转换的方法'，返回包含字符串处理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索HTML转Markdown",
+        "input": "请使用 rag_search 在知识库中搜索关于 HTML 转 Markdown 格式转换的实现方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'HTML 转 Markdown 格式转换的实现方法'，返回包含格式转换相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索共享存储",
+        "input": "请使用 rag_search 在知识库中搜索关于共享存储（share store）系统的使用和实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 '共享存储系统的使用和实现'，返回包含共享存储相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索命令执行",
+        "input": "请使用 rag_search 在知识库中搜索关于命令行执行工具（execute_command）的实现和安全考虑",
+        "expectedOutput": "调用 rag_search 工具，query 为 '命令行执行工具的实现和安全考虑'，返回包含命令执行相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索规划工具",
+        "input": "请使用 rag_search 在知识库中搜索关于任务规划（planning）工具的设计和使用",
+        "expectedOutput": "调用 rag_search 工具，query 为 '任务规划工具的设计和使用'，返回包含规划工具相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索UI控制",
+        "input": "请使用 rag_search 在知识库中搜索关于键盘鼠标控制（UI control）工具的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 '键盘鼠标控制工具的实现'，返回包含 UI 控制相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索doxygen文档生成",
+        "input": "请使用 rag_search 在知识库中搜索关于用 Doxygen 生成 C++ 项目文档的配置方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'Doxygen 生成 C++ 项目文档的配置方法'，返回包含文档生成相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索git版本控制",
+        "input": "请使用 rag_search 在知识库中搜索关于 Git 版本控制和分支管理的最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 'Git 版本控制和分支管理的最佳实践'，返回包含版本控制相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索Docker部署",
+        "input": "请使用 rag_search 在知识库中搜索关于 Docker 容器化部署 C++ 应用的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'Docker 容器化部署 C++ 应用的方法'，返回包含 Docker 部署相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索CI/CD流水线",
+        "input": "请使用 rag_search 在知识库中搜索关于 GitHub Actions 和 CI/CD 流水线配置的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'GitHub Actions 和 CI/CD 流水线配置'，返回包含 CI/CD 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码覆盖率",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 代码覆盖率工具（gcov/lcov）的使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 代码覆盖率工具的使用方法'，返回包含代码覆盖率相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索静态分析",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 静态分析工具（clang-tidy/cppcheck）的配置和使用",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 静态分析工具的配置和使用'，返回包含静态分析相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索日志系统",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 日志系统（spdlog/fmt）的集成和使用",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 日志系统的集成和使用'，返回包含日志系统相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索多线程编程",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ std::thread 和多线程编程的最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ std::thread 和多线程编程的最佳实践'，返回包含多线程编程相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索网络编程",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 网络编程（socket/HTTP/gRPC）的实现方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 网络编程的实现方法'，返回包含网络编程相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索安全性",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 应用安全编程和常见漏洞防护的指南",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 应用安全编程和常见漏洞防护'，返回包含安全编程相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码重构",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 代码重构技术和策略的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 代码重构技术和策略'，返回包含代码重构相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码生成",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 代码生成和元编程自动化的技术",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 代码生成和元编程自动化'，返回包含代码生成相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索编译优化",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 编译优化选项和链接优化的配置",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 编译优化选项和链接优化'，返回包含编译优化相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索调试技术",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 调试技术（GDB/LLDB/断点）的使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 调试技术的使用方法'，返回包含调试技术相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索C++20新特性",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++20 新特性（concepts/ranges/coroutines）的使用指南",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++20 新特性的使用指南'，返回包含 C++20 新特性相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索C++23新特性",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++23 新特性（std::expected/stacktrace）的使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++23 新特性的使用方法'，返回包含 C++23 新特性相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索项目结构",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentxx 项目的目录结构和模块划分说明",
+        "expectedOutput": "调用 rag_search 工具，query 为 'agentxx 项目的目录结构和模块划分'，返回包含项目结构相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索嵌入模型配置",
+        "input": "请使用 rag_search 在知识库中搜索关于嵌入模型（embedding model）的配置和选择指南",
+        "expectedOutput": "调用 rag_search 工具，query 为 '嵌入模型的配置和选择指南'，返回包含嵌入模型配置相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索相似度算法",
+        "input": "请使用 rag_search 在知识库中搜索关于文本相似度算法（余弦相似度、Jaccard、编辑距离）的比较",
+        "expectedOutput": "调用 rag_search 工具，query 为 '文本相似度算法的比较'，返回包含相似度算法相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索文档加载",
+        "input": "请使用 rag_search 在知识库中搜索关于文档加载和知识库构建的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 '文档加载和知识库构建的方法'，返回包含文档加载相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索分块重叠策略",
+        "input": "请使用 rag_search 在知识库中搜索关于文本分块重叠（chunk overlap）策略的配置说明",
+        "expectedOutput": "调用 rag_search 工具，query 为 '文本分块重叠策略的配置说明'，返回包含分块重叠相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索Markdown解析",
+        "input": "请使用 rag_search 在知识库中搜索关于 Markdown 文档解析和结构化拆分的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 'Markdown 文档解析和结构化拆分'，返回包含 Markdown 解析相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索UTF-8处理",
+        "input": "请使用 rag_search 在知识库中搜索关于 UTF-8 编码处理和字符长度计算的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'UTF-8 编码处理和字符长度计算'，返回包含 UTF-8 处理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索HTTP客户端",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentxx HTTP 客户端（HttpClient）的实现和使用方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'HTTP 客户端的实现和使用方法'，返回包含 HTTP 客户端相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索工具提示词配置",
+        "input": "请使用 rag_search 在知识库中搜索关于工具提示词（tool prompt）的配置方法和最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 '工具提示词的配置方法和最佳实践'，返回包含提示词配置相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索AgentContext",
+        "input": "请使用 rag_search 在知识库中搜索关于 AgentContext 的设计和使用说明",
+        "expectedOutput": "调用 rag_search 工具，query 为 'AgentContext 的设计和使用说明'，返回包含 AgentContext 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索LLM集成",
+        "input": "请使用 rag_search 在知识库中搜索关于大语言模型（LLM）集成的接口和配置方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 '大语言模型集成的接口和配置方法'，返回包含 LLM 集成相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索GraphEngine",
+        "input": "请使用 rag_search 在知识库中搜索关于 neograph::graph::GraphEngine 的使用和配置",
+        "expectedOutput": "调用 rag_search 工具，query 为 'neograph GraphEngine 的使用和配置'，返回包含 GraphEngine 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索RateLimitedProvider",
+        "input": "请使用 rag_search 在知识库中搜索关于 RateLimitedProvider 和 LLM 速率限制的配置",
+        "expectedOutput": "调用 rag_search 工具，query 为 'RateLimitedProvider 和 LLM 速率限制的配置'，返回包含速率限制相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索SchemaProvider",
+        "input": "请使用 rag_search 在知识库中搜索关于 SchemaProvider 和结构化输出配置的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'SchemaProvider 和结构化输出配置'，返回包含结构化输出相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索训练优化",
+        "input": "请使用 rag_search 在知识库中搜索关于提示词优化（prompt optimization）和训练迭代的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 '提示词优化和训练迭代的方法'，返回包含训练优化相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索评分策略",
+        "input": "请使用 rag_search 在知识库中搜索关于 LLM 输出评分策略和评估方法的设计",
+        "expectedOutput": "调用 rag_search 工具，query 为 'LLM 输出评分策略和评估方法'，返回包含评分策略相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索中间件系统",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentxx 中间件（middleware）系统的设计和实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 'agentxx 中间件系统的设计和实现'，返回包含中间件系统相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索消息通道",
+        "input": "请使用 rag_search 在知识库中搜索关于 neograph 消息通道（channels）和 reducer 机制的设计",
+        "expectedOutput": "调用 rag_search 工具，query 为 'neograph 消息通道和 reducer 机制'，返回包含消息通道相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索节点定义",
+        "input": "请使用 rag_search 在知识库中搜索关于 neograph 节点（nodes）和边（edges）的定义方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'neograph 节点和边的定义方法'，返回包含节点定义相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索条件路由",
+        "input": "请使用 rag_search 在知识库中搜索关于 neograph 条件路由（conditional edges）和动态流转的配置",
+        "expectedOutput": "调用 rag_search 工具，query 为 'neograph 条件路由和动态流转的配置'，返回包含条件路由相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索流式输出",
+        "input": "请使用 rag_search 在知识库中搜索关于 LLM 流式输出（streaming）和 run_stream_async 的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 'LLM 流式输出和 run_stream_async 的实现'，返回包含流式输出相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索GraphEvent",
+        "input": "请使用 rag_search 在知识库中搜索关于 GraphEvent 类型和使用方法的说明",
+        "expectedOutput": "调用 rag_search 工具，query 为 'GraphEvent 类型和使用方法'，返回包含 GraphEvent 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索中断处理",
+        "input": "请使用 rag_search 在知识库中搜索关于 GraphEvent::INTERRUPT 中断处理和恢复机制",
+        "expectedOutput": "调用 rag_search 工具，query 为 'GraphEvent 中断处理和恢复机制'，返回包含中断处理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索Thread配置",
+        "input": "请使用 rag_search 在知识库中搜索关于 RunConfig 中 thread_id 和 resume_if_exists 的配置说明",
+        "expectedOutput": "调用 rag_search 工具，query 为 'RunConfig thread_id 和 resume_if_exists 的配置说明'，返回包含运行配置相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索ToolCall节点",
+        "input": "请使用 rag_search 在知识库中搜索关于 ToolcallWrapNode 的定义和工具调用流程",
+        "expectedOutput": "调用 rag_search 工具，query 为 'ToolcallWrapNode 的定义和工具调用流程'，返回包含工具调用节点相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索ModelCall节点",
+        "input": "请使用 rag_search 在知识库中搜索关于 ModelCallWrapNode 的定义和模型调用流程",
+        "expectedOutput": "调用 rag_search 工具，query 为 'ModelCallWrapNode 的定义和模型调用流程'，返回包含模型调用节点相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索AgentStart和AgentEnd",
+        "input": "请使用 rag_search 在知识库中搜索关于 AgentStartCallWrapNode 和 AgentEndCallWrapNode 的作用",
+        "expectedOutput": "调用 rag_search 工具，query 为 'AgentStartCallWrapNode 和 AgentEndCallWrapNode 的作用'，返回包含代理节点相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索WrapHandle",
+        "input": "请使用 rag_search 在知识库中搜索关于 MiddlewareWrapAgentEndCallNode 中间件的实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 'MiddlewareWrapAgentEndCallNode 中间件的实现'，返回包含中间件包装相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索配置管理",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentConfig 和 prompt 配置的加载和解析方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'agentConfig 和 prompt 配置的加载和解析方法'，返回包含配置管理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索依赖注入",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentxx 中依赖注入和弱引用（weak_ptr）的使用模式",
+        "expectedOutput": "调用 rag_search 工具，query 为 'agentxx 依赖注入和 weak_ptr 的使用模式'，返回包含依赖注入相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索异常处理",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 协程中的异常处理和 try-catch 使用模式",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 协程中的异常处理和 try-catch 使用模式'，返回包含协程异常处理相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索expected类型",
+        "input": "请使用 rag_search 在知识库中搜索关于 std::expected 类型在错误处理中的使用模式",
+        "expectedOutput": "调用 rag_search 工具，query 为 'std::expected 类型在错误处理中的使用模式'，返回包含 expected 类型相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索co_return",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 协程 co_return 和 co_await 的使用语法和最佳实践",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 协程 co_return 和 co_await 的使用语法和最佳实践'，返回包含协程语法相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索fmt库",
+        "input": "请使用 rag_search 在知识库中搜索关于 fmtlib/fmt 库的格式化语法和高级用法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'fmtlib/fmt 库的格式化语法和高级用法'，返回包含 fmt 库相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索文件系统库",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ std::filesystem 库的使用和路径操作方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ std::filesystem 库的使用和路径操作方法'，返回包含文件系统库相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索XML解析",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ XML 解析和 HTML 内容提取的方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ XML 解析和 HTML 内容提取的方法'，返回包含 XML/HTML 解析相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索base64编码",
+        "input": "请使用 rag_search 在知识库中搜索关于 base64 编码和解码在 C++ 中的实现方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'base64 编码和解码在 C++ 中的实现方法'，返回包含 base64 编码相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索md4c库",
+        "input": "请使用 rag_search 在知识库中搜索关于 md4c 库的使用和 Markdown 渲染方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'md4c 库的使用和 Markdown 渲染方法'，返回包含 md4c 库相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索curl库",
+        "input": "请使用 rag_search 在知识库中搜索关于 libcurl 库在 C++ 中的 HTTP 请求实现",
+        "expectedOutput": "调用 rag_search 工具，query 为 'libcurl 库在 C++ 中的 HTTP 请求实现'，返回包含 curl 库相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索OpenSSL",
+        "input": "请使用 rag_search 在知识库中搜索关于 OpenSSL 和 HTTPS 安全连接的配置方法",
+        "expectedOutput": "调用 rag_search 工具，query 为 'OpenSSL 和 HTTPS 安全连接的配置方法'，返回包含 OpenSSL 相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索top_k为0",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 协程的相关文档，设置 top_k 为 0",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 协程'，top_k 为 0，应返回空结果数组",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索top_k为1",
+        "input": "请使用 rag_search 在知识库中搜索关于 XXToolBase 的文档，设置 top_k 为 1",
+        "expectedOutput": "调用 rag_search 工具，query 为 'XXToolBase'，top_k 为 1，返回相似度最高的 1 个文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索top_k为100",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 的所有文档，设置 top_k 为 100",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++'，top_k 为 100，返回最多 100 个相关文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 空查询搜索",
+        "input": "请使用 rag_search 在知识库中搜索，但查询参数为空字符串",
+        "expectedOutput": "调用 rag_search 工具，query 为空字符串，应返回错误信息或空结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索英文关键词",
+        "input": "请使用 rag_search 在知识库中搜索 'coroutine implementation in C++20'",
+        "expectedOutput": "调用 rag_search 工具，query 为 'coroutine implementation in C++20'，返回包含协程实现相关英文文档的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索中文关键词",
+        "input": "请使用 rag_search 在知识库中搜索 '如何实现一个自定义的 C++ 协程调度器'",
+        "expectedOutput": "调用 rag_search 工具，query 为 '如何实现一个自定义的 C++ 协程调度器'，返回包含协程调度相关中文文档的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索多关键词",
+        "input": "请使用 rag_search 在知识库中搜索 'agentxx tool filesystem grep search'",
+        "expectedOutput": "调用 rag_search 工具，query 为多关键词组合，返回与文件系统搜索工具相关的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索代码示例",
+        "input": "请使用 rag_search 在知识库中搜索包含 co_await 代码示例的文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 'co_await 代码示例'，返回包含 co_await 代码示例的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索API参考",
+        "input": "请使用 rag_search 在知识库中搜索 FilesystemGrepTool 的 API 参考文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 'FilesystemGrepTool API 参考文档'，返回包含 API 文档的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索故障排除",
+        "input": "请使用 rag_search 在知识库中搜索关于编译错误和常见问题故障排除的文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 '编译错误和常见问题故障排除'，返回包含故障排除相关信息的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索入门指南",
+        "input": "请使用 rag_search 在知识库中搜索关于 agentxx 项目入门和使用指南的文档",
+        "expectedOutput": "调用 rag_search 工具，query 为 'agentxx 项目入门和使用指南'，返回包含入门指南的文档块",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "rag_search - 搜索相似度阈值过滤",
+        "input": "请使用 rag_search 在知识库中搜索关于 C++ 协程的文档，设置 top_k 为 5，并期望返回相似度大于 0.5 的结果",
+        "expectedOutput": "调用 rag_search 工具，query 为 'C++ 协程'，top_k 为 5，返回 similarity 字段值大于 0.5 的相关文档块，每个结果包含 id、title、content、source、similarity 字段",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

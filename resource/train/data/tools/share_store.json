@@ -1,0 +1,702 @@
+[
+    {
+        "name": "share_store - 保存数据到共享存储",
+        "input": "请将用户名 'admin' 保存到共享存储中，key 为 current_user",
+        "expectedOutput": "调用 share_store 工具，action 为 set，key 为 current_user，value 为 admin，返回操作成功状态",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 从共享存储获取数据",
+        "input": "请从共享存储中获取 key 为 current_user 的值",
+        "expectedOutput": "调用 share_store 工具，action 为 get，key 为 current_user，返回之前保存的值",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 删除共享存储中的数据",
+        "input": "请删除共享存储中 key 为 temp_data 的数据",
+        "expectedOutput": "调用 share_store 工具，action 为 delete，key 为 temp_data，返回删除成功状态",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 查看所有共享存储的key",
+        "input": "请列出共享存储中所有的 key",
+        "expectedOutput": "调用 share_store 工具，action 为 list，返回所有已存储的 key 列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存配置到共享存储",
+        "input": "将配置信息 config={\"host\":\"localhost\",\"port\":8080} 保存到共享存储，key 为 server_config",
+        "expectedOutput": "调用 share_store 设置 key 为 server_config，value 为 JSON 配置对象，返回成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存多行文本到共享存储",
+        "input": "将以下内容保存到共享存储 key 为 notes：今天需要完成的任务清单",
+        "expectedOutput": "调用 share_store 设置 key 为 notes，value 包含任务清单内容，返回成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 获取并更新共享存储",
+        "input": "先获取 key 为 counter 的值，然后将其加 1 后重新保存",
+        "expectedOutput": "先调用 share_store get 获取 counter 值，然后调用 set 更新为 counter+1，返回操作结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 条件保存到共享存储",
+        "input": "如果共享存储中不存在 key 为 session_id，则保存一个新的 session_id",
+        "expectedOutput": "先调用 share_store get 检查 session_id 是否存在，若不存在则调用 set 保存，返回操作结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存数字到共享存储",
+        "input": "将数字 42 保存到共享存储，key 为 answer",
+        "expectedOutput": "调用 share_store 设置 key 为 answer，value 为 42，返回成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存布尔值到共享存储",
+        "input": "将 true 保存到共享存储，key 为 is_authenticated",
+        "expectedOutput": "调用 share_store 设置 key 为 is_authenticated，value 为 true，返回成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 获取不存在的key",
+        "input": "从共享存储中获取 key 为 nonexistent_key 的值",
+        "expectedOutput": "调用 share_store get 获取 nonexistent_key，返回空或不存在的信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存数组到共享存储",
+        "input": "将数组 [1,2,3,4,5] 保存到共享存储，key 为 numbers",
+        "expectedOutput": "调用 share_store 设置 key 为 numbers，value 为数组，返回成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 清空所有共享存储",
+        "input": "清空共享存储中的所有数据",
+        "expectedOutput": "调用 share_store 工具，action 为 clear，返回清空成功状态",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存用户偏好设置",
+        "input": "将用户偏好设置保存到共享存储：theme=dark, language=zh-CN",
+        "expectedOutput": "调用 share_store 设置 key 为 user_preferences，value 包含主题和语言设置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 批量保存多个数据",
+        "input": "将以下数据保存到共享存储：key1=value1, key2=value2, key3=value3",
+        "expectedOutput": "依次调用 share_store 设置三个 key-value 对，返回每步操作结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 获取共享存储大小",
+        "input": "获取共享存储中当前存储了多少个 key",
+        "expectedOutput": "调用 share_store list 获取所有 key，统计数量并返回",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存API响应到共享存储",
+        "input": "将API响应结果保存到共享存储 key 为 last_api_response",
+        "expectedOutput": "调用 share_store 设置 key 为 last_api_response，value 为 API 响应内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存文件路径到共享存储",
+        "input": "将文件路径 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 保存到共享存储 key 为 target_file",
+        "expectedOutput": "调用 share_store 设置 key 为 target_file，value 包含文件路径",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存时间戳到共享存储",
+        "input": "获取当前时间戳并保存到共享存储 key 为 start_time",
+        "expectedOutput": "先获取当前时间戳，然后调用 share_store 设置 key 为 start_time，value 为时间戳",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存带空格的key",
+        "input": "将值 'hello' 保存到共享存储，key 为 'my key with spaces'",
+        "expectedOutput": "调用 share_store 设置 key 为 my key with spaces，value 为 hello",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存JSON对象",
+        "input": "将 JSON 对象 {\"name\":\"test\",\"version\":\"1.0\",\"enabled\":true} 保存到共享存储 key 为 metadata",
+        "expectedOutput": "调用 share_store 设置 key 为 metadata，value 为 JSON 对象字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 获取并格式化输出",
+        "input": "从共享存储获取 key 为 server_config，然后格式化输出",
+        "expectedOutput": "调用 share_store get 获取 server_config，格式化后返回",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存搜索结果到共享存储",
+        "input": "在网络上搜索 C++ 相关的信息，并将结果保存到共享存储 key 为 search_results",
+        "expectedOutput": "先执行搜索，然后调用 share_store 设置 key 为 search_results",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存用户输入到共享存储",
+        "input": "将用户输入 'Hello World' 保存到共享存储 key 为 user_input",
+        "expectedOutput": "调用 share_store 设置 key 为 user_input，value 为 Hello World",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 更新共享存储中的值",
+        "input": "将共享存储中 key 为 status 的值更新为 completed",
+        "expectedOutput": "调用 share_store 设置 key 为 status，value 为 completed（覆盖旧值）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存空字符串到共享存储",
+        "input": "将空字符串保存到共享存储 key 为 empty_value",
+        "expectedOutput": "调用 share_store 设置 key 为 empty_value，value 为空字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存特殊字符到共享存储",
+        "input": "将特殊字符 !@#$%^&*() 保存到共享存储 key 为 special_chars",
+        "expectedOutput": "调用 share_store 设置 key 为 special_chars，value 包含特殊字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存Unicode文本到共享存储",
+        "input": "将中文文本 '你好世界' 保存到共享存储 key 为 greeting",
+        "expectedOutput": "调用 share_store 设置 key 为 greeting，value 为你好世界",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存多行代码到共享存储",
+        "input": "将以下C++代码保存到共享存储 key 为 code_snippet: int main() { return 0; }",
+        "expectedOutput": "调用 share_store 设置 key 为 code_snippet，value 包含 C++ 代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 检查key是否存在",
+        "input": "检查共享存储中是否存在 key 为 api_key",
+        "expectedOutput": "调用 share_store get 获取 api_key，根据返回结果判断是否存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存计算结果到共享存储",
+        "input": "计算 2 的 10 次方，并将结果保存到共享存储 key 为 computed_result",
+        "expectedOutput": "先计算 2^10=1024，然后调用 share_store 设置 key 为 computed_result，value 为 1024",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存环境变量到共享存储",
+        "input": "将环境变量 PATH 的值保存到共享存储 key 为 env_path",
+        "expectedOutput": "先获取系统环境变量 PATH，然后调用 share_store 设置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存URL到共享存储",
+        "input": "将 URL https://example.com/api 保存到共享存储 key 为 api_endpoint",
+        "expectedOutput": "调用 share_store 设置 key 为 api_endpoint，value 为 URL",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存颜色代码到共享存储",
+        "input": "将颜色代码 #FF5733 保存到共享存储 key 为 primary_color",
+        "expectedOutput": "调用 share_store 设置 key 为 primary_color，value 为 #FF5733",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存IP地址到共享存储",
+        "input": "将IP地址 192.168.1.100 保存到共享存储 key 为 server_ip",
+        "expectedOutput": "调用 share_store 设置 key 为 server_ip，value 为 IP 地址",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存日期到共享存储",
+        "input": "将日期 2024-01-15 保存到共享存储 key 为 deadline",
+        "expectedOutput": "调用 share_store 设置 key 为 deadline，value 为日期字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存文件内容到共享存储",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的前100行，保存到共享存储 key 为 file_content",
+        "expectedOutput": "先读取文件内容，然后调用 share_store 设置 key 为 file_content",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存命令执行结果到共享存储",
+        "input": "在当前系统执行 dir 命令，将结果保存到共享存储 key 为 dir_output",
+        "expectedOutput": "先执行命令，然后调用 share_store 设置 key 为 dir_output",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 从共享存储读取并用于后续操作",
+        "input": "从共享存储获取 key 为 target_file 的值，然后读取该文件内容",
+        "expectedOutput": "先调用 share_store get 获取文件路径，然后读取该文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存当前工作目录到共享存储",
+        "input": "将当前工作目录路径保存到共享存储 key 为 cwd",
+        "expectedOutput": "先获取当前工作目录，然后调用 share_store 设置 key 为 cwd",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存版本号到共享存储",
+        "input": "将版本号 2.5.3 保存到共享存储 key 为 app_version",
+        "expectedOutput": "调用 share_store 设置 key 为 app_version，value 为 2.5.3",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存Token到共享存储",
+        "input": "将 token eyJhbGciOiJIUzI1NiJ9 保存到共享存储 key 为 auth_token",
+        "expectedOutput": "调用 share_store 设置 key 为 auth_token，value 为 token 字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存文件大小到共享存储",
+        "input": "获取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的大小，保存到共享存储 key 为 file_size",
+        "expectedOutput": "先获取文件大小信息，然后调用 share_store 设置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存当前用户信息",
+        "input": "将当前用户信息 name=张三, role=admin, dept=技术部 保存到共享存储 key 为 current_user_info",
+        "expectedOutput": "调用 share_store 设置 key 为 current_user_info，value 包含用户信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存分页信息",
+        "input": "将分页信息 page=1, pageSize=20, total=100 保存到共享存储 key 为 pagination",
+        "expectedOutput": "调用 share_store 设置 key 为 pagination，value 包含分页参数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存排序参数",
+        "input": "将排序参数 sortBy=name, order=asc 保存到共享存储 key 为 sort_params",
+        "expectedOutput": "调用 share_store 设置 key 为 sort_params，value 包含排序参数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存过滤条件",
+        "input": "将过滤条件 status=active, category=tech 保存到共享存储 key 为 filters",
+        "expectedOutput": "调用 share_store 设置 key 为 filters，value 包含过滤条件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存搜索关键词",
+        "input": "将搜索关键词 'C++ template metaprogramming' 保存到共享存储 key 为 search_keyword",
+        "expectedOutput": "调用 share_store 设置 key 为 search_keyword，value 为搜索关键词",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存错误信息",
+        "input": "将错误信息保存到共享存储 key 为 last_error：Connection timeout",
+        "expectedOutput": "调用 share_store 设置 key 为 last_error，value 为错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存成功消息",
+        "input": "将操作成功消息保存到共享存储 key 为 last_message：File saved successfully",
+        "expectedOutput": "调用 share_store 设置 key 为 last_message，value 为成功消息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存数据库连接字符串",
+        "input": "将数据库连接字符串保存到共享存储 key 为 db_connection：host=localhost;port=5432;db=mydb",
+        "expectedOutput": "调用 share_store 设置 key 为 db_connection，value 为连接字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存日志级别",
+        "input": "将日志级别 INFO 保存到共享存储 key 为 log_level",
+        "expectedOutput": "调用 share_store 设置 key 为 log_level，value 为 INFO",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存开关状态",
+        "input": "将功能开关 feature_x_enabled=true 保存到共享存储 key 为 feature_x_enabled",
+        "expectedOutput": "调用 share_store 设置 key 为 feature_x_enabled，value 为 true",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存计数器的初始值",
+        "input": "在共享存储中初始化计数器 counter=0",
+        "expectedOutput": "调用 share_store 设置 key 为 counter，value 为 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 递增计数器",
+        "input": "将共享存储中 key 为 counter 的值加 1",
+        "expectedOutput": "先 get counter 的值，加 1 后再 set 回去",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存Markdown内容",
+        "input": "将以下Markdown内容保存到共享存储 key 为 readme：# Project Title\n\n## Description",
+        "expectedOutput": "调用 share_store 设置 key 为 readme，value 包含 Markdown 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存CSV数据",
+        "input": "将CSV数据 name,age,city\nAlice,30,NYC 保存到共享存储 key 为 csv_data",
+        "expectedOutput": "调用 share_store 设置 key 为 csv_data，value 包含 CSV 数据",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存XML数据",
+        "input": "将XML数据 <root><item>test</item></root> 保存到共享存储 key 为 xml_data",
+        "expectedOutput": "调用 share_store 设置 key 为 xml_data，value 包含 XML 数据",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存Base64编码字符串",
+        "input": "将Base64字符串 SGVsbG8gV29ybGQ= 保存到共享存储 key 为 encoded_data",
+        "expectedOutput": "调用 share_store 设置 key 为 encoded_data，value 为 Base64 字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存加密密钥",
+        "input": "将加密密钥保存到共享存储 key 为 encryption_key",
+        "expectedOutput": "调用 share_store 设置 key 为 encryption_key，value 为密钥字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存正则表达式",
+        "input": "将正则表达式 ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$ 保存到共享存储 key 为 email_regex",
+        "expectedOutput": "调用 share_store 设置 key 为 email_regex，value 为正则表达式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存调色板",
+        "input": "将调色板颜色列表保存到共享存储 key 为 color_palette：#FF0000,#00FF00,#0000FF",
+        "expectedOutput": "调用 share_store 设置 key 为 color_palette，value 为颜色列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存数学公式",
+        "input": "将数学公式 E=mc^2 保存到共享存储 key 为 formula",
+        "expectedOutput": "调用 share_store 设置 key 为 formula，value 为公式字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存路径分隔符",
+        "input": "将当前系统的路径分隔符保存到共享存储 key 为 path_separator",
+        "expectedOutput": "调用 share_store 设置 key 为 path_separator，value 为 / 或 \\",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存换行符类型",
+        "input": "将当前系统换行符类型保存到共享存储 key 为 newline",
+        "expectedOutput": "调用 share_store 设置 key 为 newline，value 为 \\n 或 \\r\\n",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存时区偏移",
+        "input": "将当前时区偏移保存到共享存储 key 为 timezone_offset",
+        "expectedOutput": "调用 share_store 设置 key 为 timezone_offset，value 为 UTC+8 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存请求头信息",
+        "input": "将请求头 Content-Type=application/json, Authorization=Bearer xxx 保存到共享存储 key 为 request_headers",
+        "expectedOutput": "调用 share_store 设置 key 为 request_headers，value 包含请求头",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存cookie信息",
+        "input": "将cookie session_id=abc123 保存到共享存储 key 为 session_cookie",
+        "expectedOutput": "调用 share_store 设置 key 为 session_cookie，value 为 cookie 字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存MIME类型",
+        "input": "将MIME类型 application/json 保存到共享存储 key 为 content_type",
+        "expectedOutput": "调用 share_store 设置 key 为 content_type，value 为 MIME 类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存HTTP状态码",
+        "input": "将HTTP状态码 200 保存到共享存储 key 为 http_status",
+        "expectedOutput": "调用 share_store 设置 key 为 http_status，value 为 200",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存响应消息",
+        "input": "将HTTP响应消息 OK 保存到共享存储 key 为 response_message",
+        "expectedOutput": "调用 share_store 设置 key 为 response_message，value 为 OK",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存UUID",
+        "input": "生成一个UUID并保存到共享存储 key 为 request_id",
+        "expectedOutput": "先生成UUID，然后调用 share_store 设置 key 为 request_id",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存哈希值",
+        "input": "将字符串 'hello' 的 MD5 哈希值保存到共享存储 key 为 md5_hash",
+        "expectedOutput": "先计算MD5哈希，然后调用 share_store 设置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存随机数",
+        "input": "生成一个0到100之间的随机数，保存到共享存储 key 为 random_number",
+        "expectedOutput": "先生成随机数，然后调用 share_store 设置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存语义化版本号",
+        "input": "将语义化版本号 1.2.3-alpha.1+build.456 保存到共享存储 key 为 semver",
+        "expectedOutput": "调用 share_store 设置 key 为 semver，value 为语义化版本号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存Git commit hash",
+        "input": "将Git commit hash a1b2c3d4e5f6 保存到共享存储 key 为 commit_hash",
+        "expectedOutput": "调用 share_store 设置 key 为 commit_hash，value 为 commit hash",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存分支名称",
+        "input": "将Git分支名 feature/user-auth 保存到共享存储 key 为 git_branch",
+        "expectedOutput": "调用 share_store 设置 key 为 git_branch，value 为分支名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存标签名称",
+        "input": "将Git标签 v1.0.0 保存到共享存储 key 为 git_tag",
+        "expectedOutput": "调用 share_store 设置 key 为 git_tag，value 为 v1.0.0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存文件扩展名",
+        "input": "将文件扩展名列表 .cpp,.h,.hpp 保存到共享存储 key 为 cpp_extensions",
+        "expectedOutput": "调用 share_store 设置 key 为 cpp_extensions，value 为扩展名列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存目录路径列表",
+        "input": "将需要搜索的目录列表保存到共享存储 key 为 search_dirs: /src,/include,/lib",
+        "expectedOutput": "调用 share_store 设置 key 为 search_dirs，value 为目录列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存忽略模式",
+        "input": "将文件忽略模式保存到共享存储 key 为 ignore_patterns: *.o,*.obj,*.exe",
+        "expectedOutput": "调用 share_store 设置 key 为 ignore_patterns，value 为忽略模式列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存编译选项",
+        "input": "将编译选项 -std=c++20 -O2 -Wall 保存到共享存储 key 为 compile_flags",
+        "expectedOutput": "调用 share_store 设置 key 为 compile_flags，value 为编译选项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存链接选项",
+        "input": "将链接选项 -lpthread -lssl -lcrypto 保存到共享存储 key 为 link_flags",
+        "expectedOutput": "调用 share_store 设置 key 为 link_flags，value 为链接选项",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存宏定义",
+        "input": "将宏定义 DEBUG=1, VERSION=\\\"2.0\\\" 保存到共享存储 key 为 macros",
+        "expectedOutput": "调用 share_store 设置 key 为 macros，value 为宏定义列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存包含路径",
+        "input": "将包含路径列表保存到共享存储 key 为 include_paths: /usr/include, /usr/local/include",
+        "expectedOutput": "调用 share_store 设置 key 为 include_paths，value 为路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存库路径",
+        "input": "将库搜索路径保存到共享存储 key 为 lib_paths: /usr/lib, /usr/local/lib",
+        "expectedOutput": "调用 share_store 设置 key 为 lib_paths，value 为路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存构建目标名称",
+        "input": "将构建目标名称 my_app 保存到共享存储 key 为 build_target",
+        "expectedOutput": "调用 share_store 设置 key 为 build_target，value 为 my_app",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存构建类型",
+        "input": "将构建类型 Debug 保存到共享存储 key 为 build_type",
+        "expectedOutput": "调用 share_store 设置 key 为 build_type，value 为 Debug",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存CMake变量",
+        "input": "将CMake变量 CMAKE_CXX_STANDARD=20 保存到共享存储 key 为 cmake_var",
+        "expectedOutput": "调用 share_store 设置 key 为 cmake_var，value 为变量定义",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存测试名称",
+        "input": "将测试名称 TestFileSystem.ListFiles 保存到共享存储 key 为 test_name",
+        "expectedOutput": "调用 share_store 设置 key 为 test_name，value 为测试名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存测试状态",
+        "input": "将测试状态 passed 保存到共享存储 key 为 test_status",
+        "expectedOutput": "调用 share_store 设置 key 为 test_status，value 为 passed",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存测试覆盖率",
+        "input": "将测试覆盖率 85.5% 保存到共享存储 key 为 coverage",
+        "expectedOutput": "调用 share_store 设置 key 为 coverage，value 为 85.5%",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存函数名",
+        "input": "将函数名 calculateSum 保存到共享存储 key 为 function_name",
+        "expectedOutput": "调用 share_store 设置 key 为 function_name，value 为 calculateSum",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存类名",
+        "input": "将类名 FileSystemTool 保存到共享存储 key 为 class_name",
+        "expectedOutput": "调用 share_store 设置 key 为 class_name，value 为 FileSystemTool",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存命名空间",
+        "input": "将命名空间 agentxx::tools 保存到共享存储 key 为 namespace",
+        "expectedOutput": "调用 share_store 设置 key 为 namespace，value 为 agentxx::tools",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存模块名",
+        "input": "将模块名 filesystem 保存到共享存储 key 为 module_name",
+        "expectedOutput": "调用 share_store 设置 key 为 module_name，value 为 filesystem",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存工具名称",
+        "input": "将工具名称 filesystem_list_file 保存到共享存储 key 为 tool_name",
+        "expectedOutput": "调用 share_store 设置 key 为 tool_name，value 为 filesystem_list_file",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存JSON对象",
+        "input": "将 JSON 对象 {\"files\": [\"a.h\", \"b.h\"], \"count\": 2} 保存到共享存储 key 为 file_list",
+        "expectedOutput": "调用 share_store 设置 key 为 file_list，value 为 JSON 字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 多次覆盖写入",
+        "input": "先保存 value=v1 到 key=test，再覆盖保存 value=v2 到 key=test，最后获取 key=test",
+        "expectedOutput": "返回 v2，覆盖成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "share_store - 保存并比较",
+        "input": "保存 value=hello 到 key=greeting，然后获取该 key 的值并与原值比较",
+        "expectedOutput": "获取的值应为 hello，与原值一致",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

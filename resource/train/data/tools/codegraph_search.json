@@ -1,0 +1,702 @@
+[
+    {
+        "name": "codegraph_search - 搜索代码符号",
+        "input": "请在代码库中搜索符号 EvolutionTrainingAgent，限制返回 10 条结果",
+        "expectedOutput": "返回 EvolutionTrainingAgent 相关符号的搜索结果，应包含 kind、name、qualified_name、file、line、signature 等字段，结果应包含 agentxx/agent/training.h 中的类定义",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索类名",
+        "input": "搜索代码库中名为 XXToolBase 的类定义",
+        "expectedOutput": "返回 XXToolBase 类定义的位置信息，包含 kind=class 或 kind=struct，name=XXToolBase，file 指向 tool.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索函数名",
+        "input": "搜索 execute_async 函数，限制返回 5 条",
+        "expectedOutput": "返回名为 execute_async 的函数搜索结果，应包含多个工具类中的 execute_async 方法，限制 5 条",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索命名空间",
+        "input": "搜索 agentxx 命名空间相关的符号",
+        "expectedOutput": "返回 agentxx 命名空间下的符号列表，包含 namespace 类型的节点",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索模板类",
+        "input": "搜索代码库中所有模板类定义，限制 30 条",
+        "expectedOutput": "返回模板类相关符号，包含 kind、name、signature 中带有 template 关键字的类定义",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索协程函数",
+        "input": "搜索代码库中所有返回 awaitable 的函数",
+        "expectedOutput": "返回签名中包含 awaitable 关键字的函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 使用默认limit",
+        "input": "搜索符号 SubAgentTaskBase，不指定 limit 参数",
+        "expectedOutput": "返回 SubAgentTaskBase 相关符号，默认返回最多 20 条结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索枚举类型",
+        "input": "搜索代码库中所有 enum 类型定义",
+        "expectedOutput": "返回 kind 为 enum 的符号列表，包含枚举名称和定义位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索宏定义",
+        "input": "搜索代码库中所有 #define 宏定义",
+        "expectedOutput": "返回 kind 为 macro 的符号列表，包含宏名称和定义文件位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索构造函数",
+        "input": "搜索所有类的构造函数定义",
+        "expectedOutput": "返回构造函数符号列表，kind 应为 constructor 或 function，name 与类名相同",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索析构函数",
+        "input": "搜索所有类的析构函数定义",
+        "expectedOutput": "返回析构函数符号列表，name 以 ~ 开头",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索虚函数",
+        "input": "搜索代码库中所有 virtual 关键字声明的虚函数",
+        "expectedOutput": "返回虚函数符号列表，signature 中包含 virtual 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 override 函数",
+        "input": "搜索代码库中所有 override 重写的函数",
+        "expectedOutput": "返回 override 函数符号列表，signature 中包含 override 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索静态函数",
+        "input": "搜索代码库中所有 static 成员函数",
+        "expectedOutput": "返回静态成员函数符号列表，signature 中包含 static 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 constexpr 函数",
+        "input": "搜索代码库中所有 constexpr 函数",
+        "expectedOutput": "返回 constexpr 函数符号列表，signature 中包含 constexpr 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 inline 函数",
+        "input": "搜索代码库中所有 inline 函数",
+        "expectedOutput": "返回 inline 函数符号列表，signature 中包含 inline 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 lambda 表达式",
+        "input": "搜索代码库中的 lambda 表达式定义",
+        "expectedOutput": "返回 lambda 表达式相关符号，kind 可能为 lambda 或 function",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 operator 重载",
+        "input": "搜索代码库中所有 operator 运算符重载函数",
+        "expectedOutput": "返回 operator 重载函数符号列表，name 以 operator 开头",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索基类",
+        "input": "搜索代码库中带有继承关系的类定义",
+        "expectedOutput": "返回类定义符号，signature 中应包含 : public 或 : private 等继承关系",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 friend 声明",
+        "input": "搜索代码库中的 friend 友元声明",
+        "expectedOutput": "返回 friend 声明相关符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 using 声明",
+        "input": "搜索代码库中所有 using 类型别名声明",
+        "expectedOutput": "返回 using 声明相关符号，kind 可能为 using 或 type_alias",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 typedef",
+        "input": "搜索代码库中所有 typedef 类型定义",
+        "expectedOutput": "返回 typedef 类型定义符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索头文件中的符号",
+        "input": "搜索 tool.h 文件中定义的所有符号",
+        "expectedOutput": "返回 tool.h 文件中定义的符号列表，file 字段应指向 tool.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索特定文件中的符号",
+        "input": "搜索 filesystem.h 文件中定义的所有符号，限制 50 条",
+        "expectedOutput": "返回 filesystem.h 文件中定义的符号列表，file 字段应指向 filesystem.h，最多 50 条",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索字符串处理相关符号",
+        "input": "搜索与字符串处理相关的符号，如 string、util、convert 等",
+        "expectedOutput": "返回字符串处理相关符号列表，包含 string_util、string 等工具类或函数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索文件系统相关符号",
+        "input": "搜索与文件系统操作相关的符号",
+        "expectedOutput": "返回文件系统相关符号列表，包含 Filesystem、ReadFile、WriteFile 等工具类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索网络相关符号",
+        "input": "搜索与网络请求相关的符号，如 HttpClient、fetch、url 等",
+        "expectedOutput": "返回网络请求相关符号列表，包含 HttpClient、WebFetch 等类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 JSON 处理相关符号",
+        "input": "搜索与 JSON 处理相关的符号，如 json、parse、dump 等",
+        "expectedOutput": "返回 JSON 处理相关符号列表，包含 neograph::json 相关类型",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索日志相关符号",
+        "input": "搜索与日志记录相关的符号，如 log、logger、debug 等",
+        "expectedOutput": "返回日志相关符号列表，包含 log.h 中定义的日志函数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索正则表达式相关符号",
+        "input": "搜索与正则表达式相关的符号，如 regex、match、pattern 等",
+        "expectedOutput": "返回正则表达式相关符号列表，包含 XXRegex 类",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索编码转换相关符号",
+        "input": "搜索与编码转换相关的符号，如 base64、utf8、convert 等",
+        "expectedOutput": "返回编码转换相关符号列表，包含 base64Encode、autoConvertToUtf8 等函数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 空查询参数",
+        "input": "使用空的 query 参数搜索代码符号",
+        "expectedOutput": "返回错误信息，提示 Arg `query` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - limit设置为0",
+        "input": "搜索符号 XXToolBase，设置 limit 为 0",
+        "expectedOutput": "返回空结果或零条符号记录",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - limit设置为1",
+        "input": "搜索符号 execute_async，设置 limit 为 1",
+        "expectedOutput": "返回最多 1 条 execute_async 相关符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - limit设置为很大的值",
+        "input": "搜索符号 include，设置 limit 为 1000",
+        "expectedOutput": "返回所有匹配 include 的符号，最多 1000 条",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索不存在的符号",
+        "input": "搜索代码库中不存在的符号 NonExistentSymbol12345",
+        "expectedOutput": "返回空结果或错误信息，提示未找到匹配符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索特殊字符",
+        "input": "搜索包含特殊字符的符号名，如 :: 命名空间分隔符",
+        "expectedOutput": "返回匹配的符号信息，正确处理命名空间限定符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索中文符号名",
+        "input": "搜索代码库中可能包含中文注释或中文命名的符号",
+        "expectedOutput": "返回匹配中文内容的符号列表，如果没有则返回空结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索数字命名",
+        "input": "搜索名称中包含数字的符号，如 graphDataKey_ 等",
+        "expectedOutput": "返回名称中包含数字的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索下划线前缀",
+        "input": "搜索以下划线 _ 开头的符号名称",
+        "expectedOutput": "返回下划线开头的符号列表，如 _defFileRWSummarizationReqHandle 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索大写字母开头的符号",
+        "input": "搜索以大写字母开头的符号名称",
+        "expectedOutput": "返回大写字母开头的符号列表，通常为类名或结构体名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索小写字母开头的符号",
+        "input": "搜索以小写字母开头的符号名称",
+        "expectedOutput": "返回小写字母开头的符号列表，通常为函数名或变量名",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 get 前缀函数",
+        "input": "搜索所有以 get 开头的函数名",
+        "expectedOutput": "返回 get 开头的函数符号列表，如 get_definition、getCallers 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 set 前缀函数",
+        "input": "搜索所有以 set 开头的函数名",
+        "expectedOutput": "返回 set 开头的函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 create 前缀函数",
+        "input": "搜索所有以 create 开头的函数名",
+        "expectedOutput": "返回 create 开头的函数符号列表，如 createSubgraph、createSystemPrompt 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 on 前缀函数",
+        "input": "搜索所有以 on 开头的事件处理函数名",
+        "expectedOutput": "返回 on 开头的函数符号列表，如 onSubagentEnd 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 def 前缀",
+        "input": "搜索所有以 def 开头定义的常量或函数",
+        "expectedOutput": "返回 def 开头的符号列表，如 defSystemPromptTemplate、defCreateSubGraphDefine 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 Tool 后缀类名",
+        "input": "搜索所有以 Tool 结尾的类名",
+        "expectedOutput": "返回 Tool 结尾的类名列表，如 XXToolBase、FilesystemGrepTool 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 Manager 后缀",
+        "input": "搜索所有以 Manager 结尾的类名",
+        "expectedOutput": "返回 Manager 结尾的类名列表，如 CodeGraphManager、SubAgentManagerTool 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 Base 后缀",
+        "input": "搜索所有以 Base 结尾的类名",
+        "expectedOutput": "返回 Base 结尾的类名列表，如 XXToolBase、SubAgentTaskBase 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 Handle 后缀",
+        "input": "搜索所有以 Handle 结尾的类名",
+        "expectedOutput": "返回 Handle 结尾的类名列表，如 SummarizationToolHandle 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 Context 后缀",
+        "input": "搜索所有以 Context 结尾的类名",
+        "expectedOutput": "返回 Context 结尾的类名列表，如 AgentContext、NodeContext 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 shared_ptr 使用",
+        "input": "搜索代码库中使用 std::shared_ptr 的符号",
+        "expectedOutput": "返回使用 shared_ptr 的符号列表，包含变量声明和函数参数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 weak_ptr 使用",
+        "input": "搜索代码库中使用 std::weak_ptr 的符号",
+        "expectedOutput": "返回使用 weak_ptr 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 unique_ptr 使用",
+        "input": "搜索代码库中使用 std::unique_ptr 的符号",
+        "expectedOutput": "返回使用 unique_ptr 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 optional 使用",
+        "input": "搜索代码库中使用 std::optional 的符号",
+        "expectedOutput": "返回使用 optional 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 string_view 使用",
+        "input": "搜索代码库中使用 std::string_view 的符号",
+        "expectedOutput": "返回使用 string_view 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 vector 容器",
+        "input": "搜索代码库中使用 std::vector 的符号",
+        "expectedOutput": "返回使用 vector 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 map 容器",
+        "input": "搜索代码库中使用 std::map 的符号",
+        "expectedOutput": "返回使用 map 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 unordered_map",
+        "input": "搜索代码库中使用 std::unordered_map 的符号",
+        "expectedOutput": "返回使用 unordered_map 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 asio 命名空间",
+        "input": "搜索 asio 或 boost::asio 命名空间下的符号",
+        "expectedOutput": "返回 asio 命名空间相关符号，如 awaitable、io_context 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 neograph 命名空间",
+        "input": "搜索 neograph 命名空间下的符号",
+        "expectedOutput": "返回 neograph 命名空间相关符号，如 json、ChatTool 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 fmt 命名空间",
+        "input": "搜索 fmt 命名空间下的符号",
+        "expectedOutput": "返回 fmt 命名空间相关符号，如 format、runtime 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 std 命名空间",
+        "input": "搜索 std 命名空间下的符号",
+        "expectedOutput": "返回 std 命名空间相关符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 co_await 使用",
+        "input": "搜索代码库中所有使用 co_await 的协程函数",
+        "expectedOutput": "返回使用 co_await 的函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 co_return 使用",
+        "input": "搜索代码库中所有使用 co_return 的协程函数",
+        "expectedOutput": "返回使用 co_return 的函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 throw 异常",
+        "input": "搜索代码库中抛出异常的位置",
+        "expectedOutput": "返回包含 throw 语句的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 try catch 块",
+        "input": "搜索代码库中 try-catch 异常处理块",
+        "expectedOutput": "返回包含 try-catch 块的函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 noexcept 声明",
+        "input": "搜索代码库中 noexcept 修饰的函数",
+        "expectedOutput": "返回 noexcept 函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 const 成员函数",
+        "input": "搜索代码库中所有 const 成员函数",
+        "expectedOutput": "返回 const 成员函数符号列表，signature 中包含 const 修饰符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 auto 返回类型",
+        "input": "搜索代码库中返回类型为 auto 的函数",
+        "expectedOutput": "返回 auto 返回类型的函数符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 decltype 使用",
+        "input": "搜索代码库中使用 decltype 的位置",
+        "expectedOutput": "返回使用 decltype 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 sizeof 使用",
+        "input": "搜索代码库中使用 sizeof 运算符的位置",
+        "expectedOutput": "返回使用 sizeof 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 static_cast",
+        "input": "搜索代码库中使用 static_cast 的位置",
+        "expectedOutput": "返回使用 static_cast 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 dynamic_cast",
+        "input": "搜索代码库中使用 dynamic_cast 的位置",
+        "expectedOutput": "返回使用 dynamic_cast 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 reinterpret_cast",
+        "input": "搜索代码库中使用 reinterpret_cast 的位置",
+        "expectedOutput": "返回使用 reinterpret_cast 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 std::move 使用",
+        "input": "搜索代码库中使用 std::move 的位置",
+        "expectedOutput": "返回使用 std::move 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 std::forward 使用",
+        "input": "搜索代码库中使用 std::forward 的位置",
+        "expectedOutput": "返回使用 std::forward 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 make_shared",
+        "input": "搜索代码库中使用 std::make_shared 的位置",
+        "expectedOutput": "返回使用 make_shared 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 make_unique",
+        "input": "搜索代码库中使用 std::make_unique 的位置",
+        "expectedOutput": "返回使用 make_unique 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 pragma once",
+        "input": "搜索代码库中所有使用 #pragma once 的头文件",
+        "expectedOutput": "返回包含 #pragma once 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 include 指令",
+        "input": "搜索代码库中所有 #include 指令",
+        "expectedOutput": "返回包含 #include 指令的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索静态变量",
+        "input": "搜索代码库中所有 static 变量定义",
+        "expectedOutput": "返回 static 变量符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索常量定义",
+        "input": "搜索代码库中所有 const 常量定义",
+        "expectedOutput": "返回 const 常量符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 extern 声明",
+        "input": "搜索代码库中所有 extern 声明",
+        "expectedOutput": "返回 extern 声明符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 struct 定义",
+        "input": "搜索代码库中所有 struct 结构体定义",
+        "expectedOutput": "返回 kind 为 struct 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 union 定义",
+        "input": "搜索代码库中所有 union 联合体定义",
+        "expectedOutput": "返回 kind 为 union 的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 typedef struct",
+        "input": "搜索代码库中 typedef struct 定义",
+        "expectedOutput": "返回 typedef struct 相关符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索模板函数",
+        "input": "搜索代码库中所有模板函数定义",
+        "expectedOutput": "返回模板函数符号列表，signature 中包含 template 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索变参模板",
+        "input": "搜索代码库中所有可变参数模板",
+        "expectedOutput": "返回可变参数模板相关符号，signature 中包含 ...",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索概念约束",
+        "input": "搜索代码库中使用 C++20 concept 概念约束的符号",
+        "expectedOutput": "返回 concept 相关符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索 requires 子句",
+        "input": "搜索代码库中使用 C++20 requires 子句的符号",
+        "expectedOutput": "返回 requires 子句相关符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索初始化列表",
+        "input": "搜索代码库中使用初始化列表构造的符号",
+        "expectedOutput": "返回初始化列表相关符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索命名空间别名",
+        "input": "搜索代码库中 namespace 别名定义",
+        "expectedOutput": "返回命名空间别名相关符号，如 namespace asio = boost::asio",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索成员变量",
+        "input": "搜索代码库中所有 protected 成员变量",
+        "expectedOutput": "返回 protected 成员变量符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索私有成员",
+        "input": "搜索代码库中所有 private 成员",
+        "expectedOutput": "返回 private 成员符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索公有成员",
+        "input": "搜索代码库中所有 public 成员",
+        "expectedOutput": "返回 public 成员符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索纯虚函数",
+        "input": "搜索代码库中所有纯虚函数（= 0）",
+        "expectedOutput": "返回纯虚函数符号列表，signature 中包含 = 0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索析构函数virtual",
+        "input": "搜索代码库中所有 virtual 析构函数",
+        "expectedOutput": "返回 virtual 析构函数符号列表，signature 中包含 virtual ~",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_search - 搜索函数返回类型为void",
+        "input": "搜索代码库中所有返回类型为 void 的函数",
+        "expectedOutput": "返回 void 函数符号列表，signature 中包含 void 返回类型",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

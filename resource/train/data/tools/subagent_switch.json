@@ -1,0 +1,702 @@
+[
+    {
+        "name": "subagent_switch - 切换到子代理执行任务",
+        "input": "请使用 tool_skill_search 子代理来帮我查找可以处理文件操作的工具或技能",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 tool_skill_search，message 包含用户需求描述，返回子代理的执行结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码探索子代理",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下的所有头文件结构",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含代码分析请求，返回子代理对目录结构的分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码生成子代理",
+        "input": "请使用 code_generator 子代理来帮我生成一个 C++ 单例模式的模板类",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_generator，message 包含代码生成需求，返回子代理生成的 C++ 单例模式代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码审查子代理",
+        "input": "请使用 code_reviewer 子代理来帮我审查 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的代码质量",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_reviewer，message 包含代码审查请求，返回子代理的代码审查意见",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到文件编辑子代理",
+        "input": "请使用 file_editor 子代理来帮我在 {agentxx_root}/temp/ 目录下创建一个新的配置文件 config.json",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 file_editor，message 包含文件创建任务，返回子代理执行结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到测试运行子代理",
+        "input": "请使用 test_runner 子代理来帮我运行 {agentxx_root}/agent/lib 目录下的所有单元测试",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 test_runner，message 包含测试运行请求，返回子代理的测试运行结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到文档生成子代理",
+        "input": "请使用 doc_generator 子代理来帮我为 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 生成 API 文档",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 doc_generator，message 包含文档生成请求，返回子代理生成的 API 文档",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到依赖分析子代理",
+        "input": "请使用 dependency_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib 目录下所有源文件的依赖关系",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 dependency_analyzer，message 包含依赖分析请求，返回子代理的依赖分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到性能分析子代理",
+        "input": "请使用 perf_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中 FilesystemGrepTool 的搜索性能",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 perf_analyzer，message 包含性能分析请求，返回子代理的性能分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到安全审计子代理",
+        "input": "请使用 security_auditor 子代理来帮我审计 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h 中 WebFetchUrlTool 的网络安全实现",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 security_auditor，message 包含安全审计请求，返回子代理的安全审计报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码重构子代理",
+        "input": "请使用 code_refactor 子代理来帮我重构 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 中的字符串处理函数",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_refactor，message 包含重构请求，返回子代理的重构建议和代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到数据库查询子代理",
+        "input": "请使用 db_query 子代理来帮我查询项目中的代码统计信息，如总行数、函数数量等",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 db_query，message 包含代码统计查询请求，返回子代理的统计结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用自定义系统提示词",
+        "input": "请使用 code_explorer 子代理，并设置 system_prompt 为 '你是一个专业的 C++ 代码分析专家，请详细分析代码结构、设计模式和潜在的改进点'，来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，system_prompt 为自定义提示词，message 包含分析请求，返回子代理的分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到国际化翻译子代理",
+        "input": "请使用 i18n_translator 子代理来帮我将 {agentxx_root}/agent/lib/include/agentxx/tools 目录下的代码注释翻译成中文",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 i18n_translator，message 包含翻译请求，返回子代理的翻译结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到配置管理子代理",
+        "input": "请使用 config_manager 子代理来帮我检查 {agentxx_root}/resource/train/data 目录下的所有 JSON 配置文件格式是否正确",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 config_manager，message 包含配置检查请求，返回子代理的检查结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到日志分析子代理",
+        "input": "请使用 log_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib 目录下的所有日志输出语句，统计日志级别分布",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 log_analyzer，message 包含日志分析请求，返回子代理的日志分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到版本控制子代理",
+        "input": "请使用 version_control 子代理来帮我查看 {agentxx_root} 项目中最近修改的文件列表",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 version_control，message 包含版本控制请求，返回子代理的文件变更列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到构建系统子代理",
+        "input": "请使用 build_system 子代理来帮我分析 {agentxx_root} 项目的 CMake 构建配置，给出优化建议",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 build_system，message 包含构建分析请求，返回子代理的构建优化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到API设计子代理",
+        "input": "请使用 api_designer 子代理来帮我审查 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中 XXToolBase 类的 API 设计",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 api_designer，message 包含 API 审查请求，返回子代理的 API 设计建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到错误处理子代理",
+        "input": "请使用 error_handler 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具的错误处理是否完善",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 error_handler，message 包含错误处理检查请求，返回子代理的检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到内存分析子代理",
+        "input": "请使用 memory_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中 FilesystemGrepTool 的内存使用情况",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 memory_analyzer，message 包含内存分析请求，返回子代理的内存分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到并发分析子代理",
+        "input": "请使用 concurrency_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录中所有协程实现的并发安全性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 concurrency_analyzer，message 包含并发分析请求，返回子代理的并发安全分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码风格检查子代理",
+        "input": "请使用 style_checker 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有头文件的代码风格一致性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 style_checker，message 包含风格检查请求，返回子代理的风格检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到模板生成子代理",
+        "input": "请使用 template_generator 子代理来帮我基于 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 生成一个新的工具类模板",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 template_generator，message 包含模板生成请求，返回子代理生成的工具类模板代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到技术债务评估子代理",
+        "input": "请使用 tech_debt 子代理来帮我评估 {agentxx_root}/agent/lib 目录下代码的技术债务程度",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 tech_debt，message 包含技术债务评估请求，返回子代理的技术债务评估报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码搜索子代理",
+        "input": "请使用 code_searcher 子代理来帮我在 {agentxx_root} 项目中搜索所有使用 co_await 的代码位置",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_searcher，message 包含代码搜索请求，返回子代理的搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码导航子代理",
+        "input": "请使用 code_navigator 子代理来帮我找到 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中 XXToolBase 类的所有子类",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_navigator，message 包含代码导航请求，返回子代理找到的所有子类列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到编译检查子代理",
+        "input": "请使用 compile_checker 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 是否存在编译错误",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 compile_checker，message 包含编译检查请求，返回子代理的编译检查结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到头文件依赖分析子代理",
+        "input": "请使用 header_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有头文件的 include 依赖关系",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 header_analyzer，message 包含头文件依赖分析请求，返回子代理的依赖关系图",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码复杂度分析子代理",
+        "input": "请使用 complexity_analyzer 子代理来帮我计算 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有函数的圈复杂度",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 complexity_analyzer，message 包含复杂度分析请求，返回子代理的圈复杂度分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到接口兼容性检查子代理",
+        "input": "请使用 compatibility_checker 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中 XXToolBase 的接口是否向后兼容",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 compatibility_checker，message 包含兼容性检查请求，返回子代理的兼容性检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到异常安全分析子代理",
+        "input": "请使用 exception_safety 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/execute_command.h 中 ExecuteCommandTool 的异常安全性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 exception_safety，message 包含异常安全分析请求，返回子代理的异常安全分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到RAII检查子代理",
+        "input": "请使用 raii_checker 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具类的资源管理是否正确使用 RAII 模式",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 raii_checker，message 包含 RAII 检查请求，返回子代理的 RAII 检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到智能指针使用分析子代理",
+        "input": "请使用 smart_ptr_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下 shared_ptr 和 weak_ptr 的使用是否合理",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 smart_ptr_analyzer，message 包含智能指针分析请求，返回子代理的分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到协程使用分析子代理",
+        "input": "请使用 coroutine_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有协程的使用模式和最佳实践",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 coroutine_analyzer，message 包含协程分析请求，返回子代理的协程使用分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到JSON序列化检查子代理",
+        "input": "请使用 json_checker 子代理来帮我检查 {agentxx_root}/resource/train/data 目录下所有 JSON 文件的序列化是否正确",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 json_checker，message 包含 JSON 检查请求，返回子代理的 JSON 格式检查结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到命名规范检查子代理",
+        "input": "请使用 naming_checker 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有类和函数的命名是否符合 C++ 命名规范",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 naming_checker，message 包含命名规范检查请求，返回子代理的命名规范检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到注释质量检查子代理",
+        "input": "请使用 comment_checker 子代理来帮我评估 {agentxx_root}/agent/lib/include/agentxx/tools 目录下代码注释的完整性和质量",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 comment_checker，message 包含注释质量检查请求，返回子代理的注释质量评估报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码度量子代理",
+        "input": "请使用 code_metrics 子代理来帮我统计 {agentxx_root}/agent/lib 目录下的代码度量指标，包括总行数、类数量、函数数量、平均函数长度等",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_metrics，message 包含代码度量请求，返回子代理的代码度量统计结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到死代码检测子代理",
+        "input": "请使用 dead_code_detector 子代理来帮我检测 {agentxx_root}/agent/lib 目录下是否存在未使用的函数和类",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 dead_code_detector，message 包含死代码检测请求，返回子代理的死代码检测结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码重复检测子代理",
+        "input": "请使用 duplicate_detector 子代理来帮我检测 {agentxx_root}/agent/lib/include/agentxx/tools 目录下是否存在重复代码",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 duplicate_detector，message 包含重复代码检测请求，返回子代理的重复代码检测结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到单元测试生成子代理",
+        "input": "请使用 test_generator 子代理来帮我为 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 中的 StringTool 生成单元测试代码",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 test_generator，message 包含测试生成请求，返回子代理生成的单元测试代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到集成测试设计子代理",
+        "input": "请使用 integration_tester 子代理来帮我设计 {agentxx_root}/agent/lib/include/agentxx/tools 目录下文件系统工具和字符串工具的集成测试方案",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 integration_tester，message 包含集成测试设计请求，返回子代理的集成测试方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到基准测试子代理",
+        "input": "请使用 benchmark 子代理来帮我为 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中的 FilesystemGrepTool 设计基准测试",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 benchmark，message 包含基准测试设计请求，返回子代理的基准测试方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码覆盖率分析子代理",
+        "input": "请使用 coverage_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib 目录下测试用例的代码覆盖率情况",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 coverage_analyzer，message 包含覆盖率分析请求，返回子代理的覆盖率分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到调试辅助子代理",
+        "input": "请使用 debug_helper 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/execute_command.h 中 ExecuteCommandTool 可能存在的运行时错误",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 debug_helper，message 包含调试辅助请求，返回子代理的潜在错误分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到堆栈跟踪分析子代理",
+        "input": "请使用 stack_tracer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中协程调用的调用链",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 stack_tracer，message 包含调用链分析请求，返回子代理的调用链分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到符号解析子代理",
+        "input": "请使用 symbol_resolver 子代理来帮我解析 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中 XXToolBase 类的所有符号引用",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 symbol_resolver，message 包含符号解析请求，返回子代理的符号引用列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到跨平台兼容性检查子代理",
+        "input": "请使用 cross_platform 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具在 Windows 和 Linux 上的兼容性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 cross_platform，message 包含跨平台兼容性检查请求，返回子代理的兼容性检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到C++标准合规检查子代理",
+        "input": "请使用 standard_compliance 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下代码是否符合 C++20 标准",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 standard_compliance，message 包含 C++ 标准合规检查请求，返回子代理的合规检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到模板元编程分析子代理",
+        "input": "请使用 tmp_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中的模板使用情况",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 tmp_analyzer，message 包含模板分析请求，返回子代理的模板使用分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到Lambda表达式分析子代理",
+        "input": "请使用 lambda_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有 lambda 表达式的使用情况",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 lambda_analyzer，message 包含 lambda 分析请求，返回子代理的 lambda 使用分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到const正确性检查子代理",
+        "input": "请使用 const_correctness 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有成员函数的 const 正确性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 const_correctness，message 包含 const 正确性检查请求，返回子代理的 const 正确性检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到noexcept规范检查子代理",
+        "input": "请使用 noexcept_checker 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有函数是否合理使用了 noexcept 规范",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 noexcept_checker，message 包含 noexcept 检查请求，返回子代理的 noexcept 规范检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到资源文件分析子代理",
+        "input": "请使用 resource_analyzer 子代理来帮我分析 {agentxx_root}/resource/train/data 目录下所有训练数据文件的统计信息和分布情况",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 resource_analyzer，message 包含资源分析请求，返回子代理的资源文件统计信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到项目结构优化子代理",
+        "input": "请使用 project_optimizer 子代理来帮我分析 {agentxx_root} 项目的目录结构，给出优化建议",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 project_optimizer，message 包含项目结构优化请求，返回子代理的优化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到CMake配置优化子代理",
+        "input": "请使用 cmake_optimizer 子代理来帮我优化 {agentxx_root} 项目的 CMakeLists.txt 配置，减少编译时间",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 cmake_optimizer，message 包含 CMake 优化请求，返回子代理的 CMake 优化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到第三方库审计子代理",
+        "input": "请使用 third_party_auditor 子代理来帮我审计 {agentxx_root} 项目中使用的第三方库（如 nlohmann/json、fmtlib/fmt）的版本和安全性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 third_party_auditor，message 包含第三方库审计请求，返回子代理的审计报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到许可合规检查子代理",
+        "input": "请使用 license_checker 子代理来帮我检查 {agentxx_root} 项目中所有源文件的许可证声明是否完整",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 license_checker，message 包含许可证检查请求，返回子代理的许可证检查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码迁移子代理",
+        "input": "请使用 code_migrator 子代理来帮我将 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 中符合 C++17 的代码迁移到 C++20 标准",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_migrator，message 包含代码迁移请求，返回子代理的迁移后代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到SDK生成子代理",
+        "input": "请使用 sdk_generator 子代理来帮我基于 {agentxx_root}/agent/lib/include/agentxx/tools 目录下的工具类生成一个 Python 绑定 SDK",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 sdk_generator，message 包含 SDK 生成请求，返回子代理生成的 Python 绑定代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到CI/CD配置子代理",
+        "input": "请使用 cicd_configurator 子代理来帮我为 {agentxx_root} 项目设计 GitHub Actions CI/CD 流水线配置",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 cicd_configurator，message 包含 CI/CD 配置请求，返回子代理的 GitHub Actions 配置文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到Docker化子代理",
+        "input": "请使用 dockerizer 子代理来帮我为 {agentxx_root} 项目创建 Dockerfile 和 docker-compose.yml 配置",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 dockerizer，message 包含 Docker 化请求，返回子代理的 Docker 配置文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到发布说明生成子代理",
+        "input": "请使用 release_notes 子代理来帮我根据 {agentxx_root}/agent/lib 目录下的代码变更生成发布说明",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 release_notes，message 包含发布说明生成请求，返回子代理生成的发布说明",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到变更日志生成子代理",
+        "input": "请使用 changelog_generator 子代理来帮我为 {agentxx_root} 项目生成 CHANGELOG.md 文件",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 changelog_generator，message 包含变更日志生成请求，返回子代理生成的 CHANGELOG 内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到代码搜索工具子代理",
+        "input": "请使用 tool_skill_search 子代理来帮我查找可以用于代码搜索和文本搜索的工具",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 tool_skill_search，message 包含工具搜索请求，返回子代理搜索到的工具列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到文件操作工具子代理",
+        "input": "请使用 tool_skill_search 子代理来帮我查找可以用于文件读写和编辑的工具",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 tool_skill_search，message 包含文件工具搜索请求，返回子代理搜索到的文件操作工具列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 切换到网络工具搜索子代理",
+        "input": "请使用 tool_skill_search 子代理来帮我查找可以用于网络请求和网页抓取的工具",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 tool_skill_search，message 包含网络工具搜索请求，返回子代理搜索到的网络工具列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理执行复杂文件分析任务",
+        "input": "请使用 code_explorer 子代理来帮我全面分析 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中 FilesystemEditTextFileTool 的实现，包括参数解析、文件操作和错误处理",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含详细的文件分析任务描述，返回子代理的全面分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理执行多文件代码生成任务",
+        "input": "请使用 code_generator 子代理来帮我在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下生成一个新的工具类头文件 new_tool.h，遵循现有工具类的模式",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_generator，message 包含新工具类生成需求，返回子代理生成的完整头文件代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理执行批量代码审查",
+        "input": "请使用 code_reviewer 子代理来帮我审查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有头文件的代码质量，按优先级排序问题",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_reviewer，message 包含批量审查请求，返回子代理按优先级排序的审查结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理执行批量文件编辑",
+        "input": "请使用 file_editor 子代理来帮我在 {agentxx_root}/temp/ 目录下创建三个测试文件 test1.txt、test2.txt、test3.txt，分别包含不同类型的内容",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 file_editor，message 包含批量文件创建任务，返回子代理的执行结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 指定不存在的子代理名称",
+        "input": "请使用 non_existent_agent 子代理来帮我执行任务",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 non_existent_agent，应返回错误信息提示 subagent 不在可用列表中",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 不指定子代理名称",
+        "input": "请使用 subagent_switch 工具但不要指定 subagent 参数",
+        "expectedOutput": "调用 subagent_switch 工具，subagent 参数为空，应返回错误信息 'Arg `subagent` is empty'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 不指定消息内容",
+        "input": "请使用 code_explorer 子代理但不要指定 message 参数",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 参数为空，应返回错误信息 'Arg `message` is empty'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 同时不指定子代理和消息",
+        "input": "请调用 subagent_switch 工具但不提供任何参数",
+        "expectedOutput": "调用 subagent_switch 工具，不提供 subagent 和 message 参数，应返回错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析训练数据质量",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/resource/train/data 目录下所有训练用例 JSON 文件的质量和覆盖度",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含训练数据质量分析请求，返回子代理的质量分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理生成训练数据",
+        "input": "请使用 code_generator 子代理来帮我为 {agentxx_root}/agent/lib/include/agentxx/tools/get_current_datetime.h 中的 GetCurrentDateTimeTool 生成额外的训练用例",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_generator，message 包含训练数据生成请求，返回子代理生成的训练用例",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理比较两个工具实现",
+        "input": "请使用 code_reviewer 子代理来帮我比较 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中 FilesystemGrepTool 和 FilesystemGlobTool 的实现差异",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_reviewer，message 包含工具比较请求，返回子代理的比较分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理查找工具注册逻辑",
+        "input": "请使用 code_explorer 子代理来帮我在 {agentxx_root} 项目中查找所有工具类是如何注册到 Agent 中的",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含工具注册逻辑查找请求，返回子代理的查找结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析协程调度机制",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/agent/lib 目录下 asio::awaitable 和 co_await 的协程调度机制实现",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含协程分析请求，返回子代理的协程调度机制分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析JSON序列化实现",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中 neograph::json 的使用方式和序列化机制",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含 JSON 序列化分析请求，返回子代理的分析结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析错误处理模式",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具的 execute_async 方法中的错误处理模式",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含错误处理分析请求，返回子代理的错误处理模式分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理生成代码摘要",
+        "input": "请使用 code_explorer 子代理来帮我为 {agentxx_root}/agent/lib/include/agentxx/tools 目录下的每个工具类生成一句话功能摘要",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含代码摘要生成请求，返回子代理生成的工具类功能摘要列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理设计新工具接口",
+        "input": "请使用 api_designer 子代理来帮我设计一个新的工具类接口，用于处理网络请求的限流和重试逻辑",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 api_designer，message 包含新工具接口设计请求，返回子代理的接口设计方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析项目依赖图",
+        "input": "请使用 dependency_analyzer 子代理来帮我生成 {agentxx_root}/agent/lib 目录下所有源文件的完整依赖关系图",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 dependency_analyzer，message 包含依赖图生成请求，返回子代理的依赖关系图",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理优化头文件包含",
+        "input": "请使用 header_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有头文件的 include 是否有多余或缺失",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 header_analyzer，message 包含头文件优化请求，返回子代理的 include 优化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理检查线程安全",
+        "input": "请使用 concurrency_analyzer 子代理来帮我检查 {agentxx_root}/agent/lib/include/agentxx/tools/share_store.h 中 ShareStoreTool 的线程安全性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 concurrency_analyzer，message 包含线程安全分析请求，返回子代理的线程安全分析报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析内存泄漏风险",
+        "input": "请使用 memory_analyzer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有使用 shared_ptr 的工具类是否存在循环引用导致的内存泄漏风险",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 memory_analyzer，message 包含内存泄漏分析请求，返回子代理的内存泄漏风险分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理寻找代码模式",
+        "input": "请使用 code_explorer 子代理来帮我在 {agentxx_root}/agent/lib 目录下查找所有使用工厂模式或单例模式的代码",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含设计模式查找请求，返回子代理查找到的设计模式使用位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理进行代码规范化",
+        "input": "请使用 style_checker 子代理来帮我检查并修正 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有头文件的缩进和空格使用",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 style_checker，message 包含代码规范化请求，返回子代理的规范化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析函数调用频率",
+        "input": "请使用 code_metrics 子代理来帮我统计 {agentxx_root}/agent/lib/include/agentxx/tools 目录下哪些函数被调用最频繁",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_metrics，message 包含函数调用频率分析请求，返回子代理的调用频率统计",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理生成API使用示例",
+        "input": "请使用 code_generator 子代理来帮我为 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中所有文件系统工具生成使用示例代码",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_generator，message 包含 API 使用示例生成请求，返回子代理生成的示例代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析工具输入参数验证",
+        "input": "请使用 code_reviewer 子代理来帮我审查 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具的 execute_async 方法中的参数验证逻辑",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_reviewer，message 包含参数验证审查请求，返回子代理的参数验证审查报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析工具返回值格式",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具返回的 JSON 格式是否一致",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含返回值格式分析请求，返回子代理的返回值格式一致性分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理生成工具对照表",
+        "input": "请使用 doc_generator 子代理来帮我生成 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具的功能对照表",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 doc_generator，message 包含工具对照表生成请求，返回子代理生成的工具功能对照表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理分析工具间的协作关系",
+        "input": "请使用 code_explorer 子代理来帮我分析 {agentxx_root}/agent/lib/include/agentxx/tools 目录下各工具之间是否存在相互调用或协作关系",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_explorer，message 包含工具协作关系分析请求，返回子代理的协作关系分析",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理评估工具扩展性",
+        "input": "请使用 code_reviewer 子代理来帮我评估 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 中 XXToolBase 基类设计的可扩展性",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 code_reviewer，message 包含可扩展性评估请求，返回子代理的可扩展性评估报告",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理修复代码问题",
+        "input": "请使用 file_editor 子代理来帮我修复 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有工具中可能存在的潜在问题",
+        "expectedOutput": "调用 subagent_switch 工具，指定 subagent 为 file_editor，message 包含代码修复请求，返回子代理的修复结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "subagent_switch - 使用子代理执行端到端任务",
+        "input": "请使用 code_explorer 子代理来帮我从 {agentxx_root}/agent/lib/include/agentxx/tools 目录中找出所有工具类，然后使用 code_reviewer 子代理依次审查每个工具的实现质量",
+        "expectedOutput": "调用 subagent_switch 工具，先指定 subagent 为 code_explorer 获取工具列表，再指定 subagent 为 code_reviewer 进行审查，返回子代理的综合审查结果",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

@@ -1,0 +1,702 @@
+[
+    {
+        "name": "filesystem_write_file - 写入文本文件",
+        "input": "请在 {agentxx_root}/temp/ 目录下创建一个名为 hello_test.txt 的文件，文件内容为 'Hello, AgentXX!'，如果文件已存在则覆盖写入",
+        "expectedOutput": "返回 'success' 表示写入成功，文件应在 {agentxx_root}/temp/hello_test.txt 路径下被创建，内容为 'Hello, AgentXX!'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入JSON配置文件",
+        "input": "在 {agentxx_root}/temp/config.json 写入 JSON 内容 {\"version\": \"1.0\", \"name\": \"test\"}，覆盖写入",
+        "expectedOutput": "返回 success，文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入多行文本",
+        "input": "在 {agentxx_root}/temp/multiline.txt 写入多行文本：第一行\n第二行\n第三行，覆盖模式",
+        "expectedOutput": "返回 success，文件包含三行文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 不覆盖已存在文件",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 写入新内容，不覆盖已存在文件",
+        "expectedOutput": "返回错误信息，文件已存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入空文件",
+        "input": "在 {agentxx_root}/temp/empty.txt 创建一个空文件，overwrite 为 true",
+        "expectedOutput": "返回 success，创建空文件成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入二进制文件",
+        "input": "在 {agentxx_root}/temp/binary.bin 写入 base64 编码的二进制数据，is_binary=true",
+        "expectedOutput": "返回 success，二进制文件写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入C++代码文件",
+        "input": "在 {agentxx_root}/temp/test.cpp 写入 C++ 代码：int main() { return 0; }",
+        "expectedOutput": "返回 success，cpp文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入头文件",
+        "input": "在 {agentxx_root}/temp/test.h 写入头文件内容：#pragma once\nvoid test();",
+        "expectedOutput": "返回 success，头文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入Markdown文件",
+        "input": "在 {agentxx_root}/temp/readme.md 写入 Markdown 内容：# Title\n## Subtitle\nContent here.",
+        "expectedOutput": "返回 success，Markdown文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入XML文件",
+        "input": "在 {agentxx_root}/temp/data.xml 写入 XML 内容：<?xml version=\"1.0\"?><root><item>test</item></root>",
+        "expectedOutput": "返回 success，XML文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入Python脚本",
+        "input": "在 {agentxx_root}/temp/script.py 写入 Python 代码：print('Hello World')",
+        "expectedOutput": "返回 success，Python脚本创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入Shell脚本",
+        "input": "在 {agentxx_root}/temp/run.sh 写入 Shell 脚本：#!/bin/bash\necho hello",
+        "expectedOutput": "返回 success，Shell脚本创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入CSS样式",
+        "input": "在 {agentxx_root}/temp/style.css 写入 CSS 内容：body { margin: 0; padding: 0; }",
+        "expectedOutput": "返回 success，CSS文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入长文本",
+        "input": "在 {agentxx_root}/temp/long_text.txt 写入一段超过1000字符的长文本，覆盖模式",
+        "expectedOutput": "返回 success，长文本文件写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含特殊字符文本",
+        "input": "在 {agentxx_root}/temp/special.txt 写入包含特殊字符的文本：!@#$%^&*()_+-=[]{}|;':\",./<>?",
+        "expectedOutput": "返回 success，特殊字符写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含中文文本",
+        "input": "在 {agentxx_root}/temp/chinese.txt 写入中文内容：你好，世界！这是一个测试文件。",
+        "expectedOutput": "返回 success，中文内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含Unicode文本",
+        "input": "在 {agentxx_root}/temp/unicode.txt 写入包含 emoji 的文本：Hello 👋🌍🎉",
+        "expectedOutput": "返回 success，Unicode文本写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入到子目录",
+        "input": "在 {agentxx_root}/temp/subdir1/test.txt 写入内容 'nested file'，自动创建子目录",
+        "expectedOutput": "返回 success，子目录自动创建并写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入到深层子目录",
+        "input": "在 {agentxx_root}/temp/a/b/c/d/e/deep.txt 写入内容 'deep nested'",
+        "expectedOutput": "返回 success，深层目录自动创建",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 覆盖写入验证",
+        "input": "先在 {agentxx_root}/temp/overwrite.txt 写入 v1，再用 overwrite=true 写入 v2",
+        "expectedOutput": "第一次返回 success，第二次返回 success，文件内容变为 v2",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入 .gitignore 文件",
+        "input": "在 {agentxx_root}/temp/.gitignore 写入内容：*.log\n*.tmp\nbuild/",
+        "expectedOutput": "返回 success，gitignore 文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入 .env 文件",
+        "input": "在 {agentxx_root}/temp/.env 写入内容：API_KEY=test123\nDEBUG=true",
+        "expectedOutput": "返回 success，env 文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入日志文件",
+        "input": "在 {agentxx_root}/temp/app.log 写入日志内容：[2024-01-01] INFO: Application started",
+        "expectedOutput": "返回 success，日志文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入CSV文件",
+        "input": "在 {agentxx_root}/temp/data.csv 写入 CSV 内容：name,age,city\nAlice,30,NYC\nBob,25,LA",
+        "expectedOutput": "返回 success，CSV文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入TSV文件",
+        "input": "在 {agentxx_root}/temp/data.tsv 写入 TSV 内容：name\tage\tcity\nAlice\t30\tNYC",
+        "expectedOutput": "返回 success，TSV文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入YAML文件",
+        "input": "在 {agentxx_root}/temp/config.yaml 写入 YAML 内容：server:\n  port: 8080\n  host: localhost",
+        "expectedOutput": "返回 success，YAML文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入TOML文件",
+        "input": "在 {agentxx_root}/temp/config.toml 写入 TOML 内容：[server]\nport = 8080",
+        "expectedOutput": "返回 success，TOML文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入INI文件",
+        "input": "在 {agentxx_root}/temp/settings.ini 写入 INI 内容：[section]\nkey=value",
+        "expectedOutput": "返回 success，INI文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入Makefile",
+        "input": "在 {agentxx_root}/temp/Makefile 写入内容：all:\n\tg++ -o test test.cpp",
+        "expectedOutput": "返回 success，Makefile创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入CMakeLists.txt",
+        "input": "在 {agentxx_root}/temp/CMakeLists.txt 写入 CMake 内容：cmake_minimum_required(VERSION 3.20)\nproject(Test)",
+        "expectedOutput": "返回 success，CMakeLists.txt创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入Dockerfile",
+        "input": "在 {agentxx_root}/temp/Dockerfile 写入内容：FROM ubuntu:22.04\nRUN apt update",
+        "expectedOutput": "返回 success，Dockerfile创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入包含引号的文本",
+        "input": "在 {agentxx_root}/temp/quotes.txt 写入内容：He said \"Hello World\" to everyone.",
+        "expectedOutput": "返回 success，含引号文本写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入包含换行符的文本",
+        "input": "在 {agentxx_root}/temp/newlines.txt 写入内容：line1\\nline2\\n\\nline4",
+        "expectedOutput": "返回 success，换行符正确写入",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入包含Tab的文本",
+        "input": "在 {agentxx_root}/temp/tabs.txt 写入内容：col1\\tcol2\\tcol3",
+        "expectedOutput": "返回 success，Tab字符正确写入",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入数字内容",
+        "input": "在 {agentxx_root}/temp/numbers.txt 写入内容：1234567890",
+        "expectedOutput": "返回 success，数字内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入JSON数组",
+        "input": "在 {agentxx_root}/temp/list.json 写入 JSON 数组：[1, 2, 3, 4, 5]",
+        "expectedOutput": "返回 success，JSON数组写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入非ASCII路径的文件",
+        "input": "在 {agentxx_root}/temp/测试文件.txt 写入中文内容：这是一个测试",
+        "expectedOutput": "返回 success，中文路径文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 覆盖写入后验证大小",
+        "input": "在 {agentxx_root}/temp/size_test.txt 写入短内容 'a'，覆盖写入更长内容 'abcdefghij'，然后检查文件大小",
+        "expectedOutput": "文件大小应为10字节",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入并立即读取",
+        "input": "在 {agentxx_root}/temp/write_read.txt 写入 'test content'，然后立即读取该文件",
+        "expectedOutput": "读取的内容应为 'test content'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入非常大的文本",
+        "input": "在 {agentxx_root}/temp/large.txt 写入一段10000字符的重复文本，覆盖模式",
+        "expectedOutput": "返回 success，大文件写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含HTML标签的文本",
+        "input": "在 {agentxx_root}/temp/html.txt 写入内容：<html><body><h1>Test</h1></body></html>",
+        "expectedOutput": "返回 success，HTML内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入正则表达式模式",
+        "input": "在 {agentxx_root}/temp/regex.txt 写入内容：^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "expectedOutput": "返回 success，正则表达式写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入SQL语句",
+        "input": "在 {agentxx_root}/temp/query.sql 写入 SQL 内容：SELECT * FROM users WHERE age > 18 ORDER BY name;",
+        "expectedOutput": "返回 success，SQL文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入HTML模板",
+        "input": "在 {agentxx_root}/temp/template.html 写入 HTML 模板：<!DOCTYPE html><html lang=\"en\"><head><title>{{title}}</title></head><body>{{content}}</body></html>",
+        "expectedOutput": "返回 success，HTML模板创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入JSON嵌套对象",
+        "input": "在 {agentxx_root}/temp/nested.json 写入嵌套 JSON：{\"a\":{\"b\":{\"c\":{\"d\":\"deep\"}}}}",
+        "expectedOutput": "返回 success，嵌套JSON写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 结合工具链创建项目结构",
+        "input": "在 {agentxx_root}/temp/project/ 下创建 src/main.cpp、include/main.h、CMakeLists.txt 三个文件",
+        "expectedOutput": "三个文件全部创建成功，返回 success",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入配置文件后修改",
+        "input": "在 {agentxx_root}/temp/settings.json 写入 {\"debug\": false}，然后修改为 {\"debug\": true}",
+        "expectedOutput": "两次写入都返回 success，最终文件内容为 {\"debug\": true}",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入版本号文件",
+        "input": "在 {agentxx_root}/temp/VERSION 写入内容：1.2.3",
+        "expectedOutput": "返回 success，版本文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入LICENSE文件",
+        "input": "在 {agentxx_root}/temp/LICENSE 写入 MIT 许可证内容",
+        "expectedOutput": "返回 success，LICENSE文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入CHANGELOG文件",
+        "input": "在 {agentxx_root}/temp/CHANGELOG.md 写入内容：## [1.0.0] - 2024-01-01\n- Initial release",
+        "expectedOutput": "返回 success，CHANGELOG创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入CONTRIBUTING文件",
+        "input": "在 {agentxx_root}/temp/CONTRIBUTING.md 写入贡献指南内容",
+        "expectedOutput": "返回 success，CONTRIBUTING创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入编辑器配置文件",
+        "input": "在 {agentxx_root}/temp/.editorconfig 写入内容：root = true\n[*]\nindent_style = space\nindent_size = 4",
+        "expectedOutput": "返回 success，编辑器配置创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入clang-format配置",
+        "input": "在 {agentxx_root}/temp/.clang-format 写入 clang-format 配置",
+        "expectedOutput": "返回 success，clang-format配置创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入gitattributes文件",
+        "input": "在 {agentxx_root}/temp/.gitattributes 写入内容：* text=auto",
+        "expectedOutput": "返回 success，gitattributes创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 覆盖写入空内容",
+        "input": "先在 {agentxx_root}/temp/clear.txt 写入内容，再覆盖写入空字符串",
+        "expectedOutput": "第二次返回 success，文件变为空文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含百分号文本",
+        "input": "在 {agentxx_root}/temp/percent.txt 写入内容：100% complete, 50% remaining",
+        "expectedOutput": "返回 success，百分号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含反斜杠文本",
+        "input": "在 {agentxx_root}/temp/backslash.txt 写入内容：C:\\Users\\test\\path",
+        "expectedOutput": "返回 success，反斜杠内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含美元符号文本",
+        "input": "在 {agentxx_root}/temp/dollar.txt 写入内容：Price: $100.00",
+        "expectedOutput": "返回 success，美元符号写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含井号文本",
+        "input": "在 {agentxx_root}/temp/hash.txt 写入内容：#include <iostream>\n#define MAX 100",
+        "expectedOutput": "返回 success，井号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含星号文本",
+        "input": "在 {agentxx_root}/temp/star.txt 写入内容：/** @param x value */",
+        "expectedOutput": "返回 success，星号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含at符号文本",
+        "input": "在 {agentxx_root}/temp/email.txt 写入内容：contact@example.com",
+        "expectedOutput": "返回 success，at符号写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含波浪号文本",
+        "input": "在 {agentxx_root}/temp/tilde.txt 写入内容：cd ~/projects",
+        "expectedOutput": "返回 success，波浪号写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含管道符文本",
+        "input": "在 {agentxx_root}/temp/pipe.txt 写入内容：ls | grep *.cpp",
+        "expectedOutput": "返回 success，管道符写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含重定向符文本",
+        "input": "在 {agentxx_root}/temp/redirect.txt 写入内容：echo hello > output.txt",
+        "expectedOutput": "返回 success，重定向符写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含分号文本",
+        "input": "在 {agentxx_root}/temp/semicolon.txt 写入内容：int x = 5; x++; return x;",
+        "expectedOutput": "返回 success，分号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 批量创建测试文件",
+        "input": "在 {agentxx_root}/temp/tests/ 目录下创建 test1.cpp, test2.cpp, test3.cpp 三个文件",
+        "expectedOutput": "三个文件全部创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入并验证文件存在",
+        "input": "在 {agentxx_root}/temp/exists.txt 写入内容，然后用 filesystem_list_file 检查文件是否存在",
+        "expectedOutput": "文件创建成功，list结果显示该文件存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含NULL字符的文本",
+        "input": "在 {agentxx_root}/temp/nullchar.txt 写入包含 \\0 字符的文本",
+        "expectedOutput": "返回 success，NULL字符写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含控制字符的文本",
+        "input": "在 {agentxx_root}/temp/control.txt 写入包含 \\r\\n 换行符的文本",
+        "expectedOutput": "返回 success，控制字符正确写入",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 覆盖写入二进制文件为文本",
+        "input": "先在 {agentxx_root}/temp/bin2txt.bin 写入二进制，再用文本模式覆盖写入",
+        "expectedOutput": "返回 success，文本内容覆盖写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入相对路径文件",
+        "input": "使用相对路径 temp/relative.txt 写入文件内容",
+        "expectedOutput": "返回 success 或错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入只含空格的文件",
+        "input": "在 {agentxx_root}/temp/spaces.txt 写入内容：'    ' (四个空格)",
+        "expectedOutput": "返回 success，空格文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入只含换行的文件",
+        "input": "在 {agentxx_root}/temp/only_newlines.txt 写入内容：'\\n\\n\\n'",
+        "expectedOutput": "返回 success，纯换行文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含emoji的文件",
+        "input": "在 {agentxx_root}/temp/emoji.txt 写入内容：🎉🎊🎈✨",
+        "expectedOutput": "返回 success，emoji文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含数学符号的文件",
+        "input": "在 {agentxx_root}/temp/math.txt 写入内容：∑∞∫√πΔ",
+        "expectedOutput": "返回 success，数学符号写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含日文内容",
+        "input": "在 {agentxx_root}/temp/japanese.txt 写入内容：こんにちは世界",
+        "expectedOutput": "返回 success，日文内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含韩文内容",
+        "input": "在 {agentxx_root}/temp/korean.txt 写入内容：안녕하세요세계",
+        "expectedOutput": "返回 success，韩文内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含阿拉伯文内容",
+        "input": "在 {agentxx_root}/temp/arabic.txt 写入内容：مرحبا بالعالم",
+        "expectedOutput": "返回 success，阿拉伯文写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含俄文内容",
+        "input": "在 {agentxx_root}/temp/russian.txt 写入内容：Привет мир",
+        "expectedOutput": "返回 success，俄文内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含混合编码内容",
+        "input": "在 {agentxx_root}/temp/mixed.txt 写入混合中英日韩文内容",
+        "expectedOutput": "返回 success，混合编码写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入大数字文件",
+        "input": "在 {agentxx_root}/temp/bignum.txt 写入从1到10000的数字，每行一个",
+        "expectedOutput": "返回 success，数字文件写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入Base64编码内容",
+        "input": "在 {agentxx_root}/temp/base64.txt 写入 base64 编码的文本内容",
+        "expectedOutput": "返回 success，base64内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入hex编码内容",
+        "input": "在 {agentxx_root}/temp/hex.txt 写入十六进制编码的文本",
+        "expectedOutput": "返回 success，hex内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入URL编码内容",
+        "input": "在 {agentxx_root}/temp/urlencoded.txt 写入 URL 编码的文本：hello%20world%21",
+        "expectedOutput": "返回 success，URL编码写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含转义序列的JSON",
+        "input": "在 {agentxx_root}/temp/escaped.json 写入 JSON：{\"msg\": \"Hello\\nWorld\\\"quoted\\\"\"}",
+        "expectedOutput": "返回 success，转义JSON写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含注释的代码",
+        "input": "在 {agentxx_root}/temp/commented.cpp 写入带注释的C++代码",
+        "expectedOutput": "返回 success，注释代码写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含多行注释的代码",
+        "input": "在 {agentxx_root}/temp/multicomment.cpp 写入包含 /* */ 多行注释的代码",
+        "expectedOutput": "返回 success，多行注释代码写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含文档注释的代码",
+        "input": "在 {agentxx_root}/temp/doxygen.cpp 写入包含 /// @param 文档注释的代码",
+        "expectedOutput": "返回 success，文档注释写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 链式写入多个文件",
+        "input": "依次在 {agentxx_root}/temp/chain/ 下创建 a.txt, b.txt, c.txt",
+        "expectedOutput": "三个文件全部创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入并检查文件权限",
+        "input": "在 {agentxx_root}/temp/perm.txt 写入内容，然后检查文件是否可读",
+        "expectedOutput": "文件创建成功且可读",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含大括号的文本",
+        "input": "在 {agentxx_root}/temp/braces.txt 写入内容：function() { return {a: 1, b: 2}; }",
+        "expectedOutput": "返回 success，大括号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含方括号的文本",
+        "input": "在 {agentxx_root}/temp/brackets.txt 写入内容：array[0] = value[1][2]",
+        "expectedOutput": "返回 success，方括号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含尖括号的文本",
+        "input": "在 {agentxx_root}/temp/angles.txt 写入内容：vector<int> data = {1, 2, 3}",
+        "expectedOutput": "返回 success，尖括号内容写入成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含下划线的文件名",
+        "input": "在 {agentxx_root}/temp/my_long_file_name_v2.txt 写入内容",
+        "expectedOutput": "返回 success，长文件名文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含点号的文件名",
+        "input": "在 {agentxx_root}/temp/config.v1.0.0.json 写入内容",
+        "expectedOutput": "返回 success，多点号文件名创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含空格的路径",
+        "input": "在 {agentxx_root}/temp/my folder/test file.txt 写入内容",
+        "expectedOutput": "返回 success，含空格路径文件创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入含连字符的文件名",
+        "input": "在 {agentxx_root}/temp/some-long-file-name.txt 写入内容",
+        "expectedOutput": "返回 success，连字符文件名创建成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 覆盖写入时验证时间戳变化",
+        "input": "在 {agentxx_root}/temp/timestamp.txt 写入内容，等1秒后覆盖写入，检查修改时间是否更新",
+        "expectedOutput": "文件修改时间应更新",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入后列出目录",
+        "input": "在 {agentxx_root}/temp/list_test/ 下创建 a.txt，然后用 filesystem_list_file 列出该目录",
+        "expectedOutput": "列出结果中包含 a.txt",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_write_file - 写入全局搜索替换结果",
+        "input": "在 {agentxx_root}/temp/replace_result.txt 写入经过编辑替换后的文件内容",
+        "expectedOutput": "返回 success，替换结果写入成功",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

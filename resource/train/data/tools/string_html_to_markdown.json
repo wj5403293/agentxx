@@ -1,0 +1,702 @@
+[
+    {
+        "name": "string_html_to_markdown - 转换简单HTML",
+        "input": "请将以下HTML转换为Markdown：<h1>Hello World</h1><p>This is a paragraph.</p>",
+        "expectedOutput": "返回 Markdown 格式文本：# Hello World\n\nThis is a paragraph.",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带链接的HTML",
+        "input": "将HTML <a href=\"https://example.com\">Click here</a> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： [Click here](https://example.com)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带图片的HTML",
+        "input": "将HTML <img src=\"photo.jpg\" alt=\"A photo\"> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： ![A photo](photo.jpg)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带列表的HTML",
+        "input": "将HTML <ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 无序列表： - Item 1\n - Item 2\n - Item 3",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换有序列表HTML",
+        "input": "将HTML <ol><li>First</li><li>Second</li><li>Third</li></ol> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 有序列表： 1. First\n2. Second\n3. Third",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换粗体和斜体HTML",
+        "input": "将HTML <strong>bold</strong> and <em>italic</em> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： **bold** and *italic*",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换表格HTML",
+        "input": "将HTML表格转换为Markdown：<table><tr><th>Name</th><th>Age</th></tr><tr><td>Alice</td><td>30</td></tr></table>",
+        "expectedOutput": "返回 Markdown 表格格式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换代码块HTML",
+        "input": "将HTML <pre><code>int main() { return 0; }</code></pre> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 代码块： ```\nint main() { return 0; }\n```",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换引用块HTML",
+        "input": "将HTML <blockquote>Important note</blockquote> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： > Important note",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换嵌套HTML结构",
+        "input": "将HTML <div><h2>Title</h2><p>Content with <strong>bold</strong> text.</p></div> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： ## Title\n\nContent with **bold** text.",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换水平线HTML",
+        "input": "将HTML <hr> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 水平线： ---",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换删除线HTML",
+        "input": "将HTML <del>deleted text</del> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 删除线： ~~deleted text~~",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换空HTML",
+        "input": "将空字符串转换为Markdown",
+        "expectedOutput": "返回空字符串",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换多级标题HTML",
+        "input": "将HTML <h1>H1</h1><h2>H2</h2><h3>H3</h3><h4>H4</h4><h5>H5</h5><h6>H6</h6> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 多级标题 # 到 ######",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换纯文本HTML",
+        "input": "将HTML <p>Just plain text without any formatting</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： Just plain text without any formatting",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换换行HTML",
+        "input": "将HTML <p>Line 1<br>Line 2</p> 转换为Markdown",
+        "expectedOutput": "Line 1 和 Line 2 之间有换行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换多段落HTML",
+        "input": "将HTML <p>First paragraph.</p><p>Second paragraph.</p><p>Third paragraph.</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 三个段落，段落间有空行分隔",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带id的HTML",
+        "input": "将HTML <h2 id=\"section1\">Section Title</h2> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： ## Section Title",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带class的HTML",
+        "input": "将HTML <p class=\"highlight\">Highlighted text</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 class 属性保留文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换内联代码HTML",
+        "input": "将HTML <code>printf()</code> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： `printf()`",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带有属性的链接",
+        "input": "将HTML <a href=\"https://example.com\" target=\"_blank\" title=\"Link\">Text</a> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： [Text](https://example.com)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带有宽高的图片",
+        "input": "将HTML <img src=\"image.png\" width=\"100\" height=\"200\" alt=\"Image\"> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： ![Image](image.png)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换任务列表HTML",
+        "input": "将HTML <ul><li><input type=\"checkbox\" checked> Done</li><li><input type=\"checkbox\"> Todo</li></ul> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 任务列表： - [x] Done\n - [ ] Todo",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换高亮文本HTML",
+        "input": "将HTML <mark>highlighted</mark> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： ==highlighted== 或保留文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换下标和上标HTML",
+        "input": "将HTML H<sub>2</sub>O and x<sup>2</sup> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理下标和上标",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换定义列表HTML",
+        "input": "将HTML <dl><dt>Term</dt><dd>Definition</dd></dl> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 格式的定义列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带样式的HTML",
+        "input": "将HTML <span style=\"color:red\">Red text</span> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，保留文本内容忽略样式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换script标签中的HTML",
+        "input": "将HTML <p>Hello</p><script>alert('xss')</script><p>World</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 script 标签内容，只保留 Hello 和 World",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带注释的HTML",
+        "input": "将HTML <!-- Comment --><p>Visible text</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 HTML 注释，保留 Visible text",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换HTML实体",
+        "input": "将HTML &amp; &lt; &gt; &quot; &#39; &nbsp; 转换为Markdown",
+        "expectedOutput": "返回 Markdown： & < > \" ' (空格)",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换中文字符HTML",
+        "input": "将HTML <h1>标题</h1><p>这是一段中文内容。</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： # 标题\n\n这是一段中文内容。",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换日文字符HTML",
+        "input": "将HTML <p>こんにちは世界</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： こんにちは世界",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换Emoji HTML",
+        "input": "将HTML <p>Hello 😀 World</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，保留 Emoji 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换嵌套列表HTML",
+        "input": "将HTML <ul><li>A<ul><li>A1</li><li>A2</li></ul></li><li>B</li></ul> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 嵌套列表，子列表缩进",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换混合有序和无序列表",
+        "input": "将HTML <ol><li>A<ul><li>A1</li></ul></li><li>B</li></ol> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 混合嵌套列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换details标签",
+        "input": "将HTML <details><summary>Click me</summary>Hidden content</details> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理 details 标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换figure和figcaption",
+        "input": "将HTML <figure><img src=\"chart.png\"><figcaption>Chart 1</figcaption></figure> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 图片和标题",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换thead和tbody",
+        "input": "将HTML <table><thead><tr><th>H1</th></tr></thead><tbody><tr><td>D1</td></tr></tbody></table> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 表格",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换colspan表格",
+        "input": "将HTML <table><tr><td colspan=\"2\">Wide cell</td></tr><tr><td>A</td><td>B</td></tr></table> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 表格，处理跨列",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换rowspan表格",
+        "input": "将HTML <table><tr><td rowspan=\"2\">Tall</td><td>A</td></tr><tr><td>B</td></tr></table> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 表格，处理跨行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换abbr标签",
+        "input": "将HTML <abbr title=\"HyperText Markup Language\">HTML</abbr> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理缩写标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换cite标签",
+        "input": "将HTML <cite>The Great Gatsby</cite> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： *The Great Gatsby* 或保留文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换kbd标签",
+        "input": "将HTML Press <kbd>Ctrl</kbd>+<kbd>C</kbd> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理键盘输入标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换samp标签",
+        "input": "将HTML Output: <samp>Hello World</samp> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理示例输出标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换var标签",
+        "input": "将HTML Variable <var>x</var> = 5 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理变量标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换time标签",
+        "input": "将HTML <time datetime=\"2024-01-15\">January 15, 2024</time> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留日期文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换address标签",
+        "input": "将HTML <address>123 Main St, City</address> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： *123 Main St, City* 或保留文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换ins和del标签",
+        "input": "将HTML <ins>New text</ins> and <del>Old text</del> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理插入和删除文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换small标签",
+        "input": "将HTML <small>Small text</small> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理小号文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换sub标签",
+        "input": "将HTML H<sub>2</sub>O 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理下标",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换sup标签",
+        "input": "将HTML E=mc<sup>2</sup> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理上标",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换bdo标签",
+        "input": "将HTML <bdo dir=\"rtl\">Right to left</bdo> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换ruby标签",
+        "input": "将HTML <ruby>漢字<rt>かんじ</rt></ruby> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理注音标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换wbr标签",
+        "input": "将HTML Super<wbr>cali<wbr>fragilistic 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本，忽略 wbr 标签",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换长文本HTML",
+        "input": "将一段包含10个段落的长HTML文本转换为Markdown",
+        "expectedOutput": "返回 Markdown，10个段落用空行分隔",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换嵌套div的HTML",
+        "input": "将HTML <div><div><div><p>Deeply nested</p></div></div></div> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Deeply nested",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带meta标签的HTML",
+        "input": "将HTML <head><meta charset=\"utf-8\"></head><body><p>Content</p></body> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 head 和 meta 标签，保留 Content",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带style标签的HTML",
+        "input": "将HTML <style>body{color:red}</style><p>Text</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 style 标签内容，保留 Text",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带link标签的HTML",
+        "input": "将HTML <link rel=\"stylesheet\" href=\"style.css\"><p>Hello</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 link 标签，保留 Hello",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换noscript标签",
+        "input": "将HTML <noscript>JavaScript is disabled</noscript><p>Content</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，保留 Content",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换iframe标签",
+        "input": "将HTML <iframe src=\"https://example.com\"></iframe><p>Below</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 iframe，保留 Below",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换canvas标签",
+        "input": "将HTML <canvas id=\"chart\"></canvas><p>Fallback</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 canvas，保留 Fallback",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换video标签",
+        "input": "将HTML <video src=\"movie.mp4\"></video><p>Text</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 video 标签，保留 Text",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换audio标签",
+        "input": "将HTML <audio src=\"song.mp3\"></audio><p>Lyrics</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 audio 标签，保留 Lyrics",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换form标签",
+        "input": "将HTML <form><input type=\"text\"><button>Submit</button></form><p>After</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 form 标签，保留 Submit 和 After",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换select标签",
+        "input": "将HTML <select><option>A</option><option>B</option></select><p>Text</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，保留选项文本和 Text",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换textarea标签",
+        "input": "将HTML <textarea>Default text</textarea><p>After</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，保留 Default text 和 After",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换button标签",
+        "input": "将HTML <button>Click Me</button> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Click Me",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换label标签",
+        "input": "将HTML <label for=\"email\">Email:</label> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Email:",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换fieldset和legend",
+        "input": "将HTML <fieldset><legend>Info</legend><p>Content</p></fieldset> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留 Info 和 Content",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换datalist标签",
+        "input": "将HTML <input list=\"options\"><datalist id=\"options\"><option>A</option></datalist> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 忽略交互元素",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换output标签",
+        "input": "将HTML <output>Result: 42</output> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Result: 42",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换progress标签",
+        "input": "将HTML <progress value=\"70\" max=\"100\">70%</progress> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留 70%",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换meter标签",
+        "input": "将HTML <meter value=\"0.6\">60%</meter> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留 60%",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换header标签",
+        "input": "将HTML <header><h1>Site Title</h1><nav>Menu</nav></header> 转换为Markdown",
+        "expectedOutput": "返回 Markdown：# Site Title 和 Menu",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换footer标签",
+        "input": "将HTML <footer><p>Copyright 2024</p></footer> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： Copyright 2024",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换nav标签",
+        "input": "将HTML <nav><a href=\"/\">Home</a><a href=\"/about\">About</a></nav> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 链接列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换main标签",
+        "input": "将HTML <main><article><h2>Article</h2><p>Content</p></article></main> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： ## Article\n\nContent",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换aside标签",
+        "input": "将HTML <aside><p>Side note</p></aside> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留 Side note",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换section标签",
+        "input": "将HTML <section><h2>Section</h2><p>Content</p></section> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理 section 为普通容器",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换article标签",
+        "input": "将HTML <article><h2>Article</h2><p>Content</p></article> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 处理 article 为普通容器",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换完整HTML页面",
+        "input": "将HTML 完整网页 <!DOCTYPE html><html><head><title>Page</title></head><body><h1>Hello</h1><p>World</p></body></html> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： # Hello\n\nWorld",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换只有head的HTML",
+        "input": "将HTML <head><title>Title</title></head> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 空或 Title 文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换只有body的HTML",
+        "input": "将HTML <body><p>Body only</p></body> 转换为Markdown",
+        "expectedOutput": "返回 Markdown： Body only",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换无效HTML",
+        "input": "将HTML <p>Unclosed paragraph 转换为Markdown",
+        "expectedOutput": "返回 Markdown，尽量处理未闭合标签，保留文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换畸形HTML",
+        "input": "将HTML <p>Text</p></div> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Text",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换混乱嵌套HTML",
+        "input": "将HTML <b><i>Bold italic</b></i> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 尽力处理交叉嵌套",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换极长HTML",
+        "input": "将一段超过10000字符的HTML文章转换为Markdown",
+        "expectedOutput": "返回完整的 Markdown 格式文本，长度与原文相当",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换YouTube嵌入HTML",
+        "input": "将HTML <iframe src=\"https://youtube.com/embed/xyz\"></iframe> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 iframe",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换Twitter嵌入HTML",
+        "input": "将HTML <blockquote class=\"twitter-tweet\">Tweet content</blockquote> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 引用块： > Tweet content",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换Gist嵌入HTML",
+        "input": "将HTML <script src=\"https://gist.github.com/xxx.js\"></script> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 script",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带自定义属性的HTML",
+        "input": "将HTML <p data-id=\"123\" aria-label=\"text\">Content</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Content，忽略自定义属性",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换SVG标签",
+        "input": "将HTML <svg><circle cx=\"50\" cy=\"50\" r=\"40\"/></svg><p>After</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown，忽略 SVG 标签，保留 After",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换MathML标签",
+        "input": "将HTML <math><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></math> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 保留数学表达式文本",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换template标签",
+        "input": "将HTML <template><p>Hidden</p></template><p>Visible</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 忽略 template 内容，保留 Visible",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换slot标签",
+        "input": "将HTML <slot name=\"header\">Default</slot> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Default",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换自定义元素",
+        "input": "将HTML <my-component>Custom content</my-component> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本： Custom content",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换多层嵌套列表",
+        "input": "将HTML <ul><li>A<ul><li>A1</li><li>A2</li></ul></li><li>B</li></ul> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 嵌套列表：- A\n  - A1\n  - A2\n- B",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换带链接的段落",
+        "input": "将HTML <p>Visit <a href=\"https://example.com\">our site</a> for details.</p> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 文本：Visit [our site](https://example.com) for details.",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "string_html_to_markdown - 转换pre代码块",
+        "input": "将HTML <pre><code>int main() { return 0; }</code></pre> 转换为Markdown",
+        "expectedOutput": "返回 Markdown 代码块：```\nint main() { return 0; }\n```",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

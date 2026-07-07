@@ -1,0 +1,702 @@
+[
+    {
+        "name": "filesystem_edit_text_file - 编辑文本文件内容替换",
+        "input": "请先读取 {agentxx_root}/temp/hello_test.txt 的内容，然后将文件中的 'Hello, AgentXX!' 替换为 'Hello, AgentXX! Updated!'，使用 filesystem_edit_text_file 工具进行精确替换",
+        "expectedOutput": "返回 'success' 表示替换成功，再次读取文件内容应变为 'Hello, AgentXX! Updated!'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换单行文本",
+        "input": "在 {agentxx_root}/temp/multiline.txt 中将 '第一行' 替换为 '修改后的第一行'",
+        "expectedOutput": "返回 success，替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换多行文本",
+        "input": "在 {agentxx_root}/temp/multiline.txt 中将 '第一行\\n第二行' 替换为 '新第一行\\n新第二行'",
+        "expectedOutput": "返回 success，多行替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换不存在的文本",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中尝试替换不存在的文本 'nonexistent' 为 'new'",
+        "expectedOutput": "返回错误信息，未找到匹配的 old_str",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 编辑不存在的文件",
+        "input": "尝试编辑不存在的文件 {agentxx_root}/temp/nonexistent.txt，替换 'a' 为 'b'",
+        "expectedOutput": "返回错误信息，文件不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 多替换模式",
+        "input": "在 {agentxx_root}/temp/repeat.txt 中（内容为 'hello hello hello'），使用 multi_replace=true 将 'hello' 替换为 'hi'",
+        "expectedOutput": "返回 Success, Replace 3 times，所有 hello 都被替换为 hi",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 单替换模式",
+        "input": "在 {agentxx_root}/temp/repeat.txt 中（内容为 'hello hello hello'），使用 multi_replace=false 将 'hello' 替换为 'hi'",
+        "expectedOutput": "返回 success，仅第一个 hello 被替换为 hi",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换为更长的字符串",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中将 'Hello' 替换为 'Greetings and Salutations'",
+        "expectedOutput": "返回 success，替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换为更短的字符串",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中将 'Hello, AgentXX!' 替换为 'Hi'",
+        "expectedOutput": "返回 success，替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换为空字符串",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中将 'Hello' 替换为空字符串 ''",
+        "expectedOutput": "返回 success，Hello 被删除",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换JSON配置值",
+        "input": "在 {agentxx_root}/temp/config.json 中将 '\"version\": \"1.0\"' 替换为 '\"version\": \"2.0\"'",
+        "expectedOutput": "返回 success，版本号更新成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换C++代码",
+        "input": "在 {agentxx_root}/temp/test.cpp 中将 'int main()' 替换为 'int main(int argc, char** argv)'",
+        "expectedOutput": "返回 success，代码替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换头文件内容",
+        "input": "在 {agentxx_root}/temp/test.h 中将 'void test();' 替换为 'int test(int x);'",
+        "expectedOutput": "返回 success，函数声明替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换Markdown标题",
+        "input": "在 {agentxx_root}/temp/readme.md 中将 '# Title' 替换为 '# New Title'",
+        "expectedOutput": "返回 success，标题替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换XML内容",
+        "input": "在 {agentxx_root}/temp/data.xml 中将 '<item>test</item>' 替换为 '<item>updated</item>'",
+        "expectedOutput": "返回 success，XML内容替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换Python代码",
+        "input": "在 {agentxx_root}/temp/script.py 中将 'Hello World' 替换为 'Hello Python'",
+        "expectedOutput": "返回 success，Python代码替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换Shell脚本",
+        "input": "在 {agentxx_root}/temp/run.sh 中将 'echo hello' 替换为 'echo world'",
+        "expectedOutput": "返回 success，Shell脚本替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换CSS样式",
+        "input": "在 {agentxx_root}/temp/style.css 中将 'margin: 0' 替换为 'margin: 10px'",
+        "expectedOutput": "返回 success，CSS样式替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含特殊字符的文本",
+        "input": "在 {agentxx_root}/temp/special.txt 中将 '!@#' 替换为 '@#!'",
+        "expectedOutput": "返回 success，特殊字符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换中文文本",
+        "input": "在 {agentxx_root}/temp/chinese.txt 中将 '你好' 替换为 '您好'",
+        "expectedOutput": "返回 success，中文替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含Unicode文本",
+        "input": "在 {agentxx_root}/temp/unicode.txt 中将 'Hello' 替换为 'Hi 👋'",
+        "expectedOutput": "返回 success，Unicode替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含正则特殊字符的文本",
+        "input": "在 {agentxx_root}/temp/regex.txt 中将 '^[a-zA-Z' 替换为 '^[A-Za-z'",
+        "expectedOutput": "返回 success，正则表达式替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换SQL语句",
+        "input": "在 {agentxx_root}/temp/query.sql 中将 'age > 18' 替换为 'age >= 21'",
+        "expectedOutput": "返回 success，SQL替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换CSV内容",
+        "input": "在 {agentxx_root}/temp/data.csv 中将 'Alice,30,NYC' 替换为 'Alice,31,Boston'",
+        "expectedOutput": "返回 success，CSV替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换YAML配置",
+        "input": "在 {agentxx_root}/temp/config.yaml 中将 'port: 8080' 替换为 'port: 9090'",
+        "expectedOutput": "返回 success，YAML替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换TOML配置",
+        "input": "在 {agentxx_root}/temp/config.toml 中将 'port = 8080' 替换为 'port = 3000'",
+        "expectedOutput": "返回 success，TOML替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换INI配置",
+        "input": "在 {agentxx_root}/temp/settings.ini 中将 'key=value' 替换为 'key=newvalue'",
+        "expectedOutput": "返回 success，INI替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换Makefile内容",
+        "input": "在 {agentxx_root}/temp/Makefile 中将 'test.cpp' 替换为 'main.cpp'",
+        "expectedOutput": "返回 success，Makefile替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换CMake配置",
+        "input": "在 {agentxx_root}/temp/CMakeLists.txt 中将 'VERSION 3.20' 替换为 'VERSION 3.25'",
+        "expectedOutput": "返回 success，CMake替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换Dockerfile内容",
+        "input": "在 {agentxx_root}/temp/Dockerfile 中将 'ubuntu:22.04' 替换为 'ubuntu:24.04'",
+        "expectedOutput": "返回 success，Dockerfile替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含引号的文本",
+        "input": "在 {agentxx_root}/temp/quotes.txt 中将 'He said \"Hello World\"' 替换为 'She said \"Goodbye World\"'",
+        "expectedOutput": "返回 success，含引号文本替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含换行符的文本",
+        "input": "在 {agentxx_root}/temp/newlines.txt 中将 'line1\\nline2' 替换为 'lineA\\nlineB'",
+        "expectedOutput": "返回 success，换行符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含Tab的文本",
+        "input": "在 {agentxx_root}/temp/tabs.txt 中将 'col1\\tcol2' 替换为 'colA\\tcolB'",
+        "expectedOutput": "返回 success，Tab替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含井号文本",
+        "input": "在 {agentxx_root}/temp/hash.txt 中将 '#define MAX 100' 替换为 '#define MAX 200'",
+        "expectedOutput": "返回 success，宏定义替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含百分号文本",
+        "input": "在 {agentxx_root}/temp/percent.txt 中将 '50%' 替换为 '75%'",
+        "expectedOutput": "返回 success，百分号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含反斜杠文本",
+        "input": "在 {agentxx_root}/temp/backslash.txt 中将 'C:\\Users' 替换为 'D:\\Users'",
+        "expectedOutput": "返回 success，反斜杠替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含美元符号文本",
+        "input": "在 {agentxx_root}/temp/dollar.txt 中将 '$100.00' 替换为 '$200.00'",
+        "expectedOutput": "返回 success，美元符号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含星号文本",
+        "input": "在 {agentxx_root}/temp/star.txt 中将 '@param x value' 替换为 '@param x updated value'",
+        "expectedOutput": "返回 success，注释替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含at符号文本",
+        "input": "在 {agentxx_root}/temp/email.txt 中将 'contact@example.com' 替换为 'support@example.com'",
+        "expectedOutput": "返回 success，邮箱替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含波浪号文本",
+        "input": "在 {agentxx_root}/temp/tilde.txt 中将 '~/projects' 替换为 '~/workspace'",
+        "expectedOutput": "返回 success，波浪号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含管道符文本",
+        "input": "在 {agentxx_root}/temp/pipe.txt 中将 '*.cpp' 替换为 '*.h'",
+        "expectedOutput": "返回 success，管道符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含重定向符文本",
+        "input": "在 {agentxx_root}/temp/redirect.txt 中将 'output.txt' 替换为 'result.txt'",
+        "expectedOutput": "返回 success，重定向符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含分号文本",
+        "input": "在 {agentxx_root}/temp/semicolon.txt 中将 'int x = 5;' 替换为 'int x = 10;'",
+        "expectedOutput": "返回 success，分号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含大括号文本",
+        "input": "在 {agentxx_root}/temp/braces.txt 中将 '{a: 1, b: 2}' 替换为 '{a: 10, b: 20}'",
+        "expectedOutput": "返回 success，大括号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含方括号文本",
+        "input": "在 {agentxx_root}/temp/brackets.txt 中将 'value[1][2]' 替换为 'value[3][4]'",
+        "expectedOutput": "返回 success，方括号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含尖括号文本",
+        "input": "在 {agentxx_root}/temp/angles.txt 中将 'vector<int>' 替换为 'vector<float>'",
+        "expectedOutput": "返回 success，尖括号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含emoji文本",
+        "input": "在 {agentxx_root}/temp/emoji.txt 中将 '🎉' 替换为 '🎊'",
+        "expectedOutput": "返回 success，emoji替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含日文文本",
+        "input": "在 {agentxx_root}/temp/japanese.txt 中将 'こんにちは' 替换为 'こんばんは'",
+        "expectedOutput": "返回 success，日文替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含韩文文本",
+        "input": "在 {agentxx_root}/temp/korean.txt 中将 '안녕하세요' 替换为 '감사합니다'",
+        "expectedOutput": "返回 success，韩文替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含俄文文本",
+        "input": "在 {agentxx_root}/temp/russian.txt 中将 'Привет' 替换为 'Здравствуйте'",
+        "expectedOutput": "返回 success，俄文替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换后重新读取验证",
+        "input": "在 {agentxx_root}/temp/verify.txt 中将 'original' 替换为 'modified'，然后读取验证",
+        "expectedOutput": "替换成功，读取内容为 'modified'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含NULL字符的内容",
+        "input": "在 {agentxx_root}/temp/nullchar.txt 中将 '\\0' 替换为 ''",
+        "expectedOutput": "返回 success，NULL字符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含控制字符的文本",
+        "input": "在 {agentxx_root}/temp/control.txt 中将 '\\r\\n' 替换为 '\\n'",
+        "expectedOutput": "返回 success，控制字符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含数学符号的文本",
+        "input": "在 {agentxx_root}/temp/math.txt 中将 '∑' 替换为 'Σ'",
+        "expectedOutput": "返回 success，数学符号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含阿拉伯文文本",
+        "input": "在 {agentxx_root}/temp/arabic.txt 中将 'مرحبا' 替换为 'صباح الخير'",
+        "expectedOutput": "返回 success，阿拉伯文替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含HTML标签的文本",
+        "input": "在 {agentxx_root}/temp/html.txt 中将 '<h1>Test</h1>' 替换为 '<h2>Updated</h2>'",
+        "expectedOutput": "返回 success，HTML标签替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 旧字符串完全相同不替换",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中将 'Hello, AgentXX!' 替换为 'Hello, AgentXX!'",
+        "expectedOutput": "返回 success，内容不变",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换文件开头内容",
+        "input": "在 {agentxx_root}/temp/chinese.txt 中将文件开头内容替换为新的开头",
+        "expectedOutput": "返回 success，开头替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换文件末尾内容",
+        "input": "在 {agentxx_root}/temp/chinese.txt 中将文件末尾内容替换为新的结尾",
+        "expectedOutput": "返回 success，末尾替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含空格前缀的文本",
+        "input": "在 {agentxx_root}/temp/spaces.txt 中将 '    ' 替换为 '  '",
+        "expectedOutput": "返回 success，空格替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含换行符的文本",
+        "input": "在 {agentxx_root}/temp/only_newlines.txt 中将 '\\n\\n' 替换为 '\\n'",
+        "expectedOutput": "返回 success，换行符替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含注释的代码",
+        "input": "在 {agentxx_root}/temp/commented.cpp 中将单行注释替换为新的注释",
+        "expectedOutput": "返回 success，注释替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含多行注释的代码",
+        "input": "在 {agentxx_root}/temp/multicomment.cpp 中将多行注释内容替换为新的注释",
+        "expectedOutput": "返回 success，多行注释替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含文档注释的代码",
+        "input": "在 {agentxx_root}/temp/doxygen.cpp 中将 '@param x' 替换为 '@param x 新的参数描述'",
+        "expectedOutput": "返回 success，文档注释替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含转义序列的JSON",
+        "input": "在 {agentxx_root}/temp/escaped.json 中将 'Hello\\nWorld' 替换为 'Hello World'",
+        "expectedOutput": "返回 success，转义JSON替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含URL编码的文本",
+        "input": "在 {agentxx_root}/temp/urlencoded.txt 中将 'hello%20world' 替换为 'hi%20there'",
+        "expectedOutput": "返回 success，URL编码替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含hex编码的文本",
+        "input": "在 {agentxx_root}/temp/hex.txt 中将十六进制值替换为新的值",
+        "expectedOutput": "返回 success，hex替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含Base64编码的文本",
+        "input": "在 {agentxx_root}/temp/base64.txt 中将base64内容替换为新的编码",
+        "expectedOutput": "返回 success，base64替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换日志文件内容",
+        "input": "在 {agentxx_root}/temp/app.log 中将 '[2024-01-01]' 替换为 '[2024-06-01]'",
+        "expectedOutput": "返回 success，日志替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换TSV内容",
+        "input": "在 {agentxx_root}/temp/data.tsv 中将 'Alice\\t30\\tNYC' 替换为 'Alice\\t31\\tLA'",
+        "expectedOutput": "返回 success，TSV替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换版本号文件",
+        "input": "在 {agentxx_root}/temp/VERSION 中将 '1.2.3' 替换为 '2.0.0'",
+        "expectedOutput": "返回 success，版本号替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换LICENSE文件",
+        "input": "在 {agentxx_root}/temp/LICENSE 中将 'MIT' 替换为 'Apache-2.0'",
+        "expectedOutput": "返回 success，许可证替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换CHANGELOG文件",
+        "input": "在 {agentxx_root}/temp/CHANGELOG.md 中将 'Initial release' 替换为 'Initial release with features'",
+        "expectedOutput": "返回 success，CHANGELOG替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换CONTRIBUTING文件",
+        "input": "在 {agentxx_root}/temp/CONTRIBUTING.md 中将贡献指南内容替换为新的指南",
+        "expectedOutput": "返回 success，CONTRIBUTING替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换编辑器配置",
+        "input": "在 {agentxx_root}/temp/.editorconfig 中将 'indent_size = 4' 替换为 'indent_size = 2'",
+        "expectedOutput": "返回 success，编辑器配置替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换clang-format配置",
+        "input": "在 {agentxx_root}/temp/.clang-format 中将缩进配置替换为新的值",
+        "expectedOutput": "返回 success，clang-format替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换gitattributes文件",
+        "input": "在 {agentxx_root}/temp/.gitattributes 中将 'text=auto' 替换为 'text=auto eol=lf'",
+        "expectedOutput": "返回 success，gitattributes替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换.gitignore文件",
+        "input": "在 {agentxx_root}/temp/.gitignore 中将 '*.log' 替换为 '*.log\\n*.out'",
+        "expectedOutput": "返回 success，gitignore替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换.env文件",
+        "input": "在 {agentxx_root}/temp/.env 中将 'DEBUG=true' 替换为 'DEBUG=false'",
+        "expectedOutput": "返回 success，env替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换大数字文件中的内容",
+        "input": "在 {agentxx_root}/temp/bignum.txt 中将 '1' 替换为 '1001'",
+        "expectedOutput": "返回 success，数字替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换JSON嵌套对象",
+        "input": "在 {agentxx_root}/temp/nested.json 中将 '\"d\":\"deep\"' 替换为 '\"d\":\"deeper\"'",
+        "expectedOutput": "返回 success，嵌套JSON替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换JSON数组",
+        "input": "在 {agentxx_root}/temp/list.json 中将 '[1, 2, 3, 4, 5]' 替换为 '[6, 7, 8, 9, 10]'",
+        "expectedOutput": "返回 success，JSON数组替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含混合编码的文本",
+        "input": "在 {agentxx_root}/temp/mixed.txt 中将混合编码内容替换为新的混合编码内容",
+        "expectedOutput": "返回 success，混合编码替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换带条件的内容",
+        "input": "在 {agentxx_root}/temp/settings.json 中将 '{\"debug\": false}' 替换为 '{\"debug\": true, \"verbose\": true}'",
+        "expectedOutput": "返回 success，复杂替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 编辑后验证文件完整性",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中替换内容后，读取完整文件验证替换结果",
+        "expectedOutput": "替换成功，读取内容与预期一致",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 多次连续编辑",
+        "input": "在 {agentxx_root}/temp/chain_edit.txt 中依次进行三次替换：A->B，B->C，C->D",
+        "expectedOutput": "三次替换均返回 success",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换含大小写敏感的内容",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中将 'hello' 替换为 'HELLO'（注意大小写）",
+        "expectedOutput": "返回错误信息，未找到匹配的 old_str（因为原文件是 'Hello' 而非 'hello'）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换开头空白行",
+        "input": "在 {agentxx_root}/temp/multiline.txt 中将文件开头空白行替换为注释行",
+        "expectedOutput": "返回 success，开头替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换末尾空白行",
+        "input": "在 {agentxx_root}/temp/multiline.txt 中将文件末尾空白行替换为结束标记",
+        "expectedOutput": "返回 success，末尾替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换包含整个文件的内容",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中将整个文件内容替换为全新的内容",
+        "expectedOutput": "返回 success，整个文件被替换",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换JSON中的值",
+        "input": "在 {agentxx_root}/temp/config.json 中将 \"version\": \"1.0\" 替换为 \"version\": \"2.0\"",
+        "expectedOutput": "返回 success，版本号更新成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换代码中的变量名",
+        "input": "在 {agentxx_root}/temp/test.cpp 中将变量名 oldName 替换为 newName",
+        "expectedOutput": "返回 success，变量名替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换文件中的路径",
+        "input": "在 {agentxx_root}/temp/settings.json 中将路径 /old/path 替换为 /new/path",
+        "expectedOutput": "返回 success，路径替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换URL地址",
+        "input": "在 {agentxx_root}/temp/config.json 中将 http://old.example.com 替换为 https://new.example.com",
+        "expectedOutput": "返回 success，URL替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换缩进风格",
+        "input": "在 {agentxx_root}/temp/test.cpp 中将4个空格缩进替换为2个空格缩进",
+        "expectedOutput": "返回 success，缩进风格替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换文件编码注释",
+        "input": "在 {agentxx_root}/temp/chinese.txt 中将文件头部编码声明替换为新编码声明",
+        "expectedOutput": "返回 success，编码声明替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换import/include语句",
+        "input": "在 {agentxx_root}/temp/test.cpp 中将 #include <oldlib.h> 替换为 #include <newlib.h>",
+        "expectedOutput": "返回 success，include语句替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换函数参数名",
+        "input": "在 {agentxx_root}/temp/test.cpp 中将函数参数 oldParam 替换为 newParam",
+        "expectedOutput": "返回 success，参数名替换成功",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - 替换后验证内容一致性",
+        "input": "在 {agentxx_root}/temp/hello_test.txt 中替换文本后，读取文件验证替换结果是否正确",
+        "expectedOutput": "读取结果与预期一致，替换准确",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_edit_text_file - multi_replace全局替换",
+        "input": "在 {agentxx_root}/temp/replace_all.txt 中将所有 old 替换为 new，使用 multi_replace=true",
+        "expectedOutput": "返回 Success, Replace N times，所有匹配项均被替换",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

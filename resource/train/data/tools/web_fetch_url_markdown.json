@@ -1,0 +1,702 @@
+[
+    {
+        "name": "web_fetch_url_markdown - 获取网页并转为 Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language/coroutines 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回该网页的 Markdown 格式内容，应包含 C++ coroutines 相关的文档信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++标准库参考文档并转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/header 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 标准库头文件列表的 Markdown 格式内容，应包含清晰的标题和列表结构，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取GitHub仓库README转Markdown",
+        "input": "请获取网页 https://github.com/fmtlib/fmt 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 fmtlib/fmt 仓库页面的 Markdown 格式内容，应包含项目描述、安装说明和使用示例，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Wikipedia页面转Markdown",
+        "input": "请获取网页 https://en.wikipedia.org/wiki/C%2B%2B 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Wikipedia C++ 页面的 Markdown 格式内容，应包含 C++ 编程语言的介绍和历史信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取JSONPlaceholder API转Markdown",
+        "input": "请获取网页 https://jsonplaceholder.typicode.com/posts/1 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 JSON 数据的 Markdown 格式表示，包含帖子数据的结构化展示，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取HTTPBin测试页转Markdown",
+        "input": "请获取网页 https://httpbin.org/get?name=test 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 HTTPBin 响应的 Markdown 格式内容，包含请求参数和头部信息的结构化展示，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Boost库文档转Markdown",
+        "input": "请获取网页 https://www.boost.org/doc/libs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Boost 库文档目录的 Markdown 格式内容，应包含库列表的层级结构，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取StackOverflow问题页转Markdown",
+        "input": "请获取网页 https://stackoverflow.com/questions/tagged/c%2b%2b 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 StackOverflow C++ 标签页的 Markdown 格式内容，应包含问题列表和标签信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取CMake文档转Markdown",
+        "input": "请获取网页 https://cmake.org/cmake/help/latest/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 CMake 最新文档的 Markdown 格式内容，应包含命令参考和指南的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取MDN JavaScript文档转Markdown",
+        "input": "请获取网页 https://developer.mozilla.org/en-US/docs/Web/JavaScript 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 MDN JavaScript 文档的 Markdown 格式内容，应包含 JS 教程和参考链接，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Python官方文档转Markdown",
+        "input": "请获取网页 https://docs.python.org/3/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Python 3 官方文档的 Markdown 格式内容，应包含教程和库参考的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Rust官方文档转Markdown",
+        "input": "请获取网页 https://doc.rust-lang.org/book/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Rust Book 的 Markdown 格式内容，应包含 Rust 教程的章节列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Go语言文档转Markdown",
+        "input": "请获取网页 https://go.dev/doc/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Go 语言文档的 Markdown 格式内容，应包含教程和参考文档的链接，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Node.js文档转Markdown",
+        "input": "请获取网页 https://nodejs.org/en/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Node.js 文档的 Markdown 格式内容，应包含 API 参考和指南的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取TypeScript文档转Markdown",
+        "input": "请获取网页 https://www.typescriptlang.org/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 TypeScript 文档的 Markdown 格式内容，应包含手册和参考的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取GitHub API响应转Markdown",
+        "input": "请获取网页 https://api.github.com/repos/fmtlib/fmt 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 GitHub API 仓库信息的 Markdown 格式内容，包含仓库名称、描述、星标数等结构化展示，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取npm包信息转Markdown",
+        "input": "请获取网页 https://registry.npmjs.org/react/latest 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 npm 包信息的 Markdown 格式内容，包含包名、版本、描述等结构化展示，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取技术博客文章转Markdown",
+        "input": "请获取网页 https://dev.to/t/cpp 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 dev.to C++ 标签页的 Markdown 格式内容，应包含文章列表和摘要信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Hacker News首页转Markdown",
+        "input": "请获取网页 https://news.ycombinator.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Hacker News 首页的 Markdown 格式内容，应包含新闻标题和链接列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++23新特性文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/23 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++23 新特性文档的 Markdown 格式内容，应包含新特性的分类列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++20协程详解转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language/coroutines 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 协程详解的 Markdown 格式内容，应包含 co_await、co_return、co_yield 等关键字的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取STL容器文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/container 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ STL 容器文档的 Markdown 格式内容，应包含 vector、map、set 等容器的列表和简介，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++智能指针文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/memory 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 内存管理文档的 Markdown 格式内容，应包含 unique_ptr、shared_ptr 等智能指针的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取CMake教程转Markdown",
+        "input": "请获取网页 https://cmake.org/cmake/help/latest/guide/tutorial/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 CMake 教程的 Markdown 格式内容，应包含从基础到高级的步骤说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Git文档转Markdown",
+        "input": "请获取网页 https://git-scm.com/docs 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Git 文档的 Markdown 格式内容，应包含 Git 命令参考的结构化列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Docker文档转Markdown",
+        "input": "请获取网页 https://docs.docker.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Docker 文档的 Markdown 格式内容，应包含入门指南和参考文档的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Linux内核文档转Markdown",
+        "input": "请获取网页 https://www.kernel.org/doc/html/latest/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Linux 内核文档的 Markdown 格式内容，应包含内核文档的目录结构，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Vulkan文档转Markdown",
+        "input": "请获取网页 https://docs.vulkan.org/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Vulkan 文档的 Markdown 格式内容，应包含 API 参考和教程的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取OpenGL文档转Markdown",
+        "input": "请获取网页 https://www.khronos.org/opengl/wiki/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 OpenGL Wiki 的 Markdown 格式内容，应包含 OpenGL 教程和参考的链接列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Qt文档转Markdown",
+        "input": "请获取网页 https://doc.qt.io/qt-6/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Qt 6 文档的 Markdown 格式内容，应包含模块和类的组织结构，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取LLVM文档转Markdown",
+        "input": "请获取网页 https://llvm.org/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 LLVM 文档的 Markdown 格式内容，应包含 LLVM 工具链和 API 的文档列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Clang文档转Markdown",
+        "input": "请获取网页 https://clang.llvm.org/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Clang 文档的 Markdown 格式内容，应包含编译器使用和开发的参考信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取JSON Schema规范转Markdown",
+        "input": "请获取网页 https://json-schema.org/understanding-json-schema/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 JSON Schema 规范的 Markdown 格式内容，应包含 schema 关键字的说明和示例，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取REST API设计指南转Markdown",
+        "input": "请获取网页 https://restfulapi.net/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 REST API 设计指南的 Markdown 格式内容，应包含 HTTP 方法和状态码的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取HTTP状态码列表转Markdown",
+        "input": "请获取网页 https://httpstatuses.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 HTTP 状态码列表的 Markdown 格式内容，应包含所有状态码的分类和说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取HTML5规范转Markdown",
+        "input": "请获取网页 https://html.spec.whatwg.org/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 HTML5 规范的 Markdown 格式内容，应包含 HTML 标准的目录结构，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取ECMAScript规范转Markdown",
+        "input": "请获取网页 https://tc39.es/ecma262/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 ECMAScript 规范的 Markdown 格式内容，应包含 JavaScript 语言标准的章节列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取正则表达式教程转Markdown",
+        "input": "请获取网页 https://regexr.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回正则表达式教程的 Markdown 格式内容，应包含正则语法参考和交互式示例，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取编码规范文档转Markdown",
+        "input": "请获取网页 https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ Core Guidelines 的 Markdown 格式内容，应包含 C++ 编码最佳实践的指南，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Google C++风格指南转Markdown",
+        "input": "请获取网页 https://google.github.io/styleguide/cppguide.html 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Google C++ 风格指南的 Markdown 格式内容，应包含命名规范、格式要求和最佳实践，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Conan包管理器文档转Markdown",
+        "input": "请获取网页 https://docs.conan.io/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Conan 包管理器文档的 Markdown 格式内容，应包含安装和使用指南，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取vcpkg文档转Markdown",
+        "input": "请获取网页 https://vcpkg.io/en/index.html 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 vcpkg 包管理器文档的 Markdown 格式内容，应包含包搜索和安装的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Markdown语法指南转Markdown",
+        "input": "请获取网页 https://www.markdownguide.org/basic-syntax/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Markdown 基本语法指南的 Markdown 格式内容，应包含标题、列表、链接等语法的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取中文技术文档转Markdown",
+        "input": "请获取网页 https://zh.cppreference.com/w/cpp 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回中文 C++ 参考文档的 Markdown 格式内容，应包含中文的 C++ 语言特性说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取日文技术文档转Markdown",
+        "input": "请获取网页 https://ja.cppreference.com/w/cpp 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回日文 C++ 参考文档的 Markdown 格式内容，应包含日文的 C++ 语言特性说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取包含代码块的网页转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/algorithm/sort 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ sort 算法文档的 Markdown 格式内容，代码块应保留格式，包含复杂度、参数和示例的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取包含表格的网页转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/compiler_support 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 编译器支持表的 Markdown 格式内容，表格数据应转换为 Markdown 表格格式，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取包含图片的网页转Markdown",
+        "input": "请获取网页 https://www.boost.org/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Boost 官网的 Markdown 格式内容，图片应转换为 Markdown 图片链接，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取简单纯文本网页转Markdown",
+        "input": "请获取网页 https://example.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 example.com 的 Markdown 格式内容，简单网页应转换为基本的 Markdown 段落，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取博客文章转Markdown",
+        "input": "请获取网页 https://herbsutter.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Herb Sutter 博客的 Markdown 格式内容，应包含文章标题和摘要列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取ISO C++官网转Markdown",
+        "input": "请获取网页 https://isocpp.org/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 ISO C++ 官网的 Markdown 格式内容，应包含 C++ 新闻和标准更新信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++提案文档转Markdown",
+        "input": "请获取网页 https://www.open-std.org/jtc1/sc22/wg21/docs/papers/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 标准委员会提案文档列表的 Markdown 格式内容，应包含论文编号和标题，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取GCC文档转Markdown",
+        "input": "请获取网页 https://gcc.gnu.org/onlinedocs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 GCC 在线文档的 Markdown 格式内容，应包含 GCC 手册和发行说明的链接，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取MSVC文档转Markdown",
+        "input": "请获取网页 https://learn.microsoft.com/en-us/cpp/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Microsoft C++ 文档的 Markdown 格式内容，应包含 MSVC 编译器和库的参考信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Makefile教程转Markdown",
+        "input": "请获取网页 https://makefiletutorial.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Makefile 教程的 Markdown 格式内容，应包含 Makefile 语法和最佳实践的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Shell脚本教程转Markdown",
+        "input": "请获取网页 https://www.shellscript.sh/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Shell 脚本教程的 Markdown 格式内容，应包含 Bash 编程的基础知识和示例，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取正则表达式测试工具转Markdown",
+        "input": "请获取网页 https://regex101.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 regex101 的 Markdown 格式内容，应包含正则表达式测试工具的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Graphviz文档转Markdown",
+        "input": "请获取网页 https://graphviz.org/documentation/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Graphviz 文档的 Markdown 格式内容，应包含 DOT 语言和图形渲染的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Protocol Buffers文档转Markdown",
+        "input": "请获取网页 https://protobuf.dev/overview/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Protocol Buffers 文档的 Markdown 格式内容，应包含 proto 文件语法和代码生成的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取gRPC文档转Markdown",
+        "input": "请获取网页 https://grpc.io/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 gRPC 文档的 Markdown 格式内容，应包含 gRPC 概念和教程的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取FlatBuffers文档转Markdown",
+        "input": "请获取网页 https://flatbuffers.dev/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 FlatBuffers 文档的 Markdown 格式内容，应包含 schema 定义和使用的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取JSON for Modern C++文档转Markdown",
+        "input": "请获取网页 https://json.nlohmann.me/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 nlohmann JSON 库文档的 Markdown 格式内容，应包含 API 参考和示例代码，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取fmt库文档转Markdown",
+        "input": "请获取网页 https://fmt.dev/latest/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 fmt 库文档的 Markdown 格式内容，应包含格式化语法和 API 参考，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取spdlog文档转Markdown",
+        "input": "请获取网页 https://github.com/gabime/spdlog 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 spdlog 库文档的 Markdown 格式内容，应包含日志级别和 sink 的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取asio文档转Markdown",
+        "input": "请获取网页 https://think-async.com/Asio/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Asio 库文档的 Markdown 格式内容，应包含异步 I/O 和协程支持的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Catch2测试框架文档转Markdown",
+        "input": "请获取网页 https://github.com/catchorg/Catch2 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Catch2 测试框架文档的 Markdown 格式内容，应包含测试宏和断言的使用说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取GTests文档转Markdown",
+        "input": "请获取网页 https://google.github.io/googletest/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 GoogleTest 文档的 Markdown 格式内容，应包含测试用例编写和断言的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取多级标题网页转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 语言参考的 Markdown 格式内容，多级标题应正确转换为 Markdown 标题层级，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取嵌套列表网页转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language/classes 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 类文档的 Markdown 格式内容，嵌套列表应正确转换为 Markdown 缩进列表，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取格式化引用网页转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language/reference 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 引用文档的 Markdown 格式内容，引用块应转换为 Markdown 引用格式，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取内联样式网页转Markdown",
+        "input": "请获取网页 https://www.w3schools.com/cpp/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 W3Schools C++ 教程的 Markdown 格式内容，内联样式应被移除，保留纯文本内容，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Angular文档转Markdown",
+        "input": "请获取网页 https://angular.dev/overview 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Angular 文档的 Markdown 格式内容，应包含 Angular 框架概述和核心概念，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取React文档转Markdown",
+        "input": "请获取网页 https://react.dev/learn 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 React 文档的 Markdown 格式内容，应包含 React 学习路径和核心概念，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Vue.js文档转Markdown",
+        "input": "请获取网页 https://vuejs.org/guide/introduction.html 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Vue.js 文档的 Markdown 格式内容，应包含 Vue 框架介绍和核心特性，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Svelte文档转Markdown",
+        "input": "请获取网页 https://svelte.dev/docs 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Svelte 文档的 Markdown 格式内容，应包含 Svelte 组件和响应式系统的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Next.js文档转Markdown",
+        "input": "请获取网页 https://nextjs.org/docs 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Next.js 文档的 Markdown 格式内容，应包含路由和渲染的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Tailwind CSS文档转Markdown",
+        "input": "请获取网页 https://tailwindcss.com/docs 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Tailwind CSS 文档的 Markdown 格式内容，应包含工具类和使用方法的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取SQLite文档转Markdown",
+        "input": "请获取网页 https://www.sqlite.org/docs.html 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 SQLite 文档的 Markdown 格式内容，应包含 SQL 语法和 API 的参考信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取PostgreSQL文档转Markdown",
+        "input": "请获取网页 https://www.postgresql.org/docs/current/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 PostgreSQL 文档的 Markdown 格式内容，应包含 SQL 命令和函数参考，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取MongoDB文档转Markdown",
+        "input": "请获取网页 https://www.mongodb.com/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 MongoDB 文档的 Markdown 格式内容，应包含 CRUD 操作和聚合管道的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Redis文档转Markdown",
+        "input": "请获取网页 https://redis.io/docs/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Redis 文档的 Markdown 格式内容，应包含数据类型和命令的参考信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Kubernetes文档转Markdown",
+        "input": "请获取网页 https://kubernetes.io/docs/home/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Kubernetes 文档的 Markdown 格式内容，应包含概念和教程的结构化信息，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Terraform文档转Markdown",
+        "input": "请获取网页 https://developer.hashicorp.com/terraform/docs 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Terraform 文档的 Markdown 格式内容，应包含 HCL 语法和资源管理的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Ansible文档转Markdown",
+        "input": "请获取网页 https://docs.ansible.com/ansible/latest/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Ansible 文档的 Markdown 格式内容，应包含 playbook 和模块的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取CI/CD文档转Markdown",
+        "input": "请获取网页 https://docs.github.com/en/actions 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 GitHub Actions 文档的 Markdown 格式内容，应包含工作流语法和市场的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取GitLab CI文档转Markdown",
+        "input": "请获取网页 https://docs.gitlab.com/ee/ci/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 GitLab CI 文档的 Markdown 格式内容，应包含 pipeline 配置和 runner 的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取Jenkins文档转Markdown",
+        "input": "请获取网页 https://www.jenkins.io/doc/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 Jenkins 文档的 Markdown 格式内容，应包含 pipeline 和插件开发的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++多线程文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/thread 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 多线程文档的 Markdown 格式内容，应包含 thread、mutex、condition_variable 的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++文件系统文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/filesystem 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 文件系统文档的 Markdown 格式内容，应包含 path、directory_iterator 的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++网络编程文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/experimental/networking 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ 网络编程文档的 Markdown 格式内容，应包含 socket、resolver 的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++ Ranges文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/ranges 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ Ranges 库文档的 Markdown 格式内容，应包含 view 和 range adaptor 的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++ Concepts文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/concepts 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ Concepts 文档的 Markdown 格式内容，应包含 concept 定义和 requires 子句的说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取C++ Modules文档转Markdown",
+        "input": "请获取网页 https://en.cppreference.com/w/cpp/language/modules 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 C++ Modules 文档的 Markdown 格式内容，应包含 import 和 export 的语法说明，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取空URL错误处理",
+        "input": "请获取网页的内容并将其转换为 Markdown 格式",
+        "expectedOutput": "返回错误信息，提示 URL 参数为空，如 'Arg `url` is empty'",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取不存在的网页转Markdown",
+        "input": "请获取网页 https://this-domain-does-not-exist-12345.com/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回错误信息，提示无法解析域名或网络请求失败，不应返回空内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取404页面转Markdown",
+        "input": "请获取网页 https://github.com/nonexistent-repo-12345 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 404 页面的 Markdown 格式内容，或返回错误信息提示页面不存在，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取500错误页面转Markdown",
+        "input": "请获取网页 https://httpbin.org/status/500 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 500 错误页面的 Markdown 格式内容，或返回错误信息提示服务器内部错误，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取本地文件URL转Markdown",
+        "input": "请获取网页 file:///etc/passwd 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回错误信息，提示不支持 file:// 协议或 URL 格式无效",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取FTP URL转Markdown",
+        "input": "请获取网页 ftp://ftp.gnu.org/ 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回错误信息，提示不支持 ftp:// 协议或 URL 格式无效",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_fetch_url_markdown - 获取JSON API响应并转Markdown",
+        "input": "请获取网页 https://httpbin.org/json 并将其转换为 Markdown 格式",
+        "expectedOutput": "返回 httpbin.org 的 JSON 响应内容转换后的 Markdown 格式，应包含 JSON 数据的结构化展示，结果长度不超过 5000 字符",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

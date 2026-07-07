@@ -1,0 +1,702 @@
+[
+    {
+        "name": "filesystem_read_text_file - 读取完整文件",
+        "input": "请读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的完整内容",
+        "expectedOutput": "返回 filesystem.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取前100行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的前100行",
+        "expectedOutput": "返回该文件的前100行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取前50行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的前50行",
+        "expectedOutput": "返回该文件的前50行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取前10行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的前10行",
+        "expectedOutput": "返回该文件的前10行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取指定行范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第50行到第100行",
+        "expectedOutput": "返回该文件第50-100行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取training.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/agent/training.h 的完整内容",
+        "expectedOutput": "返回 training.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取web_search.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h 的完整内容",
+        "expectedOutput": "返回 web_search.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取codegraph_tool.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/codegraph_tool.h 的完整内容",
+        "expectedOutput": "返回 codegraph_tool.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取string.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/string.h 的完整内容",
+        "expectedOutput": "返回 string.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取execute_command.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/execute_command.h 的完整内容",
+        "expectedOutput": "返回 execute_command.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取planning.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/planning.h 的完整内容",
+        "expectedOutput": "返回 planning.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取share_store.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/share_store.h 的完整内容",
+        "expectedOutput": "返回 share_store.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取sub_agent.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/sub_agent.h 的完整内容",
+        "expectedOutput": "返回 sub_agent.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取ui_control.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/ui_control.h 的完整内容",
+        "expectedOutput": "返回 ui_control.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取tool_skill_search.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool_skill_search.h 的完整内容",
+        "expectedOutput": "返回 tool_skill_search.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取rag_search.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/rag_search.h 的完整内容",
+        "expectedOutput": "返回 rag_search.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取get_current_datetime.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/get_current_datetime.h 的完整内容",
+        "expectedOutput": "返回 get_current_datetime.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取不存在的文件",
+        "input": "读取文件 {agentxx_root}/nonexistent_file.txt 的内容",
+        "expectedOutput": "返回错误信息，提示文件不存在",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取空文件",
+        "input": "读取文件 {agentxx_root}/temp/empty_file.txt 的内容",
+        "expectedOutput": "返回空内容或提示文件为空",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取二进制文件",
+        "input": "读取文件 {agentxx_root}/temp/test.bin 的内容作为文本",
+        "expectedOutput": "返回该文件的文本内容（可能包含乱码）或提示不适合文本读取",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取JSON文件",
+        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_list_file.json 的完整内容",
+        "expectedOutput": "返回该JSON文件的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取第1行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第1行",
+        "expectedOutput": "返回该文件第1行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取最后10行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的最后10行",
+        "expectedOutput": "返回该文件最后10行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取最后一行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的最后一行",
+        "expectedOutput": "返回该文件最后一行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取中间部分",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第200行到第300行",
+        "expectedOutput": "返回该文件第200-300行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取大文件",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的完整内容，已知该文件超过1000行",
+        "expectedOutput": "返回该文件的完整内容，能处理大文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取限制行数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，限制最多返回前500行",
+        "expectedOutput": "返回该文件的前500行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取限制字符数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，限制最多返回前10000个字符",
+        "expectedOutput": "返回该文件的前10000个字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取从偏移行开始",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，从第100行开始，读取50行",
+        "expectedOutput": "返回该文件第100-149行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取从偏移字符开始",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，从第500个字符开始，读取1000个字符",
+        "expectedOutput": "返回从第500个字符开始的1000个字符内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取所有include文件",
+        "input": "读取 {agentxx_root}/agent/lib/include/agentxx/tools 目录下所有 .h 文件的内容",
+        "expectedOutput": "返回所有头文件的内容（可能合并或逐文件返回）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计行数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并统计总行数",
+        "expectedOutput": "返回文件内容并报告总行数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计字符数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并统计总字符数",
+        "expectedOutput": "返回文件内容并报告总字符数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计单词数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并统计总单词数",
+        "expectedOutput": "返回文件内容并报告总单词数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件指定编码",
+        "input": "以 UTF-8 编码读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h",
+        "expectedOutput": "返回UTF-8编码的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件指定编码GBK",
+        "input": "以 GBK 编码读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h",
+        "expectedOutput": "返回GBK编码的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件并检测编码",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，自动检测文件编码",
+        "expectedOutput": "返回检测到的编码和文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取换行符为CRLF的文件",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并显示换行符类型",
+        "expectedOutput": "返回文件内容和换行符类型（CRLF/LF）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取只读文件",
+        "input": "以只读模式读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h",
+        "expectedOutput": "返回文件内容，不修改文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件包含BOM",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并检查是否有BOM",
+        "expectedOutput": "返回文件内容并报告BOM信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取gitignore文件",
+        "input": "读取文件 {agentxx_root}/.gitignore 的完整内容",
+        "expectedOutput": "返回 .gitignore 文件的完整内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取README文件",
+        "input": "读取文件 {agentxx_root}/README.md 的完整内容",
+        "expectedOutput": "返回 README.md 的完整内容（如果存在）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取CMakeLists.txt",
+        "input": "读取文件 {agentxx_root}/CMakeLists.txt 的完整内容",
+        "expectedOutput": "返回 CMakeLists.txt 的完整内容（如果存在）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取训练数据JSON",
+        "input": "读取文件 {agentxx_root}/resource/train/data/get_current_datetime.json 的完整内容",
+        "expectedOutput": "返回该JSON文件的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并查找特定内容",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，查找包含 class 的行",
+        "expectedOutput": "返回文件中所有包含 class 的行及其行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并查找函数定义",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，查找所有函数定义",
+        "expectedOutput": "返回文件中所有函数定义的行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并提取注释",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，提取所有注释",
+        "expectedOutput": "返回文件中所有注释内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并提取include语句",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，提取所有 #include 语句",
+        "expectedOutput": "返回文件中所有 #include 语句",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并提取命名空间",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，提取命名空间信息",
+        "expectedOutput": "返回文件中的命名空间定义",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取python文件",
+        "input": "读取文件 {agentxx_root}/resource/train/data/../scripts/train.py 的内容（如果存在）",
+        "expectedOutput": "返回该Python文件的完整内容或文件不存在错误",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取YAML文件",
+        "input": "读取文件 {agentxx_root}/resource/train/config.yaml 的内容（如果存在）",
+        "expectedOutput": "返回该YAML文件的内容或文件不存在错误",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取第1到第5行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第1行到第5行",
+        "expectedOutput": "返回该文件的前5行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取第100到第110行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第100行到第110行",
+        "expectedOutput": "返回该文件第100-110行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取第500到第600行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第500行到第600行",
+        "expectedOutput": "返回该文件第500-600行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取0行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，限制行数为0",
+        "expectedOutput": "返回空内容或提示行数限制为0",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取负数行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，限制行数为-1",
+        "expectedOutput": "返回错误提示或完整文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取超大行数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，限制行数为 999999",
+        "expectedOutput": "返回该文件的完整内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取超出范围的行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，从第99999行开始读取",
+        "expectedOutput": "返回空内容或提示超出文件行数范围",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取负偏移行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，从第-1行开始读取",
+        "expectedOutput": "返回错误提示",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并格式化缩进",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，保留原始缩进格式",
+        "expectedOutput": "返回保留原始缩进的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并去除空行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，跳过空行",
+        "expectedOutput": "返回去除空行后的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并添加行号",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，每行前添加行号",
+        "expectedOutput": "返回带行号的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并高亮关键字",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，高亮显示 class 关键字",
+        "expectedOutput": "返回高亮显示的内容（如果支持Markdown代码块）",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并计算MD5",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并计算其MD5哈希值",
+        "expectedOutput": "返回文件内容和MD5哈希值",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并计算SHA256",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并计算其SHA256哈希值",
+        "expectedOutput": "返回文件内容和SHA256哈希值",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取两个文件对比",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 和 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h 并对比差异",
+        "expectedOutput": "返回两个文件的内容或对比差异",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件并报告大小",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并报告文件大小",
+        "expectedOutput": "返回文件内容和文件大小信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件并报告修改时间",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并报告最后修改时间",
+        "expectedOutput": "返回文件内容和修改时间信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取符号链接指向的文件",
+        "input": "如果有符号链接指向 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，读取符号链接目标文件",
+        "expectedOutput": "返回符号链接目标文件的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取管道文件",
+        "input": "尝试读取一个命名管道文件的内容",
+        "expectedOutput": "返回管道文件内容或错误提示",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取设备文件",
+        "input": "尝试读取 /dev/null 的内容（Linux）或 NUL 的内容（Windows）",
+        "expectedOutput": "返回空内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取系统文件",
+        "input": "读取 /etc/hosts 的内容（Linux）或 C:\\Windows\\System32\\drivers\\etc\\hosts 的内容（Windows）",
+        "expectedOutput": "返回hosts文件的内容或权限错误",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并截断显示",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，只显示前500个字符，其余用...表示",
+        "expectedOutput": "返回截断后的文件内容，末尾有省略号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并转换为Markdown代码块",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，以Markdown代码块格式返回",
+        "expectedOutput": "返回用```包裹的Markdown代码块格式内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并提取类定义",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，提取所有类定义",
+        "expectedOutput": "返回文件中所有类定义的代码片段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并提取枚举定义",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，提取所有枚举定义",
+        "expectedOutput": "返回文件中所有枚举定义的代码片段",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取部分内容",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 从第10%位置到第20%位置的内容",
+        "expectedOutput": "返回文件中间部分的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计空行数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并统计空行数量",
+        "expectedOutput": "返回文件内容和空行统计数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计注释行数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并统计注释行数量",
+        "expectedOutput": "返回文件内容和注释行统计数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计代码行数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 并统计有效代码行数",
+        "expectedOutput": "返回文件内容和有效代码行统计数",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并反转行序",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，按行倒序输出",
+        "expectedOutput": "返回行序反转后的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并随机抽样行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，随机抽取10行",
+        "expectedOutput": "返回随机抽取的10行内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并去重",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，去除重复行",
+        "expectedOutput": "返回去重后的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并过滤包含特定字符串的行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，只显示包含 include 的行",
+        "expectedOutput": "返回所有包含 include 的行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并过滤不包含特定字符串的行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，只显示不包含 # 的行",
+        "expectedOutput": "返回所有不包含 # 的行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取多个文件",
+        "input": "同时读取 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 和 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h",
+        "expectedOutput": "返回两个文件的完整内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件并统计最长的行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，找出最长的行",
+        "expectedOutput": "返回最长行的内容和行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件并统计最短的行",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，找出最短的非空行",
+        "expectedOutput": "返回最短非空行的内容和行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取文件并计算平均行长度",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，计算平均行长度",
+        "expectedOutput": "返回文件内容和平均行长度",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取当前打开的文件",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/agent/training.h 的完整内容",
+        "expectedOutput": "返回 training.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 全文读取分块返回",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，每次返回500行，分多次读取完整文件",
+        "expectedOutput": "分多次返回该文件的完整内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并检查文件是否可读",
+        "input": "检查文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 是否可读，如果可读则读取内容",
+        "expectedOutput": "返回文件可读性检查和文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并显示文件路径",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，在结果中显示文件的完整路径",
+        "expectedOutput": "返回包含完整路径的文件内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取按照行号范围",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 的第300行到第400行",
+        "expectedOutput": "返回该文件第300-400行的内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取并统计字符串出现次数",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h，统计 class 出现的次数",
+        "expectedOutput": "返回文件内容和 class 出现次数统计",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取中文注释文件",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/share_store.h 的完整内容",
+        "expectedOutput": "返回 share_store.h 的完整文本内容，包含中文注释",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取web_search.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/web_search.h 的完整内容",
+        "expectedOutput": "返回 web_search.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取planning.h",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/planning.h 的完整内容",
+        "expectedOutput": "返回 planning.h 的完整文本内容",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取cpp实现文件",
+        "input": "读取文件 {agentxx_root}/agent/lib/src/agentxx/tools/filesystem.cpp 的完整内容",
+        "expectedOutput": "返回 filesystem.cpp 的完整实现代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_read_text_file - 读取tool.h完整内容",
+        "input": "读取文件 {agentxx_root}/agent/lib/include/agentxx/tools/tool.h 的完整内容",
+        "expectedOutput": "返回 tool.h 的完整文本内容，包含基类和模板定义",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

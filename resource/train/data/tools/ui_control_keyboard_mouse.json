@@ -1,0 +1,702 @@
+[
+    {
+        "name": "ui_control_keyboard_mouse - 键盘输入文本",
+        "input": "请模拟键盘输入，在当前光标位置输入文本 'Hello World'",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行键盘输入操作，返回执行结果，应包含 success 或相应的状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 键盘输入中文",
+        "input": "请模拟键盘输入，在当前编辑器中输入中文 '你好，世界'",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行中文键盘输入，返回执行结果，应包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 键盘输入特殊字符",
+        "input": "请模拟键盘输入，输入特殊字符 '!@#$%^&*()'",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行特殊字符输入，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 键盘输入代码",
+        "input": "请模拟键盘输入，输入 C++ 代码 '#include <iostream>\\nint main() {\\n    return 0;\\n}'",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行代码输入，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下回车键",
+        "input": "请模拟键盘操作，按下 Enter 回车键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行回车键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下退格键",
+        "input": "请模拟键盘操作，按下 Backspace 退格键删除一个字符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行退格键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下Tab键",
+        "input": "请模拟键盘操作，按下 Tab 制表键进行缩进",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Tab 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下Escape键",
+        "input": "请模拟键盘操作，按下 ESC 退出键关闭当前对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 ESC 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下箭头键向下",
+        "input": "请模拟键盘操作，按下向下方向键移动光标",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行向下箭头键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下箭头键向上",
+        "input": "请模拟键盘操作，按下向上方向键移动光标到上一行",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行向上箭头键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下箭头键向左",
+        "input": "请模拟键盘操作，按下向左方向键移动光标到左边一个字符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行向左箭头键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下箭头键向右",
+        "input": "请模拟键盘操作，按下向右方向键移动光标到右边一个字符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行向右箭头键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下Home键",
+        "input": "请模拟键盘操作，按下 Home 键将光标移动到行首",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Home 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下End键",
+        "input": "请模拟键盘操作，按下 End 键将光标移动到行尾",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 End 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下PageUp键",
+        "input": "请模拟键盘操作，按下 PageUp 键向上翻页",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 PageUp 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下PageDown键",
+        "input": "请模拟键盘操作，按下 PageDown 键向下翻页",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 PageDown 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下删除键",
+        "input": "请模拟键盘操作，按下 Delete 删除键删除光标后一个字符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Delete 键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+C",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+C 复制选中内容",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+C 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+V",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+V 粘贴内容",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+V 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+X",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+X 剪切选中内容",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+X 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+Z",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+Z 撤销上一步操作",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+Z 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+A",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+A 全选所有内容",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+A 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+S",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+S 保存当前文件",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+S 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+F",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+F 打开查找对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+F 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+H",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+H 打开替换对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+H 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+N",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+N 创建新文件",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+N 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Ctrl+O",
+        "input": "请模拟键盘组合键操作，按下 Ctrl+O 打开文件对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+O 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Alt+Tab",
+        "input": "请模拟键盘组合键操作，按下 Alt+Tab 切换窗口",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Alt+Tab 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Alt+F4",
+        "input": "请模拟键盘组合键操作，按下 Alt+F4 关闭当前窗口",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Alt+F4 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Win+D",
+        "input": "请模拟键盘组合键操作，按下 Win+D 显示桌面",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Win+D 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 组合键Win+R",
+        "input": "请模拟键盘组合键操作，按下 Win+R 打开运行对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Win+R 组合键操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 功能键F1",
+        "input": "请模拟键盘操作，按下 F1 功能键打开帮助",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 F1 功能键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 功能键F5",
+        "input": "请模拟键盘操作，按下 F5 功能键刷新页面",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 F5 功能键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 功能键F11",
+        "input": "请模拟键盘操作，按下 F11 功能键切换全屏模式",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 F11 功能键按下操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标左键点击",
+        "input": "请模拟鼠标操作，在屏幕坐标 (100, 100) 位置点击左键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标左键点击操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标右键点击",
+        "input": "请模拟鼠标操作，在屏幕坐标 (200, 200) 位置点击右键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标右键点击操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标中键点击",
+        "input": "请模拟鼠标操作，在屏幕坐标 (150, 150) 位置点击中键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标中键点击操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标左键双击",
+        "input": "请模拟鼠标操作，在屏幕坐标 (300, 300) 位置双击左键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标左键双击操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标移动",
+        "input": "请模拟鼠标操作，将鼠标移动到屏幕坐标 (500, 400) 位置",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标移动操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标拖动",
+        "input": "请模拟鼠标拖动操作，从屏幕坐标 (100, 100) 拖动到 (300, 300)",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标拖动操作，从起点位置拖动到终点位置，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标滚轮向上",
+        "input": "请模拟鼠标滚轮操作，向上滚动滚轮 3 格",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标滚轮向上滚动操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标滚轮向下",
+        "input": "请模拟鼠标滚轮操作，向下滚动滚轮 5 格",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标滚轮向下滚动操作，返回执行结果，包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标按下不松开",
+        "input": "请模拟鼠标操作，在屏幕坐标 (100, 100) 位置按下左键不松开",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标左键按下操作，保持按下状态，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标松开按键",
+        "input": "请模拟鼠标操作，松开当前按下的鼠标左键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标左键松开操作，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 移动鼠标拖动选择文本",
+        "input": "请模拟鼠标拖动选择操作，从坐标 (100, 100) 拖动到 (200, 120) 选择一段文本",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标拖动选择操作，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 右键菜单点击",
+        "input": "请在编辑器空白处右键点击打开上下文菜单",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具在目标位置执行右键点击操作，打开上下文菜单，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击菜单栏",
+        "input": "请移动鼠标点击窗口顶部的 File 菜单项",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动鼠标并点击 File 菜单项，打开下拉菜单，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击工具栏按钮",
+        "input": "请移动鼠标点击工具栏上的保存按钮，其位置大约在坐标 (50, 50)",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动鼠标到指定坐标并点击保存按钮，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 滚动点击滚动条",
+        "input": "请点击垂直滚动条的向下箭头来向下滚动页面",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具点击垂直滚动条向下箭头，页面向下滚动，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 拖动滚动条滑块",
+        "input": "请拖动水平滚动条的滑块从位置 (100, 500) 到 (300, 500)",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具拖动滚动条滑块到指定位置，横向滚动页面，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 连续输入多行文本",
+        "input": "请模拟键盘连续输入以下多行文本：\\n第一行文本\\n第二行文本\\n第三行文本\\n",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具逐行输入文本，每行输入后按回车，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 输入空格分隔多个单词",
+        "input": "请模拟键盘输入文本 \"the quick brown fox jumps over the lazy dog\"",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具输入完整的句子，每个单词之间用空格分隔，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 输入带标点符号的英文句子",
+        "input": "请模拟键盘输入句子 \"Hello, world! How are you today?\"",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具输入包含逗号、感叹号、问号的句子，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 输入中文标点符号",
+        "input": "请模拟键盘输入句子：你好，世界！今天天气真好？",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具输入包含中文标点的句子，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按住Shift输入大写字母",
+        "input": "请按住 Shift 键输入大写字母 A",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按住 Shift 键输入大写字母 A，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 切换大小写后输入",
+        "input": "按下 CapsLock 切换大写后输入文本 \"HELLO\"",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按下 CapsLock 切换大写模式，然后输入 HELLO，返回执行结果包含 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 拖动选中并复制",
+        "input": "请先用鼠标拖动从坐标 (100, 100) 到 (200, 100) 选中文本，然后按下 Ctrl+C 复制",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行拖动选择然后 Ctrl+C 复制操作，两个操作都成功执行，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 粘贴到新位置",
+        "input": "请移动鼠标到坐标 (300, 200) 点击定位光标，然后按下 Ctrl+V 粘贴",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动点击定位光标后执行 Ctrl+V 粘贴，两个操作都成功，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 选中后剪切",
+        "input": "请拖动鼠标选中一段文本，然后按下 Ctrl+X 剪切",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行拖动选择后 Ctrl+X 剪切，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 全选后删除",
+        "input": "请按下 Ctrl+A 全选所有内容，然后按下 Delete 删除",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+A 全选然后 Delete 删除，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 撤销上一步操作",
+        "input": "请按下 Ctrl+Z 撤销上一步的删除操作",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+Z 撤销操作，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 重做上一步操作",
+        "input": "请按下 Ctrl+Shift+Z 重做上一步被撤销的操作",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+Shift+Z 重做操作，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 保存文件并关闭",
+        "input": "请依次按下 Ctrl+S 保存文件，然后按下 Alt+F4 关闭窗口",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具依次执行 Ctrl+S 和 Alt+F4 操作，两个操作都成功，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 打开查找替换",
+        "input": "请按下 Ctrl+H 打开查找替换对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+H 操作，打开查找替换对话框，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 在对话框中输入查找内容",
+        "input": "请点击查找输入框位置坐标 (200, 200)，然后输入查找文本 \"TODO\"",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具点击定位输入框，然后输入查找文本，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击查找按钮",
+        "input": "请移动鼠标点击查找对话框中的查找下一个按钮，坐标大约是 (300, 250)",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具点击查找下一个按钮，执行查找操作，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 关闭对话框",
+        "input": "请按下 ESC 键关闭当前打开的对话框",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按下 ESC 键关闭对话框，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 移动到行首选择到行尾",
+        "input": "请按下 Home 键到行首，然后按住 Shift+End 选中整行",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按下 Home 再按 Shift+End 选中整行文本，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_key-mouse - 快速移动到文档开头",
+        "input": "请按下 Ctrl+Home 快速移动光标到文档开头",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+Home 组合键，光标移动到文档开头，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 快速移动到文档末尾",
+        "input": "请按下 Ctrl+End 快速移动光标到文档末尾",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+End 组合键，光标移动到文档末尾，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 选中整行",
+        "input": "请移动鼠标到行首，双击鼠标左键选中整行",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动鼠标到行首位置双击选中整行，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 三击选中段落",
+        "input": "请在段落内连续三击鼠标左键选中整个段落",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具连续三次点击鼠标左键选中整个段落，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击滚动条空白区域翻页",
+        "input": "请点击垂直滚动条滑块下方的空白区域向下翻一页",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具点击垂直滚动条空白区域，页面向下翻一页，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标侧键前进后退",
+        "input": "请按下鼠标侧键后退，在浏览器中返回上一页",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按下鼠标侧键执行后退操作，浏览器返回上一页，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard-mouse - 长按鼠标左键选择",
+        "input": "请在起始位置 (100, 100) 长按鼠标左键，然后移动到 (200, 200) 选择区域",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具长按左键并移动选择矩形区域，松开左键完成选择，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击复选框",
+        "input": "请移动鼠标到坐标 (150, 200) 点击复选框切换选中状态",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动到指定位置点击复选框，切换其选中状态，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击单选按钮",
+        "input": "请移动鼠标到坐标 (150, 220) 点击第二个单选按钮选中它",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动到指定位置点击单选按钮，使其变为选中状态，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 拖动调整列宽",
+        "input": "请拖动表格列边界从坐标 (100, 50) 到坐标 (150, 50) 调整列宽",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具拖动列边界调整宽度，松开完成调整，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 双击调整自动列宽",
+        "input": "请双击列边界位置坐标 (100, 50) 让列宽自动适应内容",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具双击列边界，自动调整列宽适应内容，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 右键点击选择上下文菜单",
+        "input": "请右键点击文件图标位置坐标 (50, 50) 打开上下文菜单",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具右键点击文件图标，打开右键上下文菜单，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 点击上下文菜单项",
+        "input": "请在打开的右键菜单中点击 Open 选项，位置大约在坐标 (80, 80)",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具点击右键菜单中的 Open 选项，打开文件，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 按下Shift点击多选",
+        "input": "先点击第一个文件位置 (50, 50)，然后按住 Shift 点击最后一个文件位置 (50, 200) 选中所有中间文件",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具先点击第一个文件，按住 Shift 再点击最后一个，选中范围内容，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - Ctrl点击多选",
+        "input": "按住 Ctrl 键依次点击三个不同位置的文件，选中多个不连续的文件",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按住 Ctrl 键依次点击多个文件，每个点击都选中对应文件，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 拖动文件移动",
+        "input": "选中文件后，从位置 (100, 100) 拖动到位置 (300, 300) 的文件夹目标处松开",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按住左键拖动文件到目标文件夹，松开完成移动，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - Ctrl拖动复制文件",
+        "input": "按住 Ctrl 键拖动文件从原位置到目标位置复制文件",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具按住 Ctrl 键拖动文件创建副本，松开完成复制，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 空操作无动作",
+        "input": "不执行任何键盘或鼠标操作",
+        "expectedOutput": "调用工具但不执行任何动作，返回 success 状态信息，不改变当前界面",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 坐标原点点击",
+        "input": "请在屏幕坐标 (0, 0) 位置点击鼠标左键",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具在 (0, 0) 位置点击左键，如果坐标有效则返回 success，否则返回错误信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 大坐标范围移动",
+        "input": "请将鼠标移动到屏幕坐标 (1920, 1080) 位置",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具移动鼠标到右下角位置，如果屏幕分辨率支持则 success，否则返回错误",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 零滚轮滚动",
+        "input": "请滚动鼠标滚轮 0 格",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行零格滚动，不产生实际滚动，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 大滚轮滚动",
+        "input": "请向下滚动鼠标滚轮 100 格",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具向下滚动 100 格，页面大幅向下滚动，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 无效按键名称",
+        "input": "请按下一个不存在的按键 'INVALID_KEY'",
+        "expectedOutput": "返回错误信息，提示按键名称无效或不支持该按键",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 空输入文本",
+        "input": "请模拟键盘输入空文本",
+        "expectedOutput": "不输入任何字符，直接返回 success 状态信息，不产生任何变化",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 输入空格",
+        "input": "请模拟键盘输入一个空格字符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具输入一个空格，光标向右移动一格，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 输入换行符",
+        "input": "请模拟键盘输入换行符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具插入换行符，光标移动到下一行开头，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 输入制表符",
+        "input": "请模拟键盘输入制表符",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具插入制表符，光标跳到下一个制表位，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 打开任务管理器",
+        "input": "请按下 Ctrl+Shift+Esc 组合键打开任务管理器",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Ctrl+Shift+Esc 组合键，打开任务管理器，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 锁定计算机",
+        "input": "请按下 Win+L 组合键锁定计算机",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行 Win+L 组合键，锁定计算机，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 连续输入多个快捷键",
+        "input": "请依次按下 Ctrl+A（全选）、Ctrl+C（复制）、Ctrl+End（跳到末尾）、Ctrl+V（粘贴）",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具依次执行四个组合键操作，每个操作返回 success 状态信息，最终粘贴内容到文档末尾",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标移动到指定坐标",
+        "input": "请将鼠标光标移动到屏幕坐标 (500, 300) 位置",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标移动操作，将光标移动到 (500, 300) 坐标，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "ui_control_keyboard_mouse - 鼠标左键单击",
+        "input": "请在当前鼠标位置执行左键单击操作",
+        "expectedOutput": "调用 ui_control_keyboard_mouse 工具执行鼠标左键单击，返回 success 状态信息",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

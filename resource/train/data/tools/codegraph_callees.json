@@ -1,0 +1,702 @@
+[
+    {
+        "name": "codegraph_callees - 获取被调用者",
+        "input": "请查找 evaluateVariant 函数内部调用了哪些其他符号，最大深度 3 层",
+        "expectedOutput": "返回 evaluateVariant 函数调用的其他符号列表，应包含被调用函数信息，以 JSON 格式返回",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 获取XXToolBase被调用",
+        "input": "查找 XXToolBase 构造函数内部调用了哪些符号，max_depth=2",
+        "expectedOutput": "返回 XXToolBase 构造函数调用的其他符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 获取execute_async被调用",
+        "input": "查找 execute_async 协程函数内部调用了哪些符号，max_depth=3",
+        "expectedOutput": "返回 execute_async 内部调用的所有符号列表，包含深度 3 层",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 默认深度",
+        "input": "查找 get_definition 内部调用了哪些符号，不指定 max_depth",
+        "expectedOutput": "返回 get_definition 内部调用的符号，默认深度为 3",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 深度为1",
+        "input": "查找 createSubgraph 内部调用了哪些符号，max_depth=1",
+        "expectedOutput": "仅返回深度 1 层，即 createSubgraph 直接调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 深度为5",
+        "input": "查找 searchSymbols 内部调用了哪些符号，max_depth=5",
+        "expectedOutput": "返回深度最多 5 层的完整调用链",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 空symbol参数",
+        "input": "查找被调用者，不指定 symbol 参数",
+        "expectedOutput": "返回错误信息，提示 Arg `symbol` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 不存在的符号",
+        "input": "查找 NonExistentFunction123 内部调用了哪些符号",
+        "expectedOutput": "返回错误信息，提示未找到该符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - getSymbolContext被调用",
+        "input": "查找 CodeGraphManager::getSymbolContext 内部调用了哪些符号",
+        "expectedOutput": "返回 getSymbolContext 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - readFileContent被调用",
+        "input": "查找 FilesystemGrepTool::readFileContent 内部调用了哪些符号",
+        "expectedOutput": "返回 readFileContent 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - autoConvertToUtf8被调用",
+        "input": "查找 autoConvertToUtf8 函数内部调用了哪些符号",
+        "expectedOutput": "返回 autoConvertToUtf8 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - base64Encode被调用",
+        "input": "查找 base64Encode 函数内部调用了哪些符号，max_depth=2",
+        "expectedOutput": "返回 base64Encode 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - HttpClient::getAsync被调用",
+        "input": "查找 HttpClient::getAsync 内部调用了哪些符号",
+        "expectedOutput": "返回 getAsync 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - onSubagentEnd被调用",
+        "input": "查找 ToolSkillSearchSubAgentTask::onSubagentEnd 内部调用了哪些符号",
+        "expectedOutput": "返回 onSubagentEnd 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - createSystemPrompt被调用",
+        "input": "查找 ToolSkillSearchSubAgentTask::createSystemPrompt 内部调用了哪些符号",
+        "expectedOutput": "返回 createSystemPrompt 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - GraphEngine::compile被调用",
+        "input": "查找 neograph::graph::GraphEngine::compile 内部调用了哪些符号",
+        "expectedOutput": "返回 compile 方法内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - glob::rglob被调用",
+        "input": "查找 glob::rglob 函数内部调用了哪些符号",
+        "expectedOutput": "返回 rglob 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - XXRegex::createRegex被调用",
+        "input": "查找 XXRegex::createRegex 内部调用了哪些符号",
+        "expectedOutput": "返回 createRegex 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - AhoCorasick::search被调用",
+        "input": "查找 AhoCorasick::search 内部调用了哪些符号",
+        "expectedOutput": "返回 search 方法内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - fmt::format被调用",
+        "input": "查找 fmt::format 内部调用了哪些符号，max_depth=2",
+        "expectedOutput": "返回 fmt::format 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - asio::async_read被调用",
+        "input": "查找 asio::async_read 内部调用了哪些符号",
+        "expectedOutput": "返回 async_read 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - asio::async_write被调用",
+        "input": "查找 asio::async_write 内部调用了哪些符号",
+        "expectedOutput": "返回 async_write 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - asio::async_read_until被调用",
+        "input": "查找 asio::async_read_until 内部调用了哪些符号",
+        "expectedOutput": "返回 async_read_until 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - std::filesystem::exists被调用",
+        "input": "查找 std::filesystem::exists 内部调用了哪些符号",
+        "expectedOutput": "返回 exists 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - std::filesystem::create_directories被调用",
+        "input": "查找 std::filesystem::create_directories 内部调用了哪些符号",
+        "expectedOutput": "返回 create_directories 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - std::filesystem::file_size被调用",
+        "input": "查找 std::filesystem::file_size 内部调用了哪些符号",
+        "expectedOutput": "返回 file_size 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphManager::searchSymbols被调用",
+        "input": "查找 CodeGraphManager::searchSymbols 内部调用了哪些符号",
+        "expectedOutput": "返回 searchSymbols 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphManager::getCallers被调用",
+        "input": "查找 CodeGraphManager::getCallers 内部调用了哪些符号",
+        "expectedOutput": "返回 getCallers 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphManager::getCallees被调用",
+        "input": "查找 CodeGraphManager::getCallees 内部调用了哪些符号",
+        "expectedOutput": "返回 getCallees 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphManager::getImpact被调用",
+        "input": "查找 CodeGraphManager::getImpact 内部调用了哪些符号",
+        "expectedOutput": "返回 getImpact 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphManager::getStatus被调用",
+        "input": "查找 CodeGraphManager::getStatus 内部调用了哪些符号",
+        "expectedOutput": "返回 getStatus 内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - SubAgentManagerTool::execute_async被调用",
+        "input": "查找 SubAgentManagerTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回该方法内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - WebSearchTool::execute_async被调用",
+        "input": "查找 WebSearchTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回网页搜索执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - WebFetchUrlTool::execute_async被调用",
+        "input": "查找 WebFetchUrlTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回网页获取执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FilesystemWriteFileTool::execute_async被调用",
+        "input": "查找 FilesystemWriteFileTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回文件写入执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FilesystemEditTextFileTool::execute_async被调用",
+        "input": "查找 FilesystemEditTextFileTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回文件编辑执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FilesystemGrepTool::execute_async被调用",
+        "input": "查找 FilesystemGrepTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回文本搜索执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FilesystemGlobTool::execute_async被调用",
+        "input": "查找 FilesystemGlobTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回通配符搜索执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - ExecuteLinuxCommandTool::execute_async被调用",
+        "input": "查找 ExecuteLinuxCommandTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回Linux命令执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - ExecuteWindowsCommandTool::execute_async被调用",
+        "input": "查找 ExecuteWindowsCommandTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回Windows命令执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - UIControlKeyboardMouseTool::execute_async被调用",
+        "input": "查找 UIControlKeyboardMouseTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回UI控制执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphSearchTool::execute_async被调用",
+        "input": "查找 CodeGraphSearchTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回代码搜索执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphContextTool::execute_async被调用",
+        "input": "查找 CodeGraphContextTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回代码上下文执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphCallersTool::execute_async被调用",
+        "input": "查找 CodeGraphCallersTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回调用者分析执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphCalleesTool::execute_async被调用",
+        "input": "查找 CodeGraphCalleesTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回被调用者分析执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphImpactTool::execute_async被调用",
+        "input": "查找 CodeGraphImpactTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回影响分析执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphIndexTool::execute_async被调用",
+        "input": "查找 CodeGraphIndexTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回代码索引执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphStatusTool::execute_async被调用",
+        "input": "查找 CodeGraphStatusTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回状态查询执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FilesystemReadTextFileTool::execute_async被调用",
+        "input": "查找 FilesystemReadTextFileTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回文本读取执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FilesystemReadBinaryFileTool::execute_async被调用",
+        "input": "查找 FilesystemReadBinaryFileTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回二进制读取执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - FileSystemListFileTool::execute_async被调用",
+        "input": "查找 FileSystemListFileTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回目录列表执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - WebFetchUrlMarkdownTool::execute_async被调用",
+        "input": "查找 WebFetchUrlMarkdownTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回Markdown网页获取执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - main函数被调用",
+        "input": "查找 main 函数内部调用了哪些符号，max_depth=5",
+        "expectedOutput": "返回 main 函数内部调用的完整符号调用链",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - defCreateSubGraphDefine被调用",
+        "input": "查找 defCreateSubGraphDefine 模板函数内部调用了哪些符号",
+        "expectedOutput": "返回该模板函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - _defFileRWSummarizationReqHandle被调用",
+        "input": "查找 _defFileRWSummarizationReqHandle 静态函数内部调用了哪些符号",
+        "expectedOutput": "返回该静态函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - _defFileRWSummarizationRespHandle被调用",
+        "input": "查找 _defFileRWSummarizationRespHandle 内联函数内部调用了哪些符号",
+        "expectedOutput": "返回该内联函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 深度为0",
+        "input": "查找 execute_async 内部调用了哪些符号，max_depth=0",
+        "expectedOutput": "返回深度为 0 的结果，应返回空列表或仅包含本身",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 深度很大值",
+        "input": "查找 get_definition 内部调用了哪些符号，max_depth=100",
+        "expectedOutput": "返回深度最多 100 层的完整调用链",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - onSubagentEnd虚函数被调用",
+        "input": "查找 onSubagentEnd 虚函数内部调用了哪些符号",
+        "expectedOutput": "返回虚函数 onSubagentEnd 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 纯虚函数execute_async",
+        "input": "查找 XXToolBase 纯虚函数 execute_async 声明中引用了哪些符号",
+        "expectedOutput": "返回纯虚函数声明中引用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - CodeGraphSearchTool构造函数",
+        "input": "查找 CodeGraphSearchTool 构造函数内部调用了哪些符号",
+        "expectedOutput": "返回构造函数内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - ~SubAgentTaskBase析构函数",
+        "input": "查找 ~SubAgentTaskBase 析构函数内部调用了哪些符号",
+        "expectedOutput": "返回析构函数内部调用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - operator<<重载",
+        "input": "查找 operator<< 重载函数内部调用了哪些符号",
+        "expectedOutput": "返回 operator<< 重载函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - lambda表达式",
+        "input": "查找 lambda 表达式内部捕获和调用了哪些符号",
+        "expectedOutput": "返回 lambda 表达式内部引用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - agentxx::util::base64Encode",
+        "input": "查找 agentxx::util::base64Encode 函数内部调用了哪些符号",
+        "expectedOutput": "返回 base64Encode 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - XXToolBase::createSummarizationToolHandle",
+        "input": "查找 XXToolBase::createSummarizationToolHandle 内部调用了哪些符号",
+        "expectedOutput": "返回该静态方法内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 递归函数调用",
+        "input": "查找递归函数内部调用了哪些符号，max_depth=5",
+        "expectedOutput": "返回递归函数的调用链，应包含自引用递归",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 跨文件调用",
+        "input": "查找 codegraph_search 工具 execute_async 在头文件中调用了哪些符号",
+        "expectedOutput": "返回跨文件引用的符号列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 跨命名空间调用",
+        "input": "查找 fmt::format 在 agentxx 代码中被调用时引用了哪些符号",
+        "expectedOutput": "返回 fmt 命名空间中的相关符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - std::string::find",
+        "input": "查找 std::string::find 成员函数内部调用了哪些符号",
+        "expectedOutput": "返回 string::find 内部调用的标准库符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - boost::asio::co_spawn",
+        "input": "查找 boost::asio::co_spawn 内部调用了哪些符号",
+        "expectedOutput": "返回 co_spawn 内部调用的 boost asio 符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - neograph::json::parse",
+        "input": "查找 neograph::json::parse 内部调用了哪些符号",
+        "expectedOutput": "返回 json::parse 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - glob::glob",
+        "input": "查找 glob::glob 内部调用了哪些符号",
+        "expectedOutput": "返回 glob 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - agentContext.lock",
+        "input": "查找 std::weak_ptr::lock 内部调用了哪些符号",
+        "expectedOutput": "返回 weak_ptr::lock 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找nodes命名空间",
+        "input": "查找 agentxx::nodes 命名空间中函数内部调用了哪些符号",
+        "expectedOutput": "返回节点模块函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找expand命名空间",
+        "input": "查找 agentxx::expand 命名空间中函数内部调用了哪些符号",
+        "expectedOutput": "返回扩展模块函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找agent命名空间",
+        "input": "查找 agentxx::agent 命名空间中函数内部调用了哪些符号",
+        "expectedOutput": "返回 agent 模块函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找training.h中函数",
+        "input": "查找 training.h 中 defaultScoringWithSubAgent 函数内部调用了哪些符号",
+        "expectedOutput": "返回评分函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找tool.h中函数",
+        "input": "查找 tool.h 中 XXToolBase 成员函数内部调用了哪些符号",
+        "expectedOutput": "返回 XXToolBase 成员函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找filesystem.h中函数",
+        "input": "查找 filesystem.h 中 FilesystemGrepTool::execute_async 内部调用了哪些符号",
+        "expectedOutput": "返回文本搜索工具执行函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找string.h中函数",
+        "input": "查找 string.h 中 html_to_markdown 函数内部调用了哪些符号",
+        "expectedOutput": "返回HTML转Markdown函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找share_store.h中函数",
+        "input": "查找 share_store.h 中保存数据函数内部调用了哪些符号",
+        "expectedOutput": "返回共享存储保存函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找planning.h中函数",
+        "input": "查找 planning.h 中规划写入函数内部调用了哪些符号",
+        "expectedOutput": "返回规划写入函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找get_current_datetime.h中函数",
+        "input": "查找 get_current_datetime.h 中获取时间函数内部调用了哪些符号",
+        "expectedOutput": "返回获取时间函数内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::cout",
+        "input": "查找 std::cout 使用时内部调用了哪些符号",
+        "expectedOutput": "返回标准输出流相关调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::ostringstream",
+        "input": "查找 std::ostringstream 构造时调用了哪些符号",
+        "expectedOutput": "返回 ostringstream 构造函数调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::ifstream",
+        "input": "查找 std::ifstream open 方法调用了哪些符号",
+        "expectedOutput": "返回 ifstream open 调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::ofstream",
+        "input": "查找 std::ofstream write 操作调用了哪些符号",
+        "expectedOutput": "返回 ofstream write 调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::fstream",
+        "input": "查找 std::fstream 构造和读写调用了哪些符号",
+        "expectedOutput": "返回 fstream 相关操作调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::stringstream",
+        "input": "查找 std::stringstream str 方法调用了哪些符号",
+        "expectedOutput": "返回 stringstream str 方法调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::find",
+        "input": "查找 std::find 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::find 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::sort",
+        "input": "查找 std::sort 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::sort 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::copy",
+        "input": "查找 std::copy 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::copy 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::transform",
+        "input": "查找 std::transform 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::transform 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::accumulate",
+        "input": "查找 std::accumulate 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::accumulate 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::for_each",
+        "input": "查找 std::for_each 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::for_each 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找std::remove_if",
+        "input": "查找 std::remove_if 算法内部调用了哪些符号",
+        "expectedOutput": "返回 std::remove_if 内部调用的符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找new表达式",
+        "input": "查找 new 表达式分配内存时调用了哪些符号",
+        "expectedOutput": "返回 new 表达式调用的内存分配符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找delete表达式",
+        "input": "查找 delete 表达式释放内存时调用了哪些符号",
+        "expectedOutput": "返回 delete 表达式调用的内存释放符号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "codegraph_callees - 查找nullptr使用",
+        "input": "查找 nullptr 使用时引用了哪些符号",
+        "expectedOutput": "返回 nullptr 相关引用的符号",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

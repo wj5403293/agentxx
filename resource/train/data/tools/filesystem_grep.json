@@ -1,0 +1,709 @@
+[
+    {
+        "name": "filesystem_grep - 文本搜索匹配文件",
+        "input": "请在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'XXToolBase' 的文件，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 'XXToolBase' 的文件路径列表，应包含 tool.h 以及所有继承自 XXToolBase 的工具类头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索类名定义",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'class FileSystemListFileTool' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回包含 'class FileSystemListFileTool' 的匹配内容及所在行号，文件路径应为 filesystem.h",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索命名空间",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx 目录下搜索所有 .h 文件中包含 'namespace agentxx' 的文件，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 'namespace agentxx' 的所有头文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索include指令",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 '#include' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回每个文件中所有 #include 指令的匹配内容及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 非正则精确匹配",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'co_await' 的文件，不使用正则（text_patterns_is_regex=false），输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 'co_await' 关键字的文件路径列表，如 filesystem.h、rag_search.h 等",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索协程函数定义",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 和 .cpp 文件中包含 'asio::awaitable' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有包含 'asio::awaitable' 的匹配内容及行号，显示协程函数定义位置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索错误处理",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'throw' 或 'co_return' 的匹配行，使用正则模式 'throw|co_return'，输出模式为 content",
+        "expectedOutput": "返回所有包含 throw 或 co_return 的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索JSON操作",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'neograph::json' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 neograph::json 的代码位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索指定文件扩展名",
+        "input": "在 {agentxx_root}/agent/lib 下搜索所有 .cpp 文件中包含 'execute_async' 的文件，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有 .cpp 文件中包含 'execute_async' 的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索fmt格式化",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'fmt::format' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 fmt::format 的代码位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索虚函数声明",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'virtual' 和 'override' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有虚函数声明的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索shared_ptr使用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::shared_ptr' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 shared_ptr 的代码位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索基底类继承",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 ': public XXToolBase' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有继承自 XXToolBase 的类定义位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索构造函数",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含构造函数的行（模式 'Tool\(' ），使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有工具类构造函数定义的位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 多个文本模式搜索",
+        "input": "在 {agentxx_root}/agent/lib/include 下搜索所有 .h 文件中同时匹配 'co_await' 或 'co_return' 的内容，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有包含协程关键字的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索注释中的TODO",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 和 .cpp 文件中包含 'TODO' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 TODO 注释的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索字符串转换函数",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'autoConvertToUtf8' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 autoConvertToUtf8 函数的代码位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索base64编码",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'base64Encode' 或 'base64Decode' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 base64 编码/解码函数的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索空参数错误",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'is empty' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含空参数错误提示的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索文件包含模式",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 '#pragma once' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 '#pragma once' 的头文件路径列表，应包含 tools 目录下所有头文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索std::optional使用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::optional' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 std::optional 的代码位置及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索lambda表达式",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'auto' 和 '[' 和 ']' 的 lambda 表达式，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 lambda 表达式定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索错误码处理",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'errCode' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有错误码处理代码的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索特定函数名",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'get_definition' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 get_definition 函数的所有文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索JSON解析",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'json::parse' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 JSON 解析调用的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索模板函数",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'template' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有模板声明/定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索互斥锁使用",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'std::mutex' 或 'std::lock_guard' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含互斥锁使用的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索constexpr定义",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'constexpr' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 constexpr 定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索inline函数",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'inline ' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 inline 函数/变量定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索size_t类型",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'size_t' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回使用 size_t 类型的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索多文件模式",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 和 .hpp 文件中包含 'agentxx' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 agentxx 的 .h 和 .hpp 文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索C++标准库使用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 C++ 标准库的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索文件流操作",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::ifstream' 或 'std::ofstream' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有文件流操作的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索日志输出",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'XX_LOGD' 或 'XX_LOGI' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有日志输出调用的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索断言使用",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'assert' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有断言调用的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索try-catch块",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'try' 或 'catch' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含异常处理块的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索static_cast",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'static_cast' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 static_cast 类型转换的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索std::move使用",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'std::move' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 std::move 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索递归目录遍历",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'recursive_directory_iterator' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有递归目录遍历的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索字符串拼接",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'std::stringstream' 或 'std::ostringstream' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用字符串流拼接的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索参数验证",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'empty()' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有空值检查的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索HTTP客户端使用",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'HttpClient' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 HttpClient 使用的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索弱指针使用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::weak_ptr' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 weak_ptr 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索chrono时间操作",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'std::chrono' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有时间操作相关的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索ranged-for循环",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'for (const auto&' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 ranged-for 循环的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索struct定义",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'struct ' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有结构体定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索enum定义",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'enum class' 或 'enum ' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有枚举定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索agent_context",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'agentContext' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有引用 agentContext 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索co_yield使用",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有文件中包含 'co_yield' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 co_yield 协程操作的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索unique_ptr使用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::unique_ptr' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 unique_ptr 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索默认参数",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 '= std::string{}' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用默认参数值的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索vector容器",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::vector' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有使用 std::vector 的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索map容器",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::map' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有使用 std::map 的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 空text_patterns错误",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索，text_patterns 为空数组，file_patterns 为 ['*.h']，使用正则模式",
+        "expectedOutput": "返回错误信息，提示 Arg `text_patterns` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 空file_patterns错误",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索，text_patterns 为 ['class'], file_patterns 为空数组，使用正则模式",
+        "expectedOutput": "返回错误信息，提示 Arg `file_patterns` is empty",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 不存在的目录",
+        "input": "在 {agentxx_root}/nonexistent_dir 目录下搜索所有 .h 文件中包含 'class' 的文件，使用正则模式",
+        "expectedOutput": "返回错误信息，提示未找到匹配 file_patterns 的文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索不存在的模式",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'NonExistentPattern12345' 的文件，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回空结果，因为没有文件包含该模式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索特定文件扩展名模式",
+        "input": "在 {agentxx_root}/agent/lib/include 下搜索所有 .h 文件中包含 'public' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有包含 public 访问控制的关键字匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索private成员",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'private:' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 private 访问控制声明的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索protected成员",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'protected:' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 protected 访问控制声明的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索析构函数",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '~' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有析构函数定义的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索多个文本模式精确匹配",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'get_definition' 和 'execute_async' 的文件，使用非正则模式，text_patterns 为 ['get_definition', 'execute_async']，输出模式为 files_with_matches",
+        "expectedOutput": "返回同时包含这两个方法名的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索C风格字符串",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'R\"(' 原始字符串字面量的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用原始字符串字面量的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索sub_agent相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'subagent' 或 'SubAgent' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有与子代理相关的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索middleware相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'middleware' 或 'Middleware' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有与中间件相关的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索node相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'node' 或 'Node' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有与节点相关的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索asio命名空间",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'asio::' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 asio 命名空间的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索fstream文件流",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::fstream' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 fstream 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索filesystem命名空间",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::filesystem' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 std::filesystem 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索工具名称定义",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'XXToolBase' 的第一个参数（工具名称字符串），使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有工具构造函数中定义的工具名称匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索training相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'training' 或 'Training' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有与训练相关的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索利用graph相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'GraphEngine' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 GraphEngine 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索prompt相关",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'prompt' 或 'Prompt' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有与提示词相关的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索toolPrompt引用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'toolPrompt' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有引用 toolPrompt 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索config相关",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'agentConfig' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有引用 agentConfig 的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索memory头文件",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '#include <memory>' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 memory 头文件的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索string头文件",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '#include <string>' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 string 头文件的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索vector头文件",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '#include <vector>' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 vector 头文件的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索iostream头文件",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '#include <iostream>' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 iostream 头文件的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索sstream头文件",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '#include <sstream>' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含 sstream 头文件的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索正则表达式模式匹配",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含匹配行首空格的模式 '^\\s+class' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有类定义（带缩进）的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索方法定义行尾",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'override;' 或 'override {' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 override 方法声明的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索默认参数数字",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '= 100' 或 '= -1' 等默认数字参数的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用默认数字参数的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索C++11特性",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'decltype' 或 'noexcept' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 C++11 特性的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索C++20协程",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'co_await' 或 'co_return' 或 'co_yield' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用 C++20 协程关键字的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索move语义",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'std::move' 或 'std::forward' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用移动语义的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索条件编译",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 '#ifdef' 或 '#ifndef' 或 '#if' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回所有包含条件编译指令的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索using声明",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'using ' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 using 声明的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索函数返回类型",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 '-> std::' 或 '-> neograph::' 的尾置返回类型，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有使用尾置返回类型的函数声明行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索AgentContext引用",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'AgentContext' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有引用 AgentContext 类的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索SummarizationToolHandle",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'SummarizationToolHandle' 的行，使用正则模式，输出模式为 files_with_matches",
+        "expectedOutput": "返回包含 SummarizationToolHandle 的文件路径列表",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索ChatTool返回类型",
+        "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录下搜索所有 .h 文件中包含 'neograph::ChatTool' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有 ChatTool 返回类型声明的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索Markdown处理",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'markdown' 或 'Markdown' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有与 Markdown 处理相关的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索HTML处理",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'html' 或 'HTML' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有与 HTML 处理相关的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索状态图相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'stateDiagram' 或 'roadmap' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有与状态图/规划相关的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索embedding相关",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'embedding' 或 'embed' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有与嵌入向量相关的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索cosineSimilarity",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'cosineSimilarity' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有余弦相似度计算代码的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索向量存储",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'VectorStore' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有向量存储相关代码的匹配行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索内容截断",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'maxLength' 或 'resize' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有内容截断处理的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索消息标志",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'MessageFlag' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有消息标志使用的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "filesystem_grep - 搜索路由配置",
+        "input": "在 {agentxx_root}/agent/lib 目录下搜索所有 .h 文件中包含 'routes' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回所有路由配置的代码行及行号",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

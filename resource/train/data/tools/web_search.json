@@ -1,0 +1,702 @@
+[
+    {
+        "name": "web_search - 搜索网页内容",
+        "input": "请在网络上搜索 C++20 coroutine 的用法，返回搜索结果",
+        "expectedOutput": "返回与 C++20 coroutine 相关的搜索结果内容，应包含 co_await、co_return、co_yield 等关键字的相关信息，结果长度不超过 8000 字符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索C++模板元编程",
+        "input": "搜索 C++ template metaprogramming 最佳实践",
+        "expectedOutput": "返回与C++模板元编程相关的搜索结果，包含最佳实践和技术文章",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索asio协程用法",
+        "input": "搜索 boost::asio awaitable coroutine 使用方法",
+        "expectedOutput": "返回与asio协程相关的搜索结果，包含代码示例",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索CMake配置",
+        "input": "搜索 CMake modern best practices for C++ projects",
+        "expectedOutput": "返回CMake现代化配置实践相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索JSON解析库",
+        "input": "搜索 C++ 高性能 JSON 解析库推荐",
+        "expectedOutput": "返回C++ JSON解析库的对比和推荐信息",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索代码搜索算法",
+        "input": "搜索 code search algorithm for large codebases",
+        "expectedOutput": "返回大规模代码库搜索算法相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索LLM训练方法",
+        "input": "搜索 LLM fine-tuning reinforcement learning 最新方法",
+        "expectedOutput": "返回LLM微调和强化学习的最新方法搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索正则表达式教程",
+        "input": "搜索 C++ regex 正则表达式使用教程",
+        "expectedOutput": "返回C++正则表达式使用教程的搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索HTML转Markdown",
+        "input": "搜索 HTML to Markdown conversion algorithm",
+        "expectedOutput": "返回HTML转Markdown转换算法相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索共享存储设计",
+        "input": "搜索 key-value store design pattern C++",
+        "expectedOutput": "返回键值存储设计模式相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索进程间通信",
+        "input": "搜索 C++ inter-process communication pipe stdin stdout",
+        "expectedOutput": "返回C++进程间通信管道相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索代码图数据库",
+        "input": "搜索 code graph database Neo4j Cypher query",
+        "expectedOutput": "返回代码图数据库和Neo4j查询相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索Aho-Corasick算法",
+        "input": "搜索 Aho-Corasick string matching algorithm C++",
+        "expectedOutput": "返回Aho-Corasick字符串匹配算法C++实现相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索glob模式匹配",
+        "input": "搜索 glob pattern matching C++ library",
+        "expectedOutput": "返回C++ glob模式匹配库相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索SubAgent架构",
+        "input": "搜索 multi-agent system sub-agent architecture LLM",
+        "expectedOutput": "返回多Agent系统子Agent架构相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索工具调用框架",
+        "input": "搜索 LLM tool calling function calling framework",
+        "expectedOutput": "返回LLM工具调用和函数调用框架相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索键盘鼠标模拟",
+        "input": "搜索 simulate keyboard mouse input C++ Windows",
+        "expectedOutput": "返回C++键盘鼠标模拟Windows相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索HTTP客户端",
+        "input": "搜索 C++ HTTP client library async awaitable",
+        "expectedOutput": "返回C++异步HTTP客户端库相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索编码转换",
+        "input": "搜索 C++ UTF-8 encoding conversion auto detect",
+        "expectedOutput": "返回C++ UTF-8编码自动检测和转换相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索Base64编解码",
+        "input": "搜索 C++ base64 encode decode implementation",
+        "expectedOutput": "返回C++ Base64编解码实现相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索中文NLP问题",
+        "input": "搜索中文自然语言处理 C++ 分词 库",
+        "expectedOutput": "返回中文NLP和C++分词库相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索流式处理",
+        "input": "搜索 C++ stream processing coroutine async generator",
+        "expectedOutput": "返回C++流式处理和异步生成器相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索日志系统",
+        "input": "搜索 C++ logging library structured logging",
+        "expectedOutput": "返回C++结构化日志库相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索格式化库",
+        "input": "搜索 fmt library C++ compile-time format string",
+        "expectedOutput": "返回fmt库编译时格式化字符串相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索性能优化",
+        "input": "搜索 C++ performance optimization memory allocation profiling",
+        "expectedOutput": "返回C++性能优化和内存分配分析相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索单元测试",
+        "input": "搜索 C++ unit testing framework comparison GoogleTest Catch2",
+        "expectedOutput": "返回C++单元测试框架对比搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索插件系统",
+        "input": "搜索 C++ plugin system dynamic loading dlopen",
+        "expectedOutput": "返回C++插件系统和动态加载相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索序列化",
+        "input": "搜索 C++ serialization deserialization JSON XML binary",
+        "expectedOutput": "返回C++序列化反序列化相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索网络编程",
+        "input": "搜索 C++ network programming boost asio tutorial",
+        "expectedOutput": "返回C++网络编程Boost.Asio教程搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索文件系统",
+        "input": "搜索 C++ filesystem std::filesystem tutorial",
+        "expectedOutput": "返回C++文件系统std::filesystem教程搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索CI/CD",
+        "input": "搜索 C++ project CI/CD GitHub Actions CMake",
+        "expectedOutput": "返回C++项目CI/CD配置相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索内存管理",
+        "input": "搜索 C++ smart pointer unique_ptr shared_ptr weak_ptr best practices",
+        "expectedOutput": "返回C++智能指针最佳实践搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索设计模式",
+        "input": "搜索 C++ design patterns factory observer strategy",
+        "expectedOutput": "返回C++设计模式工厂观察者策略模式搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索并发编程",
+        "input": "搜索 C++ concurrency thread pool async future promise",
+        "expectedOutput": "返回C++并发编程线程池异步相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索状态机",
+        "input": "搜索 C++ state machine framework boost::msm",
+        "expectedOutput": "返回C++状态机框架搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索代码生成",
+        "input": "搜索 C++ code generation reflection metaclasses",
+        "expectedOutput": "返回C++代码生成和反射相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索REST API",
+        "input": "搜索 C++ REST API framework client server",
+        "expectedOutput": "返回C++ REST API框架搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索WebSocket",
+        "input": "搜索 C++ WebSocket client server boost beast",
+        "expectedOutput": "返回C++ WebSocket编程搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索数据库连接",
+        "input": "搜索 C++ database connection pool MySQL PostgreSQL",
+        "expectedOutput": "返回C++数据库连接池搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索缓存系统",
+        "input": "搜索 C++ cache system LRU LFU implementation",
+        "expectedOutput": "返回C++缓存系统LRU/LFU实现搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索算法竞赛",
+        "input": "搜索 competitive programming algorithm C++ STL",
+        "expectedOutput": "返回C++竞赛编程和STL算法搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索GraphQL",
+        "input": "搜索 GraphQL C++ implementation server",
+        "expectedOutput": "返回C++ GraphQL实现搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索gRPC",
+        "input": "搜索 gRPC C++ async client server tutorial",
+        "expectedOutput": "返回C++ gRPC异步客户端服务端教程搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索protobuf",
+        "input": "搜索 protobuf C++ serialization performance",
+        "expectedOutput": "返回C++ protobuf序列化性能搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索OpenAI API",
+        "input": "搜索 OpenAI API C++ client implementation",
+        "expectedOutput": "返回C++ OpenAI API客户端实现搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索向量数据库",
+        "input": "搜索 vector database similarity search embedding",
+        "expectedOutput": "返回向量数据库和嵌入相似搜索搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索代码审查",
+        "input": "搜索 code review best practices automated code review AI",
+        "expectedOutput": "返回代码审查最佳实践和AI自动化代码审查搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索Prompt工程",
+        "input": "搜索 prompt engineering techniques LLM chain-of-thought",
+        "expectedOutput": "返回Prompt工程技术和思维链相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索Agent框架",
+        "input": "搜索 LLM agent framework autonomous agent tools",
+        "expectedOutput": "返回LLM Agent框架和自主Agent相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索代码搜索索引",
+        "input": "搜索 code search index inverted index tokenizer",
+        "expectedOutput": "返回代码搜索索引和倒排索引搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索文本相似度",
+        "input": "搜索 text similarity algorithm edit distance cosine similarity",
+        "expectedOutput": "返回文本相似度算法搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索符号图",
+        "input": "搜索 symbol graph static analysis call graph C++",
+        "expectedOutput": "返回C++静态分析调用图相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索代码补全",
+        "input": "搜索 code completion AI language model context",
+        "expectedOutput": "返回AI代码补全语言模型相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索进化算法",
+        "input": "搜索 evolutionary algorithm genetic programming prompt optimization",
+        "expectedOutput": "返回进化算法和Prompt优化相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索模型蒸馏",
+        "input": "搜索 model distillation knowledge distillation LLM",
+        "expectedOutput": "返回模型蒸馏知识蒸馏相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索强化学习",
+        "input": "搜索 reinforcement learning from human feedback RLHF",
+        "expectedOutput": "返回RLHF强化学习人类反馈相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索工具选择",
+        "input": "搜索 tool selection mechanism LLM agent decision making",
+        "expectedOutput": "返回LLM Agent工具选择决策机制搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索上下文窗口",
+        "input": "搜索 context window management LLM token limit truncation",
+        "expectedOutput": "返回LLM上下文窗口管理和截断策略搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索训练数据",
+        "input": "搜索 training data generation synthetic data LLM",
+        "expectedOutput": "返回训练数据生成和合成数据搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索基准测试",
+        "input": "搜索 LLM benchmark evaluation SWE-bench HumanEval",
+        "expectedOutput": "返回LLM基准测试评估搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索自主编码",
+        "input": "搜索 autonomous coding agent software engineering AI",
+        "expectedOutput": "返回自主编码Agent和软件工程AI搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索多模态",
+        "input": "搜索 multimodal LLM vision code generation",
+        "expectedOutput": "返回多模态LLM视觉代码生成搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索安全沙箱",
+        "input": "搜索 sandbox code execution security Docker",
+        "expectedOutput": "返回代码执行安全沙箱Docker搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索模型量化",
+        "input": "搜索 model quantization int8 int4 inference optimization",
+        "expectedOutput": "返回模型量化推理优化搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索服务部署",
+        "input": "搜索 LLM model serving deployment vLLM TensorRT",
+        "expectedOutput": "返回LLM模型服务部署搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索Token计算",
+        "input": "搜索 token counting estimation LLM cost calculation",
+        "expectedOutput": "返回Token计数和LLM成本计算搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索流式响应",
+        "input": "搜索 streaming response LLM SSE server-sent events",
+        "expectedOutput": "返回LLM流式响应SSE搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索剪枝技术",
+        "input": "搜索 model pruning sparse neural network optimization",
+        "expectedOutput": "返回模型剪枝稀疏网络优化搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索注意力机制",
+        "input": "搜索 attention mechanism transformer multi-head attention",
+        "expectedOutput": "返回注意力机制Transformer多头注意力搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索嵌入模型",
+        "input": "搜索 embedding model text embedding code embedding",
+        "expectedOutput": "返回文本嵌入和代码嵌入模型搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索混合搜索",
+        "input": "搜索 hybrid search keyword vector semantic search",
+        "expectedOutput": "返回混合搜索关键词和语义搜索搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索重排序",
+        "input": "搜索 reranking model cross-encoder search relevance",
+        "expectedOutput": "返回重排序模型和搜索相关性搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索OpenAPI规范",
+        "input": "搜索 OpenAPI specification tool definition function calling",
+        "expectedOutput": "返回OpenAPI规范和工具函数定义搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索JSON Schema",
+        "input": "搜索 JSON Schema validation tool definition parameter",
+        "expectedOutput": "返回JSON Schema验证和工具定义搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索自适应学习",
+        "input": "搜索 adaptive learning rate optimization AdamW SGD",
+        "expectedOutput": "返回自适应学习率优化搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索模型评估",
+        "input": "搜索 model evaluation metrics BLEU ROUGE perplexity",
+        "expectedOutput": "返回模型评估指标搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索数据集构建",
+        "input": "搜索 dataset construction curation instruction tuning",
+        "expectedOutput": "返回数据集构建和指令微调搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索模型融合",
+        "input": "搜索 model merging weight averaging ensemble",
+        "expectedOutput": "返回模型融合权重平均集成搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索MoE架构",
+        "input": "搜索 mixture of experts MoE model architecture",
+        "expectedOutput": "返回MoE混合专家模型架构搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索文档检索",
+        "input": "搜索 document retrieval RAG retrieval augmented generation",
+        "expectedOutput": "返回RAG检索增强生成文档检索搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索知识图谱",
+        "input": "搜索 knowledge graph construction code graph entity extraction",
+        "expectedOutput": "返回知识图谱构建和代码图实体提取搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索API网关",
+        "input": "搜索 API gateway rate limiting proxy",
+        "expectedOutput": "返回API网关速率限制代理搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索负载均衡",
+        "input": "搜索 load balancing algorithm round-robin consistent hashing",
+        "expectedOutput": "返回负载均衡算法搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索容器化",
+        "input": "搜索 containerization Docker Kubernetes C++ application",
+        "expectedOutput": "返回C++应用容器化搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索图数据库",
+        "input": "搜索 graph database comparison Neo4j ArangoDB",
+        "expectedOutput": "返回图数据库对比搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索对象存储",
+        "input": "搜索 object storage S3 C++ SDK minio",
+        "expectedOutput": "返回对象存储C++ SDK搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索消息队列",
+        "input": "搜索 message queue RabbitMQ Kafka C++ client",
+        "expectedOutput": "返回消息队列C++客户端搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索监控系统",
+        "input": "搜索 monitoring system Prometheus Grafana metrics C++",
+        "expectedOutput": "返回C++监控系统搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索分布式追踪",
+        "input": "搜索 distributed tracing OpenTelemetry C++ integration",
+        "expectedOutput": "返回分布式追踪C++集成搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索异常处理",
+        "input": "搜索 C++ exception safety noexcept best practices",
+        "expectedOutput": "返回C++异常安全最佳实践搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索RAII模式",
+        "input": "搜索 C++ RAII resource acquisition is initialization",
+        "expectedOutput": "返回C++ RAII资源获取即初始化搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索移动语义",
+        "input": "搜索 C++ move semantics rvalue reference perfect forwarding",
+        "expectedOutput": "返回C++移动语义右值引用完美转发搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索概念约束",
+        "input": "搜索 C++20 concepts requires clause template constraints",
+        "expectedOutput": "返回C++20概念约束搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索范围库",
+        "input": "搜索 C++20 ranges library views pipeline",
+        "expectedOutput": "返回C++20 ranges范围库搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索编译时计算",
+        "input": "搜索 C++ constexpr compile-time computation metaprogramming",
+        "expectedOutput": "返回C++编译时计算搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索错误处理",
+        "input": "搜索 C++23 std::expected error handling monadic",
+        "expectedOutput": "返回C++23 std::expected错误处理搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索模块系统",
+        "input": "搜索 C++20 modules import export build system",
+        "expectedOutput": "返回C++20模块系统搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索三路比较",
+        "input": "搜索 C++20 spaceship operator operator<=>",
+        "expectedOutput": "返回C++20三路比较运算符搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索C++23新特性",
+        "input": "搜索 C++23 new features std::expected std::mdspan",
+        "expectedOutput": "返回C++23新特性搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "web_search - 搜索协程调度器",
+        "input": "搜索 C++ coroutine scheduler executor design",
+        "expectedOutput": "返回C++协程调度器设计相关搜索结果",
+        "equalOutput": "",
+        "extra": {}
+    }
+]
