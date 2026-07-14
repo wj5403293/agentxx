@@ -1,0 +1,107 @@
+[
+    {
+        "name": "planning_project - 规划新功能集成计划",
+        "input": "规划将 SQLite 数据库集成到 AgentXX 项目中的完整计划。包含：1) 评估第三方库选项（sqlite3 C API, sqlite_orm, sqlpp11）；2) 设计数据模型；3) CMake 集成方案；4) 实现计划和时间预估；5) 测试方案",
+        "expectedOutput": "使用 planning_write 创建 roadmap，然后逐步调研选型、设计方案、规划实现步骤",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划代码迁移计划",
+        "input": "计划将项目从 C++17 迁移到 C++20。需要：1) 评估 C++20 新特性对现有代码的影响（Modules, Concepts, Coroutines, Ranges）；2) 列出需要修改的代码部分；3) 制定逐步迁移策略；4) 更新 CMake 构建配置；5) 测试和回归方案",
+        "expectedOutput": "使用 planning_write 创建迁移 roadmap，然后研究影响范围、制定迁移策略、估算工作量",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划性能优化项目",
+        "input": "规划对 AgentXX 项目进行系统性性能优化的计划。需要：1) 使用性能分析工具定位瓶颈；2) 识别关键路径；3) 制定优化方案列表（含优先级和预估收益）；4) 分阶段实施计划；5) 基准测试和效果验证方案",
+        "expectedOutput": "使用 planning_write 创建优化 roadmap，定位性能瓶颈，制定分阶段优化计划和验证方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划跨平台适配计划",
+        "input": "规划 AgentXX 项目的跨平台适配（Windows/macOS/Linux）。需要：1) 评估各平台的差异（API、文件系统、路径分隔符等）；2) 识别平台相关代码；3) 制定封装策略和抽象层设计；4) CI 多平台构建配置；5) 各平台的测试计划",
+        "expectedOutput": "使用 planning_write 创建跨平台适配 roadmap，然后分析平台差异，制定适配策略和测试方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划安全审计计划",
+        "input": "规划对 AgentXX 项目进行安全审计。需要：1) 识别安全审计范围（输入验证、命令注入、路径遍历等）；2) 制定安全评估标准；3) 计划使用工具（如 clang-tidy 安全规则、cppcheck）；4) 人工审查重点区域；5) 修复和改进计划",
+        "expectedOutput": "使用 planning_write 创建审计 roadmap，然后逐项评估安全性，制定修复优先级",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划文档完善项目",
+        "input": "规划为 AgentXX 项目完善文档体系。需要：1) 评估现有文档覆盖率和差距；2) 制定文档写作计划（API 文档、架构文档、用户指南、贡献指南等）；3) 确定文档格式和工具（Doxygen, Markdown, Sphinx 等）；4) 建立文档审核流程；5) 文档自动化构建",
+        "expectedOutput": "使用 planning_write 创建文档规划 roadmap，然后制定详细的文档内容和分工计划",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划开源发布计划",
+        "input": "规划将 AgentXX 项目开源发布。需要：1) 选择开源 License（MIT/Apache/GPL）；2) 完善项目 README 和贡献文档；3) 设置 GitHub 仓库规范（Issue/PR 模板、标签等）；4) 配置 CI/CD 开源版本；5) 社区运营和维护计划",
+        "expectedOutput": "使用 planning_write 创建开源发布 roadmap，然后准备各种开源所需的文档和配置",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划单元测试覆盖率提升",
+        "input": "规划提升 AgentXX 项目的单元测试覆盖率。需要：1) 评估当前测试覆盖率的不足；2) 制定优先测试的核心模块；3) 设计测试用例策略（正常路径、边界条件、异常路径）；4) 考虑测试替身（Mock/Stub）的使用；5) 设置覆盖率目标和 CI 门槛",
+        "expectedOutput": "使用 planning_write 创建测试覆盖率提升 roadmap，然后分析现有测试，制定补充计划和目标",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划依赖管理策略",
+        "input": "规划 AgentXX 项目的第三方依赖管理策略。需要：1) 盘点当前所有依赖；2) 评估依赖的必要性和替代方案；3) 制定依赖引入/移除流程；4) 依赖版本更新策略；5) License 合规性管理",
+        "expectedOutput": "使用 planning_write 创建依赖管理规划，然后盘点现有依赖，制定管理和审查流程",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划代码重构优先级",
+        "input": "规划 AgentXX 项目的代码重构优先级和路线图。需要：1) 评估现有代码的技术债务；2) 按影响和难度分类（快速胜利、重要改进、长期目标）；3) 制定每个重构项的验收标准和测试要求；4) 避免重构期间功能退化的策略",
+        "expectedOutput": "使用 planning_write 创建重构路线图，然后评估代码质量，制定优先级分级和实施策略",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划AI Agent能力扩展",
+        "input": "规划扩展 AgentXX 的 AI Agent 核心能力。需要：1) 评估当前 Agent 的局限性和用户需求；2) 研究新的工具集成（数据库查询、API 调用、数据分析等）；3) 设计多 Agent 协作模式；4) 改进 Agent 的任务规划和决策能力；5) 评估不同 LLM 模型的效果",
+        "expectedOutput": "使用 planning_write 创建能力扩展 roadmap，然后研究扩展方向，制定实现计划和评估标准",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划错误处理统一化",
+        "input": "规划统一 AgentXX 项目的错误处理机制。需要：1) 评估当前错误处理方式（返回码、异常、optional 等）的不一致性；2) 设计统一的错误类型层次结构；3) 制定错误码标准；4) 提供错误转换和传播工具；5) 分模块逐步迁移计划",
+        "expectedOutput": "使用 planning_write 创建错误处理统一 roadmap，然后设计错误体系，制定迁移策略",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划构建系统现代化",
+        "input": "规划现代化 AgentXX 的构建系统。需要：1) 评估是否升级 CMake 最低版本；2) 研究是否引入预设（Presets）；3) 考虑使用工具链文件（Toolchain）简化交叉编译；4) 优化构建时间（ccache、分布式构建）；5) 简化依赖管理（FetchContent / vcpkg / Conan）",
+        "expectedOutput": "使用 planning_write 创建构建系统现代化 roadmap，然后评估各种方案，制定升级和实施计划",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划集成测试补充",
+        "input": "规划为 AgentXX 补充集成测试。需要：1) 确定关键端到端场景；2) 设计测试环境和测试夹具；3) 编写集成测试用例（工具调用链、任务流程等）；4) 考虑外部服务的 Mock/模拟；5) 集成 CI 的自动执行方案",
+        "expectedOutput": "使用 planning_write 创建集成测试规划，然后设计关键场景测试用例，制定自动执行方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "planning_project - 规划LLM集成优化",
+        "input": "规划优化 AgentXX 与 LLM 的集成。需要：1) 评估当前 LLM 调用的性能和成本；2) 研究 prompt 优化技术（few-shot、chain-of-thought）；3) 考虑结果缓存和流式处理；4) 支持多模型切换和 fallback 策略；5) 设计 prompt 版本管理和 A/B 测试方案",
+        "expectedOutput": "使用 planning_write 创建 LLM 集成优化 roadmap，然后制定 prompt 优化、缓存和多模型策略",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

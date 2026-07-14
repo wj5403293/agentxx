@@ -1,0 +1,142 @@
+[
+    {
+        "name": "coding_project - 实现字符串反转函数",
+        "input": "实现一个C++函数，接受字符串输入并返回反转后的字符串。要求：1) 使用头文件 <algorithm> 中的 std::reverse；2) 支持空字符串；3) 支持包含空格的字符串；4) 编写简单的测试用例验证",
+        "expectedOutput": "先规划实现步骤（使用 planning_write），然后创建文件写入代码，包含函数定义和测试用例，最后编译验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现冒泡排序算法",
+        "input": "用C++实现冒泡排序算法。要求：1) 使用模板支持不同类型；2) 包含排序和打印功能；3) 在 main 函数中测试整数和浮点数数组；4) 注明时间复杂度",
+        "expectedOutput": "先规划实现步骤（使用 planning_write），然后创建源文件写入完整的冒泡排序模板实现，包含测试代码，最后编译验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现单例模式",
+        "input": "用C++实现线程安全的单例模式（Meyers' Singleton）。要求：1) 使用C++11的局部静态变量；2) 包含 getInstance() 方法；3) 禁用拷贝构造和赋值；4) 编写测试验证只创建一个实例",
+        "expectedOutput": "先规划设计，然后创建头文件和实现文件，包含完整的单例类定义和测试验证代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现LRU缓存",
+        "input": "用C++实现LRU（最近最少使用）缓存。要求：1) 支持 put(key, value) 和 get(key) 操作；2) 设置缓存容量上限；3) 使用 std::list 和 std::unordered_map；4) 时间复杂度 O(1)；5) 编写测试用例验证缓存淘汰逻辑",
+        "expectedOutput": "先规划实现方案，创建头文件和源文件实现 LRUCache 类，包含完整的测试验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现配置文件解析器",
+        "input": "用C++实现一个简单的INI配置文件解析器。要求：1) 支持 [section] 和 key=value 格式；2) 忽略注释行（以 ; 或 # 开头）；3) 提供 get(section, key) 方法；4) 支持默认值；5) 处理空白行和前后空格",
+        "expectedOutput": "规划实现步骤，创建解析器类，包含完整的文件读取、解析和查询功能，编写测试配置文件并验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现日志系统",
+        "input": "用C++实现一个简单的日志系统。要求：1) 支持 DEBUG/INFO/WARN/ERROR 四个级别；2) 支持输出到文件和终端；3) 每条日志包含时间戳和级别；4) 线程安全；5) 提供 LOG_DEBUG/LOG_INFO 等宏简化调用",
+        "expectedOutput": "规划设计，创建 Logger 类和日志宏定义，实现多级别日志和文件输出功能，编写测试验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现命令行参数解析器",
+        "input": "用C++实现一个命令行参数解析器。要求：1) 支持 --long-option value 和 -s value 格式；2) 支持布尔选项（无值）；3) 支持帮助信息生成；4) 支持默认值；5) 返回解析错误信息",
+        "expectedOutput": "规划实现方案，创建 ArgParser 类，实现参数注册、解析和帮助生成功能，编写测试验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现JSON序列化器",
+        "input": "用C++实现一个简单的JSON序列化库。要求：1) 支持基本类型（null/bool/number/string）；2) 支持对象（key-value）和数组；3) 支持嵌套结构；4) 实现 toJson() 序列化方法；5) 处理字符串转义",
+        "expectedOutput": "规划设计 JSON 数据结构，实现序列化功能，支持嵌套对象和数组，编写测试验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现计算器",
+        "input": "用C++实现一个支持四则运算和括号的命令行计算器。要求：1) 使用调度场算法（Shunting-yard）或递归下降解析；2) 支持 + - * / 运算符和括号；3) 支持浮点数；4) 处理除零错误；5) 支持输入表达式求值",
+        "expectedOutput": "规划实现方案，创建表达式解析器和求值器，实现完整的计算器功能，编写测试用例验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现线程池",
+        "input": "用C++11实现一个简单的线程池。要求：1) 固定线程数；2) 支持提交任务（函数对象）；3) 使用 std::queue 和 std::condition_variable；4) 优雅关闭；5) 编写测试提交多个任务并验证结果",
+        "expectedOutput": "规划设计，创建 ThreadPool 类，实现任务队列、工作者线程和同步机制，编写测试验证并行执行",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现观察者模式",
+        "input": "用C++实现观察者设计模式。要求：1) 定义 Subject 和 Observer 接口；2) 支持多个观察者订阅；3) 状态变化时自动通知所有观察者；4) 支持取消订阅；5) 编写测试用例验证通知机制",
+        "expectedOutput": "规划设计模式实现，创建 Observer 接口和 Subject 类，编写具体观察者测试通知行为",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现Base64编解码",
+        "input": "用C++实现Base64编码和解码函数。要求：1) 实现 encode(const std::string&) 和 decode(const std::string&)；2) 使用标准Base64字符表（A-Za-z0-9+/）；3) 处理填充字符 '='；4) 验证编解码一致性",
+        "expectedOutput": "规划实现，创建Base64工具函数，实现编解码逻辑，编写测试验证各种字符串的编解码正确性",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现二分查找",
+        "input": "用C++实现泛型二分查找函数。要求：1) 使用模板支持任意可比较类型；2) 返回找到元素的迭代器或 -1；3) 支持左闭右开区间；4) 处理空数组和未找到情况；5) 时间复杂度 O(log n)",
+        "expectedOutput": "创建二分查找模板函数，包含完整的边界条件处理，编写测试验证各种输入情况",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现文件行读取器",
+        "input": "用C++实现一个按行读取文件的工具类。要求：1) 使用 RAII 管理文件句柄；2) 提供 readLine() 方法逐行读取；3) 提供 readAllLines() 方法读取所有行；4) 提供行数统计功能；5) 处理大文件",
+        "expectedOutput": "规划设计，创建 LineReader 类，实现逐行和全部读取功能，编写测试读取不同大小文件",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现智能指针包装器",
+        "input": "用C++实现一个简单的智能指针 ScopedPtr（类似 unique_ptr）。要求：1) 独占所有权；2) RAII 自动释放；3) 支持 -> 和 * 运算符；4) 禁用拷贝、支持移动语义；5) 提供自定义删除器支持",
+        "expectedOutput": "规划实现，创建 ScopedPtr 模板类，实现自动内存管理和运算符重载，编写测试验证生命周期",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现日期工具类",
+        "input": "用C++实现一个日期工具类。要求：1) 支持年、月、日的设置和获取；2) 判断闰年；3) 计算日期是星期几（蔡勒公式）；4) 计算两个日期之间的天数差；5) 格式化为字符串 YYYY-MM-DD",
+        "expectedOutput": "规划实现，创建 Date 类，实现日期计算和格式化功能，编写测试验证各种日期操作",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现环形缓冲区",
+        "input": "用C++实现线程安全的环形缓冲区（Ring Buffer）。要求：1) 固定容量；2) 支持 push() 和 pop() 操作；3) 支持 isEmpty() 和 isFull() 判断；4) 使用互斥锁保证线程安全；5) 支持单生产者-单消费者无锁操作",
+        "expectedOutput": "规划设计，创建 RingBuffer 类，实现线程安全的环形缓冲区，编写多线程测试验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现URL解析器",
+        "input": "用C++实现一个URL解析器。要求：1) 解析 protocol://host:port/path?query#fragment 格式；2) 提取各部分；3) 处理默认端口（http=80, https=443）；4) 处理URL编码（%XX）；5) 支持相对URL和绝对URL",
+        "expectedOutput": "规划实现，创建 UrlParser 类，实现URL各组成部分的解析功能，编写测试验证各种URL格式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现字符串格式化工具",
+        "input": "用C++实现一个简单的字符串格式化函数 format(fmt, args...)。要求：1) 支持 {} 占位符替换；2) 按位置替换多个参数；3) 支持整数、浮点数、字符串类型；4) 处理 {{ 和 }} 转义为 { 和 }",
+        "expectedOutput": "规划实现，创建 format 可变参数模板函数，实现占位符解析和替换，编写测试验证格式化结果",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "coding_project - 实现调度场算法计算器",
+        "input": "用C++实现支持运算符优先级的中缀表达式计算器。要求：1) 使用调度场算法（Shunting-yard）；2) 支持 + - * / 和 ^（乘方）；3) 支持括号和函数（如 sin, cos, sqrt）；4) 处理一元负号；5) 提供详细的解析错误信息",
+        "expectedOutput": "规划实现方案，创建中缀转后缀和求值两个步骤，实现支持函数和运算符优先级的完整计算器",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

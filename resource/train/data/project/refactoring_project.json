@@ -1,0 +1,107 @@
+[
+    {
+        "name": "refactoring_project - 提取公共函数",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 目录中的源代码，找出重复的代码片段，提取为公共函数。要求：1) 识别至少3处重复代码；2) 提取公共函数到合适的工具类；3) 保留原有功能不变；4) 更新所有调用点",
+        "expectedOutput": "先分析代码找重复，然后创建提取后的公共函数并替换调用点，最后编译验证",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 替换为智能指针",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 目录中的代码，将原始指针管理替换为智能指针。要求：1) 找出使用 new/delete 手动管理内存的地方；2) 根据所有权语义选择合适的智能指针（unique_ptr/shared_ptr）；3) 移除对应的 delete 调用；4) 使用 std::make_unique/make_shared",
+        "expectedOutput": "先搜索 new/delete 使用位置，然后逐个替换为智能指针，编译验证无内存管理错误",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 添加const正确性",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/tools/filesystem.h 中的函数，添加 const 正确性。要求：1) 不修改成员变量的成员函数标记为 const；2) 引用参数尽可能标记为 const&；3) 返回值可以 const 的添加 const；4) 不破坏现有接口兼容性",
+        "expectedOutput": "先分析头文件中的函数声明，然后逐项添加 const 限定，确保不破坏已有接口",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用范围for替换索引循环",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 目录中的代码，将传统的索引 for 循环（for (int i = 0; i < vec.size(); ++i)）替换为 C++11 范围 for 循环（for (auto& elem : vec)）。保留需要索引的情况（如同时操作多个容器）",
+        "expectedOutput": "搜索代码中传统的索引循环，分析哪些可以安全替换，逐个替换为范围 for 循环",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用emplace替换push_back",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的代码，将 push_back 替换为 emplace_back。要求：1) 替换构造临时对象后 push_back 的模式（如 vec.push_back(Foo(a,b)) 改为 vec.emplace_back(a,b)）；2) 不需要修改已构造变量 push_back 的情况",
+        "expectedOutput": "搜索 push_back 调用点，分析是否可替换为 emplace_back 以避免不必要的拷贝",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用override关键字",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的虚函数，添加 C++11 override 关键字。要求：1) 找出所有重写基类虚函数的地方；2) 添加 override 关键字；3) 移除多余的 virtual 关键字（override 已隐含 virtual）；4) 编译验证无错误",
+        "expectedOutput": "搜索虚函数定义，识别重写基类虚函数的位置，添加 override 关键字",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用auto简化类型声明",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的代码，在合适的地方使用 auto 简化声明。要求：1) 迭代器类型声明使用 auto；2) new 表达式结果使用 auto（auto* ptr = new Foo()）；3) 长模板类型（如 std::map<std::string, std::vector<int>>::iterator）使用 auto；4) 不影响可读性",
+        "expectedOutput": "搜索冗长的类型声明位置，分析是否适合使用 auto 简化，逐个替换",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用enum class替换enum",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的代码，将传统 enum 替换为 C++11 enum class。要求：1) 找出所有传统 enum 定义；2) 分析使用这些枚举的代码；3) 替换为 enum class；4) 更新所有枚举值的引用方式",
+        "expectedOutput": "搜索 enum 定义，识别传统 enum，替换为 enum class 并更新所有引用处",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用deleted函数禁用拷贝",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的类，使用 =delete 明确禁用不需要的特殊成员函数。要求：1) 对于不应拷贝的 RAII 类，使用 =delete 删除拷贝构造和拷贝赋值；2) 对不需要默认构造的类，使用 =delete；3) 替换以前将拷贝构造声明为 private 的方式",
+        "expectedOutput": "分析类定义，识别应该禁用拷贝或默认构造的类，使用 =delete 替代 private 声明的方式",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用defaulted函数",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的代码，使用 =default 显式声明平凡的成员函数。要求：1) 空的析构函数改为 =default；2) 平凡的拷贝构造/赋值改为 =default；3) 平凡的默认构造改为 =default；4) 移动构造函数和移动赋值",
+        "expectedOutput": "搜索空的特殊成员函数实现，替换为 =default 声明，让编译器自动生成",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用noexcept标注",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的不抛出异常的函数，添加 noexcept 说明。要求：1) 移动构造函数和移动赋值应 noexcept；2) swap 函数应 noexcept；3) 不会抛出异常的函数添加 noexcept；4) 不影响现有代码的行为",
+        "expectedOutput": "分析函数实现，识别不会抛出异常的函数，添加 noexcept 说明符",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用结构化绑定",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 中的代码，使用 C++17 结构化绑定简化代码。要求：1) map/set 的 insert 返回值处理使用 auto [iter, inserted]；2) 返回 pair/tuple 的函数调用处使用结构化绑定",
+        "expectedOutput": "搜索 pair/tuple 解构的代码，替换为结构化绑定语法",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用if constexpr优化",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的模板代码，使用 C++17 if constexpr 优化编译期分支。要求：1) 替换 SFINAE enable_if 的用法；2) 编译期条件分支使用 if constexpr 替代运行期 if；3) 减少实例化代码量",
+        "expectedOutput": "搜索模板代码中的 SFINAE 和 enable_if 用法，评估替换为 if constexpr 的可行性",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用std::optional处理可选值",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的代码，使用 std::optional 表达可选值。要求：1) 替换通过输出参数返回数据的方式；2) 替换通过特殊值（如 -1，nullptr）表示无数据的模式；3) 使用 std::nullopt 表示空值",
+        "expectedOutput": "搜索通过特殊值表示无数据的模式，评估替换为 std::optional 的可行性并实施",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "refactoring_project - 用std::variant替代union",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 中的代码，使用 std::variant 替代传统 union。要求：1) 查找现有的 union 定义；2) 分析使用场景；3) 替换为 std::variant；4) 使用 std::visit 访问变体内容",
+        "expectedOutput": "搜索 union 定义，分析是否适合替换为 std::variant，实施替换并更新访问方式",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

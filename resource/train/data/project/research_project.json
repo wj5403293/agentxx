@@ -1,0 +1,107 @@
+[
+    {
+        "name": "research_project - 研究C++20协程用法",
+        "input": "研究 C++20 协程（Coroutines）的基本用法。需要：1) 获取 cppreference 上关于协程的文档；2) 了解 co_await、co_yield、co_return 的用法；3) 查找一个简单的协程示例代码；4) 总结协程的关键概念和最佳实践",
+        "expectedOutput": "通过 web_fetch_url 获取文档，阅读后总结协程的核心概念、语法和示例，形成有结构的说明",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究C++内存模型",
+        "input": "研究 C++11 内存模型（Memory Model）的基本概念。需要：1) 查找资料了解 memory_order 的各种类型和含义；2) 理解 happens-before 关系；3) 了解 atomic 操作的使用场景；4) 对比 lock-free 和基于锁的并发编程",
+        "expectedOutput": "通过 web_fetch_url 或其他来源获取信息，总结内存模型核心概念，用图表和示例帮助理解",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究SFINAE和概念",
+        "input": "研究 C++ SFINAE（Substitution Failure Is Not An Error）和 C++20 Concepts 的用法对比。需要：1) 理解 SFINAE 的实现原理（使用 enable_if）；2) 了解 C++20 Concepts 的语法；3) 对比两者的优缺点；4) 给出概念替换 SFINAE 的迁移示例",
+        "expectedOutput": "获取文档资料，总结 SFINAE 和 Concepts 的原理，编写对比分析和迁移示例",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究CRTP模式",
+        "input": "研究 C++ CRTP（Curiously Recurring Template Pattern）模式。需要：1) 了解 CRTP 的实现方式；2) 查找 CRTP 的主要应用场景（如静态多态、对象计数、enable_shared_from_this）；3) 对比 CRTP 和虚函数多态的性能差异",
+        "expectedOutput": "获取资料，总结 CRTP 的原理、实现方式和应用场景，提供代码示例说明",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究RVO和移动语义",
+        "input": "研究 C++ 返回值优化（RVO/NRVO）和移动语义的性能影响。需要：1) 理解 RVO 的编译优化原理；2) 了解何时 RVO 生效/失效；3) 移动语义的引入对性能的影响；4) 编写验证 RVO 行为的测试代码",
+        "expectedOutput": "获取资料，解释 RVO 和移动语义的原理，编写测试代码验证不同编译器行为",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究现代CMake用法",
+        "input": "研究现代 CMake（3.20+）的最佳实践。需要：1) 了解 target-based 构建的优缺点；2) 查找 interface/tests 的使用方式；3) 了解 find_package 和 FetchContent 的用法；4) 了解 C++ 标准设置的最佳实践",
+        "expectedOutput": "获取 CMake 官方文档，总结现代 CMake 的主要特性和最佳实践，提供示例 CMakeLists.txt",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究protobuf vs json",
+        "input": "对比研究 Protocol Buffers 和 JSON 在 C++ 项目中的使用。需要：1) 了解 protobuf 的编译和使用流程；2) 对比序列化性能（大小和速度）；3) 了解 schema 演变和数据兼容性；4) 给出选型建议",
+        "expectedOutput": "获取两种技术文档，对比分析优缺点，给出基于不同场景的选型建议和代码示例",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究HTTP客户端库对比",
+        "input": "对比 C++ 中常用的 HTTP 客户端库（libcurl, cpprestsdk, Boost.Beast 等）。需要：1) 了解各库的 API 风格；2) 对比性能、易用性、跨平台支持；3) 了解各库的 License；4) 给出选型建议",
+        "expectedOutput": "通过 web_fetch_url 获取各库的文档和评测，给出对比分析和选型建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究日志库对比",
+        "input": "对比 C++ 主流日志库（spdlog, glog, Boost.Log, fmtlog）。需要：1) 了解各库的特性；2) 对比性能（吞吐量、延迟）；3) 了解配置灵活性；4) 给出基于不同场景的推荐",
+        "expectedOutput": "获取各日志库的文档和基准测试数据，编写对比分析报告和推荐建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究SQLite C++集成",
+        "input": "研究如何在 C++ 项目中集成和使用 SQLite。需要：1) 了解 SQLite C API 的基本使用；2) 查找 C++ 封装库（如 sqlite_orm, sqlpp11）；3) 了解 ORM 和直接使用 C API 的权衡；4) 给出一个简单的集成示例",
+        "expectedOutput": "获取 SQLite 文档和 C++ 封装库信息，总结集成方案，提供示例代码",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究单元测试框架对比",
+        "input": "对比 C++ 单元测试框架（Google Test, Catch2, Boost.Test, doctest）。需要：1) 了解各框架的特性（断言、mock、参数化测试等）；2) 对比编译速度和运行时性能；3) 了解各框架的头文件依赖和可移植性；4) 给出推荐",
+        "expectedOutput": "获取各测试框架的文档和用户评价，编写对比分析报告，为不同项目类型推荐合适的框架",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究编译时间优化技术",
+        "input": "研究 C++ 编译时间优化技术。需要：1) 了解 Pimpl 模式的优劣；2) 研究预编译头（PCH）的使用；3) 了解模块（C++20 Modules）的进展和支持情况；4) 研究 Unity Build；5) 总结各技术的适用场景和优化效果",
+        "expectedOutput": "获取资料了解各种编译优化技术，总结技术原理、优缺点和实际优化效果数据",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究LLVM/Clang工具链",
+        "input": "研究如何使用 LLVM/Clang 工具链进行 C++ 代码分析。需要：1) 了解 clang-tidy 的规则配置和使用；2) 了解 clang-format 的格式配置和集成；3) 了解 clangd（LSP）的用法；4) 了解使用 clang AST 进行自定义代码分析的方案",
+        "expectedOutput": "获取 Clang 工具链文档，总结各工具的使用方法、配置示例和在项目中的应用",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究CI/CD最佳实践",
+        "input": "研究 C++ 项目 CI/CD 的最佳实践。需要：1) 了解 GitHub Actions / GitLab CI 的 C++ 项目配置；2) 了解缓存策略（ccache、sccache）的使用；3) 了解跨平台构建矩阵配置；4) 了解自动测试和代码质量检查的集成",
+        "expectedOutput": "获取 CI/CD 配置案例和最佳实践，总结 C++ 项目的 CI/CD 配置方案",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "research_project - 研究Docker容器化C++应用",
+        "input": "研究如何将 C++ 应用容器化。需要：1) 了解多阶段构建（Multi-stage Build）减少镜像大小；2) 了解基础镜像选择（Alpine, Ubuntu, Debian 等）；3) 了解如何处理运行时依赖；4) 编写一个 Dockerfile 示例",
+        "expectedOutput": "获取 Docker 和 C++ 容器化的资料，总结最佳实践，编写多阶段构建的 Dockerfile 示例",
+        "equalOutput": "",
+        "extra": {}
+    }
+]

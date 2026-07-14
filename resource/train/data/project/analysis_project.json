@@ -1,0 +1,107 @@
+[
+    {
+        "name": "analysis_project - 分析C++代码中内存泄漏风险",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 目录下的 C++ 源码文件，找出可能的内存泄漏风险。重点关注：1) new/delete 是否配对；2) 动态分配的内存是否在异常路径上被释放；3) 是否使用了智能指针",
+        "expectedOutput": "先列出需要检查的文件，逐文件分析 new/delete 使用情况，报告潜在的内存泄漏风险和修复建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析代码复杂度",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/tools/ 目录下的头文件，计算每个文件的圈复杂度（Cyclomatic Complexity）。重点关注：1) 条件分支数量；2) 循环嵌套深度；3) 函数参数数量；4) 标识复杂度最高的文件和函数并给出简化建议",
+        "expectedOutput": "先说明圈复杂度的计算方法，然后逐文件分析，报告复杂度统计结果和优化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析代码重复",
+        "input": "检查 {agentxx_root}/agent/lib/src/ 目录下的 C++ 源码，查找重复代码。找出：1) 完全相同的代码块；2) 结构相似只有变量名不同的代码；3) 可提取为公共函数的重复逻辑",
+        "expectedOutput": "先规划查找策略，然后执行重复代码检测，报告重复的位置、规模和提取公共函数的建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析头文件依赖关系",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 目录下的头文件依赖关系。要求：1) 绘制 include 依赖图；2) 找出循环依赖；3) 识别不必要的 include；4) 建议使用前置声明替代 include 的位置",
+        "expectedOutput": "遍历所有头文件分析 #include 语句，报告依赖关系、循环依赖和不必要的 include 问题",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析代码风格一致性",
+        "input": "检查 {agentxx_root}/agent/lib/include/agentxx/ 目录下的头文件是否遵循一致的代码风格。检查项：1) 命名约定（snake_case/camelCase 等）；2) 缩进空格 vs 制表符；3) 大括号位置；4) const 正确性；5) include guard 风格",
+        "expectedOutput": "逐项检查代码风格规则，报告不一致的地方，给出统一的风格建议参考",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析异常安全性",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 目录下的 C++ 源码的异常安全性。重点关注：1) 可能抛出异常的路径上是否有资源泄漏；2) 析构函数是否 noexcept；3) move 操作是否 noexcept；4) 是否使用 RAII 管理资源",
+        "expectedOutput": "逐文件检查异常安全性问题，报告异常不安全的位置和改进建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析性能热点",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/tools/ 目录下的头文件，识别性能问题。检查点：1) 值传递大对象；2) 不必要的拷贝；3) 未使用移动语义；4) 容器选择是否合理；5) 频繁的动态内存分配",
+        "expectedOutput": "逐文件检查性能问题，报告值传递大对象、不必要的拷贝等性能热点位置和优化建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析多线程安全性",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 目录下的源码中多线程安全性。检查：1) 共享数据的访问是否有锁保护；2) 是否有死锁风险；3) 条件变量使用是否正确；4) 原子操作使用是否合理",
+        "expectedOutput": "逐文件分析多线程相关代码，报告线程安全问题位置和修复建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析未使用的代码",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/tools/ 目录中未使用的代码。检查：1) 未使用的 include 头文件；2) 未使用的函数/方法；3) 未使用的成员变量；4) 未使用的 typedef/using",
+        "expectedOutput": "逐文件分析，标记未使用的 include、函数和变量，给出清理建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析代码可移植性",
+        "input": "分析 {agentxx_root}/agent/lib/src/ 和 include 目录中代码的可移植性问题。检查：1) 是否使用了非标准扩展；2) 平台相关的预处理器宏；3) 字节序假设；4) 大小端处理；5) 文件路径分隔符处理",
+        "expectedOutput": "逐文件检查可移植性问题，报告非标准扩展和平台相关假设，给出跨平台修改建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析API设计一致性",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/tools/ 目录中工具类的 API 设计一致性。检查：1) 命名风格是否统一；2) 参数顺序是否一致；3) 错误处理方式是否统一；4) 返回值类型风格是否一致",
+        "expectedOutput": "比较各工具类 API 的设计模式，报告不一致的地方，给出统一的 API 设计建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析第三方依赖管理",
+        "input": "分析整个 AgentXX 项目的第三方依赖情况。检查：1) 使用的第三方库列表；2) 各库的使用范围和理由；3) 是否有不必要的依赖；4) 依赖版本是否过时；5) 是否存在 License 兼容性问题",
+        "expectedOutput": "先查看 CMakeLists.txt 等构建文件，列出所有第三方依赖，分析必要性和版本状态",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析测试覆盖率",
+        "input": "分析 {agentxx_root}/agent/test/ 目录下的测试代码对应的覆盖率。找出：1) 哪些核心类没有被测试覆盖；2) 哪些函数的测试用例不够全面；3) 边界条件和异常路径的测试覆盖情况",
+        "expectedOutput": "先列出所有源文件中的类/函数，然后与测试文件对比，报告未被测试覆盖的部分和测试增强建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析构建时间优化",
+        "input": "分析 AgentXX 项目的 CMakeLists.txt 构建系统，找出影响构建速度的因素并提出优化建议。检查：1) include 依赖是否过多；2) 是否使用了预编译头；3) 是否有不必要的重新编译；4) 模块划分是否合理",
+        "expectedOutput": "先分析 CMakeLists.txt 和头文件依赖，报告影响构建性能的因素，给出优化构建配置的建议",
+        "equalOutput": "",
+        "extra": {}
+    },
+    {
+        "name": "analysis_project - 分析编译警告",
+        "input": "分析 {agentxx_root}/agent/lib/include/agentxx/ 目录中的头文件，在编译这些文件时可能产生的编译器警告。检查：1) 未使用的参数；2) 隐式类型转换；3) 有符号/无符号不匹配；4) 可能丢失数据的缩窄转换",
+        "expectedOutput": "逐文件检查可能的编译警告场景，报告每种警告的位置和修复方法",
+        "equalOutput": "",
+        "extra": {}
+    }
+]
