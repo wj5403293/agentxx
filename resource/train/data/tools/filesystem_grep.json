@@ -8,8 +8,8 @@
     },
     {
         "name": "filesystem_grep - 搜索类名定义",
-        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'class FileSystemListFileTool' 的行，使用正则模式，输出模式为 content",
-        "expectedOutput": "返回包含 'class FileSystemListFileTool' 的匹配内容及所在行号，文件路径应为 filesystem.h",
+        "input": "在 {agentxx_root}/agent/lib/include 目录下搜索所有 .h 文件中包含 'class FileSystemListTool' 的行，使用正则模式，输出模式为 content",
+        "expectedOutput": "返回包含 'class FileSystemListTool' 的匹配内容及所在行号，文件路径应为 filesystem.h",
         "equalOutput": "",
         "extra": {}
     },

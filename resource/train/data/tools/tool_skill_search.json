@@ -114,7 +114,7 @@
     {
         "name": "tool_skill_search - 搜索文件列表工具",
         "input": "请帮我搜索可以用于列出目录中文件的工具或技能",
-        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_list_file 和 filesystem_list_file_recursive 工具",
+        "expectedOutput": "返回 JSON 对象，tool 数组应包含 filesystem_list 和 filesystem_list_recursive 工具",
         "equalOutput": "",
         "extra": {}
     },

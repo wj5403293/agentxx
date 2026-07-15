@@ -350,8 +350,8 @@
         "extra": {}
     },
     {
-        "name": "codegraph_callers - 获取FileSystemListFileTool::execute_async调用者",
-        "input": "查找调用 FileSystemListFileTool::execute_async 的代码",
+        "name": "codegraph_callers - 获取FileSystemListTool::execute_async调用者",
+        "input": "查找调用 FileSystemListTool::execute_async 的代码",
         "expectedOutput": "返回调用目录列表执行函数的代码位置",
         "equalOutput": "",
         "extra": {}

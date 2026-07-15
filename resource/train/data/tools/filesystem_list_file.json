@@ -1,706 +1,706 @@
 [
     {
-        "name": "filesystem_list_file - 列出根目录下的文件",
+        "name": "filesystem_list - 列出根目录下的文件",
         "input": "请列出 {agentxx_root} 目录下的所有文件和文件夹",
         "expectedOutput": "返回 {agentxx_root} 目录下的文件和文件夹列表，包含名称、类型、大小、修改时间等信息",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出agent目录",
+        "name": "filesystem_list - 列出agent目录",
         "input": "列出 {agentxx_root}/agent 目录的内容",
         "expectedOutput": "返回 {agentxx_root}/agent 目录下的文件和子目录列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出lib目录",
+        "name": "filesystem_list - 列出lib目录",
         "input": "请查看 {agentxx_root}/agent/lib 目录下有哪些文件",
         "expectedOutput": "返回 {agentxx_root}/agent/lib 目录下的内容列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出include目录",
+        "name": "filesystem_list - 列出include目录",
         "input": "列出 {agentxx_root}/agent/lib/include 目录的内容",
         "expectedOutput": "返回 include 目录下的文件和子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出tools目录",
+        "name": "filesystem_list - 列出tools目录",
         "input": "查看 {agentxx_root}/agent/lib/include/agentxx/tools 目录下有哪些头文件",
         "expectedOutput": "返回 tools 目录下的 .h 头文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出resource目录",
+        "name": "filesystem_list - 列出resource目录",
         "input": "列出 {agentxx_root}/resource 目录下的内容",
         "expectedOutput": "返回 resource 目录下的文件和子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出train目录",
+        "name": "filesystem_list - 列出train目录",
         "input": "查看 {agentxx_root}/resource/train 目录的内容",
         "expectedOutput": "返回 train 目录下的文件和子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出data目录",
+        "name": "filesystem_list - 列出data目录",
         "input": "列出 {agentxx_root}/resource/train/data 目录下的所有JSON文件",
         "expectedOutput": "返回 data 目录下的 .json 文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出agent/agent目录",
+        "name": "filesystem_list - 列出agent/agent目录",
         "input": "查看 {agentxx_root}/agent/lib/include/agentxx/agent 目录",
         "expectedOutput": "返回 agent 目录下的头文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看当前工作目录",
+        "name": "filesystem_list - 查看当前工作目录",
         "input": "列出当前工作目录下的所有内容",
         "expectedOutput": "返回当前工作目录的文件和文件夹列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出temp目录",
+        "name": "filesystem_list - 列出temp目录",
         "input": "查看 {agentxx_root}/temp 目录下是否有文件",
         "expectedOutput": "返回 temp 目录的内容列表，如果目录不存在则返回错误信息",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出resource目录结构",
+        "name": "filesystem_list - 列出resource目录结构",
         "input": "请列出 {agentxx_root}/resource 目录下的所有文件和子目录",
         "expectedOutput": "返回 resource 目录的完整内容列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看agentxx根目录",
+        "name": "filesystem_list - 查看agentxx根目录",
         "input": "列出 {agentxx_root} 下的顶层目录和文件",
         "expectedOutput": "返回根目录下的所有顶级项",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出agent/lib/include/agentxx目录",
+        "name": "filesystem_list - 列出agent/lib/include/agentxx目录",
         "input": "查看 {agentxx_root}/agent/lib/include/agentxx 目录下的内容",
         "expectedOutput": "返回 agentxx 目录下的子目录和文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有头文件",
+        "name": "filesystem_list - 列出所有头文件",
         "input": "请列出 {agentxx_root}/agent/lib/include/agentxx/tools 目录下的所有 .h 文件",
         "expectedOutput": "返回 tools 目录下所有 .h 文件的列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出skill目录",
+        "name": "filesystem_list - 列出skill目录",
         "input": "查看 {agentxx_root}/resource/skills 目录下有哪些内容",
         "expectedOutput": "返回 skills 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出resource/train目录",
+        "name": "filesystem_list - 列出resource/train目录",
         "input": "请列出 {agentxx_root}/resource/train 目录下的所有子目录",
         "expectedOutput": "返回 train 目录下的子目录列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看CMakeLists所在目录",
+        "name": "filesystem_list - 查看CMakeLists所在目录",
         "input": "列出 {agentxx_root} 目录的内容，找CMakeLists.txt",
         "expectedOutput": "返回根目录内容列表，包含 CMakeLists.txt",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有子目录",
+        "name": "filesystem_list - 列出所有子目录",
         "input": "请列出 {agentxx_root}/agent 下的所有子目录",
         "expectedOutput": "返回 agent 目录下的子目录列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看.gitignore所在目录",
+        "name": "filesystem_list - 查看.gitignore所在目录",
         "input": "列出 {agentxx_root} 目录，确认 .gitignore 文件存在",
         "expectedOutput": "返回根目录内容列表，包含 .gitignore",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出build目录",
+        "name": "filesystem_list - 列出build目录",
         "input": "查看 {agentxx_root}/build 目录下是否有编译产物",
         "expectedOutput": "返回 build 目录的内容列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出cmake目录",
+        "name": "filesystem_list - 列出cmake目录",
         "input": "查看 {agentxx_root}/cmake 目录的内容",
         "expectedOutput": "返回 cmake 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出third_party目录",
+        "name": "filesystem_list - 列出third_party目录",
         "input": "查看 {agentxx_root}/third_party 目录下有哪些第三方库",
         "expectedOutput": "返回 third_party 目录下的子目录列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出doc目录",
+        "name": "filesystem_list - 列出doc目录",
         "input": "查看 {agentxx_root}/doc 目录的内容",
         "expectedOutput": "返回 doc 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出test目录",
+        "name": "filesystem_list - 列出test目录",
         "input": "查看 {agentxx_root}/test 目录下有哪些测试文件",
         "expectedOutput": "返回 test 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出script目录",
+        "name": "filesystem_list - 列出script目录",
         "input": "查看 {agentxx_root}/script 目录的内容",
         "expectedOutput": "返回 script 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出config目录",
+        "name": "filesystem_list - 列出config目录",
         "input": "查看 {agentxx_root}/config 目录的配置文件",
         "expectedOutput": "返回 config 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出example目录",
+        "name": "filesystem_list - 列出example目录",
         "input": "查看 {agentxx_root}/example 目录下的示例",
         "expectedOutput": "返回 example 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有顶层目录",
+        "name": "filesystem_list - 列出所有顶层目录",
         "input": "请列出 {agentxx_root} 下所有的子目录",
         "expectedOutput": "返回根目录下所有子目录的列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有顶层文件",
+        "name": "filesystem_list - 列出所有顶层文件",
         "input": "请列出 {agentxx_root} 下所有的顶层文件",
         "expectedOutput": "返回根目录下所有文件的列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看resources目录",
+        "name": "filesystem_list - 查看resources目录",
         "input": "列出 {agentxx_root}/resources 目录的内容",
         "expectedOutput": "返回 resources 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看data目录",
+        "name": "filesystem_list - 查看data目录",
         "input": "列出 {agentxx_root}/data 目录的内容",
         "expectedOutput": "返回 data 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看output目录",
+        "name": "filesystem_list - 查看output目录",
         "input": "查看 {agentxx_root}/output 目录下是否有输出文件",
         "expectedOutput": "返回 output 目录的内容列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看log目录",
+        "name": "filesystem_list - 查看log目录",
         "input": "列出 {agentxx_root}/log 目录下的日志文件",
         "expectedOutput": "返回 log 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看bin目录",
+        "name": "filesystem_list - 查看bin目录",
         "input": "列出 {agentxx_root}/bin 目录下的可执行文件",
         "expectedOutput": "返回 bin 目录下的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有C++源文件",
+        "name": "filesystem_list - 列出所有C++源文件",
         "input": "在 {agentxx_root}/agent 目录下列出所有 .cpp 文件",
         "expectedOutput": "返回 agent 目录下所有 .cpp 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有头文件_递归",
+        "name": "filesystem_list - 列出所有头文件_递归",
         "input": "列出 {agentxx_root}/agent/lib/include 下所有 .h 文件",
         "expectedOutput": "返回 include 目录下所有 .h 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有CMake文件",
+        "name": "filesystem_list - 列出所有CMake文件",
         "input": "在 {agentxx_root} 下列出所有 CMakeLists.txt 文件",
         "expectedOutput": "返回所有 CMakeLists.txt 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看resource/train/data目录",
+        "name": "filesystem_list - 查看resource/train/data目录",
         "input": "列出 {agentxx_root}/resource/train/data 目录的内容",
         "expectedOutput": "返回 data 目录下所有 JSON 训练用例文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出根目录下所有项",
+        "name": "filesystem_list - 列出根目录下所有项",
         "input": "请展示 {agentxx_root} 目录的完整内容",
         "expectedOutput": "返回根目录下的所有文件和子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看agent/lib目录结构",
+        "name": "filesystem_list - 查看agent/lib目录结构",
         "input": "列出 {agentxx_root}/agent/lib 下的目录结构",
         "expectedOutput": "返回 lib 目录下的子目录和文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看include第一层目录",
+        "name": "filesystem_list - 查看include第一层目录",
         "input": "列出 {agentxx_root}/agent/lib/include 下的子目录",
         "expectedOutput": "返回 include 下的子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看agentxx/tools目录",
+        "name": "filesystem_list - 查看agentxx/tools目录",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/tools 的所有文件",
         "expectedOutput": "返回 tools 目录下所有头文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看resource子目录",
+        "name": "filesystem_list - 查看resource子目录",
         "input": "列出 {agentxx_root}/resource 下的所有子目录",
         "expectedOutput": "返回 resource 的子目录列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查找resource/train子目录",
+        "name": "filesystem_list - 查找resource/train子目录",
         "input": "查看 {agentxx_root}/resource/train 下有哪些子目录",
         "expectedOutput": "返回 train 目录的子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出data目录所有文件",
+        "name": "filesystem_list - 列出data目录所有文件",
         "input": "列出 {agentxx_root}/resource/train/data 中所有文件",
         "expectedOutput": "返回 data 目录中所有 JSON 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看agent/lib/include/agentxx/agent",
+        "name": "filesystem_list - 查看agent/lib/include/agentxx/agent",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/agent 目录",
         "expectedOutput": "返回 agent 子目录下的头文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有子目录不递归",
+        "name": "filesystem_list - 列出所有子目录不递归",
         "input": "列出 {agentxx_root}/agent 下的所有子目录（不递归）",
         "expectedOutput": "返回 agent 的直接子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有文件不递归",
+        "name": "filesystem_list - 列出所有文件不递归",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx 下的所有文件（不递归）",
         "expectedOutput": "返回 agentxx 目录的直接文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看vcpkg目录",
+        "name": "filesystem_list - 查看vcpkg目录",
         "input": "列出 {agentxx_root}/vcpkg 目录的内容",
         "expectedOutput": "返回 vcpkg 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看external目录",
+        "name": "filesystem_list - 查看external目录",
         "input": "列出 {agentxx_root}/external 目录的内容",
         "expectedOutput": "返回 external 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看src目录",
+        "name": "filesystem_list - 查看src目录",
         "input": "列出 {agentxx_root}/src 目录的内容",
         "expectedOutput": "返回 src 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看include目录子目录",
+        "name": "filesystem_list - 查看include目录子目录",
         "input": "列出 {agentxx_root}/agent/lib/include 下所有的子目录",
         "expectedOutput": "返回 include 目录的子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看lib目录子目录",
+        "name": "filesystem_list - 查看lib目录子目录",
         "input": "列出 {agentxx_root}/agent/lib 下所有的子目录",
         "expectedOutput": "返回 lib 目录的子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看agentxx子目录",
+        "name": "filesystem_list - 查看agentxx子目录",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx 下所有的子目录",
         "expectedOutput": "返回 agentxx 的子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看tools子目录",
+        "name": "filesystem_list - 查看tools子目录",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/tools 下所有的子目录",
         "expectedOutput": "返回 tools 的子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有隐藏文件",
+        "name": "filesystem_list - 列出所有隐藏文件",
         "input": "列出 {agentxx_root} 目录下的所有隐藏文件和目录",
         "expectedOutput": "返回根目录下的隐藏文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有非隐藏文件",
+        "name": "filesystem_list - 列出所有非隐藏文件",
         "input": "列出 {agentxx_root} 目录下的所有非隐藏文件",
         "expectedOutput": "返回根目录下非隐藏文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 按文件大小排序",
+        "name": "filesystem_list - 按文件大小排序",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/tools 目录并按文件大小排序",
         "expectedOutput": "返回按大小排序的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 按修改时间排序",
+        "name": "filesystem_list - 按修改时间排序",
         "input": "列出 {agentxx_root}/resource/train/data 目录并按修改时间排序",
         "expectedOutput": "返回按修改时间排序的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出大于1KB的文件",
+        "name": "filesystem_list - 列出大于1KB的文件",
         "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录中列出大于1KB的文件",
         "expectedOutput": "返回大于1KB的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.json文件",
+        "name": "filesystem_list - 列出所有.json文件",
         "input": "在 {agentxx_root}/resource/train/data 目录中列出所有 .json 文件",
         "expectedOutput": "返回所有 .json 文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.h文件",
+        "name": "filesystem_list - 列出所有.h文件",
         "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录中列出所有 .h 文件",
         "expectedOutput": "返回所有 .h 文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.cpp文件",
+        "name": "filesystem_list - 列出所有.cpp文件",
         "input": "在 {agentxx_root}/agent 目录中列出所有 .cpp 文件",
         "expectedOutput": "返回所有 .cpp 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.txt文件",
+        "name": "filesystem_list - 列出所有.txt文件",
         "input": "在 {agentxx_root} 目录中列出所有 .txt 文件",
         "expectedOutput": "返回所有 .txt 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.md文件",
+        "name": "filesystem_list - 列出所有.md文件",
         "input": "在 {agentxx_root} 目录中列出所有 .md 文件",
         "expectedOutput": "返回所有 .md 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.yml文件",
+        "name": "filesystem_list - 列出所有.yml文件",
         "input": "在 {agentxx_root} 目录中列出所有 .yml 文件",
         "expectedOutput": "返回所有 .yml 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.yaml文件",
+        "name": "filesystem_list - 列出所有.yaml文件",
         "input": "在 {agentxx_root} 目录中列出所有 .yaml 文件",
         "expectedOutput": "返回所有 .yaml 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.xml文件",
+        "name": "filesystem_list - 列出所有.xml文件",
         "input": "在 {agentxx_root} 目录中列出所有 .xml 文件",
         "expectedOutput": "返回所有 .xml 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.py文件",
+        "name": "filesystem_list - 列出所有.py文件",
         "input": "在 {agentxx_root} 目录中列出所有 .py 文件",
         "expectedOutput": "返回所有 .py 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.sh文件",
+        "name": "filesystem_list - 列出所有.sh文件",
         "input": "在 {agentxx_root} 目录中列出所有 .sh 文件",
         "expectedOutput": "返回所有 .sh 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.bat文件",
+        "name": "filesystem_list - 列出所有.bat文件",
         "input": "在 {agentxx_root} 目录中列出所有 .bat 文件",
         "expectedOutput": "返回所有 .bat 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.ps1文件",
+        "name": "filesystem_list - 列出所有.ps1文件",
         "input": "在 {agentxx_root} 目录中列出所有 .ps1 文件",
         "expectedOutput": "返回所有 .ps1 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.dll文件",
+        "name": "filesystem_list - 列出所有.dll文件",
         "input": "在 {agentxx_root} 目录中列出所有 .dll 文件",
         "expectedOutput": "返回所有 .dll 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.exe文件",
+        "name": "filesystem_list - 列出所有.exe文件",
         "input": "在 {agentxx_root} 目录中列出所有 .exe 文件",
         "expectedOutput": "返回所有 .exe 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.so文件",
+        "name": "filesystem_list - 列出所有.so文件",
         "input": "在 {agentxx_root} 目录中列出所有 .so 文件",
         "expectedOutput": "返回所有 .so 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.a文件",
+        "name": "filesystem_list - 列出所有.a文件",
         "input": "在 {agentxx_root} 目录中列出所有 .a 文件",
         "expectedOutput": "返回所有 .a 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.lib文件",
+        "name": "filesystem_list - 列出所有.lib文件",
         "input": "在 {agentxx_root} 目录中列出所有 .lib 文件",
         "expectedOutput": "返回所有 .lib 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.o文件",
+        "name": "filesystem_list - 列出所有.o文件",
         "input": "在 {agentxx_root} 目录中列出所有 .o 文件",
         "expectedOutput": "返回所有 .o 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有.obj文件",
+        "name": "filesystem_list - 列出所有.obj文件",
         "input": "在 {agentxx_root} 目录中列出所有 .obj 文件",
         "expectedOutput": "返回所有 .obj 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出.git目录",
+        "name": "filesystem_list - 列出.git目录",
         "input": "查看 {agentxx_root}/.git 目录是否存在",
         "expectedOutput": "如果 .git 目录存在则返回其内容，否则返回错误",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出.vs目录",
+        "name": "filesystem_list - 列出.vs目录",
         "input": "查看 {agentxx_root}/.vs 目录的内容",
         "expectedOutput": "返回 .vs 目录的内容",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出.vscode目录",
+        "name": "filesystem_list - 列出.vscode目录",
         "input": "查看 {agentxx_root}/.vscode 目录的内容",
         "expectedOutput": "返回 .vscode 目录的内容",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出.idea目录",
+        "name": "filesystem_list - 列出.idea目录",
         "input": "查看 {agentxx_root}/.idea 目录的内容",
         "expectedOutput": "返回 .idea 目录的内容",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出CMakeFiles目录",
+        "name": "filesystem_list - 列出CMakeFiles目录",
         "input": "查看 {agentxx_root}/build/CMakeFiles 目录的内容",
         "expectedOutput": "返回 CMakeFiles 目录的内容",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出不存在的目录",
+        "name": "filesystem_list - 列出不存在的目录",
         "input": "列出 {agentxx_root}/nonexistent_directory 目录的内容",
         "expectedOutput": "返回错误信息，提示目录不存在",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出resource/temp目录",
+        "name": "filesystem_list - 列出resource/temp目录",
         "input": "查看 {agentxx_root}/resource/temp 目录的内容",
         "expectedOutput": "返回 temp 目录的内容列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出resource/skills目录",
+        "name": "filesystem_list - 列出resource/skills目录",
         "input": "列出 {agentxx_root}/resource/skills 目录的内容",
         "expectedOutput": "返回 skills 目录的资料文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出resource/prompt目录",
+        "name": "filesystem_list - 列出resource/prompt目录",
         "input": "查看 {agentxx_root}/resource/prompt 目录下有哪些提示词文件",
         "expectedOutput": "返回 prompt 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有目录不包括文件",
+        "name": "filesystem_list - 列出所有目录不包括文件",
         "input": "在 {agentxx_root} 目录中只列出子目录，不列出文件",
         "expectedOutput": "返回根目录下所有子目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出所有文件不包括目录",
+        "name": "filesystem_list - 列出所有文件不包括目录",
         "input": "在 {agentxx_root}/agent/lib/include/agentxx/tools 目录中只列出文件，不列出子目录",
         "expectedOutput": "返回 tools 目录下所有文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出目录并显示详细信息",
+        "name": "filesystem_list - 列出目录并显示详细信息",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/tools 目录的详细信息",
         "expectedOutput": "返回完整的文件信息列表，包含大小、修改时间、权限等",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看项目根目录结构",
+        "name": "filesystem_list - 查看项目根目录结构",
         "input": "请展示 {agentxx_root} 项目的根目录结构",
         "expectedOutput": "返回根目录的完整内容",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出agent源代码目录",
+        "name": "filesystem_list - 列出agent源代码目录",
         "input": "列出 {agentxx_root}/agent 目录下的所有源代码文件",
         "expectedOutput": "返回 agent 目录下的所有 .cpp 和 .h 文件",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看lib目录下所有库文件",
+        "name": "filesystem_list - 查看lib目录下所有库文件",
         "input": "列出 {agentxx_root}/agent/lib 下的所有文件类型",
         "expectedOutput": "返回 lib 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看include下所有头文件类型",
+        "name": "filesystem_list - 查看include下所有头文件类型",
         "input": "列出 {agentxx_root}/agent/lib/include 下所有头文件的类型和数量",
         "expectedOutput": "返回 include 目录的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 查看resource下所有资源类型",
+        "name": "filesystem_list - 查看resource下所有资源类型",
         "input": "列出 {agentxx_root}/resource 下所有资源文件和目录",
         "expectedOutput": "返回 resource 目录的完整内容",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 检查空目录",
+        "name": "filesystem_list - 检查空目录",
         "input": "查看 {agentxx_root}/temp 目录是否为空",
         "expectedOutput": "返回 temp 目录的内容，如果为空则显示空目录",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出目录按名称排序",
+        "name": "filesystem_list - 列出目录按名称排序",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/tools 目录并按名称字母排序",
         "expectedOutput": "返回按名称排序的文件列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出目录按类型排序",
+        "name": "filesystem_list - 列出目录按类型排序",
         "input": "列出 {agentxx_root} 目录并按类型排序（目录在前，文件在后）",
         "expectedOutput": "返回按类型分组排序的内容列表",
         "equalOutput": "",
         "extra": {}
     },
     {
-        "name": "filesystem_list_file - 列出目录显示文件数量",
+        "name": "filesystem_list - 列出目录显示文件数量",
         "input": "列出 {agentxx_root}/agent/lib/include/agentxx/tools 目录并显示文件总数",
         "expectedOutput": "返回文件列表和文件总数",
         "equalOutput": "",

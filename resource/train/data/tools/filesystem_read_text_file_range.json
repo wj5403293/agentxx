@@ -519,7 +519,7 @@
     },
     {
         "name": "filesystem_read_text_file_range - 读取大JSON的中间Range",
-        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_list_file.json 从第200行到第250行",
+        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_list.json 从第200行到第250行",
         "expectedOutput": "返回该JSON文件第200-250行的内容",
         "equalOutput": "",
         "extra": {}

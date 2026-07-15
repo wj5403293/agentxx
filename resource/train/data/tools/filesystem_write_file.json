@@ -463,7 +463,7 @@
     },
     {
         "name": "filesystem_write_file - 写入并验证文件存在",
-        "input": "在 {agentxx_root}/temp/exists.txt 写入内容，然后用 filesystem_list_file 检查文件是否存在",
+        "input": "在 {agentxx_root}/temp/exists.txt 写入内容，然后用 filesystem_list 检查文件是否存在",
         "expectedOutput": "文件创建成功，list结果显示该文件存在",
         "equalOutput": "",
         "extra": {}
@@ -687,7 +687,7 @@
     },
     {
         "name": "filesystem_write_file - 写入后列出目录",
-        "input": "在 {agentxx_root}/temp/list_test/ 下创建 a.txt，然后用 filesystem_list_file 列出该目录",
+        "input": "在 {agentxx_root}/temp/list_test/ 下创建 a.txt，然后用 filesystem_list 列出该目录",
         "expectedOutput": "列出结果中包含 a.txt",
         "equalOutput": "",
         "extra": {}

@@ -673,8 +673,8 @@
     },
     {
         "name": "share_store - 保存工具名称",
-        "input": "将工具名称 filesystem_list_file 保存到共享存储 key 为 tool_name",
-        "expectedOutput": "调用 share_store 设置 key 为 tool_name，value 为 filesystem_list_file",
+        "input": "将工具名称 filesystem_list 保存到共享存储 key 为 tool_name",
+        "expectedOutput": "调用 share_store 设置 key 为 tool_name，value 为 filesystem_list",
         "equalOutput": "",
         "extra": {}
     },

@@ -350,8 +350,8 @@
         "extra": {}
     },
     {
-        "name": "codegraph_callees - FileSystemListFileTool::execute_async被调用",
-        "input": "查找 FileSystemListFileTool::execute_async 内部调用了哪些符号",
+        "name": "codegraph_callees - FileSystemListTool::execute_async被调用",
+        "input": "查找 FileSystemListTool::execute_async 内部调用了哪些符号",
         "expectedOutput": "返回目录列表执行函数内部调用的符号",
         "equalOutput": "",
         "extra": {}

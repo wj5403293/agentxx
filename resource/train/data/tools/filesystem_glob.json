@@ -254,7 +254,7 @@
     {
         "name": "filesystem_glob - 搜索data目录下所有filesystem开头文件",
         "input": "请使用 glob 模式搜索 {agentxx_root}/resource/train/data 目录下所有以 filesystem 开头的 JSON 文件",
-        "expectedOutput": "返回所有匹配 filesystem*.json 模式的文件路径列表，包含 filesystem_list_file.json 等",
+        "expectedOutput": "返回所有匹配 filesystem*.json 模式的文件路径列表，包含 filesystem_list.json 等",
         "equalOutput": "",
         "extra": {}
     },

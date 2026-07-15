@@ -141,7 +141,7 @@
     },
     {
         "name": "filesystem_read_text_file - 读取JSON文件",
-        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_list_file.json 的完整内容",
+        "input": "读取文件 {agentxx_root}/resource/train/data/filesystem_list.json 的完整内容",
         "expectedOutput": "返回该JSON文件的完整文本内容",
         "equalOutput": "",
         "extra": {}
